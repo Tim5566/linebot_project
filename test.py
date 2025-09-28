@@ -1,5 +1,5 @@
 # test_linebot_dummy.py
-from linebot.models import TextMessage, TextSendMessage
+from linebot.models import TextSendMessage
 
 # 匯入你原本的 handle_message 函式
 from linebot_test import handle_message
@@ -16,7 +16,7 @@ class DummyLineBotApi:
         if isinstance(message, TextSendMessage):
             print(f"[Bot 回覆] {message.text}")
 
-# 替換 linebot_test 裡的 line_bot_api
+# 替換 linebot_test 裡的 line_bot_api 為 Dummy
 import linebot_test
 linebot_test.line_bot_api = DummyLineBotApi()
 
