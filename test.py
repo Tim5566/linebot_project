@@ -21,7 +21,7 @@ import linebot_test
 linebot_test.line_bot_api = DummyLineBotApi()
 
 # 測試訊息
-test_messages = ["2330", "台積電", "1234"]
+test_messages = ["2330", "台積電"]
 
 for msg in test_messages:
     print(f"[模擬使用者] {msg}")
