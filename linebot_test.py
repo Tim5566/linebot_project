@@ -32,11 +32,39 @@ def callback():
 # 處理文字訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_text = event.message.text
-    reply_text = f"你剛剛說：{user_text}"
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+    user_text = event.message.text.strip()
+
+    # 查詢外資買賣超
+    reply_text = query_foreign_investor(user_text)
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=reply_text)
+    )
+
+def query_foreign_investor(keyword):
+    """查詢今日外資買賣超"""
+    today = datetime.datetime.now().strftime("%Y%m%d")
+    url = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+    
+    try:
+        res = requests.get(url)
+        data = res.json()
+
+        if data.get("stat") != "OK":
+            return "查詢失敗，可能今天沒有資料。"
+
+        # data["data"] 格式: [證券代號, 證券名稱, 外資買進股數, 外資賣出股數, 外資買賣超股數, 外資買賣超金額]
+        for row in data["data"]:
+            stock_id, stock_name = row[0], row[1]
+            if keyword == stock_id or keyword in stock_name:
+                return f"📊 {stock_name}({stock_id})\n外資買賣超：{row[4]} 股\n金額：{row[5]} 元"
+
+        return f"找不到「{keyword}」的外資買賣超資料。"
+
+    except Exception as e:
+        return f"查詢時發生錯誤：{e}"
 
 if __name__ == "__main__":
-    # 使用 Render 提供的 PORT，並允許外部訪問
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
