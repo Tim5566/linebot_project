@@ -51,8 +51,8 @@ def query_foreign_investor(keyword):
         res = requests.get(url)
         data = res.json()
 
-        if data.get("stat") != "OK":
-            return "查詢失敗，可能今天沒有資料。"
+        if data.get("stat") != "OK" or data.get("total",0) == 0:
+            return "今天沒有交易資料，可能是休假或沒有外資交易。"
 
         # data["data"] 格式: [證券代號, 證券名稱, 外資買進股數, 外資賣出股數, 外資買賣超股數, 外資買賣超金額]
         for row in data["data"]:
