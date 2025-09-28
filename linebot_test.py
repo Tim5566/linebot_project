@@ -48,13 +48,14 @@ def handle_message(event):
     )
 
 def query_foreign_investor(keyword):
-    """查詢今日外資買賣超"""
+    #查詢今日外資買賣超
     today = datetime.datetime.now().strftime("%Y%m%d")
     url = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={20250926}"
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
     try:
-        res = requests.get(url, headers=headers)
+        #res = requests.get(url, headers=headers)
+        res = requests.get(url, headers=headers, verify=False)
         data = res.json()
 
         if data.get("stat") != "OK" or data.get("total", 0) == 0:
