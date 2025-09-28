@@ -65,6 +65,4 @@ def query_foreign_investor(keyword):
     except Exception as e:
         return f"查詢時發生錯誤：{e}"
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == "__main__": app.run(port=5000)
