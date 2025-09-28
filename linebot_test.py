@@ -69,7 +69,7 @@ def query_foreign_investor(keyword):
                 continue  # 跳過選擇權
 
             if keyword == keyword in stock_id or keyword in stock_name:
-                return f"{stock_name}\n外資買賣超：{row[5]} 股"
+                return f"{stock_name} (今盤後)\n外資買賣超：{row[5]} 股"
 
         return f"找不到「{keyword}」的外資買賣超資料。"
 
