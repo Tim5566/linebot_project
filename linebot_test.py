@@ -22,6 +22,11 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 def home():
     return "LINE Bot Server 運行中！"
 
+# 保活用的 ping 路由
+@app.route("/ping")
+def ping():
+    return "pong", 200
+
 # Webhook 路由
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -50,7 +55,7 @@ def handle_message(event):
 def query_foreign_investor(keyword):
     #查詢今日外資買賣超
     today = datetime.datetime.now().strftime("%Y%m%d")
-    url = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={20250926}"
+    url = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
     try:
