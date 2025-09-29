@@ -57,7 +57,7 @@ def query_investor(keyword):
 
     try:
         #外資
-        res = requests.get(url_Foreign, headers=headers, verify=True)
+        res = requests.get(url_Foreign, headers=headers, verify=False)
         data = res.json()
 
         Foreign_text = None
@@ -73,7 +73,7 @@ def query_investor(keyword):
                 break
         
         #投信
-        res = requests.get(url_Trust, headers=headers, verify=True)
+        res = requests.get(url_Trust, headers=headers, verify=False)
         data = res.json()
 
         Trust_text = None
@@ -89,7 +89,7 @@ def query_investor(keyword):
                 break
         
         #自營商
-        res = requests.get(url_Proprietary, headers=headers, verify=True)
+        res = requests.get(url_Proprietary, headers=headers, verify=False)
         data = res.json()
 
         Proprietary_text = None
