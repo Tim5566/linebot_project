@@ -58,6 +58,11 @@ def query_investor(keyword):
 
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
+    Foreign_text = None
+    Trust_text = None
+    Proprietary_text = None
+
+    #外資買賣超
     try:
         #外資
         res = requests.get(url_Foreign, headers=headers, verify=False)
@@ -71,10 +76,14 @@ def query_investor(keyword):
             if re.search(r'售|認購|認售', stock_name):
                 continue #跳過選擇權
 
-            if keyword == keyword in stock_id or keyword in stock_name:
+            if keyword in stock_id or keyword in stock_name:
                 Foreign_text = f"外資：{row[5]} 股"
                 break
-        
+    except Exception :
+        Foreign_text = None
+
+    #投信買賣超
+    try:        
         #投信
         res = requests.get(url_Trust, headers=headers, verify=False)
         data = res.json()
@@ -87,10 +96,14 @@ def query_investor(keyword):
             if re.search(r'售|認購|認售', stock_name):
                 continue #跳過選擇權
 
-            if keyword == keyword in stock_id or keyword in stock_name:
+            if keyword in stock_id or keyword in stock_name:
                 Trust_text = f"投信：{row[5]} 股"
                 break
-        
+    except Exception :
+        Trust_text = None
+
+    #自營商買賣超
+    try:  
         #自營商
         res = requests.get(url_Proprietary, headers=headers, verify=False)
         data = res.json()
@@ -103,37 +116,20 @@ def query_investor(keyword):
             if re.search(r'購|售|認購|認售', stock_name):
                 continue #跳過選擇權
 
-            if keyword == keyword in stock_id or keyword in stock_name:
+            if keyword in stock_id or keyword in stock_name:
                 Proprietary_text = f"自營商：{row[4]} 股"
                 break
+    except Exception :
+        Proprietary_text = None
 
-        if Foreign_text or Trust_text or Proprietary_text:
-            reply = f"{keyword} (今盤後買賣超)\n"
-
-            #外資
-            if Foreign_text:
-                reply += Foreign_text + "\n"
-            else:
-                reply += "外資：暫未更新。" + "\n"
-
-            #投信
-            if Trust_text:
-                reply += Trust_text + "\n"
-            else:
-                reply += "投信：暫未更新。" + "\n"
-
-            #自營商
-            if Proprietary_text:
-                reply += Proprietary_text + "\n"
-            else:
-                reply += "自營商：暫未更新" + "\n"
-
-            return reply.strip()
-        else:
-            return f"找不到「{keyword}」的外資或投信買賣超資料。"
-
-    except Exception as e:
-        return f"今日週休或連假未開盤"
+    reply = f"{keyword} (今盤後買賣超)\n"
+    reply += (Foreign_text + "\n") if Foreign_text else "外資：暫未更新。" + "\n"
+    reply += (Trust_text + "\n") if Trust_text else "投信：暫未更新。" + "\n"
+    reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：暫未更新。"
+    
+    if not (Foreign_text or Trust_text or Proprietary_text):
+        return f"找不到「{keyword}」的外資或投信買賣超資料。"
+    return reply
 
 if __name__ == "__main__":
     # 啟動推播排程
