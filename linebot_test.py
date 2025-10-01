@@ -49,9 +49,9 @@ def handle_message(event):
 # 供查詢今日個股買賣超
 def query_investor(keyword):
     today = datetime.datetime.now().strftime("%Y%m%d")
-    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={20250926}"
-    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={20250926}"
-    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={20250926}"
+    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
+    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
 
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
@@ -95,13 +95,13 @@ def query_investor(keyword):
         Proprietary_text = None
         # data["data"] 格式: [證券代號, 證券名稱, 買進股數, 賣出股數, 買賣超股數]
         for row in data["data"]:
-            stock_id, stock_name = row[1], row[2]
+            stock_id, stock_name = row[0], row[1]
 
-            if re.search(r'售|認購|認售', stock_name):
+            if re.search(r'購|售|認購|認售', stock_name):
                 continue #跳過選擇權
 
             if keyword == keyword in stock_id or keyword in stock_name:
-                Proprietary_text = f"自營商買賣超：{row[5]} 股"
+                Proprietary_text = f"自營商買賣超：{row[4]} 股"
                 break
 
         if Foreign_text or Trust_text or Proprietary_text:
