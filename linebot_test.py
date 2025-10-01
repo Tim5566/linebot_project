@@ -8,6 +8,9 @@ import requests
 import logging
 import re
 
+# 每日推播
+from push_service import broadcast_job
+
 app = Flask(__name__)
 
 # 使用 Render 環境變數設定 Token 與 Secret
@@ -49,9 +52,9 @@ def handle_message(event):
 # 供查詢今日個股買賣超
 def query_investor(keyword):
     today = datetime.datetime.now().strftime("%Y%m%d")
-    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
-    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
-    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
+    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={20250926}"
+    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={20250926}"
+    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={20250926}"
 
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
@@ -133,6 +136,9 @@ def query_investor(keyword):
         return f"今日週休或連假未開盤"
 
 if __name__ == "__main__":
+    # 啟動推播排程
+    start_scheduler(line_bot_api)
+
     # 使用 Render 提供的 PORT，並允許外部訪問
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
