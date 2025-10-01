@@ -129,7 +129,7 @@ def query_investor(keyword):
     
     if not (Foreign_text or Trust_text or Proprietary_text):
         return f"找不到「{keyword}」的外資或投信買賣超資料。"
-    return reply
+    return reply.strip()
 
 if __name__ == "__main__":
     # 啟動推播排程
