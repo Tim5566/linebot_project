@@ -17,8 +17,8 @@ def start_scheduler(line_bot_api):
     scheduler = BackgroundScheduler()
     taiwan = pytz.timezone("Asia/Taipei")
     # 每天 18:00 推播一次（可依需求調整）
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=16, minute=1, timezone=taiwan)
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=16, minute=3, timezone=taiwan)
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 2), 'cron', hour=16, minute=5, timezone=taiwan)
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=15, minute=5, timezone=taiwan)
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=7, timezone=taiwan)
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 2), 'cron', hour=15, minute=9, timezone=taiwan)
 
     scheduler.start()

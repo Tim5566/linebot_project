@@ -72,7 +72,7 @@ def query_investor(keyword):
                 continue #跳過選擇權
 
             if keyword == keyword in stock_id or keyword in stock_name:
-                Foreign_text = f"外資買賣超：{row[5]} 股"
+                Foreign_text = f"外資：{row[5]} 股"
                 break
         
         #投信
@@ -88,7 +88,7 @@ def query_investor(keyword):
                 continue #跳過選擇權
 
             if keyword == keyword in stock_id or keyword in stock_name:
-                Trust_text = f"投信買賣超：{row[5]} 股"
+                Trust_text = f"投信：{row[5]} 股"
                 break
         
         #自營商
@@ -104,29 +104,29 @@ def query_investor(keyword):
                 continue #跳過選擇權
 
             if keyword == keyword in stock_id or keyword in stock_name:
-                Proprietary_text = f"自營商買賣超：{row[4]} 股"
+                Proprietary_text = f"自營商：{row[4]} 股"
                 break
 
         if Foreign_text or Trust_text or Proprietary_text:
-            reply = f"{keyword} (今盤後)\n"
+            reply = f"{keyword} (今盤後買賣超)\n"
 
             #外資
             if Foreign_text:
                 reply += Foreign_text + "\n"
             else:
-                reply += "外資買賣超：暫未更新。" + "\n"
+                reply += "外資：暫未更新。" + "\n"
 
             #投信
             if Trust_text:
                 reply += Trust_text + "\n"
             else:
-                reply += "投信買賣超：暫未更新。" + "\n"
+                reply += "投信：暫未更新。" + "\n"
 
             #自營商
             if Proprietary_text:
                 reply += Proprietary_text + "\n"
             else:
-                reply += "自營商買賣超：暫未更新" + "\n"
+                reply += "自營商：暫未更新" + "\n"
 
             return reply.strip()
         else:
