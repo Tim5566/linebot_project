@@ -9,7 +9,7 @@ import logging
 import re
 
 # 每日推播
-from push_service import broadcast_job, start_scheduler
+from push_service import start_scheduler
 
 app = Flask(__name__)
 
@@ -52,9 +52,9 @@ def handle_message(event):
 # 供查詢今日個股買賣超
 def query_investor(keyword):
     today = datetime.datetime.now().strftime("%Y%m%d")
-    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={20250926}"
-    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={20250926}"
-    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={20250926}"
+    url_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+    url_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
+    url_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
 
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 

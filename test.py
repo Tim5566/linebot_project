@@ -1,7 +1,7 @@
 # test_linebot_dummy.py
 from linebot.models import TextSendMessage
 import linebot_test
-from push_service import broadcast_job
+from push_service import broadcast_post_inf
 
 # 建立一個模擬的 event 物件
 class DummyEvent:
@@ -32,5 +32,5 @@ for msg in test_messages:
 
 # 測試推播功能（直接呼叫副程式）
 print("[測試推播] 開始")
-broadcast_job(linebot_test.line_bot_api)
+broadcast_post_inf(linebot_test.line_bot_api, 0)
 print("[測試推播] 結束")
