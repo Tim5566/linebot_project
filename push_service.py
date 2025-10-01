@@ -10,6 +10,6 @@ def start_scheduler(line_bot_api):
     scheduler = BackgroundScheduler()
 
     # 每天 18:00 推播一次（可依需求調整）
-    scheduler.add_job(lambda: broadcast_job(line_bot_api), 'cron', hour=14, minute=35)
+    scheduler.add_job(lambda: broadcast_job(line_bot_api), 'cron', hour=14, minute=40)
 
     scheduler.start()

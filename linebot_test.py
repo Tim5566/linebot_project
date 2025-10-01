@@ -9,7 +9,7 @@ import logging
 import re
 
 # 每日推播
-from push_service import broadcast_job
+from push_service import broadcast_job, start_scheduler
 
 app = Flask(__name__)
 
