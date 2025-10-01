@@ -1,4 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from linebot.models import TextSendMessage
 
 def broadcast_job(line_bot_api):
@@ -8,8 +9,8 @@ def broadcast_job(line_bot_api):
 
 def start_scheduler(line_bot_api):
     scheduler = BackgroundScheduler()
-
+    taiwan = pytz.timezone("Asia/Taipei")
     # 每天 18:00 推播一次（可依需求調整）
-    scheduler.add_job(lambda: broadcast_job(line_bot_api), 'cron', hour=14, minute=40)
+    scheduler.add_job(lambda: broadcast_job(line_bot_api), 'cron', hour=14, minute=58, timezone=taiwan)
 
     scheduler.start()
