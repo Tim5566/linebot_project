@@ -73,12 +73,12 @@ def stock_info(keyword):
         Proprietary_text = None
 
     reply = f"{keyword} (今盤後資訊)\n"
-    reply += (Foreign_text + "\n") if Foreign_text else "外資：暫未更新" + "\n"
-    reply += (Trust_text + "\n") if Trust_text else "投信：暫未更新" + "\n"
-    reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：暫未更新"
+    reply += (Foreign_text + "\n") if Foreign_text else "外資：🚫暫未更新" + "\n"
+    reply += (Trust_text + "\n") if Trust_text else "投信：🚫暫未更新" + "\n"
+    reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫暫未更新"
     
     if not (Foreign_text or Trust_text or Proprietary_text):
-        return f"找不到「{keyword}」相關資料。"
+        return f"❌找不到「{keyword}」相關資料。"
     return reply.strip()
 
 #大盤總體資訊
