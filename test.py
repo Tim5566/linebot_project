@@ -2,6 +2,7 @@
 from linebot.models import TextSendMessage
 import linebot_test
 from push_service import broadcast_post_inf
+from post_Info import stock_info, market_pnfo
 
 # 建立一個模擬的 event 物件
 class DummyEvent:
@@ -34,3 +35,7 @@ for msg in test_messages:
 print("[測試推播] 開始")
 broadcast_post_inf(linebot_test.line_bot_api, 0)
 print("[測試推播] 結束")
+
+#測試大盤總資訊
+print("[測試大盤資訊]")
+print(market_pnfo())
