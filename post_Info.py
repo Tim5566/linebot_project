@@ -72,7 +72,7 @@ def stock_info(keyword):
     except Exception :
         Proprietary_text = None
 
-    reply = f"{keyword} (今盤後資訊)\n"
+    reply = f"{keyword} (今盤後買賣超)\n"
     reply += (Foreign_text + "\n") if Foreign_text else "外資：🚫暫未更新" + "\n"
     reply += (Trust_text + "\n") if Trust_text else "投信：🚫暫未更新" + "\n"
     reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫暫未更新"
