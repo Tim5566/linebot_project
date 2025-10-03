@@ -104,10 +104,10 @@ def market_pnfo():
             net_amount = float(row[3].replace(',', '')) / 1e8
             net_total += net_amount
             net_amount = int(net_amount * 100) / 100  # 截斷兩位小數
-            reply += f"{row[0]} : {net_amount}e\n"
+            reply += f"{row[0][:2]} : {net_amount}e\n"
 
         net_total = int(net_total * 100) / 100  # 截斷兩位小數
-        reply += f"合計金額 : {net_total}e"
+        reply += f"合計金額 : {net_total} 億"
 
     except Exception :
         Net_Total_text = None
