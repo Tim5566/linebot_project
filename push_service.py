@@ -6,7 +6,7 @@ import pytz
 
 def broadcast_post_inf(line_bot_api, label):
     if label == 0:
-        message = TextSendMessage(text=f"📢 今盤後，三大法人買賣金額已更新❗\t\n{market_pnfo()}")
+        message = TextSendMessage(text=f"📢 今盤後，三大法人買賣金額已更新❗\n{market_pnfo()}")
     elif label == 1:
         message = TextSendMessage(text="📢 今盤後，投信買賣超已更新❗\n目前個股可供查詢。")
     elif label == 2:
@@ -21,7 +21,7 @@ def start_scheduler(line_bot_api):
     taiwan = pytz.timezone("Asia/Taipei")
 
     # 盤後整體資訊更新時間
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=17, minute=25, timezone=taiwan)
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=17, minute=40, timezone=taiwan)
 
     # 三大法人個股買賣超更新時間
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=0, timezone=taiwan)
