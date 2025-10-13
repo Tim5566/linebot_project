@@ -137,7 +137,7 @@ async def market_pnfo_async():
             reply += f"{name} : {net_amount}億\n"
         net_total = int(net_total * 100) / 100
         reply += f"合計金額 : {net_total}億\n"
-        reply += "-----------------------------\n"
+        reply += "----------------------------------------------\n"
     except Exception:
         reply += "三大法人買賣金額：🚫 暫未更新\n"
 
