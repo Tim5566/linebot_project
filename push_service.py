@@ -12,9 +12,8 @@ def broadcast_post_inf(line_bot_api, label):
             message = TextSendMessage(text="📢 今日週末或連假未開盤❗")
             line_bot_api.broadcast(message)
         return
-
     if label == 1:
-        messages = [
+        message = [
             TextSendMessage(text="📢 今盤後，法人總買賣金額已更新❗"),
             TextSendMessage(text=market_pnfo())
         ]
@@ -26,7 +25,7 @@ def broadcast_post_inf(line_bot_api, label):
         message = TextSendMessage(text="📢 今盤後，自營商買賣超已更新❗\n目前個股可供查詢。")
     elif label == 5:
         message = [
-            TextSendMessage(text=f"📢 今盤後，大盤融資金額已更新❗")
+            TextSendMessage(text="📢 今盤後，大盤融資金額已更新❗"),
             TextSendMessage(text=market_pnfo())
         ]
     elif label == 6:
@@ -42,7 +41,7 @@ def start_scheduler(line_bot_api):
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=15, minute=0, timezone=taiwan) #15:00
 
     # 盤後整體資訊更新時間
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=57, timezone=taiwan) #15:00
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=16, minute=0, timezone=taiwan) #15:00
     
     # 三大法人個股買賣超更新時間
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 2), 'cron', hour=15, minute=0, timezone=taiwan) #15:00
