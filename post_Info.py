@@ -8,16 +8,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 today = datetime.datetime.now().strftime("%Y%m%d")
 #today = '20251009'
 
-# -------------------------------
-# 通用的 fetch_json 函式（非同步）
-# -------------------------------
 async def fetch_json(session, url):
     async with session.get(url, ssl=False) as res:
         return await res.json()
 
-# ==================================================
 # 📊 個股盤後資訊 (外資、投信、自營商、借券) - 非同步版
-# ==================================================
 async def stock_info_async(keyword):
     headers = {"User-Agent": "Mozilla/5.0", "Accept-Encoding": "gzip, deflate"}
     base = "https://www.twse.com.tw/rwd/zh"
@@ -103,21 +98,16 @@ async def stock_info_async(keyword):
     return reply.strip()
 
 
-# --------------------------------------------------
 # 提供同步介面給 LINE Bot 呼叫
-# --------------------------------------------------
 def stock_info(keyword):
     return asyncio.run(stock_info_async(keyword))
 
 
-# ==================================================
 # 📈 大盤盤後總體資訊 - 非同步版
-# ==================================================
 async def market_pnfo_async():
     headers = {"User-Agent": "Mozilla/5.0", "Accept-Encoding": "gzip, deflate"}
     base = "https://www.twse.com.tw/rwd/zh"
 
-    # 建立 API 字典，key 可直接對應到結果
     apis = {
         "三大法人買賣金額": f"{base}/fund/BFI82U?response=json&date={today}",
         "大盤融資金額": f"{base}/marginTrading/MI_MARGN?response=json&date={today}"
@@ -130,7 +120,6 @@ async def market_pnfo_async():
             return_exceptions=True
         )
 
-    # 將結果和名稱對應成字典，方便後續統一取用
     results = dict(zip(apis.keys(), responses))
 
     reply = "📉大盤盤後詳細資訊📈\n"
@@ -166,8 +155,6 @@ async def market_pnfo_async():
 
     return reply.strip()
 
-# --------------------------------------------------
 # 提供同步介面給 LINE Bot 呼叫
-# --------------------------------------------------
 def market_pnfo():
     return asyncio.run(market_pnfo_async())
