@@ -40,7 +40,7 @@ async def stock_info_async(keyword):
         text = None
         for row in data:
             stock_id, stock_name = row[1], row[2]
-            if re.search(r'售|認購|認售', stock_name):
+            if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 text = f"外資：{row[5]} 股"
@@ -55,7 +55,7 @@ async def stock_info_async(keyword):
         text = None
         for row in data:
             stock_id, stock_name = row[1], row[2]
-            if re.search(r'售|認購|認售', stock_name):
+            if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 text = f"投信：{row[5]} 股"
