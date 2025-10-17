@@ -115,7 +115,7 @@ def market_pnfo():
                 reply += f"{row[0]} : {net_amount}億\n"
         net_total = int(net_total * 100) / 100
         reply += f"合計金額 : {net_total}億\n"
-        reply += "--------------------------------------------------------\n"
+        reply += "---------------------------------------------\n"
     except Exception:
         Net_Amount_text = None
 
