@@ -2,21 +2,63 @@ import datetime
 import requests
 import re
 import urllib3
+import pandas as pd
+from io import StringIO
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-#today = '20251009'
+today = '20260206'
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    #today = datetime.datetime.now().strftime("%Y%m%d")
     API_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     API_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
     API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
     API_Short_Sale = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
+    API_Notice = f"https://www.twse.com.tw/rwd/zh/announcement/notice?response=csv&querytype=1&stockNo=&selectType=&startDate={today}&endDate={today}&sortKind=STKNO"
+    API_Disposal = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
+
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
     reply = f"{keyword} (今盤後買賣超)\n"
+
+    # 當日注意股
+    try:
+        Notice_text = None
+        Flag = 0
+        res = requests.get(API_Notice, headers=headers, verify=False)
+        data = pd.read_csv(StringIO(res.text.replace("=", "")), skiprows=1)
+        for index, row in data.iterrows():
+            stock_id = str(int(row["證券代號"]))
+            stock_name = row["證券名稱"]
+            if keyword in stock_id or keyword in stock_name:
+                Notice_text = "當日注意：⭕"
+                break
+            else:
+                Flag = 1
+    except Exception:
+        if Flag == 1:
+            Notice_text = "當日注意：❌"
+        else:
+            Notice_text = None
+
+    #處置股
+    try:
+        Disposal_text = None
+        flag = 0
+        res = requests.get(API_Disposal, headers=headers, verify=False)
+        data = res.json()
+        for row in data["data"]:
+            stock_id, stock_name = row[2], row[3]
+            disposal_end_date = row[6][10:]
+            if keyword in stock_id or keyword in stock_name:
+                Disposal_text = f"處置：⭕ 至 {disposal_end_date}"
+                break
+            else:
+                Disposal_text = "處置：❌"
+    except Exception:
+        Disposal_text = None
 
     # 外資買賣超
     try:
@@ -78,6 +120,8 @@ def stock_info(keyword):
     except Exception:
         Short_sale_text = None
 
+    reply += (Notice_text + "  ") if Notice_text else "注意：🚫 暫未更新  "
+    reply += (Disposal_text + "\n") if Disposal_text else "處置：🚫 暫未更新\n"
     reply += (Foreign_text + "\n") if Foreign_text else "外資：🚫 暫未更新\n"
     reply += (Trust_text + "\n") if Trust_text else "投信：🚫 暫未更新\n"
     reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫 暫未更新\n"
@@ -91,7 +135,7 @@ def stock_info(keyword):
 
 # 大盤總體資訊
 def market_pnfo():
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    #today = datetime.datetime.now().strftime("%Y%m%d")
     API_Net_Amount = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
     headers = {"User-Agent": "Mozilla/5.0"}
