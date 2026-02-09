@@ -7,11 +7,11 @@ from io import StringIO
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-today = '20260206'
+#today = '20260206'
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     API_Foreign = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     API_Trust = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
     API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
@@ -46,7 +46,6 @@ def stock_info(keyword):
     #處置股
     try:
         Disposal_text = None
-        flag = 0
         res = requests.get(API_Disposal, headers=headers, verify=False)
         data = res.json()
         for row in data["data"]:
@@ -135,7 +134,7 @@ def stock_info(keyword):
 
 # 大盤總體資訊
 def market_pnfo():
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     API_Net_Amount = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
     headers = {"User-Agent": "Mozilla/5.0"}
