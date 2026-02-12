@@ -7,7 +7,7 @@ from io import StringIO
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-#today = '20260206'
+#today = '20260211'
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
@@ -119,7 +119,7 @@ def stock_info(keyword):
     except Exception:
         Short_sale_text = None
 
-    reply += (Notice_text + "  ") if Notice_text else "注意：🚫 暫未更新  "
+    reply += (Notice_text + "\n") if Notice_text else "注意：🚫 暫未更新\n"
     reply += (Disposal_text + "\n") if Disposal_text else "處置：🚫 暫未更新\n"
     reply += (Foreign_text + "\n") if Foreign_text else "外資：🚫 暫未更新\n"
     reply += (Trust_text + "\n") if Trust_text else "投信：🚫 暫未更新\n"
