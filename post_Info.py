@@ -7,11 +7,11 @@ from io import StringIO
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-today = '20260211'
+#today = '20260211'
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
     #判斷上市or上櫃
@@ -153,7 +153,7 @@ def stock_info(keyword):
 
 # 大盤總體資訊
 def market_pnfo():
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     API_Net_Amount = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
     headers = {"User-Agent": "Mozilla/5.0"}

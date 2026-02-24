@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>台股盤後查詢</title>
+<style>
+    /* ===== 全局樣式 ===== */
+    body {
+        font-family: "Noto Sans TC", Arial, sans-serif;
+        background: #eef2f7;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        color: #333;
+    }
+
+    header {
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        color: white;
+        padding: 20px 0;
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    /* ===== 卡片樣式 ===== */
+    .card {
+        background: white;
+        width: 100%;
+        max-width: 450px;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card input {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: 0.2s;
+    }
+    .card input:focus {
+        border-color: #1e88e5;
+        box-shadow: 0 0 5px rgba(30,136,229,0.4);
+    }
+
+    .card button {
+        padding: 12px 25px;
+        font-size: 16px;
+        background: #1e88e5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .card button:hover {
+        background: #1565c0;
+    }
+
+    /* ===== 結果樣式 ===== */
+    .result {
+        margin-top: 20px;
+        text-align: left;
+    }
+    .result h2 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
+        text-align: center;
+        color: #1e88e5;
+    }
+    .result .price {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .up { color: #e53935; }
+    .down { color: #43a047; }
+
+    /* ===== 資訊表格 ===== */
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 16px;
+    }
+    .info-table th, .info-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+    }
+    .info-table th {
+        background: #f5f5f5;
+        font-weight: 600;
+    }
+    .info-table td.up { font-weight: bold; color: #e53935; }
+    .info-table td.down { font-weight: bold; color: #43a047; }
+
+    /* ===== 廣告樣式 ===== */
+    .ad-box {
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+        background: #f0f4f8;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 50px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    footer {
+        padding: 20px;
+        font-size: 14px;
+        color: #888;
+        text-align: center;
+        background: #f7f9fb;
+        margin-top: auto;
+    }
+
+    /* ===== 響應式 ===== */
+    @media (max-width: 500px) {
+        .card, .ad-box {
+            width: 90%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>📈 台股盤後查詢</header>
+
+<div class="container">
+    <div class="card">
+        <input type="text" id="code" placeholder="輸入股票代號">
+        <button onclick="search()">查詢</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <div class="ad-box">
+        🔽 Google AdSense 廣告會放在這裡
+    </div>
+</div>
+
+<footer>
+    © 2026 台股盤後查詢
+</footer>
+
+<script>
+async function search() {
+    let code = document.getElementById("code").value.trim();
+    if(!code){
+        alert("請輸入股票代號");
+        return;
+    }
+
+    let response = await fetch("stock.json");
+    let data = await response.json();
+
+    if(data[code]){
+        let stock = data[code];
+        let priceClass = stock.change.includes("-") ? "down" : "up";
+        let tableRows = `
+            <tr><th>外資買賣超</th><td class="${stock.foreign && stock.foreign.includes('-') ? 'down':'up'}">${stock.foreign || '🚫 暫未更新'}</td></tr>
+            <tr><th>投信買賣超</th><td class="${stock.trust && stock.trust.includes('-') ? 'down':'up'}">${stock.trust || '🚫 暫未更新'}</td></tr>
+            <tr><th>自營商買賣超</th><td class="${stock.proprietary && stock.proprietary.includes('-') ? 'down':'up'}">${stock.proprietary || '🚫 暫未更新'}</td></tr>
+            <tr><th>借卷賣出</th><td>${stock.short_sale || '🚫 暫未更新'}</td></tr>
+            <tr><th>注意股</th><td>${stock.notice || '❌'}</td></tr>
+            <tr><th>處置股</th><td>${stock.disposal || '❌'}</td></tr>
+        `;
+
+        document.getElementById("result").innerHTML = `
+            <h2>${stock.name} (${code})</h2>
+            <div class="price ${priceClass}">收盤價：${stock.price}</div>
+            <div class="${priceClass}">漲跌：${stock.change}</div>
+            <div>成交量：${stock.volume}</div>
+            <table class="info-table">${tableRows}</table>
+        `;
+    } else {
+        document.getElementById("result").innerHTML = "❌ 找不到該股票資料";
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+cmd -> python -m http.server 8000
+網站輸入 -> http://localhost:8000
