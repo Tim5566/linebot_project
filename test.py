@@ -28,7 +28,7 @@ linebot_test.line_bot_api = DummyLineBotApi()
 start = time.perf_counter()
 
 # 測試回覆功能
-test_messages = ["華通"]
+test_messages = ["泰茂"]
 for msg in test_messages:
     print(f"[模擬使用者] {msg}")
     dummy_event = DummyEvent(msg)
