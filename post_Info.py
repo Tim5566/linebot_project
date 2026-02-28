@@ -4,18 +4,18 @@ import re
 import urllib3
 import pandas as pd
 from io import StringIO
+from get_trading_holidays import is_trading_day
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-today = '20260226'
+#today = '20260226'
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
 
     #判斷上市or上櫃
-    flag = 0
     TWSE = f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={today}"
     OTC = f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={today}"
     TWSE_res = requests.get(TWSE, headers=headers, verify=False)
@@ -93,7 +93,7 @@ def stock_info(keyword):
                 if re.search(r'購|售|認購|認售', stock_name):
                     continue
                 if keyword in stock_id or keyword in stock_name:
-                    Proprietary_text = f"自營商：{row[4]} 股"
+                    Proprietary_text = f"自營商：{row[10]} 股"
                     break
         except Exception:
             Proprietary_text = None
@@ -127,6 +127,7 @@ def stock_info(keyword):
     elif keyword in OTC_data_code or keyword in OTC_data_name:
         API_institutional = f"https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
         API_Disposal = f"https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
+        API_Short_Sale = f"https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
 
         reply = f"{keyword} (今盤後買賣超)\n"
 
@@ -191,11 +192,34 @@ def stock_info(keyword):
         except Exception:
             Proprietary_text = None
 
+        # 借卷賣出
+        try:
+            Short_sale_text = None
+            res = requests.get(API_Short_Sale, headers=headers, verify=False)
+            data = res.json()
+
+            if keyword.isdigit():
+                print("這是股票代碼")
+            else:
+                print("這是股票名稱轉代碼")
+                idx = OTC_data_name.index(keyword) 
+                keyword = OTC_data_code[idx]
+
+            for row in data["tables"][0]["data"]:
+                stock_id = row[0]
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+                if keyword in stock_id or keyword in stock_name:
+                    Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
+                    break
+        except Exception:
+            Short_sale_text = None
+
         reply += (Disposal_text + "\n") if Disposal_text else "處置：🚫 暫未更新\n"
         reply += (Foreign_text + "\n") if Foreign_text else "外資：🚫 暫未更新\n"
         reply += (Trust_text + "\n") if Trust_text else "投信：🚫 暫未更新\n"
         reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫 暫未更新\n"
-        #reply += (Short_sale_text + "\n") if Short_sale_text else "借卷賣出：🚫 暫未更新\n"
+        reply += (Short_sale_text + "\n") if Short_sale_text else "借卷賣出：🚫 暫未更新\n"
 
         if not (Foreign_text or Trust_text or Proprietary_text):
             return f"❌找不到「{keyword}」今盤後資料。"
@@ -207,7 +231,7 @@ def stock_info(keyword):
 
 # 大盤總體資訊
 def market_pnfo():
-    #today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y%m%d")
     API_Net_Amount = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
     headers = {"User-Agent": "Mozilla/5.0"}
