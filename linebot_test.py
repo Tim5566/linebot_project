@@ -3,8 +3,6 @@ from linebot import LineBotApi, WebhookHandler  # 使用舊版 API，避免 v3 I
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
-import requests
-import logging
 
 from push_service import start_scheduler
 from post_Info import stock_info
