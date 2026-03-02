@@ -112,13 +112,17 @@ def stock_info(keyword):
         try:
             res = requests.get(API_Short_Sale, headers=headers, verify=False)
             data = res.json()
-            for row in data["data"]:
-                stock_id, stock_name = row[0], row[1]
-                if re.search(r'購|售|認購|認售', stock_name):
-                    continue
-                if keyword in stock_id or keyword in stock_name:
-                    Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
-                    break
+            
+            if today not in data.get("date", ""):
+                Short_sale_text = None
+            else:
+                for row in data["data"]:
+                    stock_id, stock_name = row[0], row[1]
+                    if re.search(r'購|售|認購|認售', stock_name):
+                        continue
+                    if keyword in stock_id or keyword in stock_name:
+                        Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
+                        break
         except Exception:
             Short_sale_text = None
 
@@ -200,13 +204,16 @@ def stock_info(keyword):
                 idx = OTC_data_name.index(keyword) 
                 keyword = OTC_data_code[idx]
 
-            for row in data["tables"][0]["data"]:
-                stock_id = row[0]
-                if re.search(r'購|售|認購|認售', stock_name):
-                    continue
-                if keyword in stock_id or keyword in stock_name:
-                    Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
-                    break
+            if today not in data.get("date", ""):
+                Short_sale_text = None
+            else:
+                for row in data["tables"][0]["data"]:
+                    stock_id = row[0]
+                    if re.search(r'購|售|認購|認售', stock_name):
+                        continue
+                    if keyword in stock_id or keyword in stock_name:
+                        Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
+                        break
         except Exception:
             Short_sale_text = None
 
