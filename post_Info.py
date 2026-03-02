@@ -4,6 +4,8 @@ import re
 import urllib3
 import pandas as pd
 from io import StringIO
+from zoneinfo import ZoneInfo
+
 from get_trading_holidays import is_trading_day
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
@@ -18,7 +20,7 @@ def stock_info(keyword):
     #判斷是否假日或盤後更新
     if not is_trading_day():
         return f"📢 今日週末或連假未開盤❗"
-    elif datetime.datetime.now().hour < 15:
+    elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
         return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
     #變數初始化
