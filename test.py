@@ -28,7 +28,7 @@ class DummyLineBotApi:
 linebot_test.line_bot_api = DummyLineBotApi()
 
 # 測試回覆功能
-test_messages = ["穩懋"]
+test_messages = ["華通"]
 for msg in test_messages:
     print(f"[模擬使用者] {msg}")
     dummy_event = DummyEvent(msg)
