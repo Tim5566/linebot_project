@@ -11,6 +11,25 @@ from tools import to_minguo
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
+import time as _time
+
+def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
+    """發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。"""
+    _headers = {"User-Agent": "Mozilla/5.0"}
+    today_d = re.sub(r"[^\d]", "", today)
+    for attempt in range(retries):
+        try:
+            res = requests.get(url, headers=_headers, verify=False, timeout=10)
+            data = res.json()
+            api_date = re.sub(r"[^\d]", "", str(data.get(date_key, "")))
+            if today_d in api_date:
+                return data
+            print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_date} today={today_d}")
+        except Exception as e:
+            print(f"[retry {attempt+1}/{retries}] 請求失敗: {e}")
+        _time.sleep(delay)
+    return None
+
 #today = '20260306'
 
 #上市or上櫃公司代碼名稱存檔 (初始讀取一次)
@@ -77,10 +96,8 @@ def stock_info(keyword):
 
         # 外資買賣超
         try:
-            res = requests.get(API_Foreign, headers=headers, verify=False)
-            data = res.json()  # data["data"] 格式: [證券代號, 證券名稱, 買進股數, 賣出股數, 買賣超股數]
-
-            if today not in data.get("date", ""):
+            data = fetch_with_retry(API_Foreign, today)
+            if data is None:
                 Foreign_text = None
             else:
                 for row in data["data"]:
@@ -95,10 +112,8 @@ def stock_info(keyword):
 
         # 投信買賣超
         try:
-            res = requests.get(API_Trust, headers=headers, verify=False)
-            data = res.json()
-
-            if today not in data.get("date", ""):
+            data = fetch_with_retry(API_Trust, today)
+            if data is None:
                 Trust_text = None
             else:
                 for row in data["data"]:
@@ -113,10 +128,8 @@ def stock_info(keyword):
 
         # 自營商買賣超
         try:
-            res = requests.get(API_Proprietary, headers=headers, verify=False)
-            data = res.json()
-
-            if today not in data.get("date", ""):
+            data = fetch_with_retry(API_Proprietary, today)
+            if data is None:
                 Proprietary_text = None
             else:
                 for row in data["data"]:
@@ -131,10 +144,8 @@ def stock_info(keyword):
 
         # 借卷賣出
         try:
-            res = requests.get(API_Short_Sale, headers=headers, verify=False)
-            data = res.json()
-            
-            if today not in data.get("date", ""):
+            data = fetch_with_retry(API_Short_Sale, today)
+            if data is None:
                 Short_sale_text = None
             else:
                 for row in data["data"]:
@@ -175,68 +186,35 @@ def stock_info(keyword):
         except Exception:
             Disposal_text = None
 
-        # 外資買賣超
+        # 上櫃三大法人：只請求一次，外資/投信/自營商共用
         try:
-            res = requests.get(API_institutional, headers=headers, verify=False)
-            data = res.json()  # data["data"] 格式: [證券代號, 證券名稱, 買進股數, 賣出股數, 買賣超股數]
+            # 上櫃日期格式為民國，轉成西元後比對
+            def otc_date_ok(data):
+                raw = data[0]["Date"] if data else ""
+                return re.sub(r"[^\d]", "", to_minguo(raw)) == re.sub(r"[^\d]", "", today)
 
-            date = data[0]["Date"]
-            date = to_minguo(date)  # 西元轉民國
+            inst_data = None
+            for attempt in range(3):
+                res = requests.get(API_institutional, headers=headers, verify=False, timeout=10)
+                inst_data = res.json()
+                if otc_date_ok(inst_data):
+                    break
+                import time as _t; _t.sleep(1.5)
 
-            if today != date:
-                Foreign_text = None
+            if not otc_date_ok(inst_data):
+                Foreign_text = Trust_text = Proprietary_text = None
             else:
-                for row in data:
-                    stock_id, stock_name = row["SecuritiesCompanyCode"], row["CompanyName"]
-                    if re.search(r'購|售|認購|認售', stock_name):
-                        continue  # 跳過選擇權
-                    if keyword in stock_id or keyword in stock_name:
-                        Foreign_text = f"外資：{int(row['Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference']):,} 股"
-                        break
-        except Exception:
-            Foreign_text = None
-
-        # 投信買賣超
-        try:
-            res = requests.get(API_institutional, headers=headers, verify=False)
-            data = res.json()
-
-            date = data[0]["Date"]
-            date = to_minguo(date)  # 西元轉民國
-
-            if today != date:
-                Trust_text = None
-            else:
-                for row in data:
+                for row in inst_data:
                     stock_id, stock_name = row["SecuritiesCompanyCode"], row["CompanyName"]
                     if re.search(r'購|售|認購|認售', stock_name):
                         continue
                     if keyword in stock_id or keyword in stock_name:
-                        Trust_text = f"投信：{int(row['SecuritiesInvestmentTrustCompanies-Difference']):,} 股"
-                        break
-        except Exception:
-            Trust_text = None
-
-        # 自營商買賣超
-        try:
-            res = requests.get(API_institutional, headers=headers, verify=False)
-            data = res.json()
-            
-            date = data[0]["Date"]
-            date = to_minguo(date)  # 西元轉民國
-
-            if today != date:
-                Proprietary_text = None
-            else:
-                for row in data:
-                    stock_id, stock_name = row["SecuritiesCompanyCode"], row["CompanyName"]
-                    if re.search(r'購|售|認購|認售', stock_name):
-                        continue
-                    if keyword in stock_id or keyword in stock_name:
+                        Foreign_text     = f"外資：{int(row['Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference']):,} 股"
+                        Trust_text       = f"投信：{int(row['SecuritiesInvestmentTrustCompanies-Difference']):,} 股"
                         Proprietary_text = f"自營商：{int(row['Dealers-Difference']):,} 股"
                         break
         except Exception:
-            Proprietary_text = None
+            Foreign_text = Trust_text = Proprietary_text = None
 
         # 借卷賣出
         try:
