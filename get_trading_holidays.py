@@ -16,8 +16,8 @@ def is_trading_day():
 
     Trading_day = {"國曆新年開始交易日", "農曆春節前最後交易日"}
 
-    today = date.today().isoformat()
-    #today = "2026-02-26"
+    #today = date.today().isoformat()
+    today = "2026-03-06"
 
     # 週六週日一定不是交易日
     if date.fromisoformat(today).weekday() >= 5:
@@ -35,3 +35,5 @@ def is_trading_day():
 
     # 不在假日表 → 正常交易日
     return True
+
+#print(is_trading_day())

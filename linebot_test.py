@@ -6,6 +6,7 @@ import os
 
 from push_service import start_scheduler
 from post_Info import stock_info
+from stock_site.api_routes import register_api
 
 app = Flask(__name__)
 
@@ -15,6 +16,8 @@ LINE_CHANNEL_SECRET = '0f27654b82ca9f667ac6c8eb37dc0a07'
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
+
+register_api(app) # 建立網站
 
 # 保活用的 ping 路由
 @app.route("/ping")

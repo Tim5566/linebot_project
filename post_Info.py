@@ -11,7 +11,27 @@ from tools import to_minguo
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警告
 
-#today = '20260226'
+#today = '20260306'
+
+#上市or上櫃公司代碼名稱存檔 (初始讀取一次)
+try:
+    TWSE = "https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date=20260309"
+    OTC = "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date=20260309"
+    headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
+    TWSE_res = requests.get(TWSE, headers=headers, verify=False)
+    OTC_res = requests.get(OTC, headers=headers, verify=False)
+    TWSE_data = TWSE_res.json()
+    OTC_data = OTC_res.json()
+    TWSE_data_code = [item[0] for item in TWSE_data["data"]]
+    OTC_data_code = [item[0] for item in OTC_data["tables"][0]["data"]]
+    TWSE_data_name = [item[1] for item in TWSE_data["data"]]
+    OTC_data_name = [item[1] for item in OTC_data["tables"][0]["data"]]
+except Exception:
+    TWSE_data_code = []
+    OTC_data_code = []
+    TWSE_data_name = []
+    OTC_data_name = []
+    print(f"❌ 無法取得資料: {e}")
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
@@ -19,7 +39,7 @@ def stock_info(keyword):
 
     #判斷是否假日或盤後更新
     if not is_trading_day():
-        return f"📢 今日週末或連假未開盤❗"
+        return f"📢 今日週末或連假未開盤❗0"
     elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
         return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
@@ -30,19 +50,6 @@ def stock_info(keyword):
     Proprietary_text = None
     Short_sale_text = None   
     reply = f"{keyword} (今盤後買賣超)\n"
-
-    #判斷上市or上櫃
-    TWSE = f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={today}"
-    OTC = f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={today}"
-    headers = {"User-Agent": "Mozilla/5.0"}  # 模擬瀏覽器，避免被 TWSE 拒絕
-    TWSE_res = requests.get(TWSE, headers=headers, verify=False)
-    OTC_res = requests.get(OTC, headers=headers, verify=False)
-    TWSE_data = TWSE_res.json()
-    OTC_data = OTC_res.json()
-    TWSE_data_code = [item[0] for item in TWSE_data["data"]]
-    OTC_data_code = [item[0] for item in OTC_data["tables"][0]["data"]]
-    TWSE_data_name = [item[1] for item in TWSE_data["data"]]
-    OTC_data_name = [item[1] for item in OTC_data["tables"][0]["data"]]
 
     #上市個股資料
     if keyword in TWSE_data_code or keyword in TWSE_data_name:
@@ -245,9 +252,7 @@ def stock_info(keyword):
             else:
                 for row in data["tables"][0]["data"]:
                     stock_id = row[0]
-                    if re.search(r'購|售|認購|認售', stock_name):
-                        continue
-                    if keyword in stock_id or keyword in stock_name:
+                    if keyword in stock_id:
                         Short_sale_text = f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
                         break
         except Exception:

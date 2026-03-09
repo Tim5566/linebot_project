@@ -42,10 +42,10 @@ def start_scheduler(line_bot_api):
     taiwan = pytz.timezone("Asia/Taipei")
 
     # 判斷是否週末或連假
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=15, minute=0, timezone=taiwan) #15:00
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=9, minute=0, timezone=taiwan) #09:00
 
     # 盤後整體資訊更新時間
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=0, timezone=taiwan) #15:00
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=5, timezone=taiwan) #15:05
     
     # 三大法人個股買賣超更新時間
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 2), 'cron', hour=15, minute=0, timezone=taiwan) #15:00

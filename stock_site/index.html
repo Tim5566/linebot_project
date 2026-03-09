@@ -1,209 +1,758 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>台股盤後查詢</title>
-<style>
-    /* ===== 全局樣式 ===== */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>盤後雷達｜台股法人追蹤</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #090e1a;
+      --surface:  #0d1526;
+      --border:   #1a2540;
+      --accent:   #00e5ff;
+      --green:    #00ff88;
+      --red:      #ff3d5a;
+      --yellow:   #ffd600;
+      --muted:    #4a5a7a;
+      --text:     #d0ddf5;
+      --text-dim: #7a8fba;
+      --glow:     0 0 18px rgba(0,229,255,.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-        font-family: "Noto Sans TC", Arial, sans-serif;
-        background: #eef2f7;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        color: #333;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
     header {
-        background: linear-gradient(90deg, #1e88e5, #42a5f5);
-        color: white;
-        padding: 20px 0;
-        font-size: 28px;
-        font-weight: bold;
-        text-align: center;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 36px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9,14,26,.85);
+      backdrop-filter: blur(8px);
     }
 
-    .container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 40px 20px;
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--glow);
+    }
+    .logo-icon svg { width: 20px; height: 20px; }
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: #fff;
+    }
+    .logo-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      color: var(--accent);
+      letter-spacing: .15em;
     }
 
-    /* ===== 卡片樣式 ===== */
-    .card {
-        background: white;
-        width: 100%;
-        max-width: 450px;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-        text-align: center;
-        transition: transform 0.2s ease;
-    }
-    .card:hover {
-        transform: translateY(-5px);
+    #clock {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .85rem;
+      color: var(--text-dim);
+      letter-spacing: .1em;
     }
 
-    .card input {
-        width: calc(100% - 20px);
-        padding: 12px;
-        margin-bottom: 15px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        outline: none;
-        transition: 0.2s;
+    /* ── TICKER TAPE ── */
+    .ticker-wrap {
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,21,38,.9);
+      height: 34px;
+      position: relative;
+      z-index: 9;
     }
-    .card input:focus {
-        border-color: #1e88e5;
-        box-shadow: 0 0 5px rgba(30,136,229,0.4);
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 40s linear infinite;
+      white-space: nowrap;
+      height: 100%;
+      align-items: center;
+    }
+    .ticker-item {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      padding: 0 28px;
+      border-right: 1px solid var(--border);
+      color: var(--text-dim);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ticker-item span.up   { color: var(--green); }
+    .ticker-item span.down { color: var(--red);   }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
     }
 
-    .card button {
-        padding: 12px 25px;
-        font-size: 16px;
-        background: #1e88e5;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.2s;
+    /* ── SECTION TITLE ── */
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      text-transform: uppercase;
     }
-    .card button:hover {
-        background: #1565c0;
-    }
-
-    /* ===== 結果樣式 ===== */
-    .result {
-        margin-top: 20px;
-        text-align: left;
-    }
-    .result h2 {
-        margin: 0 0 10px 0;
-        font-size: 24px;
-        text-align: center;
-        color: #1e88e5;
-    }
-    .result .price {
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-    .up { color: #e53935; }
-    .down { color: #43a047; }
-
-    /* ===== 資訊表格 ===== */
-    .info-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        font-size: 16px;
-    }
-    .info-table th, .info-table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-        border-radius: 5px;
-    }
-    .info-table th {
-        background: #f5f5f5;
-        font-weight: 600;
-    }
-    .info-table td.up { font-weight: bold; color: #e53935; }
-    .info-table td.down { font-weight: bold; color: #43a047; }
-
-    /* ===== 廣告樣式 ===== */
-    .ad-box {
-        width: 100%;
-        max-width: 450px;
-        padding: 20px;
-        background: #f0f4f8;
-        border-radius: 15px;
-        text-align: center;
-        margin-bottom: 50px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    h2.section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 28px;
     }
 
-    footer {
-        padding: 20px;
-        font-size: 14px;
-        color: #888;
-        text-align: center;
-        background: #f7f9fb;
-        margin-top: auto;
+    /* ── SEARCH BOX ── */
+    .search-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 36px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .search-area::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
 
-    /* ===== 響應式 ===== */
-    @media (max-width: 500px) {
-        .card, .ad-box {
-            width: 90%;
-        }
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
     }
-</style>
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .search-input-wrap svg {
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      width: 18px; height: 18px;
+    }
+    #stockInput {
+      width: 100%;
+      height: 52px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0 16px 0 46px;
+      font-size: 1rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    #stockInput::placeholder { color: var(--muted); }
+    #stockInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.12);
+    }
+    #searchBtn {
+      height: 52px;
+      padding: 0 28px;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: .95rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 0 20px rgba(0,229,255,.3);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #searchBtn:hover {
+      background: #33ecff;
+      box-shadow: 0 0 30px rgba(0,229,255,.5);
+    }
+    #searchBtn:active { transform: scale(.97); }
+    #searchBtn svg { width: 16px; height: 16px; }
+
+    .hint {
+      margin-top: 12px;
+      font-size: .8rem;
+      color: var(--text-dim);
+    }
+    .hint kbd {
+      background: var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      color: var(--accent);
+    }
+
+    /* ── RESULT CARD ── */
+    #result {
+      min-height: 200px;
+      transition: opacity .3s;
+    }
+    #result.loading { opacity: .4; }
+
+    .stock-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp .35s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,229,255,.04);
+    }
+    .stock-badge {
+      background: rgba(0,229,255,.1);
+      border: 1px solid rgba(0,229,255,.3);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: .08em;
+    }
+    .stock-name-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stock-market-tag {
+      margin-left: auto;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      color: var(--text-dim);
+      background: var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+    .card-timestamp {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+    .metric-cell {
+      background: var(--surface);
+      padding: 22px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background .2s;
+    }
+    .metric-cell:hover { background: rgba(0,229,255,.05); }
+    .metric-label {
+      font-size: .75rem;
+      color: var(--text-dim);
+      letter-spacing: .06em;
+    }
+    .metric-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .metric-value.positive { color: var(--green); }
+    .metric-value.negative { color: var(--red); }
+    .metric-value.warning  { color: var(--yellow); }
+    .metric-value.neutral  { color: var(--text-dim); }
+    .metric-icon { font-size: 1.1rem; }
+
+    .disposal-banner {
+      margin: 0;
+      padding: 14px 28px;
+      background: rgba(255,61,90,.08);
+      border-top: 1px solid rgba(255,61,90,.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .85rem;
+      color: var(--red);
+    }
+
+    /* ── MARKET OVERVIEW ── */
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .market-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .market-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .market-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .market-card.green::after { background: var(--green); }
+    .market-card.red::after   { background: var(--red); }
+    .market-card.blue::after  { background: var(--accent); }
+    .market-card.yellow::after{ background: var(--yellow); }
+
+    .market-card-label {
+      font-size: .75rem;
+      color: var(--text-dim);
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+    .market-card-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .market-card-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .8rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ── UPDATE TIMELINE ── */
+    .timeline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .timeline-title {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timeline-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: .82rem;
+    }
+    .timeline-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .timeline-dot.done    { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .timeline-dot.pending { background: var(--muted); }
+    .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+    .timeline-time {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      color: var(--muted);
+      width: 48px;
+      flex-shrink: 0;
+    }
+    .timeline-label { color: var(--text-dim); }
+    .timeline-label.done  { color: var(--text); }
+
+    /* ── EMPTY / ERROR STATES ── */
+    .state-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 60px 24px;
+      color: var(--text-dim);
+      font-size: .9rem;
+      text-align: center;
+    }
+    .state-box svg { opacity: .3; }
+    .state-box.error { color: var(--red); }
+    .state-box.error svg { opacity: .5; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      header { padding: 14px 18px; }
+      .search-area { padding: 22px 18px; }
+      .search-row { flex-direction: column; }
+      .card-header { padding: 18px 20px; flex-wrap: wrap; }
+      .metric-cell { padding: 18px 20px; }
+      main { padding: 24px 14px 60px; }
+    }
+  </style>
 </head>
 <body>
 
-<header>📈 台股盤後查詢</header>
-
-<div class="container">
-    <div class="card">
-        <input type="text" id="code" placeholder="輸入股票代號">
-        <button onclick="search()">查詢</button>
-
-        <div id="result" class="result"></div>
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+      </svg>
     </div>
-
-    <div class="ad-box">
-        🔽 Google AdSense 廣告會放在這裡
+    <div>
+      <div class="logo-text">盤後雷達</div>
+      <div class="logo-sub">AFTER-HOURS RADAR</div>
     </div>
+  </div>
+  <div id="clock">--:--:--</div>
+</header>
+
+<!-- TICKER TAPE -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack">
+    <!-- duplicated for seamless loop -->
+    <div class="ticker-item">加權指數 <span class="up">▲ --</span></div>
+    <div class="ticker-item">外資合計 <span id="t-foreign">--</span></div>
+    <div class="ticker-item">投信合計 <span id="t-trust">--</span></div>
+    <div class="ticker-item">自營商合計 <span id="t-prop">--</span></div>
+    <div class="ticker-item">融資增減 <span id="t-margin">--</span></div>
+    <div class="ticker-item">三大法人合計 <span id="t-total">--</span></div>
+    <div class="ticker-item">加權指數 <span class="up">▲ --</span></div>
+    <div class="ticker-item">外資合計 <span>--</span></div>
+    <div class="ticker-item">投信合計 <span>--</span></div>
+    <div class="ticker-item">自營商合計 <span>--</span></div>
+    <div class="ticker-item">融資增減 <span>--</span></div>
+    <div class="ticker-item">三大法人合計 <span>--</span></div>
+  </div>
 </div>
 
-<footer>
-    © 2026 台股盤後查詢
-</footer>
+<main>
+
+  <!-- SEARCH -->
+  <div class="search-area">
+    <p class="section-label">個股查詢</p>
+    <h2 class="section-title">盤後買賣超查詢</h2>
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="stockInput" type="text" placeholder="輸入股票代碼或名稱，例如：2330 或 台積電" autocomplete="off" />
+      </div>
+      <button id="searchBtn" onclick="queryStock()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        查詢
+      </button>
+    </div>
+    <p class="hint">支援上市 &amp; 上櫃個股 ・ 按 <kbd>Enter</kbd> 查詢</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <div class="state-box">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#4a5a7a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>輸入股票代碼或名稱開始查詢</span>
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+
+  <!-- MARKET OVERVIEW -->
+  <p class="section-label">大盤概況</p>
+  <h2 class="section-title">今日盤後大盤資訊</h2>
+
+  <div class="market-grid" id="marketGrid">
+    <div class="market-card blue">
+      <div class="market-card-label">外資買賣超</div>
+      <div class="market-card-value" id="m-foreign">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+    <div class="market-card green">
+      <div class="market-card-label">投信買賣超</div>
+      <div class="market-card-value" id="m-trust">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+    <div class="market-card yellow">
+      <div class="market-card-label">自營商買賣超</div>
+      <div class="market-card-value" id="m-prop">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+    <div class="market-card red">
+      <div class="market-card-label">三大法人合計</div>
+      <div class="market-card-value" id="m-total">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+    <div class="market-card blue">
+      <div class="market-card-label">融資增減</div>
+      <div class="market-card-value" id="m-margin-delta">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+    <div class="market-card green">
+      <div class="market-card-label">融資水位</div>
+      <div class="market-card-value" id="m-margin-level">載入中…</div>
+      <div class="market-card-sub">億元</div>
+    </div>
+  </div>
+
+  <!-- UPDATE TIMELINE -->
+  <div class="timeline">
+    <div class="timeline-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      今日資料更新時程
+    </div>
+    <ul class="timeline-list" id="timeline"></ul>
+  </div>
+
+</main>
 
 <script>
-async function search() {
-    let code = document.getElementById("code").value.trim();
-    if(!code){
-        alert("請輸入股票代號");
-        return;
-    }
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+// 將這裡換成你的 Flask 後端網址
+const API_BASE = 'http://127.0.0.1:5000';
 
-    let response = await fetch("stock.json");
-    let data = await response.json();
-
-    if(data[code]){
-        let stock = data[code];
-        let priceClass = stock.change.includes("-") ? "down" : "up";
-        let tableRows = `
-            <tr><th>外資買賣超</th><td class="${stock.foreign && stock.foreign.includes('-') ? 'down':'up'}">${stock.foreign || '🚫 暫未更新'}</td></tr>
-            <tr><th>投信買賣超</th><td class="${stock.trust && stock.trust.includes('-') ? 'down':'up'}">${stock.trust || '🚫 暫未更新'}</td></tr>
-            <tr><th>自營商買賣超</th><td class="${stock.proprietary && stock.proprietary.includes('-') ? 'down':'up'}">${stock.proprietary || '🚫 暫未更新'}</td></tr>
-            <tr><th>借卷賣出</th><td>${stock.short_sale || '🚫 暫未更新'}</td></tr>
-            <tr><th>注意股</th><td>${stock.notice || '❌'}</td></tr>
-            <tr><th>處置股</th><td>${stock.disposal || '❌'}</td></tr>
-        `;
-
-        document.getElementById("result").innerHTML = `
-            <h2>${stock.name} (${code})</h2>
-            <div class="price ${priceClass}">收盤價：${stock.price}</div>
-            <div class="${priceClass}">漲跌：${stock.change}</div>
-            <div>成交量：${stock.volume}</div>
-            <table class="info-table">${tableRows}</table>
-        `;
-    } else {
-        document.getElementById("result").innerHTML = "❌ 找不到該股票資料";
-    }
+// ── CLOCK ───────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('clock').textContent =
+    `${tw.getFullYear()}-${pad(tw.getMonth()+1)}-${pad(tw.getDate())} ` +
+    `${pad(tw.getHours())}:${pad(tw.getMinutes())}:${pad(tw.getSeconds())} (TWN)`;
 }
-</script>
+updateClock();
+setInterval(updateClock, 1000);
 
+// ── TIMELINE ─────────────────────────────────────────────────────────────────
+const TIMELINE_ITEMS = [
+  { time: '15:00', label: '法人買賣金額 / 投信買賣超' },
+  { time: '16:10', label: '外資 / 自營商買賣超' },
+  { time: '17:30', label: '處置股 / 注意股更新' },
+  { time: '21:00', label: '大盤融資金額統計' },
+  { time: '21:30', label: '個股借券賣出' },
+];
+
+function buildTimeline() {
+  const now = new Date();
+  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const current = tw.getHours() * 60 + tw.getMinutes();
+
+  const ul = document.getElementById('timeline');
+  ul.innerHTML = '';
+  TIMELINE_ITEMS.forEach(item => {
+    const [h, m] = item.time.split(':').map(Number);
+    const itemMin = h * 60 + m;
+    let dotClass = 'pending', labelClass = '';
+    if (current > itemMin + 5) { dotClass = 'done'; labelClass = 'done'; }
+    else if (Math.abs(current - itemMin) <= 5) { dotClass = 'active'; }
+
+    ul.innerHTML += `
+      <li class="timeline-item">
+        <span class="timeline-dot ${dotClass}"></span>
+        <span class="timeline-time">${item.time}</span>
+        <span class="timeline-label ${labelClass}">${item.label}</span>
+      </li>`;
+  });
+}
+buildTimeline();
+setInterval(buildTimeline, 60000);
+
+// ── MARKET DATA ──────────────────────────────────────────────────────────────
+async function loadMarket() {
+  try {
+    const res  = await fetch(`${API_BASE}/api/market`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const set = (id, val, colorClass) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = val; el.className = 'market-card-value ' + (colorClass||''); }
+    };
+
+    const colorVal = v => (v > 0 ? 'positive' : v < 0 ? 'negative' : '');
+
+    set('m-foreign',      data.foreign      ?? '--', colorVal(data.foreign));
+    set('m-trust',        data.trust        ?? '--', colorVal(data.trust));
+    set('m-prop',         data.proprietary  ?? '--', colorVal(data.proprietary));
+    set('m-total',        data.total        ?? '--', colorVal(data.total));
+    set('m-margin-delta', data.margin_delta ?? '--', colorVal(data.margin_delta));
+    set('m-margin-level', data.margin_level ?? '--');
+
+    // ticker
+    const fmt = v => v != null ? (v > 0 ? `<span class="up">+${v}</span>` : `<span class="down">${v}</span>`) : '--';
+    document.getElementById('t-foreign').innerHTML = fmt(data.foreign) + '億';
+    document.getElementById('t-trust').innerHTML   = fmt(data.trust)   + '億';
+    document.getElementById('t-prop').innerHTML    = fmt(data.proprietary) + '億';
+    document.getElementById('t-margin').innerHTML  = fmt(data.margin_delta) + '億';
+    document.getElementById('t-total').innerHTML   = fmt(data.total)   + '億';
+
+  } catch (e) {
+    ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '--'; });
+  }
+}
+loadMarket();
+
+// ── STOCK QUERY ──────────────────────────────────────────────────────────────
+const resultEl = document.getElementById('result');
+
+async function queryStock() {
+  const keyword = document.getElementById('stockInput').value.trim();
+  if (!keyword) return;
+
+  resultEl.innerHTML = `
+    <div class="state-box">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6;animation:spin 1s linear infinite">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <span>查詢中…</span>
+    </div>`;
+  // spin animation
+  document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
+
+  try {
+    const res  = await fetch(`${API_BASE}/api/stock?keyword=${encodeURIComponent(keyword)}`);
+    const data = await res.json();
+
+    if (data.error) {
+      resultEl.innerHTML = `
+        <div class="state-box error">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>${data.error}</span>
+        </div>`;
+      return;
+    }
+
+    renderStock(data);
+  } catch (e) {
+    resultEl.innerHTML = `<div class="state-box error"><span>⚠️ 無法連線至伺服器，請稍後再試。</span></div>`;
+  }
+}
+
+function colorClass(val) {
+  if (val == null) return 'neutral';
+  const n = typeof val === 'string' ? parseInt(val.replace(/,/g,'')) : val;
+  if (isNaN(n)) return 'neutral';
+  return n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
+}
+
+function renderStock(d) {
+  const disposal = d.disposal;
+  const isDisposal = disposal && disposal.includes('⭕');
+
+  const disposalBanner = isDisposal
+    ? `<div class="disposal-banner">⚠️ 處置股：${disposal.replace('處置：⭕ ', '')}</div>`
+    : '';
+
+  const metricCell = (label, value, icon='') => {
+    const cc = colorClass(value);
+    return `
+      <div class="metric-cell">
+        <div class="metric-label">${icon} ${label}</div>
+        <div class="metric-value ${cc}">${value ?? '🚫 暫未更新'}</div>
+      </div>`;
+  };
+
+  resultEl.innerHTML = `
+    <div class="stock-card">
+      <div class="card-header">
+        <div class="stock-badge">${d.code || d.keyword}</div>
+        <div class="stock-name-title">${d.name || d.keyword}</div>
+        <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
+        <div class="card-timestamp">${d.date || ''} 盤後</div>
+      </div>
+      <div class="metrics-grid">
+        ${metricCell('外資買賣超（股）', d.foreign,      '🌏')}
+        ${metricCell('投信買賣超（股）', d.trust,        '🏦')}
+        ${metricCell('自營商買賣超（股）', d.proprietary, '🏢')}
+        ${metricCell('借券賣出差額（股）', d.short_sale,  '📉')}
+        ${metricCell('處置狀態', d.disposal,             '⚠️')}
+      </div>
+      ${disposalBanner}
+    </div>`;
+}
+
+// ── ENTER KEY ────────────────────────────────────────────────────────────────
+document.getElementById('stockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') queryStock();
+});
+</script>
 </body>
 </html>
