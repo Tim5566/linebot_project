@@ -3,3 +3,4 @@ line-bot-sdk
 apscheduler
 pytz
 pandas
+flask_cors
