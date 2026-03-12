@@ -13,6 +13,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警
 
 import time as _time
 
+#today = '20260306'
+
 def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
     """發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。"""
     _headers = {"User-Agent": "Mozilla/5.0"}
@@ -30,7 +32,6 @@ def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
         _time.sleep(delay)
     return None
 
-#today = '20260306'
 
 #上市or上櫃公司代碼名稱存檔 (初始讀取一次)
 try:

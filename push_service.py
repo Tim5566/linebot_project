@@ -45,7 +45,7 @@ def start_scheduler(line_bot_api):
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 0), 'cron', hour=9, minute=0, timezone=taiwan) #09:00
 
     # 盤後整體資訊更新時間
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=5, timezone=taiwan) #15:05
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 1), 'cron', hour=15, minute=10, timezone=taiwan) #15:10
     
     # 三大法人個股買賣超更新時間
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 2), 'cron', hour=15, minute=0, timezone=taiwan) #15:00
@@ -59,7 +59,7 @@ def start_scheduler(line_bot_api):
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 6), 'cron', hour=17, minute=30, timezone=taiwan) #17:30
 
     ##大盤融資卷總金額統計
-    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 7), 'cron', hour=21, minute=0, timezone=taiwan) #21:00
+    scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 7), 'cron', hour=21, minute=10, timezone=taiwan) #21:10
 
     # 個股借卷賣出
     scheduler.add_job(lambda: broadcast_post_inf(line_bot_api, 8), 'cron', hour=21, minute=30, timezone=taiwan) #21:30
