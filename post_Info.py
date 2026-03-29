@@ -13,7 +13,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  # 忽略警
 
 import time as _time
 
-#today = '20260306'
+today = '20260327'
 
 def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
     """發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。"""
@@ -55,7 +55,7 @@ except Exception:
 
 # 供查詢今日個股資訊
 def stock_info(keyword):
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    #today = datetime.datetime.now().strftime("%Y%m%d")
 
     #判斷是否假日或盤後更新
     if not is_trading_day():
@@ -249,7 +249,7 @@ def stock_info(keyword):
 
 # 大盤總體資訊
 def market_pnfo():
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    #today = datetime.datetime.now().strftime("%Y%m%d")
 
     API_Net_Amount = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"

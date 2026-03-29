@@ -121,7 +121,7 @@
     }
     .ticker-item span.up   { color: var(--green); }
     .ticker-item span.down { color: var(--red);   }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-33.33%); } }
 
     /* ── MAIN LAYOUT ── */
     main {
@@ -135,14 +135,14 @@
     /* ── SECTION TITLE ── */
     .section-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .7rem;
+      font-size: .75rem;
       letter-spacing: .2em;
       color: var(--accent);
       margin-bottom: 8px;
       text-transform: uppercase;
     }
     h2.section-title {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 28px;
@@ -227,7 +227,7 @@
 
     .hint {
       margin-top: 12px;
-      font-size: .8rem;
+      font-size: .85rem;
       color: var(--text-dim);
     }
     .hint kbd {
@@ -283,7 +283,7 @@
     }
     .stock-market-tag {
       margin-left: auto;
-      font-size: .72rem;
+      font-size: .78rem;
       letter-spacing: .1em;
       color: var(--text-dim);
       background: var(--border);
@@ -292,7 +292,7 @@
     }
     .card-timestamp {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .72rem;
+      font-size: .78rem;
       color: var(--muted);
     }
 
@@ -312,18 +312,18 @@
     }
     .metric-cell:hover { background: rgba(0,229,255,.05); }
     .metric-label {
-      font-size: .75rem;
+      font-size: .8rem;
       color: var(--text-dim);
       letter-spacing: .06em;
     }
     .metric-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 600;
       color: var(--text);
     }
-    .metric-value.positive { color: var(--green); }
-    .metric-value.negative { color: var(--red); }
+    .metric-value.positive { color: var(--red); }
+    .metric-value.negative { color: var(--green); }
     .metric-value.warning  { color: var(--yellow); }
     .metric-value.neutral  { color: var(--text-dim); }
     .metric-icon { font-size: 1.1rem; }
@@ -372,20 +372,21 @@
     .market-card.yellow::after{ background: var(--yellow); }
 
     .market-card-label {
-      font-size: .75rem;
+      font-size: .8rem;
       color: var(--text-dim);
       letter-spacing: .06em;
       margin-bottom: 8px;
     }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: #fff;
     }
+    .market-card-value.positive { color: var(--red); }
+    .market-card-value.negative { color: var(--green); }
     .market-card-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .8rem;
+      font-size: .82rem;
       color: var(--text-dim);
       margin-top: 4px;
     }
@@ -398,7 +399,7 @@
       padding: 24px 28px;
     }
     .timeline-title {
-      font-size: .85rem;
+      font-size: .92rem;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 20px;
@@ -411,7 +412,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      font-size: .82rem;
+      font-size: .85rem;
     }
     .timeline-dot {
       width: 8px; height: 8px;
@@ -424,7 +425,7 @@
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
     .timeline-time {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
+      font-size: .8rem;
       color: var(--muted);
       width: 48px;
       flex-shrink: 0;
@@ -480,19 +481,11 @@
 <!-- TICKER TAPE -->
 <div class="ticker-wrap">
   <div class="ticker-track" id="tickerTrack">
-    <!-- duplicated for seamless loop -->
-    <div class="ticker-item">加權指數 <span class="up">▲ --</span></div>
-    <div class="ticker-item">外資合計 <span id="t-foreign">--</span></div>
-    <div class="ticker-item">投信合計 <span id="t-trust">--</span></div>
-    <div class="ticker-item">自營商合計 <span id="t-prop">--</span></div>
-    <div class="ticker-item">融資增減 <span id="t-margin">--</span></div>
-    <div class="ticker-item">三大法人合計 <span id="t-total">--</span></div>
-    <div class="ticker-item">加權指數 <span class="up">▲ --</span></div>
-    <div class="ticker-item">外資合計 <span>--</span></div>
-    <div class="ticker-item">投信合計 <span>--</span></div>
-    <div class="ticker-item">自營商合計 <span>--</span></div>
-    <div class="ticker-item">融資增減 <span>--</span></div>
-    <div class="ticker-item">三大法人合計 <span>--</span></div>
+    <div class="ticker-item">外資合計 <span class="t-foreign">--</span></div>
+    <div class="ticker-item">投信合計 <span class="t-trust">--</span></div>
+    <div class="ticker-item">自營商合計 <span class="t-prop">--</span></div>
+    <div class="ticker-item">融資增減 <span class="t-margin">--</span></div>
+    <div class="ticker-item">三大法人合計 <span class="t-total">--</span></div>
   </div>
 </div>
 
@@ -653,13 +646,19 @@ async function loadMarket() {
     set('m-margin-delta', data.margin_delta ?? '--', colorVal(data.margin_delta));
     set('m-margin-level', data.margin_level ?? '--');
 
-    // ticker
+    // ticker — 自動複製到夠寬，確保無縫循環
     const fmt = v => v != null ? (v > 0 ? `<span class="up">+${v}</span>` : `<span class="down">${v}</span>`) : '--';
-    document.getElementById('t-foreign').innerHTML = fmt(data.foreign) + '億';
-    document.getElementById('t-trust').innerHTML   = fmt(data.trust)   + '億';
-    document.getElementById('t-prop').innerHTML    = fmt(data.proprietary) + '億';
-    document.getElementById('t-margin').innerHTML  = fmt(data.margin_delta) + '億';
-    document.getElementById('t-total').innerHTML   = fmt(data.total)   + '億';
+    const track = document.getElementById('tickerTrack');
+    const original = track.innerHTML;
+    track.innerHTML = original;
+    while (track.scrollWidth < window.innerWidth * 3) {
+      track.innerHTML += original;
+    }
+    document.querySelectorAll('.t-foreign').forEach(el => el.innerHTML = fmt(data.foreign) + '億');
+    document.querySelectorAll('.t-trust').forEach(el => el.innerHTML   = fmt(data.trust)   + '億');
+    document.querySelectorAll('.t-prop').forEach(el => el.innerHTML    = fmt(data.proprietary) + '億');
+    document.querySelectorAll('.t-margin').forEach(el => el.innerHTML  = fmt(data.margin_delta) + '億');
+    document.querySelectorAll('.t-total').forEach(el => el.innerHTML   = fmt(data.total)   + '億');
 
   } catch (e) {
     ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
