@@ -4,3 +4,4 @@ apscheduler
 pytz
 pandas
 flask_cors
+python-dotenv

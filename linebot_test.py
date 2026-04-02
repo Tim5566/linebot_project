@@ -3,6 +3,7 @@ from linebot import LineBotApi, WebhookHandler  # 使用舊版 API，避免 v3 I
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
+from dotenv import load_dotenv
 
 from push_service import start_scheduler
 from post_Info import stock_info
@@ -11,6 +12,7 @@ from stock_site.api_routes import register_api
 app = Flask(__name__)
 
 # 使用 Render 環境變數設定 Token 與 Secret
+load_dotenv()  # .env 本地端載入環境變數
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 

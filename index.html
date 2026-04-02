@@ -8,17 +8,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:       #090e1a;
-      --surface:  #0d1526;
-      --border:   #1a2540;
-      --accent:   #00e5ff;
-      --green:    #00ff88;
-      --red:      #ff3d5a;
-      --yellow:   #ffd600;
-      --muted:    #4a5a7a;
-      --text:     #d0ddf5;
-      --text-dim: #7a8fba;
-      --glow:     0 0 18px rgba(0,229,255,.25);
+      --bg:        #070d1a;
+      --surface:   #0b1220;
+      --surface2:  #0f1828;
+      --border:    #162035;
+      --border2:   #1e2f4a;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --green:     #00e676;
+      --red:       #ff3d5a;
+      --yellow:    #ffd600;
+      --muted:     #3a4d6a;
+      --text:      #ccdaf5;
+      --text-dim:  #6a80a8;
+      --text-faint:#3a4d6a;
+      --glow:      0 0 24px rgba(0,229,255,.2);
+      --glow-red:  0 0 16px rgba(255,61,90,.3);
+      --glow-grn:  0 0 16px rgba(0,230,118,.3);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,15 +37,23 @@
       overflow-x: hidden;
     }
 
-    /* ── GRID BACKGROUND ── */
+    /* ── ANIMATED GRID BACKGROUND ── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,100,140,.12) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -51,58 +65,90 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 36px;
+      padding: 16px 40px;
       border-bottom: 1px solid var(--border);
-      background: rgba(9,14,26,.85);
-      backdrop-filter: blur(8px);
+      background: rgba(7,13,26,.92);
+      backdrop-filter: blur(12px);
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
     .logo-icon {
-      width: 36px; height: 36px;
-      border: 2px solid var(--accent);
-      border-radius: 8px;
+      width: 40px; height: 40px;
+      border: 1.5px solid var(--accent);
+      border-radius: 10px;
       display: grid;
       place-items: center;
       box-shadow: var(--glow);
+      background: rgba(0,229,255,.05);
     }
-    .logo-icon svg { width: 20px; height: 20px; }
+    .logo-icon svg { width: 22px; height: 22px; }
     .logo-text {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: .08em;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: .06em;
       color: #fff;
     }
     .logo-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .65rem;
+      font-size: .6rem;
       color: var(--accent);
-      letter-spacing: .15em;
+      letter-spacing: .18em;
+      opacity: .7;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .market-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--text-dim);
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: var(--glow-grn);
+      animation: pulse 2s infinite;
+    }
     #clock {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .85rem;
+      font-size: .82rem;
       color: var(--text-dim);
-      letter-spacing: .1em;
+      letter-spacing: .08em;
     }
 
     /* ── TICKER TAPE ── */
     .ticker-wrap {
       overflow: hidden;
       border-bottom: 1px solid var(--border);
-      background: rgba(13,21,38,.9);
-      height: 34px;
+      background: rgba(11,18,32,.95);
+      height: 38px;
       position: relative;
       z-index: 9;
     }
+    .ticker-wrap::before,
+    .ticker-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 60px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .ticker-wrap::before { left: 0; background: linear-gradient(90deg, rgba(11,18,32,1), transparent); }
+    .ticker-wrap::after  { right: 0; background: linear-gradient(-90deg, rgba(11,18,32,1), transparent); }
     .ticker-track {
       display: flex;
-      gap: 0;
       animation: ticker 40s linear infinite;
       white-space: nowrap;
       height: 100%;
@@ -110,51 +156,55 @@
     }
     .ticker-item {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .78rem;
-      padding: 0 28px;
+      font-size: .82rem;
+      padding: 0 32px;
       border-right: 1px solid var(--border);
       color: var(--text-dim);
       height: 100%;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: .03em;
     }
-    .ticker-item span.up   { color: var(--green); }
-    .ticker-item span.down { color: var(--red);   }
+    .ticker-item .label { color: var(--text-faint); font-size: .75rem; }
+    .ticker-item span.up   { color: var(--red);   font-weight: 600; }
+    .ticker-item span.down { color: var(--green); font-weight: 600; }
     @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-33.33%); } }
 
     /* ── MAIN LAYOUT ── */
     main {
       position: relative;
       z-index: 1;
-      max-width: 1100px;
+      max-width: 1160px;
       margin: 0 auto;
-      padding: 40px 24px 80px;
+      padding: 44px 28px 100px;
     }
 
     /* ── SECTION TITLE ── */
     .section-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
-      letter-spacing: .2em;
+      font-size: .68rem;
+      letter-spacing: .25em;
       color: var(--accent);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-transform: uppercase;
+      opacity: .8;
     }
     h2.section-title {
-      font-size: 1.6rem;
-      font-weight: 700;
+      font-size: 1.55rem;
+      font-weight: 800;
       color: #fff;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      letter-spacing: -.01em;
     }
 
     /* ── SEARCH BOX ── */
     .search-area {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px 36px;
-      margin-bottom: 40px;
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 36px;
       position: relative;
       overflow: hidden;
     }
@@ -162,13 +212,24 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+      opacity: .6;
+    }
+    .search-area::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% -20%, rgba(0,229,255,.04) 0%, transparent 70%);
+      pointer-events: none;
     }
 
+    .search-top {
+      margin-bottom: 20px;
+    }
     .search-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: stretch;
     }
     .search-input-wrap {
@@ -180,16 +241,16 @@
       left: 16px; top: 50%;
       transform: translateY(-50%);
       color: var(--muted);
-      width: 18px; height: 18px;
+      width: 17px; height: 17px;
     }
     #stockInput {
       width: 100%;
-      height: 52px;
+      height: 50px;
       background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
       padding: 0 16px 0 46px;
-      font-size: 1rem;
+      font-size: .95rem;
       font-family: 'Noto Sans TC', sans-serif;
       color: var(--text);
       outline: none;
@@ -198,240 +259,399 @@
     #stockInput::placeholder { color: var(--muted); }
     #stockInput:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,229,255,.12);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.1), 0 0 20px rgba(0,229,255,.08);
     }
     #searchBtn {
-      height: 52px;
-      padding: 0 28px;
+      height: 50px;
+      padding: 0 26px;
       background: var(--accent);
       color: #000;
-      font-weight: 700;
-      font-size: .95rem;
+      font-weight: 800;
+      font-size: .9rem;
       font-family: 'Noto Sans TC', sans-serif;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background .2s, transform .1s, box-shadow .2s;
-      box-shadow: 0 0 20px rgba(0,229,255,.3);
+      transition: all .2s;
+      box-shadow: 0 0 24px rgba(0,229,255,.35);
       white-space: nowrap;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: .04em;
     }
     #searchBtn:hover {
       background: #33ecff;
-      box-shadow: 0 0 30px rgba(0,229,255,.5);
+      box-shadow: 0 0 36px rgba(0,229,255,.55);
+      transform: translateY(-1px);
     }
     #searchBtn:active { transform: scale(.97); }
-    #searchBtn svg { width: 16px; height: 16px; }
+    #searchBtn svg { width: 15px; height: 15px; }
 
     .hint {
-      margin-top: 12px;
-      font-size: .85rem;
-      color: var(--text-dim);
+      margin-top: 10px;
+      font-size: .8rem;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .hint kbd {
-      background: var(--border);
+      background: var(--border2);
       border-radius: 4px;
-      padding: 1px 6px;
+      padding: 1px 7px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
+      font-size: .72rem;
       color: var(--accent);
+      border: 1px solid var(--border2);
     }
 
     /* ── RESULT CARD ── */
-    #result {
-      min-height: 200px;
-      transition: opacity .3s;
-    }
+    #result { min-height: 160px; transition: opacity .3s; }
     #result.loading { opacity: .4; }
 
     .stock-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      border: 1px solid var(--border2);
+      border-radius: 18px;
       overflow: hidden;
-      animation: fadeUp .35s ease;
+      animation: fadeUp .3s ease;
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     .card-header {
-      padding: 24px 32px;
+      padding: 22px 28px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       border-bottom: 1px solid var(--border);
-      background: rgba(0,229,255,.04);
+      background: rgba(0,229,255,.03);
+      flex-wrap: wrap;
     }
     .stock-badge {
       background: rgba(0,229,255,.1);
-      border: 1px solid rgba(0,229,255,.3);
+      border: 1px solid rgba(0,229,255,.25);
       border-radius: 8px;
-      padding: 6px 14px;
+      padding: 5px 14px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: var(--accent);
-      letter-spacing: .08em;
+      letter-spacing: .1em;
     }
     .stock-name-title {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: #fff;
     }
     .stock-market-tag {
       margin-left: auto;
-      font-size: .78rem;
+      font-size: .72rem;
       letter-spacing: .1em;
       color: var(--text-dim);
       background: var(--border);
+      border: 1px solid var(--border2);
       border-radius: 6px;
       padding: 3px 10px;
     }
     .card-timestamp {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .78rem;
+      font-size: .72rem;
       color: var(--muted);
     }
 
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1px;
       background: var(--border);
     }
     .metric-cell {
       background: var(--surface);
-      padding: 22px 28px;
+      padding: 20px 26px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      transition: background .2s;
+      position: relative;
+    }
+    .metric-cell::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: transparent;
       transition: background .2s;
     }
-    .metric-cell:hover { background: rgba(0,229,255,.05); }
+    .metric-cell:hover { background: rgba(0,229,255,.04); }
+    .metric-cell:hover::before { background: rgba(0,229,255,.15); }
     .metric-label {
-      font-size: .8rem;
+      font-size: .75rem;
       color: var(--text-dim);
       letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .metric-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 600;
       color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
     }
+    .metric-value .unit { font-size: .72rem; color: var(--text-dim); font-weight: 400; }
     .metric-value.positive { color: var(--red); }
     .metric-value.negative { color: var(--green); }
     .metric-value.warning  { color: var(--yellow); }
     .metric-value.neutral  { color: var(--text-dim); }
-    .metric-icon { font-size: 1.1rem; }
+    .metric-arrow { font-size: .85rem; }
 
     .disposal-banner {
       margin: 0;
-      padding: 14px 28px;
-      background: rgba(255,61,90,.08);
-      border-top: 1px solid rgba(255,61,90,.25);
+      padding: 12px 28px;
+      background: rgba(255,61,90,.06);
+      border-top: 1px solid rgba(255,61,90,.2);
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: .85rem;
+      font-size: .82rem;
       color: var(--red);
+      letter-spacing: .02em;
     }
 
     /* ── MARKET OVERVIEW ── */
+    .market-section { margin-bottom: 40px; }
     .market-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 800px) {
+      .market-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .market-grid { grid-template-columns: 1fr; }
     }
     .market-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 24px;
+      border-radius: 16px;
+      padding: 20px 22px;
       position: relative;
       overflow: hidden;
-      transition: border-color .2s, transform .2s;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+      cursor: default;
     }
     .market-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
+      border-color: var(--border2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
     }
+    .market-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .market-card:hover::before { opacity: 1; }
+    .market-card.blue::before   { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+    .market-card.green::before  { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+    .market-card.yellow::before { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
+    .market-card.red::before    { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+    .market-card.muted::before  { background: linear-gradient(90deg, transparent, var(--muted), transparent); }
     .market-card::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
     }
-    .market-card.green::after { background: var(--green); }
-    .market-card.red::after   { background: var(--red); }
-    .market-card.blue::after  { background: var(--accent); }
-    .market-card.yellow::after{ background: var(--yellow); }
+    .market-card.green::after  { background: var(--green); }
+    .market-card.red::after    { background: var(--red); }
+    .market-card.blue::after   { background: var(--accent); }
+    .market-card.yellow::after { background: var(--yellow); }
+    .market-card.muted::after  { background: var(--muted); }
 
+    .market-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
     .market-card-label {
-      font-size: .8rem;
+      font-size: .75rem;
       color: var(--text-dim);
-      letter-spacing: .06em;
-      margin-bottom: 8px;
+      letter-spacing: .08em;
+    }
+    .market-card-icon {
+      font-size: .95rem;
+      opacity: .6;
     }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
     }
-    .market-card-value.positive { color: var(--red); }
-    .market-card-value.negative { color: var(--green); }
+    .market-card-value.positive { color: var(--red); text-shadow: var(--glow-red); }
+    .market-card-value.negative { color: var(--green); text-shadow: var(--glow-grn); }
+    .market-card-value .arrow { font-size: 1rem; }
     .market-card-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .82rem;
-      color: var(--text-dim);
-      margin-top: 4px;
+      font-size: .75rem;
+      color: var(--text-faint);
+    }
+
+    /* ── TWO-COL BOTTOM SECTION ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .bottom-grid { grid-template-columns: 1fr; }
     }
 
     /* ── UPDATE TIMELINE ── */
     .timeline {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px 28px;
+      border-radius: 16px;
+      padding: 22px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.3), transparent);
     }
     .timeline-title {
-      font-size: .92rem;
-      font-weight: 600;
+      font-size: .88rem;
+      font-weight: 700;
       color: var(--text);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: .02em;
     }
-    .timeline-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .timeline-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .timeline-list::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--border2);
+    }
     .timeline-item {
       display: flex;
       align-items: center;
       gap: 14px;
-      font-size: .85rem;
+      font-size: .83rem;
+      padding: 8px 0;
+      position: relative;
     }
     .timeline-dot {
       width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
-    .timeline-dot.done    { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .timeline-dot.pending { background: var(--muted); }
-    .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+    .timeline-dot.done    { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .timeline-dot.pending { background: var(--border2); border: 1px solid var(--muted); }
+    .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 10px var(--accent); } 50% { opacity: .5; box-shadow: 0 0 4px var(--accent); } }
     .timeline-time {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .8rem;
+      font-size: .76rem;
       color: var(--muted);
-      width: 48px;
+      width: 44px;
       flex-shrink: 0;
     }
     .timeline-label { color: var(--text-dim); }
     .timeline-label.done  { color: var(--text); }
+
+    /* ── DATA NOTE ── */
+    .data-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+    }
+    .data-note-title {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .data-note-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: .78rem;
+      color: var(--text-dim);
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .data-note-item:last-child { border-bottom: none; }
+    .data-note-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 5px;
+      opacity: .6;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7,13,26,.8);
+    }
+    .footer-left {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      color: var(--text-faint);
+      letter-spacing: .06em;
+    }
+    .footer-right {
+      font-size: .72rem;
+      color: var(--text-faint);
+    }
+    .footer-right span { color: var(--text-dim); }
 
     /* ── EMPTY / ERROR STATES ── */
     .state-box {
@@ -440,23 +660,25 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      padding: 60px 24px;
+      padding: 50px 24px;
       color: var(--text-dim);
-      font-size: .9rem;
+      font-size: .88rem;
       text-align: center;
     }
-    .state-box svg { opacity: .3; }
+    .state-box svg { opacity: .25; }
     .state-box.error { color: var(--red); }
-    .state-box.error svg { opacity: .5; }
+    .state-box.error svg { opacity: .4; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       header { padding: 14px 18px; }
+      .header-right .market-status { display: none; }
       .search-area { padding: 22px 18px; }
       .search-row { flex-direction: column; }
-      .card-header { padding: 18px 20px; flex-wrap: wrap; }
-      .metric-cell { padding: 18px 20px; }
-      main { padding: 24px 14px 60px; }
+      .card-header { padding: 16px 18px; }
+      .metric-cell { padding: 16px 18px; }
+      main { padding: 28px 16px 80px; }
+      footer { padding: 14px 18px; flex-direction: column; gap: 6px; text-align: center; }
     }
   </style>
 </head>
@@ -472,20 +694,26 @@
     </div>
     <div>
       <div class="logo-text">盤後雷達</div>
-      <div class="logo-sub">AFTER-HOURS RADAR</div>
+      <div class="logo-sub">AFTER-HOURS RADAR · TWSE / TPEX</div>
     </div>
   </div>
-  <div id="clock">--:--:--</div>
+  <div class="header-right">
+    <div class="market-status">
+      <div class="status-dot"></div>
+      <span>資料來源：TWSE / TPEX</span>
+    </div>
+    <div id="clock">--:--:--</div>
+  </div>
 </header>
 
 <!-- TICKER TAPE -->
 <div class="ticker-wrap">
   <div class="ticker-track" id="tickerTrack">
-    <div class="ticker-item">外資合計 <span class="t-foreign">--</span></div>
-    <div class="ticker-item">投信合計 <span class="t-trust">--</span></div>
-    <div class="ticker-item">自營商合計 <span class="t-prop">--</span></div>
-    <div class="ticker-item">融資增減 <span class="t-margin">--</span></div>
-    <div class="ticker-item">三大法人合計 <span class="t-total">--</span></div>
+    <div class="ticker-item"><span class="label">外資</span> <span class="t-foreign">--</span></div>
+    <div class="ticker-item"><span class="label">投信</span> <span class="t-trust">--</span></div>
+    <div class="ticker-item"><span class="label">自營商</span> <span class="t-prop">--</span></div>
+    <div class="ticker-item"><span class="label">融資增減</span> <span class="t-margin">--</span></div>
+    <div class="ticker-item"><span class="label">三大法人</span> <span class="t-total">--</span></div>
   </div>
 </div>
 
@@ -493,8 +721,10 @@
 
   <!-- SEARCH -->
   <div class="search-area">
-    <p class="section-label">個股查詢</p>
-    <h2 class="section-title">盤後買賣超查詢</h2>
+    <div class="search-top">
+      <p class="section-label">個股查詢</p>
+      <h2 class="section-title">盤後買賣超查詢</h2>
+    </div>
     <div class="search-row">
       <div class="search-input-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -509,84 +739,128 @@
         查詢
       </button>
     </div>
-    <p class="hint">支援上市 &amp; 上櫃個股 ・ 按 <kbd>Enter</kbd> 查詢</p>
+    <p class="hint">支援上市 &amp; 上櫃個股 ・ 按 <kbd>Enter</kbd> 快速查詢</p>
   </div>
 
   <!-- RESULT -->
   <div id="result">
     <div class="state-box">
-      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#4a5a7a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4a5a7a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <span>輸入股票代碼或名稱開始查詢</span>
     </div>
   </div>
 
-  <div style="height:40px"></div>
+  <div style="height:48px"></div>
 
   <!-- MARKET OVERVIEW -->
-  <p class="section-label">大盤概況</p>
-  <h2 class="section-title">今日盤後大盤資訊</h2>
-
-  <div class="market-grid" id="marketGrid">
-    <div class="market-card blue">
-      <div class="market-card-label">外資買賣超</div>
-      <div class="market-card-value" id="m-foreign">載入中…</div>
-      <div class="market-card-sub">億元</div>
-    </div>
-    <div class="market-card green">
-      <div class="market-card-label">投信買賣超</div>
-      <div class="market-card-value" id="m-trust">載入中…</div>
-      <div class="market-card-sub">億元</div>
-    </div>
-    <div class="market-card yellow">
-      <div class="market-card-label">自營商買賣超</div>
-      <div class="market-card-value" id="m-prop">載入中…</div>
-      <div class="market-card-sub">億元</div>
-    </div>
-    <div class="market-card red">
-      <div class="market-card-label">三大法人合計</div>
-      <div class="market-card-value" id="m-total">載入中…</div>
-      <div class="market-card-sub">億元</div>
-    </div>
-    <div class="market-card blue">
-      <div class="market-card-label">融資增減</div>
-      <div class="market-card-value" id="m-margin-delta">載入中…</div>
-      <div class="market-card-sub">億元</div>
-    </div>
-    <div class="market-card green">
-      <div class="market-card-label">融資水位</div>
-      <div class="market-card-value" id="m-margin-level">載入中…</div>
-      <div class="market-card-sub">億元</div>
+  <div class="market-section">
+    <p class="section-label">大盤概況</p>
+    <h2 class="section-title">今日盤後大盤資訊</h2>
+    <div class="market-grid" id="marketGrid">
+      <div class="market-card blue">
+        <div class="market-card-top">
+          <div class="market-card-label">外資買賣超</div>
+          <div class="market-card-icon">🌏</div>
+        </div>
+        <div class="market-card-value" id="m-foreign">--</div>
+        <div class="market-card-sub">億元</div>
+      </div>
+      <div class="market-card green">
+        <div class="market-card-top">
+          <div class="market-card-label">投信買賣超</div>
+          <div class="market-card-icon">🏦</div>
+        </div>
+        <div class="market-card-value" id="m-trust">--</div>
+        <div class="market-card-sub">億元</div>
+      </div>
+      <div class="market-card yellow">
+        <div class="market-card-top">
+          <div class="market-card-label">自營商買賣超</div>
+          <div class="market-card-icon">🏢</div>
+        </div>
+        <div class="market-card-value" id="m-prop">--</div>
+        <div class="market-card-sub">億元</div>
+      </div>
+      <div class="market-card red">
+        <div class="market-card-top">
+          <div class="market-card-label">三大法人合計</div>
+          <div class="market-card-icon">📊</div>
+        </div>
+        <div class="market-card-value" id="m-total">--</div>
+        <div class="market-card-sub">億元</div>
+      </div>
+      <div class="market-card blue">
+        <div class="market-card-top">
+          <div class="market-card-label">融資增減</div>
+          <div class="market-card-icon">📈</div>
+        </div>
+        <div class="market-card-value" id="m-margin-delta">--</div>
+        <div class="market-card-sub">億元</div>
+      </div>
+      <div class="market-card muted">
+        <div class="market-card-top">
+          <div class="market-card-label">融資水位</div>
+          <div class="market-card-icon">💧</div>
+        </div>
+        <div class="market-card-value" id="m-margin-level">--</div>
+        <div class="market-card-sub">億元（總餘額）</div>
+      </div>
     </div>
   </div>
 
-  <!-- UPDATE TIMELINE -->
-  <div class="timeline">
-    <div class="timeline-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-      今日資料更新時程
+  <!-- BOTTOM: TIMELINE + DATA NOTE -->
+  <div class="bottom-grid">
+
+    <!-- UPDATE TIMELINE -->
+    <div class="timeline">
+      <div class="timeline-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        今日資料更新時程
+      </div>
+      <ul class="timeline-list" id="timeline"></ul>
     </div>
-    <ul class="timeline-list" id="timeline"></ul>
+
+    <!-- DATA NOTE -->
+    <div class="data-note">
+      <div class="data-note-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        資料說明
+      </div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位為當日融資餘額總額，非增減值，僅供參考</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>資料來源：台灣證交所（TWSE）及櫃買中心（TPEX）</span></div>
+    </div>
+
   </div>
 
 </main>
 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">AFTER-HOURS RADAR · 盤後雷達 · DATA BY TWSE / TPEX</div>
+  <div class="footer-right">資料僅供參考，<span>不構成任何投資建議</span></div>
+</footer>
+
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
-// 將這裡換成你的 Flask 後端網址
+// ── CONFIG ───────────────────────────────────────────────────────────────────
 //const API_BASE = 'http://127.0.0.1:5000';
 const API_BASE = 'https://linebot-project-oxnw.onrender.com';
-// ── CLOCK ───────────────────────────────────────────────────────────────────
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
   const pad = n => String(n).padStart(2, '0');
   document.getElementById('clock').textContent =
     `${tw.getFullYear()}-${pad(tw.getMonth()+1)}-${pad(tw.getDate())} ` +
-    `${pad(tw.getHours())}:${pad(tw.getMinutes())}:${pad(tw.getSeconds())} (TWN)`;
+    `${pad(tw.getHours())}:${pad(tw.getMinutes())}:${pad(tw.getSeconds())} TWN`;
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -604,16 +878,14 @@ function buildTimeline() {
   const now = new Date();
   const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
   const current = tw.getHours() * 60 + tw.getMinutes();
-
   const ul = document.getElementById('timeline');
   ul.innerHTML = '';
   TIMELINE_ITEMS.forEach(item => {
     const [h, m] = item.time.split(':').map(Number);
     const itemMin = h * 60 + m;
     let dotClass = 'pending', labelClass = '';
-    if (current > itemMin + 5) { dotClass = 'done'; labelClass = 'done'; }
+    if (current > itemMin + 5)            { dotClass = 'done';   labelClass = 'done'; }
     else if (Math.abs(current - itemMin) <= 5) { dotClass = 'active'; }
-
     ul.innerHTML += `
       <li class="timeline-item">
         <span class="timeline-dot ${dotClass}"></span>
@@ -625,49 +897,70 @@ function buildTimeline() {
 buildTimeline();
 setInterval(buildTimeline, 60000);
 
-// ── MARKET DATA ──────────────────────────────────────────────────────────────
+// ── MARKET DATA ───────────────────────────────────────────────────────────────
 async function loadMarket() {
   try {
     const res  = await fetch(`${API_BASE}/api/market`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    const set = (id, val, colorClass) => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = val; el.className = 'market-card-value ' + (colorClass||''); }
-    };
-
     const colorVal = v => (v > 0 ? 'positive' : v < 0 ? 'negative' : '');
 
-    set('m-foreign',      data.foreign      ?? '--', colorVal(data.foreign));
-    set('m-trust',        data.trust        ?? '--', colorVal(data.trust));
-    set('m-prop',         data.proprietary  ?? '--', colorVal(data.proprietary));
-    set('m-total',        data.total        ?? '--', colorVal(data.total));
-    set('m-margin-delta', data.margin_delta ?? '--', colorVal(data.margin_delta));
-    set('m-margin-level', data.margin_level ?? '--');
+    const set = (id, val, colorClass) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (val == null) {
+        el.textContent = '🚫 暫未更新';
+        el.className = 'market-card-value neutral';
+      } else {
+        el.textContent = val;
+        el.className = 'market-card-value ' + (colorClass || '');
+      }
+    };
 
-    // ticker — 自動複製到夠寬，確保無縫循環
-    const fmt = v => v != null ? (v > 0 ? `<span class="up">+${v}</span>` : `<span class="down">${v}</span>`) : '--';
+    set('m-foreign',      data.foreign,      colorVal(data.foreign));
+    set('m-trust',        data.trust,        colorVal(data.trust));
+    set('m-prop',         data.proprietary,  colorVal(data.proprietary));
+    set('m-total',        data.total,        colorVal(data.total));
+    set('m-margin-delta', data.margin_delta, colorVal(data.margin_delta));
+
+    // 融資水位：絕對值，不顯示箭頭
+    const lvlEl = document.getElementById('m-margin-level');
+    if (lvlEl) {
+      if (data.margin_level == null) {
+        lvlEl.textContent = '🚫 暫未更新';
+        lvlEl.className = 'market-card-value neutral';
+      } else {
+        lvlEl.textContent = data.margin_level;
+        lvlEl.className = 'market-card-value';
+      }
+    }
+
+    // ticker
+    const fmt = v => v != null
+      ? (v > 0 ? `<span class="up">+${v}億</span>` : `<span class="down">${v}億</span>`)
+      : '<span style="color:var(--text-faint)">🚫 暫未更新</span>';
     const track = document.getElementById('tickerTrack');
     const original = track.innerHTML;
     track.innerHTML = original;
-    while (track.scrollWidth < window.innerWidth * 3) {
-      track.innerHTML += original;
-    }
-    document.querySelectorAll('.t-foreign').forEach(el => el.innerHTML = fmt(data.foreign) + '億');
-    document.querySelectorAll('.t-trust').forEach(el => el.innerHTML   = fmt(data.trust)   + '億');
-    document.querySelectorAll('.t-prop').forEach(el => el.innerHTML    = fmt(data.proprietary) + '億');
-    document.querySelectorAll('.t-margin').forEach(el => el.innerHTML  = fmt(data.margin_delta) + '億');
-    document.querySelectorAll('.t-total').forEach(el => el.innerHTML   = fmt(data.total)   + '億');
+    while (track.scrollWidth < window.innerWidth * 3) { track.innerHTML += original; }
+    document.querySelectorAll('.t-foreign').forEach(el => el.innerHTML = fmt(data.foreign));
+    document.querySelectorAll('.t-trust').forEach(el   => el.innerHTML = fmt(data.trust));
+    document.querySelectorAll('.t-prop').forEach(el    => el.innerHTML = fmt(data.proprietary));
+    document.querySelectorAll('.t-margin').forEach(el  => el.innerHTML = fmt(data.margin_delta));
+    document.querySelectorAll('.t-total').forEach(el   => el.innerHTML = fmt(data.total));
 
   } catch (e) {
     ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
-      .forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '--'; });
+      .forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = '--'; el.className = 'market-card-value'; }
+      });
   }
 }
 loadMarket();
 
-// ── STOCK QUERY ──────────────────────────────────────────────────────────────
+// ── STOCK QUERY ───────────────────────────────────────────────────────────────
 const resultEl = document.getElementById('result');
 
 async function queryStock() {
@@ -676,29 +969,26 @@ async function queryStock() {
 
   resultEl.innerHTML = `
     <div class="state-box">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6;animation:spin 1s linear infinite">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7;animation:spin 1s linear infinite">
         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
       </svg>
       <span>查詢中…</span>
     </div>`;
-  // spin animation
   document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
 
   try {
     const res  = await fetch(`${API_BASE}/api/stock?keyword=${encodeURIComponent(keyword)}`);
     const data = await res.json();
-
     if (data.error) {
       resultEl.innerHTML = `
         <div class="state-box error">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <span>${data.error}</span>
         </div>`;
       return;
     }
-
     renderStock(data);
   } catch (e) {
     resultEl.innerHTML = `<div class="state-box error"><span>⚠️ 無法連線至伺服器，請稍後再試。</span></div>`;
@@ -715,19 +1005,24 @@ function colorClass(val) {
 function renderStock(d) {
   const disposal = d.disposal;
   const isDisposal = disposal && disposal.includes('⭕');
-
   const disposalBanner = isDisposal
     ? `<div class="disposal-banner">⚠️ 處置股：${disposal.replace('處置：⭕ ', '')}</div>`
     : '';
 
-  const metricCell = (label, value, icon='') => {
+  const metricCell = (label, value, icon='', unit='股') => {
     const cc = colorClass(value);
+    const display = value != null
+      ? `<span>${value}</span><span class="unit">${unit}</span>`
+      : '🚫 暫未更新';
     return `
       <div class="metric-cell">
-        <div class="metric-label">${icon} ${label}</div>
-        <div class="metric-value ${cc}">${value ?? '🚫 暫未更新'}</div>
+        <div class="metric-label">${icon ? `<span>${icon}</span>` : ''} ${label}</div>
+        <div class="metric-value ${cc}">${display}</div>
       </div>`;
   };
+
+  const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
+  const disposalDisplay = disposal ?? '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
@@ -738,17 +1033,20 @@ function renderStock(d) {
         <div class="card-timestamp">${d.date || ''} 盤後</div>
       </div>
       <div class="metrics-grid">
-        ${metricCell('外資買賣超（股）', d.foreign,      '🌏')}
-        ${metricCell('投信買賣超（股）', d.trust,        '🏦')}
-        ${metricCell('自營商買賣超（股）', d.proprietary, '🏢')}
-        ${metricCell('借券賣出差額（股）', d.short_sale,  '📉')}
-        ${metricCell('處置狀態', d.disposal,             '⚠️')}
+        ${metricCell('外資買賣超', d.foreign,      '🌏')}
+        ${metricCell('投信買賣超', d.trust,        '🏦')}
+        ${metricCell('自營商買賣超', d.proprietary,'🏢')}
+        ${metricCell('借券賣出差額', d.short_sale, '📉')}
+        <div class="metric-cell">
+          <div class="metric-label"><span>⚠️</span> 處置狀態</div>
+          <div class="metric-value ${disposalCc}">${disposalDisplay}</div>
+        </div>
       </div>
       ${disposalBanner}
     </div>`;
 }
 
-// ── ENTER KEY ────────────────────────────────────────────────────────────────
+// ── ENTER KEY ─────────────────────────────────────────────────────────────────
 document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') queryStock();
 });
