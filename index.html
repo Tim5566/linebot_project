@@ -430,7 +430,7 @@
       background: var(--surface);
       border: 1px solid var(--border2);
       border-radius: 20px;
-      padding: 20px;
+      padding: 28px 24px 20px 24px;
       position: relative;
       overflow: hidden;
     }
@@ -772,9 +772,9 @@
 
   <!-- MARKET OVERVIEW -->
   <div class="market-section">
+    <div class="market-wrap">
     <p class="section-label">大盤概況</p>
     <h2 class="section-title">今日盤後大盤資訊</h2>
-    <div class="market-wrap">
     <div class="market-grid" id="marketGrid">
       <div class="market-card blue">
         <div class="market-card-top">
@@ -1041,7 +1041,7 @@ function renderStock(d) {
 
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
   const disposalDisplay = disposal ? disposal.replace('處置：', '') : '🚫 暫未更新';
-
+  
   resultEl.innerHTML = `
     <div class="stock-card">
       <div class="card-header">
