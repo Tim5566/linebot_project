@@ -426,6 +426,22 @@
 
     /* ── MARKET OVERVIEW ── */
     .market-section { margin-bottom: 40px; }
+    .market-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .market-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+      opacity: .4;
+    }
     .market-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -758,6 +774,7 @@
   <div class="market-section">
     <p class="section-label">大盤概況</p>
     <h2 class="section-title">今日盤後大盤資訊</h2>
+    <div class="market-wrap">
     <div class="market-grid" id="marketGrid">
       <div class="market-card blue">
         <div class="market-card-top">
@@ -807,6 +824,7 @@
         <div class="market-card-value" id="m-margin-level">--</div>
         <div class="market-card-sub">億元（總餘額）</div>
       </div>
+    </div>
     </div>
   </div>
 
@@ -1022,7 +1040,7 @@ function renderStock(d) {
   };
 
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
-  const disposalDisplay = disposal ?? '🚫 暫未更新';
+  const disposalDisplay = disposal ? disposal.replace('處置：', '') : '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
