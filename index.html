@@ -180,6 +180,68 @@
       padding: 44px 28px 100px;
     }
 
+    /* ── MUSIC BUTTON ── */
+    #musicBtn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,229,255,.3);
+      background: rgba(0,229,255,.08);
+      color: var(--accent);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    #musicBtn svg { width: 13px; height: 13px; }
+    #musicBtn:hover {
+      background: rgba(0,229,255,.18);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(0,229,255,.3);
+    }
+    #musicBtn.playing {
+      background: rgba(0,229,255,.15);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0,229,255,.25);
+      animation: musicPulse 2s ease-in-out infinite;
+    }
+    @keyframes musicPulse {
+      0%,100% { box-shadow: 0 0 8px rgba(0,229,255,.2); }
+      50%      { box-shadow: 0 0 18px rgba(0,229,255,.5); }
+    }
+
+    /* ── MARKET TITLE ROW ── */
+    .market-title-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .market-title-row h2.section-title { margin-bottom: 0; }
+    .refresh-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--text-dim);
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.15);
+      border-radius: 8px;
+      padding: 6px 12px;
+      margin-bottom: 4px;
+    }
+    .refresh-badge svg { color: var(--accent); opacity: .7; flex-shrink: 0; }
+    .countdown {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--accent);
+      font-size: .8rem;
+      letter-spacing: .05em;
+      min-width: 36px;
+    }
+    .countdown.urgent { color: var(--red); animation: pulse 1s infinite; }
+
     /* ── SECTION TITLE ── */
     .section-label {
       font-family: 'Share Tech Mono', monospace;
@@ -198,15 +260,65 @@
       letter-spacing: -.01em;
     }
 
+    /* ── ANIMATED BORDER GLOW ── */
+    @keyframes borderGlow {
+      0%   { opacity: .25; }
+      50%  { opacity: .9; }
+      100% { opacity: .25; }
+    }
+    @keyframes borderScan {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes cornerPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,229,255,0); }
+      50%      { box-shadow: 0 0 12px 2px rgba(0,229,255,.18); }
+    }
+
+    /* 外框共用動態邊框 */
+    .glow-border {
+      position: relative;
+    }
+    .glow-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(
+        120deg,
+        rgba(0,229,255,0) 0%,
+        rgba(0,229,255,.6) 30%,
+        rgba(0,180,255,.8) 50%,
+        rgba(0,229,255,.6) 70%,
+        rgba(0,229,255,0) 100%
+      );
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: borderGlowMove 4s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes borderGlowMove {
+      0%   { background-position: 0% 50%; opacity: .3; }
+      25%  { opacity: .9; }
+      50%  { background-position: 100% 50%; opacity: .5; }
+      75%  { opacity: .9; }
+      100% { background-position: 0% 50%; opacity: .3; }
+    }
+
     /* ── SEARCH BOX ── */
     .search-area {
       background: var(--surface);
-      border: 1px solid var(--border2);
+      border: 1px solid transparent;
       border-radius: 20px;
       padding: 28px 32px;
       margin-bottom: 36px;
       position: relative;
       overflow: hidden;
+      animation: cornerPulse 3s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.15), inset 0 0 40px rgba(0,229,255,.02);
     }
     .search-area::before {
       content: '';
@@ -214,13 +326,17 @@
       top: 0; left: 0; right: 0;
       height: 1px;
       background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-      opacity: .6;
+      opacity: .7;
+      animation: borderGlow 3s ease-in-out infinite;
     }
     .search-area::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(ellipse 60% 80% at 50% -20%, rgba(0,229,255,.04) 0%, transparent 70%);
+      top: 0; left: -100%; right: auto;
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.8), transparent);
+      animation: borderScan 4s linear infinite;
       pointer-events: none;
     }
 
@@ -312,10 +428,11 @@
 
     .stock-card {
       background: var(--surface);
-      border: 1px solid var(--border2);
+      border: 1px solid rgba(0,229,255,.15);
       border-radius: 18px;
       overflow: hidden;
-      animation: fadeUp .3s ease;
+      animation: fadeUp .3s ease, cornerPulse 3s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.08), 0 4px 24px rgba(0,0,0,.3);
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -371,15 +488,16 @@
     }
     .metric-cell {
       background: var(--bg);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0,229,255,.1);
       border-radius: 14px;
       padding: 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      transition: border-color .2s, transform .2s;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
       position: relative;
       overflow: hidden;
+      animation: cornerPulse 4s ease-in-out infinite;
     }
     .metric-cell::after {
       content: '';
@@ -389,8 +507,9 @@
       background: var(--border2);
     }
     .metric-cell:hover {
-      border-color: var(--border2);
+      border-color: rgba(0,229,255,.3);
       transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.2), 0 0 12px rgba(0,229,255,.06);
     }
     .metric-cell:hover::before { background: rgba(0,229,255,.15); }
     .metric-label {
@@ -415,10 +534,10 @@
     .metric-value.negative { color: var(--green); }
     .metric-value.warning  { color: var(--yellow); }
     .metric-value.neutral  { color: var(--text-dim); }
-    .metric-cell:has(.metric-value.positive)::after { background: var(--red); }
-    .metric-cell:has(.metric-value.negative)::after { background: var(--green); }
-    .metric-cell:has(.metric-value.warning)::after  { background: var(--yellow); }
-    .metric-cell:has(.metric-value.neutral)::after  { background: var(--muted); }
+    .metric-cell:has(.metric-value.positive)::after { background: var(--accent); }
+    .metric-cell:has(.metric-value.negative)::after { background: var(--accent); }
+    .metric-cell:has(.metric-value.warning)::after  { background: var(--accent); }
+    .metric-cell:has(.metric-value.neutral)::after  { background: var(--accent); }
     .metric-arrow { font-size: .85rem; }
 
     .disposal-banner {
@@ -438,11 +557,13 @@
     .market-section { margin-bottom: 40px; }
     .market-wrap {
       background: var(--surface);
-      border: 1px solid var(--border2);
+      border: 1px solid rgba(0,229,255,.15);
       border-radius: 20px;
       padding: 28px 24px 20px 24px;
       position: relative;
       overflow: hidden;
+      animation: cornerPulse 3s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.06), inset 0 0 40px rgba(0,229,255,.02);
     }
     .market-wrap::before {
       content: '';
@@ -450,7 +571,18 @@
       top: 0; left: 0; right: 0;
       height: 1px;
       background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-      opacity: .4;
+      opacity: .5;
+      animation: borderGlow 3.5s ease-in-out infinite;
+    }
+    .market-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.7), transparent);
+      animation: borderScan 5s linear infinite;
+      pointer-events: none;
     }
     .market-grid {
       display: grid;
@@ -465,18 +597,19 @@
     }
     .market-card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0,229,255,.1);
       border-radius: 16px;
       padding: 20px 22px;
       position: relative;
       overflow: hidden;
       transition: border-color .25s, transform .25s, box-shadow .25s;
       cursor: default;
+      animation: cornerPulse 4s ease-in-out infinite;
     }
     .market-card:hover {
-      border-color: var(--border2);
+      border-color: rgba(0,229,255,.35);
       transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 16px rgba(0,229,255,.08);
     }
     .market-card::before {
       content: '';
@@ -498,11 +631,11 @@
       bottom: 0; left: 0; right: 0;
       height: 2px;
     }
-    .market-card.green::after  { background: var(--green); }
-    .market-card.red::after    { background: var(--red); }
+    .market-card.green::after  { background: var(--accent); }
+    .market-card.red::after    { background: var(--accent); }
     .market-card.blue::after   { background: var(--accent); }
-    .market-card.yellow::after { background: var(--yellow); }
-    .market-card.muted::after  { background: var(--muted); }
+    .market-card.yellow::after { background: var(--accent); }
+    .market-card.muted::after  { background: var(--accent); }
 
     .market-card-top {
       display: flex;
@@ -552,11 +685,12 @@
     /* ── UPDATE TIMELINE ── */
     .timeline {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 16px;
       padding: 22px 26px;
       position: relative;
       overflow: hidden;
+      animation: cornerPulse 3.5s ease-in-out infinite;
     }
     .timeline::before {
       content: '';
@@ -623,9 +757,12 @@
     /* ── DATA NOTE ── */
     .data-note {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 16px;
       padding: 22px 26px;
+      position: relative;
+      overflow: hidden;
+      animation: cornerPulse 3.5s ease-in-out infinite;
     }
     .data-note-title {
       font-size: .88rem;
@@ -696,19 +833,93 @@
     .state-box.error svg { opacity: .4; }
 
     /* ── RESPONSIVE ── */
+    @media (max-width: 768px) and (min-width: 601px) {
+      main { padding: 30px 20px 80px; }
+      .search-area { padding: 24px 24px; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .market-grid { grid-template-columns: repeat(2, 1fr); }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+
     @media (max-width: 600px) {
-      header { padding: 14px 18px; }
+      /* Header */
+      header { padding: 12px 16px; }
       .header-right .market-status { display: none; }
-      .search-area { padding: 22px 18px; }
-      .search-row { flex-direction: column; }
-      .card-header { padding: 16px 18px; }
-      .metric-cell { padding: 16px 18px; }
-      main { padding: 28px 16px 80px; }
-      footer { padding: 14px 18px; flex-direction: column; gap: 6px; text-align: center; }
+      .logo-text { font-size: 1rem; }
+      .logo-sub { font-size: .55rem; }
+      .logo-icon { width: 32px; height: 32px; }
+      #clock { font-size: .7rem; letter-spacing: .04em; }
+      #musicBtn { width: 30px; height: 30px; }
+
+      /* Main */
+      main { padding: 20px 12px 60px; }
+
+      /* Section title */
+      h2.section-title { font-size: 1.2rem; }
+
+      /* Search */
+      .search-area { padding: 20px 16px; border-radius: 14px; }
+      .search-row { flex-direction: column; gap: 8px; }
+      #stockInput { height: 46px; font-size: .9rem; }
+      #searchBtn { height: 46px; font-size: .88rem; padding: 0 20px; }
+
+      /* Result card */
+      .card-header { padding: 14px 16px; gap: 10px; }
+      .stock-badge { font-size: .9rem; padding: 4px 10px; }
+      .stock-name-title { font-size: 1rem; }
+      .stock-market-tag { font-size: .65rem; }
+      .card-timestamp { font-size: .65rem; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px; }
+      .metric-cell { padding: 14px 14px; }
+      .metric-label { font-size: .7rem; }
+      .metric-value { font-size: 1.05rem; }
+
+      /* Market wrap */
+      .market-wrap { padding: 18px 14px 14px; border-radius: 16px; }
+      .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .refresh-badge { font-size: .68rem; padding: 5px 10px; }
+
+      /* Market grid */
+      .market-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .market-card { padding: 14px 14px; border-radius: 12px; }
+      .market-card-label { font-size: .68rem; }
+      .market-card-value { font-size: 1.1rem; }
+      .market-card-sub { font-size: .68rem; }
+      .market-card-icon { font-size: .8rem; }
+
+      /* Bottom grid */
+      .bottom-grid { grid-template-columns: 1fr; gap: 14px; }
+
+      /* Timeline */
+      .timeline { padding: 18px 16px; }
+      .timeline-title { font-size: .82rem; }
+      .timeline-item { font-size: .78rem; gap: 10px; }
+      .timeline-time { font-size: .7rem; width: 38px; }
+
+      /* Data note */
+      .data-note { padding: 18px 16px; }
+      .data-note-title { font-size: .82rem; }
+      .data-note-item { font-size: .72rem; }
+
+      /* Footer */
+      footer { padding: 12px 16px; flex-direction: column; gap: 4px; text-align: center; }
+      .footer-left { font-size: .62rem; }
+      .footer-right { font-size: .65rem; }
+
+      /* Disposal banner */
+      .disposal-banner { padding: 10px 16px; font-size: .78rem; }
+    }
+
+    @media (max-width: 360px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .market-grid  { grid-template-columns: 1fr; }
+      .market-card-value { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
+<audio src="MapleMusic.mp3" autoplay loop></audio>
 
 <!-- HEADER -->
 <header>
@@ -728,6 +939,11 @@
       <div class="status-dot"></div>
       <span>資料來源：TWSE / TPEX</span>
     </div>
+    <button id="musicBtn" onclick="toggleMusic()" title="播放/暫停音樂">
+      <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    </button>
     <div id="clock">--:--:--</div>
   </div>
 </header>
@@ -783,8 +999,20 @@
   <!-- MARKET OVERVIEW -->
   <div class="market-section">
     <div class="market-wrap">
-    <p class="section-label">大盤概況</p>
-    <h2 class="section-title">今日盤後大盤資訊</h2>
+    <div class="market-title-row">
+      <div>
+        <p class="section-label">大盤概況</p>
+        <h2 class="section-title">今日盤後大盤資訊</h2>
+      </div>
+      <div class="refresh-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        <span>下次更新</span>
+        <span id="refreshCountdown" class="countdown">25:00</span>
+      </div>
+    </div>
     <div class="market-grid" id="marketGrid">
       <div class="market-card blue">
         <div class="market-card-top">
@@ -878,8 +1106,8 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-//const API_BASE = 'http://127.0.0.1:5000';
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+const API_BASE = 'http://127.0.0.1:5000';
+//const API_BASE = 'https://linebot-project-oxnw.onrender.com';
 
 // ── CLOCK ────────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -988,6 +1216,52 @@ async function loadMarket() {
 }
 loadMarket();
 
+// ── 自動更新倒數計時 ──────────────────────────────────────────────────────────
+const REFRESH_INTERVAL = 25 * 60; // 25 分鐘（秒）
+let countdown = REFRESH_INTERVAL;
+
+function updateCountdown() {
+  countdown--;
+  if (countdown <= 0) {
+    countdown = REFRESH_INTERVAL;
+    loadMarket();
+  }
+  const m = String(Math.floor(countdown / 60)).padStart(2, '0');
+  const s = String(countdown % 60).padStart(2, '0');
+  const el = document.getElementById('refreshCountdown');
+  if (el) {
+    el.textContent = `${m}:${s}`;
+    el.className = countdown <= 30 ? 'countdown urgent' : 'countdown';
+  }
+}
+setInterval(updateCountdown, 1000);
+
+// ── 音樂控制 ─────────────────────────────────────────────────────────────────
+const audio = document.querySelector('audio');
+const musicBtn = document.getElementById('musicBtn');
+const playIcon = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+const pauseIcon = `<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/>`;
+
+function toggleMusic() {
+  if (audio.paused) {
+    audio.play();
+    musicBtn.classList.add('playing');
+    document.getElementById('musicIcon').innerHTML = pauseIcon;
+  } else {
+    audio.pause();
+    musicBtn.classList.remove('playing');
+    document.getElementById('musicIcon').innerHTML = playIcon;
+  }
+}
+
+// 嘗試自動播放
+audio.play().then(() => {
+  musicBtn.classList.add('playing');
+  document.getElementById('musicIcon').innerHTML = pauseIcon;
+}).catch(() => {
+  // 瀏覽器封鎖自動播放，維持暫停狀態等使用者點擊
+});
+
 // ── STOCK QUERY ───────────────────────────────────────────────────────────────
 const resultEl = document.getElementById('result');
 
@@ -1050,7 +1324,7 @@ function renderStock(d) {
   };
 
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
-  const disposalDisplay = disposal ? disposal.replace('處置：', '') : '🚫 暫未更新';
+  const disposalDisplay = disposal ?? '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
