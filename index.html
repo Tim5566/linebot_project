@@ -798,23 +798,49 @@
       position: relative;
       z-index: 1;
       border-top: 1px solid var(--border);
-      padding: 18px 40px;
+      background: rgba(7,13,26,.92);
+    }
+    .footer-disclaimer {
+      padding: 20px 40px 24px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-disclaimer-top {
+      display: flex;
+      align-items: flex-start;
       justify-content: space-between;
-      background: rgba(7,13,26,.8);
+      margin-bottom: 4px;
     }
-    .footer-left {
+    .footer-disclaimer-title {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .7rem;
-      color: var(--text-faint);
-      letter-spacing: .06em;
+      font-size: .65rem;
+      color: var(--text-dim);
+      letter-spacing: .12em;
     }
-    .footer-right {
+    .footer-brand {
+      text-align: right;
+    }
+    .footer-brand-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      color: var(--accent);
+      letter-spacing: .12em;
+      opacity: .6;
+    }
+    .footer-brand-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      color: var(--text-faint);
+      letter-spacing: .08em;
+      margin-top: 2px;
+    }
+    .footer-disclaimer-text {
       font-size: .72rem;
       color: var(--text-faint);
+      line-height: 1.7;
+      max-width: 900px;
     }
-    .footer-right span { color: var(--text-dim); }
 
     /* ── EMPTY / ERROR STATES ── */
     .state-box {
@@ -903,9 +929,12 @@
       .data-note-item { font-size: .72rem; }
 
       /* Footer */
-      footer { padding: 12px 16px; flex-direction: column; gap: 4px; text-align: center; }
-      .footer-left { font-size: .62rem; }
-      .footer-right { font-size: .65rem; }
+      footer { border-top: 1px solid var(--border); }
+      .footer-disclaimer { padding: 16px 16px 20px; }
+      .footer-disclaimer-top { flex-direction: column; gap: 8px; }
+      .footer-brand { text-align: left; }
+      .footer-disclaimer-title { font-size: .6rem; }
+      .footer-disclaimer-text { font-size: .68rem; }
 
       /* Disposal banner */
       .disposal-banner { padding: 10px 16px; font-size: .78rem; }
@@ -1091,7 +1120,6 @@
       <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位為當日融資餘額總額，非增減值，僅供參考</span></div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>資料來源：台灣證交所（TWSE）及櫃買中心（TPEX）</span></div>
     </div>
 
   </div>
@@ -1100,8 +1128,17 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-left">AFTER-HOURS RADAR · 盤後雷達 · DATA BY TWSE / TPEX</div>
-  <div class="footer-right">資料僅供參考，<span>不構成任何投資建議</span></div>
+  <div class="footer-disclaimer">
+    <div class="footer-disclaimer-top">
+      <div class="footer-disclaimer-title">【 資料來源與免責聲明 】</div>
+      <div class="footer-brand">
+        <div class="footer-brand-name">AFTER-HOURS RADAR</div>
+        <div class="footer-brand-sub">© 2026 盤後雷達</div>
+      </div>
+    </div>
+    <p class="footer-disclaimer-text">本網站資料來源為臺灣證券交易所（TWSE）、櫃買中心（TPEx）及台灣期貨交易所（TAIFEX）等公開資訊。</p>
+    <p class="footer-disclaimer-text">資料僅供參考，實際資訊以官方公告為準。本網站不保證資料之即時性與正確性，使用者應自行判斷並承擔投資風險。</p>
+  </div>
 </footer>
 
 <script>
@@ -1156,7 +1193,7 @@ setInterval(buildTimeline, 60000);
 // ── MARKET DATA ───────────────────────────────────────────────────────────────
 async function loadMarket() {
   try {
-    const res  = await fetch(`${API_BASE}/api/market`);
+    const res  = await fetch(`${API_BASE}/api/market?t=${Date.now()}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
@@ -1235,6 +1272,29 @@ function updateCountdown() {
   }
 }
 setInterval(updateCountdown, 1000);
+
+// ── 凌晨重置（過12點自動清空數字） ──────────────────────────────────────────
+function resetMarketDisplay() {
+  ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value'; }
+    });
+  document.querySelectorAll('.t-foreign, .t-trust, .t-prop, .t-margin, .t-total')
+    .forEach(el => el.innerHTML = '<span style="color:var(--text-faint)">🚫 暫未更新</span>');
+}
+
+function scheduleResetAtMidnight() {
+  const now = new Date();
+  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const msUntilMidnight =
+    ((24 - tw.getHours()) * 60 * 60 - tw.getMinutes() * 60 - tw.getSeconds()) * 1000;
+  setTimeout(() => {
+    resetMarketDisplay();
+    scheduleResetAtMidnight(); // 隔天再繼續排程
+  }, msUntilMidnight);
+}
+scheduleResetAtMidnight();
 
 // ── 音樂控制 ─────────────────────────────────────────────────────────────────
 const audio = document.querySelector('audio');
