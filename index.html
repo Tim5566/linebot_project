@@ -1367,9 +1367,6 @@ function colorClass(val) {
 function renderStock(d) {
   const disposal = d.disposal;
   const isDisposal = disposal && disposal.includes('⭕');
-  const disposalBanner = isDisposal
-    ? `<div class="disposal-banner">⚠️ 處置股：${disposal.replace('處置：⭕ ', '')}</div>`
-    : '';
 
   const metricCell = (label, value, icon='', unit='股') => {
     const cc = colorClass(value);
@@ -1384,7 +1381,7 @@ function renderStock(d) {
   };
 
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
-  const disposalDisplay = disposal ?? '🚫 暫未更新';
+  const disposalDisplay = disposal ? disposal.replace('處置：⭕ 至', '') : '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
@@ -1404,7 +1401,6 @@ function renderStock(d) {
           <div class="metric-value ${disposalCc}">${disposalDisplay}</div>
         </div>
       </div>
-      ${disposalBanner}
     </div>`;
 }
 

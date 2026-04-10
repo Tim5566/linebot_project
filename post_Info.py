@@ -12,8 +12,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import time as _time
 
-today = datetime.datetime.now().strftime("%Y%m%d")
 headers = {"User-Agent": "Mozilla/5.0"}
+
+def get_today():
+    """每次呼叫都回傳台灣當下日期，避免 Render 長時間不重啟導致日期停在舊值。"""
+    return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
 def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
     """發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。"""
@@ -32,7 +35,7 @@ def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
     return None
 
 
-# 上市 / 上櫃公司代碼名稱存檔（初始讀取一次）
+# ── 上市 / 上櫃公司代碼名稱存檔（初始讀取一次）────────────────────────────────
 try:
     TWSE_res = requests.get(
         "https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date=20260309",
@@ -68,7 +71,7 @@ def _twse_disposal(keyword, api_url):
     except Exception:
         return None
 
-def _twse_foreign(keyword, api_url):
+def _twse_foreign(keyword, api_url, today):
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -82,7 +85,7 @@ def _twse_foreign(keyword, api_url):
     except Exception:
         return None
 
-def _twse_trust(keyword, api_url):
+def _twse_trust(keyword, api_url, today):
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -96,7 +99,7 @@ def _twse_trust(keyword, api_url):
     except Exception:
         return None
 
-def _twse_proprietary(keyword, api_url):
+def _twse_proprietary(keyword, api_url, today):
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -110,7 +113,7 @@ def _twse_proprietary(keyword, api_url):
     except Exception:
         return None
 
-def _twse_short_sale(keyword, api_url):
+def _twse_short_sale(keyword, api_url, today):
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -139,7 +142,7 @@ def _otc_disposal(keyword, api_url):
     except Exception:
         return None
 
-def _otc_institutional(keyword, api_url):
+def _otc_institutional(keyword, api_url, today):
     try:
         def otc_date_ok(data):
             raw = data[0]["Date"] if data else ""
@@ -151,6 +154,7 @@ def _otc_institutional(keyword, api_url):
             inst_data = res.json()
             if otc_date_ok(inst_data):
                 break
+            print(f"[otc_inst retry {attempt+1}/3] 日期不符，等待重試...")
             _time.sleep(1.5)
 
         if not otc_date_ok(inst_data):
@@ -169,16 +173,15 @@ def _otc_institutional(keyword, api_url):
     except Exception:
         return None, None, None
 
-def _otc_short_sale(keyword, api_url):
+def _otc_short_sale(keyword, api_url, today):
     try:
-        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-        data = res.json()
+        data = fetch_with_retry(api_url, today, date_key="date", retries=3, delay=1.5)
+        if data is None:
+            return None
         kw = keyword
         if not kw.isdigit():
             idx = OTC_data_name.index(kw)
             kw  = OTC_data_code[idx]
-        if today not in data.get("date", ""):
-            return None
         for row in data["tables"][0]["data"]:
             if kw in row[0]:
                 return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
@@ -188,8 +191,8 @@ def _otc_short_sale(keyword, api_url):
 
 # ── 主查詢函式 ────────────────────────────────────────────────────────────────
 def stock_info(keyword):
+    today = get_today()
 
-    # 判斷是否假日或盤後更新
     if not is_trading_day():
         return f"📢 今日週末或連假未開盤❗0"
     elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
@@ -207,10 +210,10 @@ def stock_info(keyword):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             f_disposal    = executor.submit(_twse_disposal,    keyword, API_Disposal)
-            f_foreign     = executor.submit(_twse_foreign,     keyword, API_Foreign)
-            f_trust       = executor.submit(_twse_trust,       keyword, API_Trust)
-            f_proprietary = executor.submit(_twse_proprietary, keyword, API_Proprietary)
-            f_short_sale  = executor.submit(_twse_short_sale,  keyword, API_Short_Sale)
+            f_foreign     = executor.submit(_twse_foreign,     keyword, API_Foreign,     today)
+            f_trust       = executor.submit(_twse_trust,       keyword, API_Trust,       today)
+            f_proprietary = executor.submit(_twse_proprietary, keyword, API_Proprietary, today)
+            f_short_sale  = executor.submit(_twse_short_sale,  keyword, API_Short_Sale,  today)
 
             Disposal_text    = f_disposal.result()
             Foreign_text     = f_foreign.result()
@@ -232,13 +235,13 @@ def stock_info(keyword):
         API_Short_Sale    = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            f_disposal     = executor.submit(_otc_disposal,     keyword, API_Disposal)
-            f_inst         = executor.submit(_otc_institutional, keyword, API_institutional)
-            f_short_sale   = executor.submit(_otc_short_sale,   keyword, API_Short_Sale)
+            f_disposal   = executor.submit(_otc_disposal,     keyword, API_Disposal)
+            f_inst       = executor.submit(_otc_institutional, keyword, API_institutional, today)
+            f_short_sale = executor.submit(_otc_short_sale,   keyword, API_Short_Sale,    today)
 
-            Disposal_text               = f_disposal.result()
+            Disposal_text                              = f_disposal.result()
             Foreign_text, Trust_text, Proprietary_text = f_inst.result()
-            Short_sale_text             = f_short_sale.result()
+            Short_sale_text                            = f_short_sale.result()
 
         reply += (Disposal_text    + "\n") if Disposal_text    else "處置：🚫 暫未更新\n"
         reply += (Foreign_text     + "\n") if Foreign_text     else "外資：🚫 暫未更新\n"
@@ -253,6 +256,8 @@ def stock_info(keyword):
 
 # ── 大盤總體資訊 ──────────────────────────────────────────────────────────────
 def market_pnfo():
+    today = get_today()
+
     API_Net_Amount  = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
     API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
 
@@ -260,8 +265,9 @@ def market_pnfo():
 
     # 三大法人買賣金額統計
     try:
-        res  = requests.get(API_Net_Amount, headers=headers, verify=False)
-        data = res.json()
+        data = fetch_with_retry(API_Net_Amount, today)
+        if data is None:
+            raise Exception("日期不符或無資料")
         net_total = 0
         for i in range(3, -1, -1):
             row        = data["data"][i]
@@ -273,13 +279,15 @@ def market_pnfo():
         reply += f"合計金額 : {int(net_total * 100) / 100}億\n"
         reply += "---------------------------------------------\n"
     except Exception:
-        pass
+        reply += "三大法人 : 🚫 暫未更新\n"
+        reply += "---------------------------------------------\n"
 
     # 大盤融資金額統計
     try:
-        res  = requests.get(API_MarginDelta, headers=headers, verify=False)
-        data = res.json()
-        row  = data["tables"][0]["data"]
+        data = fetch_with_retry(API_MarginDelta, today)
+        if data is None:
+            raise Exception("日期不符或無資料")
+        row          = data["tables"][0]["data"]
         prev_margin  = int(row[2][4].replace(',', '')) / 1e5
         today_margin = int(row[2][5].replace(',', '')) / 1e5
         margin_delta = today_margin - prev_margin
