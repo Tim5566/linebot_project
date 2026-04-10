@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>盤後雷達｜台股法人追蹤</title>
+  <title>台股即時法人追蹤</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
@@ -74,19 +74,15 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 25px;
     }
     .logo-icon {
-      width: 40px; height: 40px;
-      border: 1.5px solid var(--accent);
+      width: 52px; height: 52px;
       border-radius: 10px;
       display: grid;
       place-items: center;
-      box-shadow: var(--glow);
-      background: rgba(0,229,255,.05);
     }
-    .logo-icon svg { width: 22px; height: 22px; }
-    .logo-text {
+    .logo-icon img { width: 75px; height: 75px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 6px rgba(0,229,255,.4)); position: relative; top: -12px; left: -12px; }    .logo-text {
       font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: .06em;
@@ -954,13 +950,11 @@
 <header>
   <div class="logo">
     <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-      </svg>
+      <img src="images/jerry.png" alt="JerryStock Logo" />
     </div>
     <div>
       <div class="logo-text">盤後雷達</div>
-      <div class="logo-sub">AFTER-HOURS RADAR · TWSE / TPEX</div>
+      <div class="logo-sub">JerryStock</div>
     </div>
   </div>
   <div class="header-right">
@@ -1132,8 +1126,8 @@
     <div class="footer-disclaimer-top">
       <div class="footer-disclaimer-title">【 資料來源與免責聲明 】</div>
       <div class="footer-brand">
-        <div class="footer-brand-name">AFTER-HOURS RADAR</div>
-        <div class="footer-brand-sub">© 2026 盤後雷達</div>
+        <div class="footer-brand-name">盤後雷達</div>
+        <div class="footer-brand-sub">© 2026 JerryStock</div>
       </div>
     </div>
     <p class="footer-disclaimer-text">本網站資料來源為臺灣證券交易所（TWSE）、櫃買中心（TPEx）及台灣期貨交易所（TAIFEX）等公開資訊。</p>
@@ -1143,8 +1137,8 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-//const API_BASE = 'http://127.0.0.1:5000';
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+const API_BASE = 'http://127.0.0.1:5000';
+//const API_BASE = 'https://linebot-project-oxnw.onrender.com';
 
 // ── CLOCK ────────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -1381,7 +1375,7 @@ function renderStock(d) {
   };
 
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
-  const disposalDisplay = disposal ? disposal.replace('處置：⭕ 至', '') : '🚫 暫未更新';
+  const disposalDisplay = disposal ? disposal.replace('處置：', '') : '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
