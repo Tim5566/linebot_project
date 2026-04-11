@@ -5,26 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>台股即時法人追蹤</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:        #070d1a;
-      --surface:   #0b1220;
-      --surface2:  #0f1828;
-      --border:    #162035;
-      --border2:   #1e2f4a;
+      --bg:        #04080f;
+      --surface:   #080f1c;
+      --surface2:  #0c1422;
+      --border:    #0f1a2e;
+      --border2:   #172438;
       --accent:    #00e5ff;
       --accent2:   #0099bb;
+      --accent3:   #00aaff;
       --green:     #00e676;
       --red:       #ff3d5a;
       --yellow:    #ffd600;
-      --muted:     #3a4d6a;
-      --text:      #ccdaf5;
-      --text-dim:  #6a80a8;
-      --text-faint:#3a4d6a;
-      --glow:      0 0 24px rgba(0,229,255,.2);
-      --glow-red:  0 0 16px rgba(255,61,90,.3);
-      --glow-grn:  0 0 16px rgba(0,230,118,.3);
+      --muted:     #2a3d5a;
+      --text:      #b8cceb;
+      --text-dim:  #516070;
+      --text-faint:#273040;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --glow-red:  0 0 20px rgba(255,61,90,.4);
+      --glow-grn:  0 0 20px rgba(0,230,118,.4);
+      --glow-strong: 0 0 60px rgba(0,229,255,.15);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,25 +39,46 @@
       overflow-x: hidden;
     }
 
-    /* ── ANIMATED GRID BACKGROUND ── */
-    body::before {
-      content: '';
+    /* ── LAYERED ANIMATED BACKGROUND ── */
+    .bg-layer {
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
-      background-size: 48px 48px;
       pointer-events: none;
       z-index: 0;
     }
-    body::after {
-      content: '';
+    /* Perspective grid */
+    .bg-layer-grid {
+      background-image:
+        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+    /* Radial vignette */
+    .bg-layer-vignette {
+      background: radial-gradient(ellipse 90% 70% at 50% -10%, rgba(0,120,180,.1) 0%, transparent 65%);
+    }
+    /* Scanline effect */
+    .bg-layer-scanlines {
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,.07) 3px,
+        rgba(0,0,0,.07) 4px
+      );
+      animation: scanlineShift 8s linear infinite;
+    }
+    @keyframes scanlineShift {
+      from { background-position: 0 0; }
+      to   { background-position: 0 100px; }
+    }
+    /* Floating particles canvas */
+    #particleCanvas {
       position: fixed;
       inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,100,140,.12) 0%, transparent 70%);
-      pointer-events: none;
       z-index: 0;
+      pointer-events: none;
+      opacity: .55;
     }
 
     /* ── HEADER ── */
@@ -65,70 +88,109 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 40px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(7,13,26,.92);
-      backdrop-filter: blur(12px);
+      padding: 14px 40px;
+      border-bottom: 1px solid rgba(0,229,255,.08);
+      background: rgba(4,8,15,.94);
+      backdrop-filter: blur(20px);
+    }
+    /* Animated header bottom line */
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0,229,255,.7) 20%,
+        rgba(0,170,255,.9) 50%,
+        rgba(0,229,255,.7) 80%,
+        transparent 100%);
+      background-size: 200% 100%;
+      animation: headerLineSweep 4s linear infinite;
+    }
+    @keyframes headerLineSweep {
+      from { background-position: -100% 0; }
+      to   { background-position: 200% 0; }
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 25px;
+      gap: 20px;
     }
     .logo-icon {
-      width: 52px; height: 52px;
+      width: 48px; height: 48px;
       border-radius: 10px;
       display: grid;
       place-items: center;
+      position: relative;
     }
-    .logo-icon img { width: 75px; height: 75px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 6px rgba(0,229,255,.4)); position: relative; top: -12px; left: -12px; }    .logo-text {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: .06em;
+    .logo-icon img { width: 68px; height: 68px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 6px rgba(0,229,255,.3)); position: relative; top: -10px; left: -10px; }
+    .logo-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .1em;
       color: #fff;
+      text-shadow: 0 0 20px rgba(0,229,255,.4);
     }
     .logo-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .6rem;
+      font-size: .58rem;
       color: var(--accent);
-      letter-spacing: .18em;
-      opacity: .7;
+      letter-spacing: .22em;
+      opacity: .65;
+      margin-top: 2px;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 20px;
     }
     .market-status {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--text-dim);
+      background: rgba(0,229,255,.04);
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 20px;
+      padding: 5px 12px;
     }
     .status-dot {
-      width: 6px; height: 6px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: var(--glow-grn);
-      animation: pulse 2s infinite;
+      box-shadow: 0 0 0 0 rgba(0,230,118,.6);
+      animation: sonarPulse 2s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes sonarPulse {
+      0%  { box-shadow: 0 0 0 0 rgba(0,230,118,.6); }
+      70% { box-shadow: 0 0 0 8px rgba(0,230,118,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(0,230,118,0); }
     }
     #clock {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .82rem;
-      color: var(--text-dim);
-      letter-spacing: .08em;
+      font-size: .78rem;
+      color: var(--accent);
+      letter-spacing: .1em;
+      text-shadow: 0 0 10px rgba(0,229,255,.35);
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.12);
+      border-radius: 20px;
+      padding: 5px 14px;
     }
 
     /* ── TICKER TAPE ── */
     .ticker-wrap {
       overflow: hidden;
-      border-bottom: 1px solid var(--border);
-      background: rgba(11,18,32,.95);
-      height: 38px;
+      border-bottom: 1px solid rgba(0,229,255,.06);
+      background: rgba(4,8,15,.97);
+      height: 36px;
       position: relative;
       z-index: 9;
     }
@@ -137,12 +199,12 @@
       content: '';
       position: absolute;
       top: 0; bottom: 0;
-      width: 60px;
+      width: 80px;
       z-index: 2;
       pointer-events: none;
     }
-    .ticker-wrap::before { left: 0; background: linear-gradient(90deg, rgba(11,18,32,1), transparent); }
-    .ticker-wrap::after  { right: 0; background: linear-gradient(-90deg, rgba(11,18,32,1), transparent); }
+    .ticker-wrap::before { left: 0; background: linear-gradient(90deg, rgba(4,8,15,1), transparent); }
+    .ticker-wrap::after  { right: 0; background: linear-gradient(-90deg, rgba(4,8,15,1), transparent); }
     .ticker-track {
       display: flex;
       animation: ticker 40s linear infinite;
@@ -152,26 +214,31 @@
     }
     .ticker-item {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .82rem;
-      padding: 0 32px;
-      border-right: 1px solid var(--border);
+      font-size: .78rem;
+      padding: 0 28px;
+      border-right: 1px solid rgba(0,229,255,.06);
       color: var(--text-dim);
       height: 100%;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: .03em;
+      letter-spacing: .04em;
+      position: relative;
     }
-    .ticker-item .label { color: var(--text-faint); font-size: .75rem; }
-    .ticker-item span.up   { color: var(--red);   font-weight: 600; }
-    .ticker-item span.down { color: var(--green); font-weight: 600; }
+    .ticker-item .label {
+      color: var(--text-faint);
+      font-size: .68rem;
+      letter-spacing: .08em;
+    }
+    .ticker-item span.up   { color: var(--red);   font-weight: 600; text-shadow: 0 0 8px rgba(255,61,90,.4); }
+    .ticker-item span.down { color: var(--green); font-weight: 600; text-shadow: 0 0 8px rgba(0,230,118,.4); }
     @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-33.33%); } }
 
     /* ── MAIN LAYOUT ── */
     main {
       position: relative;
       z-index: 1;
-      max-width: 1160px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 44px 28px 100px;
     }
@@ -180,8 +247,8 @@
     #musicBtn {
       width: 34px; height: 34px;
       border-radius: 50%;
-      border: 1px solid rgba(0,229,255,.3);
-      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.25);
+      background: rgba(0,229,255,.06);
       color: var(--accent);
       cursor: pointer;
       display: flex;
@@ -192,19 +259,18 @@
     }
     #musicBtn svg { width: 13px; height: 13px; }
     #musicBtn:hover {
-      background: rgba(0,229,255,.18);
+      background: rgba(0,229,255,.16);
       border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(0,229,255,.3);
+      box-shadow: 0 0 16px rgba(0,229,255,.35);
     }
     #musicBtn.playing {
-      background: rgba(0,229,255,.15);
+      background: rgba(0,229,255,.12);
       border-color: var(--accent);
-      box-shadow: 0 0 10px rgba(0,229,255,.25);
-      animation: musicPulse 2s ease-in-out infinite;
+      animation: musicPulse 2.5s ease-in-out infinite;
     }
     @keyframes musicPulse {
-      0%,100% { box-shadow: 0 0 8px rgba(0,229,255,.2); }
-      50%      { box-shadow: 0 0 18px rgba(0,229,255,.5); }
+      0%,100% { box-shadow: 0 0 6px rgba(0,229,255,.15); }
+      50%      { box-shadow: 0 0 22px rgba(0,229,255,.55); }
     }
 
     /* ── MARKET TITLE ROW ── */
@@ -220,10 +286,10 @@
       align-items: center;
       gap: 6px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--text-dim);
-      background: rgba(0,229,255,.06);
-      border: 1px solid rgba(0,229,255,.15);
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 8px;
       padding: 6px 12px;
       margin-bottom: 4px;
@@ -235,110 +301,88 @@
       font-size: .8rem;
       letter-spacing: .05em;
       min-width: 36px;
+      text-shadow: 0 0 8px rgba(0,229,255,.4);
     }
-    .countdown.urgent { color: var(--red); animation: pulse 1s infinite; }
+    .countdown.urgent { color: var(--red); animation: pulse 1s infinite; text-shadow: 0 0 8px rgba(255,61,90,.5); }
 
     /* ── SECTION TITLE ── */
     .section-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .68rem;
-      letter-spacing: .25em;
+      font-size: .65rem;
+      letter-spacing: .3em;
       color: var(--accent);
       margin-bottom: 6px;
       text-transform: uppercase;
-      opacity: .8;
+      opacity: .75;
     }
     h2.section-title {
-      font-size: 1.55rem;
-      font-weight: 800;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.35rem;
+      font-weight: 700;
       color: #fff;
       margin-bottom: 24px;
-      letter-spacing: -.01em;
+      letter-spacing: .04em;
+      text-shadow: 0 0 30px rgba(0,229,255,.2);
     }
 
-    /* ── ANIMATED BORDER GLOW ── */
+    /* ── ANIMATED GLOWING BORDER UTIL ── */
     @keyframes borderGlow {
-      0%   { opacity: .25; }
-      50%  { opacity: .9; }
-      100% { opacity: .25; }
+      0%   { opacity: .2; }
+      50%  { opacity: 1; }
+      100% { opacity: .2; }
     }
     @keyframes borderScan {
       0%   { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+      100% { transform: translateX(160%); }
     }
     @keyframes cornerPulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(0,229,255,0); }
-      50%      { box-shadow: 0 0 12px 2px rgba(0,229,255,.18); }
-    }
-
-    /* 外框共用動態邊框 */
-    .glow-border {
-      position: relative;
-    }
-    .glow-border::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(
-        120deg,
-        rgba(0,229,255,0) 0%,
-        rgba(0,229,255,.6) 30%,
-        rgba(0,180,255,.8) 50%,
-        rgba(0,229,255,.6) 70%,
-        rgba(0,229,255,0) 100%
-      );
-      background-size: 200% 200%;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      animation: borderGlowMove 4s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes borderGlowMove {
-      0%   { background-position: 0% 50%; opacity: .3; }
-      25%  { opacity: .9; }
-      50%  { background-position: 100% 50%; opacity: .5; }
-      75%  { opacity: .9; }
-      100% { background-position: 0% 50%; opacity: .3; }
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,229,255,0), 0 4px 20px rgba(0,0,0,.4); }
+      50%      { box-shadow: 0 0 16px 1px rgba(0,229,255,.1), 0 4px 20px rgba(0,0,0,.4); }
     }
 
     /* ── SEARCH BOX ── */
     .search-area {
       background: var(--surface);
-      border: 1px solid transparent;
+      border: 1px solid rgba(0,229,255,.1);
       border-radius: 20px;
-      padding: 28px 32px;
-      margin-bottom: 36px;
+      padding: 30px 32px;
+      margin-bottom: 38px;
       position: relative;
       overflow: hidden;
-      animation: cornerPulse 3s ease-in-out infinite;
-      box-shadow: 0 0 0 1px rgba(0,229,255,.15), inset 0 0 40px rgba(0,229,255,.02);
+      animation: cornerPulse 3.5s ease-in-out infinite;
     }
+    /* Top edge sweep */
     .search-area::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-      opacity: .7;
-      animation: borderGlow 3s ease-in-out infinite;
+      background: linear-gradient(90deg, transparent, var(--accent), rgba(0,170,255,.9), var(--accent), transparent);
+      background-size: 300% 100%;
+      animation: edgeSweep 3s ease-in-out infinite;
     }
+    /* Bottom scan */
     .search-area::after {
       content: '';
       position: absolute;
-      top: 0; left: -100%; right: auto;
-      width: 60%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,229,255,.8), transparent);
-      animation: borderScan 4s linear infinite;
+      top: 0; left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.025), transparent);
+      animation: cardSweep 4s ease-in-out infinite;
       pointer-events: none;
     }
-
-    .search-top {
-      margin-bottom: 20px;
+    @keyframes edgeSweep {
+      0%,100% { background-position: -100% 0; opacity: .6; }
+      50%      { background-position: 200% 0; opacity: 1; }
     }
+    @keyframes cardSweep {
+      0%   { left: -100%; }
+      50%  { left: 160%; }
+      100% { left: 160%; }
+    }
+
+    .search-top { margin-bottom: 22px; }
     .search-row {
       display: flex;
       gap: 10px;
@@ -354,68 +398,84 @@
       transform: translateY(-50%);
       color: var(--muted);
       width: 17px; height: 17px;
+      transition: color .2s;
     }
+    .search-input-wrap:focus-within svg { color: var(--accent); }
     #stockInput {
       width: 100%;
       height: 50px;
-      background: var(--bg);
-      border: 1px solid var(--border2);
+      background: rgba(0,0,0,.4);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 12px;
       padding: 0 16px 0 46px;
-      font-size: .95rem;
+      font-size: .92rem;
       font-family: 'Noto Sans TC', sans-serif;
       color: var(--text);
       outline: none;
-      transition: border-color .2s, box-shadow .2s;
+      transition: border-color .25s, box-shadow .25s, background .25s;
+      letter-spacing: .02em;
     }
     #stockInput::placeholder { color: var(--muted); }
     #stockInput:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,229,255,.1), 0 0 20px rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.4);
+      background: rgba(0,229,255,.03);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.08), 0 0 24px rgba(0,229,255,.06), inset 0 0 20px rgba(0,229,255,.02);
     }
     #searchBtn {
       height: 50px;
-      padding: 0 26px;
-      background: var(--accent);
+      padding: 0 28px;
+      background: linear-gradient(135deg, #00e5ff, #0099ff);
       color: #000;
       font-weight: 800;
-      font-size: .9rem;
-      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .88rem;
+      font-family: 'Orbitron', monospace;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: all .2s;
-      box-shadow: 0 0 24px rgba(0,229,255,.35);
+      transition: all .25s;
+      box-shadow: 0 0 30px rgba(0,229,255,.4), 0 4px 12px rgba(0,0,0,.3);
       white-space: nowrap;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: .04em;
+      letter-spacing: .08em;
+      position: relative;
+      overflow: hidden;
     }
+    #searchBtn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      transition: left .4s;
+    }
+    #searchBtn:hover::before { left: 160%; }
     #searchBtn:hover {
-      background: #33ecff;
-      box-shadow: 0 0 36px rgba(0,229,255,.55);
-      transform: translateY(-1px);
+      background: linear-gradient(135deg, #33ecff, #00bbff);
+      box-shadow: 0 0 50px rgba(0,229,255,.65), 0 6px 20px rgba(0,0,0,.3);
+      transform: translateY(-2px);
     }
-    #searchBtn:active { transform: scale(.97); }
+    #searchBtn:active { transform: scale(.97) translateY(0); }
     #searchBtn svg { width: 15px; height: 15px; }
 
     .hint {
       margin-top: 10px;
-      font-size: .8rem;
+      font-size: .78rem;
       color: var(--text-faint);
       display: flex;
       align-items: center;
       gap: 6px;
     }
     .hint kbd {
-      background: var(--border2);
+      background: rgba(0,229,255,.08);
       border-radius: 4px;
       padding: 1px 7px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--accent);
-      border: 1px solid var(--border2);
+      border: 1px solid rgba(0,229,255,.2);
     }
 
     /* ── RESULT CARD ── */
@@ -424,15 +484,26 @@
 
     .stock-card {
       background: var(--surface);
-      border: 1px solid rgba(0,229,255,.15);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 18px;
       overflow: hidden;
-      animation: fadeUp .3s ease, cornerPulse 3s ease-in-out infinite;
-      box-shadow: 0 0 0 1px rgba(0,229,255,.08), 0 4px 24px rgba(0,0,0,.3);
+      animation: fadeUp .35s cubic-bezier(.22,1,.36,1), cornerPulse 4s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.06), 0 8px 32px rgba(0,0,0,.35);
+      position: relative;
+    }
+    .stock-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.9), transparent);
+      animation: borderScan 5s linear infinite;
+      pointer-events: none;
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(16px) scale(.99); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .card-header {
@@ -440,107 +511,133 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,229,255,.03);
+      border-bottom: 1px solid rgba(0,229,255,.07);
+      background: rgba(0,229,255,.02);
       flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.5), transparent);
+      animation: borderGlow 3s ease-in-out infinite;
     }
     .stock-badge {
       background: rgba(0,229,255,.1);
-      border: 1px solid rgba(0,229,255,.25);
+      border: 1px solid rgba(0,229,255,.3);
       border-radius: 8px;
       padding: 5px 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 1.05rem;
+      font-family: 'Orbitron', monospace;
+      font-size: .95rem;
       color: var(--accent);
-      letter-spacing: .1em;
+      letter-spacing: .12em;
+      text-shadow: 0 0 12px rgba(0,229,255,.4);
     }
     .stock-name-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: #fff;
     }
     .stock-market-tag {
       margin-left: auto;
-      font-size: .72rem;
-      letter-spacing: .1em;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .12em;
       color: var(--text-dim);
-      background: var(--border);
-      border: 1px solid var(--border2);
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 6px;
       padding: 3px 10px;
     }
     .card-timestamp {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--muted);
     }
 
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      padding: 20px;
-      background: transparent;
+      gap: 10px;
+      padding: 16px;
     }
     .metric-cell {
-      background: var(--bg);
-      border: 1px solid rgba(0,229,255,.1);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(0,229,255,.08);
       border-radius: 14px;
       padding: 18px 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition: border-color .25s, transform .25s, box-shadow .25s;
+      gap: 12px;
+      transition: all .3s cubic-bezier(.22,1,.36,1);
       position: relative;
       overflow: hidden;
-      animation: cornerPulse 4s ease-in-out infinite;
+      cursor: default;
     }
+    /* Bottom accent bar */
     .metric-cell::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--border2);
+      background: rgba(0,229,255,.15);
+      transform: scaleX(0);
+      transition: transform .3s ease, background .3s;
     }
+    /* Top sweep on hover */
+    .metric-cell::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; right: auto;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.04), transparent);
+      transition: left .5s;
+      pointer-events: none;
+    }
+    .metric-cell:hover::before { left: 100%; }
     .metric-cell:hover {
-      border-color: rgba(0,229,255,.3);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,0,0,.2), 0 0 12px rgba(0,229,255,.06);
+      border-color: rgba(0,229,255,.25);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.3), 0 0 16px rgba(0,229,255,.05);
     }
-    .metric-cell:hover::before { background: rgba(0,229,255,.15); }
+    .metric-cell:hover::after { transform: scaleX(1); }
+    .metric-cell:has(.metric-value.positive):hover::after { background: var(--red); }
+    .metric-cell:has(.metric-value.negative):hover::after { background: var(--green); }
+    .metric-cell:has(.metric-value.warning):hover::after  { background: var(--yellow); }
+    .metric-cell:has(.metric-value.neutral):hover::after  { background: var(--accent); }
+
     .metric-label {
-      font-size: .75rem;
+      font-size: .72rem;
       color: var(--text-dim);
-      letter-spacing: .06em;
+      letter-spacing: .08em;
       display: flex;
       align-items: center;
       gap: 5px;
     }
     .metric-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 600;
       color: var(--text);
       display: flex;
       align-items: baseline;
       gap: 4px;
     }
-    .metric-value .unit { font-size: .72rem; color: var(--text-dim); font-weight: 400; }
-    .metric-value.positive { color: var(--red); }
-    .metric-value.negative { color: var(--green); }
-    .metric-value.warning  { color: var(--yellow); }
+    .metric-value .unit { font-size: .7rem; color: var(--text-dim); font-weight: 400; }
+    .metric-value.positive { color: var(--red); text-shadow: 0 0 12px rgba(255,61,90,.3); }
+    .metric-value.negative { color: var(--green); text-shadow: 0 0 12px rgba(0,230,118,.3); }
+    .metric-value.warning  { color: var(--yellow); text-shadow: 0 0 12px rgba(255,214,0,.3); }
     .metric-value.neutral  { color: var(--text-dim); }
-    .metric-cell:has(.metric-value.positive)::after { background: var(--accent); }
-    .metric-cell:has(.metric-value.negative)::after { background: var(--accent); }
-    .metric-cell:has(.metric-value.warning)::after  { background: var(--accent); }
-    .metric-cell:has(.metric-value.neutral)::after  { background: var(--accent); }
-    .metric-arrow { font-size: .85rem; }
 
     .disposal-banner {
       margin: 0;
       padding: 12px 28px;
-      background: rgba(255,61,90,.06);
-      border-top: 1px solid rgba(255,61,90,.2);
+      background: rgba(255,61,90,.05);
+      border-top: 1px solid rgba(255,61,90,.15);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -550,70 +647,67 @@
     }
 
     /* ── MARKET OVERVIEW ── */
-    .market-section { margin-bottom: 40px; }
+    .market-section { margin-bottom: 42px; }
     .market-wrap {
       background: var(--surface);
-      border: 1px solid rgba(0,229,255,.15);
-      border-radius: 20px;
-      padding: 28px 24px 20px 24px;
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 22px;
+      padding: 30px 26px 22px;
       position: relative;
       overflow: hidden;
-      animation: cornerPulse 3s ease-in-out infinite;
-      box-shadow: 0 0 0 1px rgba(0,229,255,.06), inset 0 0 40px rgba(0,229,255,.02);
+      animation: cornerPulse 3.5s ease-in-out infinite;
     }
     .market-wrap::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-      opacity: .5;
-      animation: borderGlow 3.5s ease-in-out infinite;
+      background: linear-gradient(90deg, transparent, var(--accent), rgba(0,170,255,.9), var(--accent), transparent);
+      background-size: 300% 100%;
+      animation: edgeSweep 5s ease-in-out infinite;
     }
     .market-wrap::after {
       content: '';
       position: absolute;
       top: 0; left: -100%;
-      width: 60%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,229,255,.7), transparent);
-      animation: borderScan 5s linear infinite;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.02), transparent);
+      animation: cardSweep 6s ease-in-out infinite;
       pointer-events: none;
     }
+
     .market-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
     }
-    @media (max-width: 800px) {
-      .market-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-      .market-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 800px) { .market-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .market-grid { grid-template-columns: 1fr; } }
+
     .market-card {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.1);
+      background: rgba(0,0,0,.4);
+      border: 1px solid rgba(0,229,255,.08);
       border-radius: 16px;
       padding: 20px 22px;
       position: relative;
       overflow: hidden;
-      transition: border-color .25s, transform .25s, box-shadow .25s;
+      transition: all .3s cubic-bezier(.22,1,.36,1);
       cursor: default;
-      animation: cornerPulse 4s ease-in-out infinite;
     }
     .market-card:hover {
-      border-color: rgba(0,229,255,.35);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 16px rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 20px rgba(0,229,255,.07);
     }
+    /* Hover top line */
     .market-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 1px;
       opacity: 0;
-      transition: opacity .25s;
+      transition: opacity .3s;
     }
     .market-card:hover::before { opacity: 1; }
     .market-card.blue::before   { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
@@ -621,49 +715,74 @@
     .market-card.yellow::before { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
     .market-card.red::before    { background: linear-gradient(90deg, transparent, var(--red), transparent); }
     .market-card.muted::before  { background: linear-gradient(90deg, transparent, var(--muted), transparent); }
+    /* Bottom bar */
     .market-card::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
+      transform: scaleX(0);
+      transition: transform .3s ease;
     }
-    .market-card.green::after  { background: var(--accent); }
-    .market-card.red::after    { background: var(--accent); }
+    .market-card:hover::after { transform: scaleX(1); }
     .market-card.blue::after   { background: var(--accent); }
-    .market-card.yellow::after { background: var(--accent); }
-    .market-card.muted::after  { background: var(--accent); }
+    .market-card.green::after  { background: var(--green); }
+    .market-card.yellow::after { background: var(--yellow); }
+    .market-card.red::after    { background: var(--red); }
+    .market-card.muted::after  { background: var(--muted); }
+
+    /* Light sweep on hover */
+    .market-card .card-sweep {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(0,229,255,.035) 50%, transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .market-card:hover .card-sweep { opacity: 1; }
 
     .market-card-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .market-card-label {
-      font-size: .75rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
       color: var(--text-dim);
-      letter-spacing: .08em;
+      letter-spacing: .1em;
     }
     .market-card-icon {
-      font-size: .95rem;
-      opacity: .6;
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      width: 70px;
+      height: 70px;
+      pointer-events: none;
+      opacity: .14;
+      transition: opacity .3s;
     }
+    .market-card:hover .market-card-icon { opacity: .28; }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 700;
       line-height: 1;
       margin-bottom: 6px;
       display: flex;
       align-items: baseline;
       gap: 4px;
+      transition: text-shadow .3s;
     }
-    .market-card-value.positive { color: var(--red); text-shadow: var(--glow-red); }
-    .market-card-value.negative { color: var(--green); text-shadow: var(--glow-grn); }
-    .market-card-value .arrow { font-size: 1rem; }
+    .market-card-value.positive { color: var(--red); }
+    .market-card-value.negative { color: var(--green); }
+    .market-card:hover .market-card-value.positive { text-shadow: var(--glow-red); }
+    .market-card:hover .market-card-value.negative { text-shadow: var(--glow-grn); }
     .market-card-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
+      font-size: .72rem;
       color: var(--text-faint);
     }
 
@@ -674,36 +793,35 @@
       gap: 20px;
       align-items: start;
     }
-    @media (max-width: 900px) {
-      .bottom-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
 
     /* ── UPDATE TIMELINE ── */
     .timeline {
       background: var(--surface);
-      border: 1px solid rgba(0,229,255,.12);
+      border: 1px solid rgba(0,229,255,.1);
       border-radius: 16px;
-      padding: 22px 26px;
+      padding: 24px 28px;
       position: relative;
       overflow: hidden;
-      animation: cornerPulse 3.5s ease-in-out infinite;
     }
     .timeline::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,229,255,.3), transparent);
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.35), transparent);
+      animation: borderGlow 4s ease-in-out infinite;
     }
     .timeline-title {
-      font-size: .88rem;
+      font-family: 'Orbitron', monospace;
+      font-size: .78rem;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 22px;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: .02em;
+      letter-spacing: .06em;
     }
     .timeline-list {
       list-style: none;
@@ -719,55 +837,68 @@
       top: 8px;
       bottom: 8px;
       width: 1px;
-      background: var(--border2);
+      background: linear-gradient(to bottom, var(--accent), rgba(0,229,255,.1));
     }
     .timeline-item {
       display: flex;
       align-items: center;
       gap: 14px;
-      font-size: .83rem;
-      padding: 8px 0;
+      font-size: .82rem;
+      padding: 9px 0;
       position: relative;
+      transition: all .2s;
     }
+    .timeline-item:hover .timeline-label { color: var(--text); }
     .timeline-dot {
       width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
       position: relative;
       z-index: 1;
+      transition: transform .2s;
     }
-    .timeline-dot.done    { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .timeline-item:hover .timeline-dot { transform: scale(1.4); }
+    .timeline-dot.done    { background: var(--green); box-shadow: 0 0 8px rgba(0,230,118,.6); }
     .timeline-dot.pending { background: var(--border2); border: 1px solid var(--muted); }
-    .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 10px var(--accent); } 50% { opacity: .5; box-shadow: 0 0 4px var(--accent); } }
+    .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 0 0 rgba(0,229,255,.6); animation: sonarPulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
     .timeline-time {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .76rem;
+      font-size: .74rem;
       color: var(--muted);
       width: 44px;
       flex-shrink: 0;
     }
-    .timeline-label { color: var(--text-dim); }
-    .timeline-label.done  { color: var(--text); }
+    .timeline-label { color: var(--text-dim); transition: color .2s; }
+    .timeline-label.done { color: var(--text); }
 
     /* ── DATA NOTE ── */
     .data-note {
       background: var(--surface);
-      border: 1px solid rgba(0,229,255,.12);
+      border: 1px solid rgba(0,229,255,.1);
       border-radius: 16px;
-      padding: 22px 26px;
+      padding: 24px 26px;
       position: relative;
       overflow: hidden;
-      animation: cornerPulse 3.5s ease-in-out infinite;
+    }
+    .data-note::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.3), transparent);
+      animation: borderGlow 4.5s ease-in-out infinite;
     }
     .data-note-title {
-      font-size: .88rem;
+      font-family: 'Orbitron', monospace;
+      font-size: .78rem;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: .06em;
     }
     .data-note-item {
       display: flex;
@@ -775,10 +906,12 @@
       gap: 10px;
       font-size: .78rem;
       color: var(--text-dim);
-      padding: 7px 0;
-      border-bottom: 1px solid var(--border);
-      line-height: 1.5;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+      line-height: 1.55;
+      transition: color .2s;
     }
+    .data-note-item:hover { color: var(--text); }
     .data-note-item:last-child { border-bottom: none; }
     .data-note-dot {
       width: 5px; height: 5px;
@@ -786,15 +919,16 @@
       background: var(--accent);
       flex-shrink: 0;
       margin-top: 5px;
-      opacity: .6;
+      opacity: .5;
+      box-shadow: 0 0 4px rgba(0,229,255,.4);
     }
 
     /* ── FOOTER ── */
     footer {
       position: relative;
       z-index: 1;
-      border-top: 1px solid var(--border);
-      background: rgba(7,13,26,.92);
+      border-top: 1px solid rgba(0,229,255,.06);
+      background: rgba(4,8,15,.95);
     }
     .footer-disclaimer {
       padding: 20px 40px 24px;
@@ -810,31 +944,29 @@
     }
     .footer-disclaimer-title {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .65rem;
+      font-size: .63rem;
       color: var(--text-dim);
-      letter-spacing: .12em;
+      letter-spacing: .14em;
     }
-    .footer-brand {
-      text-align: right;
-    }
+    .footer-brand { text-align: right; }
     .footer-brand-name {
-      font-family: 'Share Tech Mono', monospace;
+      font-family: 'Orbitron', monospace;
       font-size: .65rem;
       color: var(--accent);
-      letter-spacing: .12em;
-      opacity: .6;
+      letter-spacing: .14em;
+      opacity: .55;
     }
     .footer-brand-sub {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .6rem;
+      font-size: .58rem;
       color: var(--text-faint);
       letter-spacing: .08em;
       margin-top: 2px;
     }
     .footer-disclaimer-text {
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--text-faint);
-      line-height: 1.7;
+      line-height: 1.75;
       max-width: 900px;
     }
 
@@ -844,108 +976,196 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 50px 24px;
+      gap: 14px;
+      padding: 52px 24px;
       color: var(--text-dim);
       font-size: .88rem;
       text-align: center;
     }
-    .state-box svg { opacity: .25; }
+    .state-box svg { opacity: .2; }
     .state-box.error { color: var(--red); }
-    .state-box.error svg { opacity: .4; }
+    .state-box.error svg { opacity: .35; }
+
+    /* ── HOLIDAY / CLOSED BANNER ── */
+    #holiday-banner {
+      display: none;
+      position: relative;
+      z-index: 8;
+      background: linear-gradient(90deg,
+        rgba(20,5,5,.99) 0%,
+        rgba(30,6,6,.99) 50%,
+        rgba(20,5,5,.99) 100%);
+      border-bottom: 1px solid rgba(255,61,90,.18);
+      overflow: hidden;
+    }
+    #holiday-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,61,90,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,61,90,.02) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events: none;
+    }
+    #holiday-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,61,90,.7), transparent);
+      animation: borderScan 6s linear infinite;
+      pointer-events: none;
+    }
+    .holiday-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 40px;
+      flex-wrap: wrap;
+    }
+    .holiday-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .holiday-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(255,61,90,.08);
+      border: 1px solid rgba(255,61,90,.2);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      animation: holidayPulse 3s ease-in-out infinite;
+    }
+    @keyframes holidayPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,61,90,0); }
+      50%      { box-shadow: 0 0 20px 4px rgba(255,61,90,.15); }
+    }
+    .holiday-icon-wrap svg { width: 26px; height: 26px; color: var(--red); }
+    .holiday-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .28em;
+      color: rgba(255,90,90,.55);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .holiday-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .04em;
+    }
+    .holiday-subtitle {
+      font-size: .76rem;
+      color: rgba(255,255,255,.4);
+      margin-top: 3px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .holiday-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .holiday-next-box {
+      background: rgba(255,61,90,.05);
+      border: 1px solid rgba(255,61,90,.18);
+      border-radius: 12px;
+      padding: 10px 18px;
+      text-align: center;
+    }
+    .holiday-next-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      color: rgba(255,255,255,.35);
+      letter-spacing: .18em;
+      margin-bottom: 3px;
+    }
+    .holiday-next-val {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── HOLIDAY MODE ── */
+    body.holiday-mode main { opacity: .3; pointer-events: none; filter: grayscale(.6); }
+    body.holiday-mode .ticker-track { opacity: .2; }
+    body.holiday-mode .status-dot {
+      background: var(--red) !important;
+      animation: pulse 1.5s infinite !important;
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) and (min-width: 601px) {
       main { padding: 30px 20px 80px; }
-      .search-area { padding: 24px 24px; }
+      .search-area { padding: 24px 22px; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); }
       .market-grid { grid-template-columns: repeat(2, 1fr); }
       .bottom-grid { grid-template-columns: 1fr; }
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
-
     @media (max-width: 600px) {
-      /* Header */
       header { padding: 12px 16px; }
       .header-right .market-status { display: none; }
-      .logo-text { font-size: 1rem; }
-      .logo-sub { font-size: .55rem; }
+      .logo-text { font-size: .9rem; }
+      .logo-sub  { font-size: .52rem; }
       .logo-icon { width: 36px; height: 36px; overflow: hidden; }
-      .logo-icon img { width: 36px; height: 36px; position: static; top: auto; left: auto; }
+      .logo-icon img { width: 36px; height: 36px; position: static; }
       .logo { gap: 10px; }
-      #clock { font-size: .7rem; letter-spacing: .04em; }
+      #clock { font-size: .68rem; letter-spacing: .04em; padding: 4px 10px; }
       #musicBtn { width: 30px; height: 30px; }
-
-      /* Main */
       main { padding: 20px 12px 60px; }
-
-      /* Section title */
-      h2.section-title { font-size: 1.2rem; }
-
-      /* Search */
-      .search-area { padding: 20px 16px; border-radius: 14px; }
+      h2.section-title { font-size: 1.1rem; }
+      .search-area { padding: 18px 14px; border-radius: 14px; }
       .search-row { flex-direction: column; gap: 8px; }
-      #stockInput { height: 46px; font-size: .9rem; }
-      #searchBtn { height: 46px; font-size: .88rem; padding: 0 20px; }
-
-      /* Result card */
+      #stockInput { height: 46px; font-size: .88rem; }
+      #searchBtn { height: 46px; font-size: .8rem; padding: 0 18px; }
       .card-header { padding: 14px 16px; gap: 10px; }
-      .stock-badge { font-size: .9rem; padding: 4px 10px; }
-      .stock-name-title { font-size: 1rem; }
-      .stock-market-tag { font-size: .65rem; }
-      .card-timestamp { font-size: .65rem; }
-      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px; }
-      .metric-cell { padding: 14px 14px; }
-      .metric-label { font-size: .7rem; }
-      .metric-value { font-size: 1.05rem; }
-
-      /* Market wrap */
+      .stock-badge { font-size: .85rem; padding: 4px 10px; }
+      .stock-name-title { font-size: .98rem; }
+      .stock-market-tag { font-size: .62rem; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; }
+      .metric-cell { padding: 14px; }
+      .metric-value { font-size: 1rem; }
       .market-wrap { padding: 18px 14px 14px; border-radius: 16px; }
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .refresh-badge { font-size: .68rem; padding: 5px 10px; }
-
-      /* Market grid */
       .market-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .market-card { padding: 14px 14px; border-radius: 12px; }
-      .market-card-label { font-size: .68rem; }
+      .market-card { padding: 14px; border-radius: 12px; }
       .market-card-value { font-size: 1.1rem; }
-      .market-card-sub { font-size: .68rem; }
-      .market-card-icon { font-size: .8rem; }
-
-      /* Bottom grid */
+      .market-card-icon { width: 52px; height: 52px; }
       .bottom-grid { grid-template-columns: 1fr; gap: 14px; }
-
-      /* Timeline */
       .timeline { padding: 18px 16px; }
-      .timeline-title { font-size: .82rem; }
-      .timeline-item { font-size: .78rem; gap: 10px; }
-      .timeline-time { font-size: .7rem; width: 38px; }
-
-      /* Data note */
       .data-note { padding: 18px 16px; }
-      .data-note-title { font-size: .82rem; }
-      .data-note-item { font-size: .72rem; }
-
-      /* Footer */
-      footer { border-top: 1px solid var(--border); }
+      footer { border-top: 1px solid rgba(0,229,255,.05); }
       .footer-disclaimer { padding: 16px 16px 20px; }
       .footer-disclaimer-top { flex-direction: column; gap: 8px; }
       .footer-brand { text-align: left; }
-      .footer-disclaimer-title { font-size: .6rem; }
-      .footer-disclaimer-text { font-size: .68rem; }
-
-      /* Disposal banner */
-      .disposal-banner { padding: 10px 16px; font-size: .78rem; }
+      .holiday-inner { padding: 14px 16px; }
+      .holiday-title { font-size: .88rem; }
+      .holiday-next-box { padding: 8px 14px; }
+      .holiday-next-val { font-size: .85rem; }
     }
-
     @media (max-width: 360px) {
       .metrics-grid { grid-template-columns: 1fr; }
       .market-grid  { grid-template-columns: 1fr; }
-      .market-card-value { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
+
+<!-- BACKGROUND LAYERS -->
+<div class="bg-layer bg-layer-grid"></div>
+<div class="bg-layer bg-layer-vignette"></div>
+<div class="bg-layer bg-layer-scanlines"></div>
+<canvas id="particleCanvas"></canvas>
+
 <audio src="MapleMusic.mp3" autoplay loop></audio>
 
 <!-- HEADER -->
@@ -956,13 +1176,13 @@
     </div>
     <div>
       <div class="logo-text">盤後雷達</div>
-      <div class="logo-sub">JellyStock</div>
+      <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
     </div>
   </div>
   <div class="header-right">
     <div class="market-status">
       <div class="status-dot"></div>
-      <span>資料來源：TWSE / TPEX</span>
+      <span>TWSE / TPEX LIVE</span>
     </div>
     <button id="musicBtn" onclick="toggleMusic()" title="播放/暫停音樂">
       <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -972,6 +1192,31 @@
     <div id="clock">--:--:--</div>
   </div>
 </header>
+
+<!-- HOLIDAY BANNER -->
+<div id="holiday-banner">
+  <div class="holiday-inner">
+    <div class="holiday-left">
+      <div class="holiday-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="9" y1="15" x2="15" y2="15" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <div class="holiday-text-block">
+        <div class="holiday-tag">Market Closed</div>
+        <div class="holiday-title" id="holiday-title-text">今日休市</div>
+        <div class="holiday-subtitle" id="holiday-reason">週末 ・ 本日無交易</div>
+      </div>
+    </div>
+    <div class="holiday-right">
+      <div class="holiday-next-box">
+        <div class="holiday-next-label">NEXT TRADING DAY</div>
+        <div class="holiday-next-val" id="holiday-next-trading-day">--</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- TICKER TAPE -->
 <div class="ticker-wrap">
@@ -989,7 +1234,7 @@
   <!-- SEARCH -->
   <div class="search-area">
     <div class="search-top">
-      <p class="section-label">個股查詢</p>
+      <p class="section-label">· Individual Stock Query ·</p>
       <h2 class="section-title">盤後買賣超查詢</h2>
     </div>
     <div class="search-row">
@@ -1012,106 +1257,162 @@
   <!-- RESULT -->
   <div id="result">
     <div class="state-box">
-      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4a5a7a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#2a3d5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <span>輸入股票代碼或名稱開始查詢</span>
     </div>
   </div>
 
-  <div style="height:48px"></div>
+  <div style="height:50px"></div>
 
   <!-- MARKET OVERVIEW -->
   <div class="market-section">
     <div class="market-wrap">
-    <div class="market-title-row">
-      <div>
-        <p class="section-label">大盤概況</p>
-        <h2 class="section-title">今日盤後大盤資訊</h2>
-      </div>
-      <div class="refresh-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-        <span>下次更新</span>
-        <span id="refreshCountdown" class="countdown">25:00</span>
-      </div>
-    </div>
-    <div class="market-grid" id="marketGrid">
-      <div class="market-card blue">
-        <div class="market-card-top">
-          <div class="market-card-label">外資買賣超</div>
-          <div class="market-card-icon">🌏</div>
+      <div class="market-title-row">
+        <div>
+          <p class="section-label">· Market Overview ·</p>
+          <h2 class="section-title">今日盤後大盤資訊</h2>
         </div>
-        <div class="market-card-value" id="m-foreign">--</div>
-        <div class="market-card-sub">億元</div>
-      </div>
-      <div class="market-card green">
-        <div class="market-card-top">
-          <div class="market-card-label">投信買賣超</div>
-          <div class="market-card-icon">🏦</div>
+        <div class="refresh-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          <span>下次更新</span>
+          <span id="refreshCountdown" class="countdown">25:00</span>
         </div>
-        <div class="market-card-value" id="m-trust">--</div>
-        <div class="market-card-sub">億元</div>
       </div>
-      <div class="market-card yellow">
-        <div class="market-card-top">
-          <div class="market-card-label">自營商買賣超</div>
-          <div class="market-card-icon">🏢</div>
+      <div class="market-grid" id="marketGrid">
+
+        <div class="market-card blue">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">外資買賣超</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="38" cy="42" r="28"/><ellipse cx="38" cy="42" rx="11" ry="28"/><ellipse cx="38" cy="42" rx="22" ry="28"/>
+              <line x1="10" y1="42" x2="66" y2="42"/><line x1="12" y1="28" x2="64" y2="28"/><line x1="12" y1="56" x2="64" y2="56"/>
+              <line x1="17" y1="18" x2="59" y2="66" stroke-width="2.8"/>
+              <line x1="55" y1="18" x2="68" y2="12"/><polyline points="56,10 68,10 68,22" stroke-width="2.5" fill="none"/>
+              <path d="M13,64 Q6,52 10,40" stroke-width="2" fill="none"/><polyline points="8,54 13,64 22,62" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-foreign">--</div>
+          <div class="market-card-sub">億元</div>
         </div>
-        <div class="market-card-value" id="m-prop">--</div>
-        <div class="market-card-sub">億元</div>
-      </div>
-      <div class="market-card red">
-        <div class="market-card-top">
-          <div class="market-card-label">三大法人合計</div>
-          <div class="market-card-icon">📊</div>
+
+        <div class="market-card green">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">投信買賣超</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="8" y="66" width="64" height="7" rx="2"/><rect x="12" y="58" width="56" height="8" rx="1"/>
+              <polygon points="40,10 70,34 10,34"/><rect x="18" y="34" width="10" height="24" rx="1"/><rect x="52" y="34" width="10" height="24" rx="1"/>
+              <line x1="40" y1="58" x2="40" y2="44" stroke-width="2.8"/><polyline points="32,52 40,44 48,52" stroke-width="2.5" fill="none"/>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-trust">--</div>
+          <div class="market-card-sub">億元</div>
         </div>
-        <div class="market-card-value" id="m-total">--</div>
-        <div class="market-card-sub">億元</div>
-      </div>
-      <div class="market-card blue">
-        <div class="market-card-top">
-          <div class="market-card-label">融資增減</div>
-          <div class="market-card-icon">📈</div>
+
+        <div class="market-card yellow">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">自營商買賣超</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="70" x2="72" y2="70"/><rect x="10" y="14" width="32" height="56" rx="1"/>
+              <rect x="14" y="10" width="6" height="6" rx="1"/><rect x="22" y="10" width="6" height="6" rx="1"/><rect x="30" y="10" width="6" height="6" rx="1"/>
+              <rect x="13" y="20" width="7" height="5" rx="1"/><rect x="22" y="20" width="7" height="5" rx="1"/><rect x="31" y="20" width="7" height="5" rx="1"/>
+              <rect x="13" y="28" width="7" height="5" rx="1"/><rect x="22" y="28" width="7" height="5" rx="1"/><rect x="31" y="28" width="7" height="5" rx="1"/>
+              <rect x="13" y="36" width="7" height="5" rx="1"/><rect x="22" y="36" width="7" height="5" rx="1"/><rect x="31" y="36" width="7" height="5" rx="1"/>
+              <rect x="13" y="44" width="7" height="5" rx="1"/><rect x="22" y="44" width="7" height="5" rx="1"/><rect x="31" y="44" width="7" height="5" rx="1"/>
+              <rect x="44" y="30" width="26" height="40" rx="1"/>
+              <rect x="47" y="34" width="6" height="4" rx="1"/><rect x="55" y="34" width="6" height="4" rx="1"/><rect x="63" y="34" width="4" height="4" rx="1"/>
+              <rect x="47" y="41" width="6" height="4" rx="1"/><rect x="55" y="41" width="6" height="4" rx="1"/><rect x="63" y="41" width="4" height="4" rx="1"/>
+              <rect x="47" y="48" width="6" height="4" rx="1"/><rect x="55" y="48" width="6" height="4" rx="1"/><rect x="63" y="48" width="4" height="4" rx="1"/>
+              <circle cx="57" cy="62" r="7"/><text x="54" y="66" font-size="10" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">S</text>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-prop">--</div>
+          <div class="market-card-sub">億元</div>
         </div>
-        <div class="market-card-value" id="m-margin-delta">--</div>
-        <div class="market-card-sub">億元</div>
-      </div>
-      <div class="market-card muted">
-        <div class="market-card-top">
-          <div class="market-card-label">融資水位</div>
-          <div class="market-card-icon">💧</div>
+
+        <div class="market-card red">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">三大法人合計</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="40" cy="18" r="11"/><path d="M20,74 Q20,50 40,50 Q60,50 60,74"/>
+              <rect x="28" y="50" width="24" height="22" rx="10"/>
+              <text x="37" y="67" font-size="11" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">2</text>
+              <circle cx="18" cy="28" r="8"/><path d="M4,74 Q4,54 18,54"/>
+              <rect x="6" y="54" width="18" height="18" rx="8"/>
+              <text x="10" y="67" font-size="10" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">1</text>
+              <circle cx="62" cy="28" r="8"/><path d="M76,74 Q76,54 62,54"/>
+              <rect x="56" y="54" width="18" height="18" rx="8"/>
+              <text x="61" y="67" font-size="10" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">3</text>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-total">--</div>
+          <div class="market-card-sub">億元</div>
         </div>
-        <div class="market-card-value" id="m-margin-level">--</div>
-        <div class="market-card-sub">億元（總餘額）</div>
+
+        <div class="market-card blue">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">融資增減</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="16" cy="52" r="13"/><line x1="16" y1="43" x2="16" y2="61" stroke-width="2.5"/><line x1="8" y1="52" x2="24" y2="52" stroke-width="2.5"/>
+              <circle cx="64" cy="58" r="13"/><line x1="56" y1="58" x2="72" y2="58" stroke-width="2.5"/>
+              <rect x="30" y="52" width="9" height="18" rx="1"/><rect x="41" y="44" width="9" height="26" rx="1"/>
+              <polyline points="28,52 32,42 36,46 42,36 46,40 50,32" stroke-width="2.2" fill="none"/>
+              <polyline points="46,26 56,16 68,8" stroke-width="2.5" fill="none"/>
+              <polygon points="60,6 70,6 70,16" fill="#00e5ff" stroke="#00e5ff" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-margin-delta">--</div>
+          <div class="market-card-sub">億元</div>
+        </div>
+
+        <div class="market-card muted">
+          <div class="card-sweep"></div>
+          <div class="market-card-top"><div class="market-card-label">融資水位</div></div>
+          <div class="market-card-icon">
+            <svg viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14,8 L14,54 Q14,72 40,72 Q66,72 66,54 L66,8" stroke-width="2.5"/>
+              <line x1="14" y1="8" x2="66" y2="8" stroke-width="2.5"/>
+              <line x1="8" y1="8" x2="14" y2="8" stroke-width="2"/><line x1="66" y1="8" x2="72" y2="8" stroke-width="2"/>
+              <rect x="28" y="22" width="24" height="6" rx="3"/><rect x="26" y="34" width="28" height="6" rx="3"/>
+              <rect x="24" y="46" width="32" height="6" rx="3"/><rect x="26" y="58" width="28" height="6" rx="3"/>
+            </svg>
+          </div>
+          <div class="market-card-value" id="m-margin-level">--</div>
+          <div class="market-card-sub">億元（總餘額）</div>
+        </div>
+
       </div>
-    </div>
     </div>
   </div>
 
   <!-- BOTTOM: TIMELINE + DATA NOTE -->
   <div class="bottom-grid">
 
-    <!-- UPDATE TIMELINE -->
     <div class="timeline">
       <div class="timeline-title">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
-        今日資料更新時程
+        UPDATE SCHEDULE
       </div>
       <ul class="timeline-list" id="timeline"></ul>
     </div>
 
-    <!-- DATA NOTE -->
     <div class="data-note">
       <div class="data-note-title">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-        資料說明
+        DATA NOTES
       </div>
       <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
@@ -1139,13 +1440,179 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-//const API_BASE = 'http://127.0.0.1:5000';
 const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+//const API_BASE = 'http://127.0.0.1:5000';
 
-// ── CLOCK ────────────────────────────────────────────────────────────────────
+// ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const COLORS = ['rgba(0,229,255,', 'rgba(0,170,255,', 'rgba(0,230,118,'];
+  function mkParticle() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - .5) * .35,
+      vy: (Math.random() - .5) * .35,
+      r: Math.random() * 1.4 + .3,
+      a: Math.random() * .5 + .15,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      life: Math.random() * 200 + 100,
+      age: 0,
+    };
+  }
+
+  for (let i = 0; i < 80; i++) particles.push(mkParticle());
+
+  // Data lines (occasional streaks)
+  let streaks = [];
+  function mkStreak() {
+    return {
+      x: Math.random() * W, y: -10,
+      speed: Math.random() * 2.5 + 1,
+      len: Math.random() * 60 + 30,
+      a: Math.random() * .3 + .1,
+      w: Math.random() * .8 + .3,
+    };
+  }
+  setInterval(() => { if (streaks.length < 12) streaks.push(mkStreak()); }, 600);
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (d < 120) {
+          ctx.strokeStyle = `rgba(0,229,255,${.08 * (1 - d/120)})`;
+          ctx.lineWidth = .5;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw particles
+    particles.forEach((p, idx) => {
+      p.x += p.vx; p.y += p.vy; p.age++;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      if (p.age > p.life) particles[idx] = mkParticle();
+      const fade = Math.min(p.age / 20, 1) * Math.min((p.life - p.age) / 20, 1);
+      ctx.fillStyle = p.color + (p.a * fade) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Draw streaks
+    streaks = streaks.filter(s => s.y < H + s.len);
+    streaks.forEach(s => {
+      s.y += s.speed;
+      const grad = ctx.createLinearGradient(s.x, s.y - s.len, s.x, s.y);
+      grad.addColorStop(0, `rgba(0,229,255,0)`);
+      grad.addColorStop(.5, `rgba(0,229,255,${s.a})`);
+      grad.addColorStop(1, `rgba(0,229,255,0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = s.w;
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y - s.len);
+      ctx.lineTo(s.x, s.y);
+      ctx.stroke();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── HOLIDAY DETECTION ─────────────────────────────────────────────────────────
+const TRADING_DAY_EXCEPTIONS = new Set(["國曆新年開始交易日","農曆春節前最後交易日"]);
+let _twHolidayCache = null;
+
+async function fetchTwHolidays() {
+  if (_twHolidayCache) return _twHolidayCache;
+  try {
+    const res  = await fetch('https://www.twse.com.tw/rwd/zh/holidaySchedule/holidaySchedule?response=json',{ headers: {'Accept':'application/json'} });
+    const data = await res.json();
+    const map  = {};
+    (data.data || []).forEach(item => { map[item[0]] = item[1]; });
+    _twHolidayCache = map;
+    return map;
+  } catch(e) { return {}; }
+}
+
+async function isTradingDay(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00+08:00');
+  const dow = d.getDay();
+  if (dow === 0 || dow === 6) return false;
+  const holidays = await fetchTwHolidays();
+  if (holidays[dateStr]) return TRADING_DAY_EXCEPTIONS.has(holidays[dateStr]);
+  return true;
+}
+
+async function nextTradingDay(fromDateStr) {
+  const d = new Date(fromDateStr + 'T00:00:00+08:00');
+  for (let i = 1; i <= 30; i++) {
+    d.setDate(d.getDate() + 1);
+    const iso = d.toISOString().slice(0, 10);
+    if (await isTradingDay(iso)) return iso;
+  }
+  return null;
+}
+
+function getTodayTW() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+}
+
+async function initHolidayBanner() {
+  const today   = getTodayTW();
+  const trading = await isTradingDay(today);
+  if (!trading) {
+    document.getElementById('holiday-banner').style.display = 'block';
+    document.body.classList.add('holiday-mode');
+    const d   = new Date(today + 'T00:00:00+08:00');
+    const dow = d.getDay();
+    let reason = '';
+    if (dow === 6) reason = '週六 ・ 本日無交易';
+    else if (dow === 0) reason = '週日 ・ 本日無交易';
+    else {
+      const holidays = await fetchTwHolidays();
+      reason = '國定假日：' + (holidays[today] || '休市') + ' ・ 本日無交易';
+    }
+    const isWeekend = (dow === 0 || dow === 6);
+    document.getElementById('holiday-title-text').textContent = isWeekend ? '週末休市' : '國定假日休市';
+    document.getElementById('holiday-reason').textContent    = reason;
+    const nextDay = await nextTradingDay(today);
+    if (nextDay) {
+      const nd = new Date(nextDay + 'T00:00:00+08:00');
+      const weekdayNames = ['日','一','二','三','四','五','六'];
+      document.getElementById('holiday-next-trading-day').textContent =
+        nextDay.slice(5).replace('-','/') + ' (週' + weekdayNames[nd.getDay()] + ')';
+    }
+    const dot = document.querySelector('.status-dot');
+    if (dot) { dot.style.background = 'var(--red)'; dot.style.animation = 'pulse 1.5s infinite'; }
+  }
+}
+initHolidayBanner();
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
 function updateClock() {
-  const now = new Date();
-  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const tw  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
   const pad = n => String(n).padStart(2, '0');
   document.getElementById('clock').textContent =
     `${tw.getFullYear()}-${pad(tw.getMonth()+1)}-${pad(tw.getDate())} ` +
@@ -1154,7 +1621,7 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-// ── TIMELINE ─────────────────────────────────────────────────────────────────
+// ── TIMELINE ──────────────────────────────────────────────────────────────────
 const TIMELINE_ITEMS = [
   { time: '15:00', label: '法人買賣金額 / 投信買賣超' },
   { time: '16:10', label: '外資 / 自營商買賣超' },
@@ -1162,10 +1629,8 @@ const TIMELINE_ITEMS = [
   { time: '21:00', label: '大盤融資金額統計' },
   { time: '21:30', label: '個股借券賣出' },
 ];
-
 function buildTimeline() {
-  const now = new Date();
-  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const tw = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
   const current = tw.getHours() * 60 + tw.getMinutes();
   const ul = document.getElementById('timeline');
   ul.innerHTML = '';
@@ -1173,7 +1638,7 @@ function buildTimeline() {
     const [h, m] = item.time.split(':').map(Number);
     const itemMin = h * 60 + m;
     let dotClass = 'pending', labelClass = '';
-    if (current > itemMin + 5)            { dotClass = 'done';   labelClass = 'done'; }
+    if (current > itemMin + 5)                 { dotClass = 'done';   labelClass = 'done'; }
     else if (Math.abs(current - itemMin) <= 5) { dotClass = 'active'; }
     ul.innerHTML += `
       <li class="timeline-item">
@@ -1192,40 +1657,23 @@ async function loadMarket() {
     const res  = await fetch(`${API_BASE}/api/market?t=${Date.now()}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-
     const colorVal = v => (v > 0 ? 'positive' : v < 0 ? 'negative' : '');
-
     const set = (id, val, colorClass) => {
       const el = document.getElementById(id);
       if (!el) return;
-      if (val == null) {
-        el.textContent = '🚫 暫未更新';
-        el.className = 'market-card-value neutral';
-      } else {
-        el.textContent = val;
-        el.className = 'market-card-value ' + (colorClass || '');
-      }
+      if (val == null) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value neutral'; }
+      else { el.textContent = val; el.className = 'market-card-value ' + (colorClass || ''); }
     };
-
     set('m-foreign',      data.foreign,      colorVal(data.foreign));
     set('m-trust',        data.trust,        colorVal(data.trust));
     set('m-prop',         data.proprietary,  colorVal(data.proprietary));
     set('m-total',        data.total,        colorVal(data.total));
     set('m-margin-delta', data.margin_delta, colorVal(data.margin_delta));
-
-    // 融資水位：絕對值，不顯示箭頭
     const lvlEl = document.getElementById('m-margin-level');
     if (lvlEl) {
-      if (data.margin_level == null) {
-        lvlEl.textContent = '🚫 暫未更新';
-        lvlEl.className = 'market-card-value neutral';
-      } else {
-        lvlEl.textContent = data.margin_level;
-        lvlEl.className = 'market-card-value';
-      }
+      if (data.margin_level == null) { lvlEl.textContent = '🚫 暫未更新'; lvlEl.className = 'market-card-value neutral'; }
+      else { lvlEl.textContent = data.margin_level; lvlEl.className = 'market-card-value'; }
     }
-
-    // ticker
     const fmt = v => v != null
       ? (v > 0 ? `<span class="up">+${v}億</span>` : `<span class="down">${v}億</span>`)
       : '<span style="color:var(--text-faint)">🚫 暫未更新</span>';
@@ -1238,66 +1686,49 @@ async function loadMarket() {
     document.querySelectorAll('.t-prop').forEach(el    => el.innerHTML = fmt(data.proprietary));
     document.querySelectorAll('.t-margin').forEach(el  => el.innerHTML = fmt(data.margin_delta));
     document.querySelectorAll('.t-total').forEach(el   => el.innerHTML = fmt(data.total));
-
-  } catch (e) {
-    ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
-      .forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.textContent = '--'; el.className = 'market-card-value'; }
-      });
+  } catch(e) {
+    ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = '--'; el.className = 'market-card-value'; }
+    });
   }
 }
 loadMarket();
 
-// ── 自動更新倒數計時 ──────────────────────────────────────────────────────────
-const REFRESH_INTERVAL = 25 * 60; // 25 分鐘（秒）
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+const REFRESH_INTERVAL = 25 * 60;
 let countdown = REFRESH_INTERVAL;
-
 function updateCountdown() {
   countdown--;
-  if (countdown <= 0) {
-    countdown = REFRESH_INTERVAL;
-    loadMarket();
-  }
+  if (countdown <= 0) { countdown = REFRESH_INTERVAL; loadMarket(); }
   const m = String(Math.floor(countdown / 60)).padStart(2, '0');
   const s = String(countdown % 60).padStart(2, '0');
   const el = document.getElementById('refreshCountdown');
-  if (el) {
-    el.textContent = `${m}:${s}`;
-    el.className = countdown <= 30 ? 'countdown urgent' : 'countdown';
-  }
+  if (el) { el.textContent = `${m}:${s}`; el.className = countdown <= 30 ? 'countdown urgent' : 'countdown'; }
 }
 setInterval(updateCountdown, 1000);
 
-// ── 凌晨重置（過12點自動清空數字） ──────────────────────────────────────────
+// ── MIDNIGHT RESET ────────────────────────────────────────────────────────────
 function resetMarketDisplay() {
-  ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value'; }
-    });
-  document.querySelectorAll('.t-foreign, .t-trust, .t-prop, .t-margin, .t-total')
+  ['m-foreign','m-trust','m-prop','m-total','m-margin-delta','m-margin-level'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value'; }
+  });
+  document.querySelectorAll('.t-foreign,.t-trust,.t-prop,.t-margin,.t-total')
     .forEach(el => el.innerHTML = '<span style="color:var(--text-faint)">🚫 暫未更新</span>');
 }
-
 function scheduleResetAtMidnight() {
-  const now = new Date();
-  const tw  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
-  const msUntilMidnight =
-    ((24 - tw.getHours()) * 60 * 60 - tw.getMinutes() * 60 - tw.getSeconds()) * 1000;
-  setTimeout(() => {
-    resetMarketDisplay();
-    scheduleResetAtMidnight(); // 隔天再繼續排程
-  }, msUntilMidnight);
+  const tw  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+  const ms  = ((24 - tw.getHours()) * 3600 - tw.getMinutes() * 60 - tw.getSeconds()) * 1000;
+  setTimeout(() => { resetMarketDisplay(); scheduleResetAtMidnight(); }, ms);
 }
 scheduleResetAtMidnight();
 
-// ── 音樂控制 ─────────────────────────────────────────────────────────────────
-const audio = document.querySelector('audio');
-const musicBtn = document.getElementById('musicBtn');
-const playIcon = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+// ── MUSIC ─────────────────────────────────────────────────────────────────────
+const audio     = document.querySelector('audio');
+const musicBtn  = document.getElementById('musicBtn');
+const playIcon  = `<polygon points="5 3 19 12 5 21 5 3"/>`;
 const pauseIcon = `<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/>`;
-
 function toggleMusic() {
   if (audio.paused) {
     audio.play();
@@ -1309,14 +1740,10 @@ function toggleMusic() {
     document.getElementById('musicIcon').innerHTML = playIcon;
   }
 }
-
-// 嘗試自動播放
 audio.play().then(() => {
   musicBtn.classList.add('playing');
   document.getElementById('musicIcon').innerHTML = pauseIcon;
-}).catch(() => {
-  // 瀏覽器封鎖自動播放，維持暫停狀態等使用者點擊
-});
+}).catch(() => {});
 
 // ── STOCK QUERY ───────────────────────────────────────────────────────────────
 const resultEl = document.getElementById('result');
@@ -1330,7 +1757,7 @@ async function queryStock() {
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7;animation:spin 1s linear infinite">
         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
       </svg>
-      <span>查詢中…</span>
+      <span style="font-family:'Share Tech Mono',monospace;letter-spacing:.1em;color:var(--accent)">LOADING DATA...</span>
     </div>`;
   document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
 
@@ -1348,7 +1775,7 @@ async function queryStock() {
       return;
     }
     renderStock(data);
-  } catch (e) {
+  } catch(e) {
     resultEl.innerHTML = `<div class="state-box error"><span>⚠️ 無法連線至伺服器，請稍後再試。</span></div>`;
   }
 }
@@ -1362,8 +1789,6 @@ function colorClass(val) {
 
 function renderStock(d) {
   const disposal = d.disposal;
-  const isDisposal = disposal && disposal.includes('⭕');
-
   const metricCell = (label, value, icon='', unit='股') => {
     const cc = colorClass(value);
     const display = value != null
@@ -1375,9 +1800,8 @@ function renderStock(d) {
         <div class="metric-value ${cc}">${display}</div>
       </div>`;
   };
-
-  const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : disposal && disposal.includes('❌') ? 'neutral' : 'neutral';
-  const disposalDisplay = disposal ? disposal.replace('處置：', '') : '🚫 暫未更新';
+  const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : 'neutral';
+  const disposalDisplay = disposal ? disposal.replace('處置：','') : '🚫 暫未更新';
 
   resultEl.innerHTML = `
     <div class="stock-card">
@@ -1400,7 +1824,6 @@ function renderStock(d) {
     </div>`;
 }
 
-// ── ENTER KEY ─────────────────────────────────────────────────────────────────
 document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') queryStock();
 });

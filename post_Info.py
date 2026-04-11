@@ -14,6 +14,8 @@ import time as _time
 
 headers = {"User-Agent": "Mozilla/5.0"}
 
+#TEST_DATE = "20260410"
+
 def get_today():
     """每次呼叫都回傳台灣當下日期，避免 Render 長時間不重啟導致日期停在舊值。"""
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
