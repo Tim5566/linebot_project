@@ -14,10 +14,7 @@ import time as _time
 
 headers = {"User-Agent": "Mozilla/5.0"}
 
-#TEST_DATE = "20260410"
-
 def get_today():
-    """每次呼叫都回傳台灣當下日期，避免 Render 長時間不重啟導致日期停在舊值。"""
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
 def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
@@ -300,3 +297,83 @@ def market_pnfo():
         reply += "融資額金水位 : 🚫 暫未更新\n"
 
     return reply.strip()
+
+# ── 上市上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────────
+def twse_top50(today=None):
+    """
+    回傳上市外資、投信、自營商的買超/賣超前50名。
+    回傳格式：
+    {
+        "foreign":     {"buy": [...], "sell": [...]},
+        "trust":       {"buy": [...], "sell": [...]},
+        "proprietary": {"buy": [...], "sell": [...]}
+    }
+    每筆資料：{"id": "2330", "name": "台積電", "net": 8159}  (單位：張)
+    """
+    if today is None:
+        today = get_today()
+
+    API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+    API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
+    API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
+
+    def _parse_top50(api_url, net_col):
+        """
+        net_col：買賣超欄位索引
+          外資  TWT38U → row[5]  (index 5)
+          投信  TWT44U → row[5]  (index 5)
+          自營商 TWT43U → row[10] (index 10)
+        """
+        try:
+            data = fetch_with_retry(api_url, today)
+            if data is None:
+                return None, None
+
+            processed = []
+            for row in data["data"]:
+                # 過濾權證、認購認售
+                name = row[2].strip() if len(row) > 2 else row[1].strip()
+                if re.search(r'購|售|認購|認售', name):
+                    continue
+                stock_id = row[1].strip() if len(row) > 2 else row[0].strip()
+                try:
+                    net = int(row[net_col].replace(",", "")) // 1000  # 股 → 張
+                except (ValueError, IndexError):
+                    continue
+                processed.append({"id": stock_id, "name": name, "net": net})
+
+            buy  = sorted(processed, key=lambda x: x["net"], reverse=True)[:50]
+            sell = sorted(processed, key=lambda x: x["net"])[:50]
+            return buy, sell
+
+        except Exception as e:
+            print(f"[twse_top50] 查詢失敗: {e}")
+            return None, None
+
+    # 並行抓三支 API
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        f_foreign     = executor.submit(_parse_top50, API_Foreign,     5)
+        f_trust       = executor.submit(_parse_top50, API_Trust,       5)
+        f_proprietary = executor.submit(_parse_top50, API_Proprietary, 10)
+
+        foreign_buy,     foreign_sell     = f_foreign.result()
+        trust_buy,       trust_sell       = f_trust.result()
+        proprietary_buy, proprietary_sell = f_proprietary.result()
+
+    return {
+        "foreign": {
+            "buy":  foreign_buy  if foreign_buy  is not None else [],
+            "sell": foreign_sell if foreign_sell is not None else [],
+            "error": "🚫 暫未更新" if foreign_buy is None else None,
+        },
+        "trust": {
+            "buy":  trust_buy  if trust_buy  is not None else [],
+            "sell": trust_sell if trust_sell is not None else [],
+            "error": "🚫 暫未更新" if trust_buy is None else None,
+        },
+        "proprietary": {
+            "buy":  proprietary_buy  if proprietary_buy  is not None else [],
+            "sell": proprietary_sell if proprietary_sell is not None else [],
+            "error": "🚫 暫未更新" if proprietary_buy is None else None,
+        },
+    }

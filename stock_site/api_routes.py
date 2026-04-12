@@ -1,12 +1,17 @@
 from flask import jsonify, request
 from flask_cors import CORS
-from post_Info import stock_info, market_pnfo
+from post_Info import stock_info, market_pnfo, get_today
+from get_trading_holidays import get_trading_status
 import re
 
 
 def register_api(app):
-    # ── 允許靜態網站跨域呼叫 ──────────────────────────────────────────
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # ── 交易日狀態 API ─────────────────────────────────────────────────
+    @app.route("/api/trading_status")
+    def api_trading_status():
+        return jsonify(get_trading_status())
 
     # ── 個股查詢 API ───────────────────────────────────────────────────
     @app.route("/api/stock")
@@ -15,23 +20,22 @@ def register_api(app):
         if not keyword:
             return jsonify({"error": "請輸入股票代碼或名稱"}), 400
 
-        raw = stock_info(keyword)   # 你原本的函式，回傳純文字
+        raw = stock_info(keyword)
 
-        # ── 解析純文字 → JSON ──────────────────────────────────────────
         if raw.startswith("📢") or raw.startswith("❌"):
             return jsonify({"error": raw}), 200
 
-        lines = raw.split("\n")
+        lines  = raw.split("\n")
         result = {
-            "keyword": keyword,
-            "name":    lines[0].split("(")[0].strip() if lines else keyword,
-            "date":    _today_str(),
-            "market":  None,
-            "foreign":    None,
-            "trust":      None,
-            "proprietary":None,
-            "short_sale": None,
-            "disposal":   None,
+            "keyword":     keyword,
+            "name":        lines[0].split("(")[0].strip() if lines else keyword,
+            "date":        get_today(),   # 統一使用 post_Info 的 get_today()
+            "market":      None,
+            "foreign":     None,
+            "trust":       None,
+            "proprietary": None,
+            "short_sale":  None,
+            "disposal":    None,
         }
 
         for line in lines[1:]:
@@ -51,8 +55,7 @@ def register_api(app):
     # ── 大盤資訊 API ───────────────────────────────────────────────────
     @app.route("/api/market")
     def api_market():
-        raw = market_pnfo()   # 你原本的函式，回傳純文字
-
+        raw    = market_pnfo()
         result = {
             "foreign":     None,
             "trust":       None,
@@ -63,7 +66,6 @@ def register_api(app):
         }
 
         for line in raw.split("\n"):
-            lc = line.lower()
             if "外資" in line:
                 result["foreign"]      = _extract_float(line)
             elif "投信" in line:
@@ -82,19 +84,12 @@ def register_api(app):
 
 # ── 工具函式 ──────────────────────────────────────────────────────────────────
 def _extract_val(line):
-    """外資：123,456 股  →  '123,456'"""
     m = re.search(r"：\s*([^\s]+)\s*股", line)
     return m.group(1) if m else None
 
 def _extract_float(line):
-    """合計金額 : -12.34億  →  -12.34"""
     m = re.search(r":\s*(-?[\d.]+)", line)
     try:
         return float(m.group(1)) if m else None
     except Exception:
         return None
-
-def _today_str() -> str:
-    import datetime
-    from zoneinfo import ZoneInfo
-    return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")

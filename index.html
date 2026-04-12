@@ -116,7 +116,7 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 30px;
     }
     .logo-icon {
       width: 48px; height: 48px;
@@ -1540,72 +1540,42 @@ const API_BASE = 'https://linebot-project-oxnw.onrender.com';
   draw();
 })();
 
-// ── HOLIDAY DETECTION ─────────────────────────────────────────────────────────
-const TRADING_DAY_EXCEPTIONS = new Set(["國曆新年開始交易日","農曆春節前最後交易日"]);
-let _twHolidayCache = null;
-
-async function fetchTwHolidays() {
-  if (_twHolidayCache) return _twHolidayCache;
-  try {
-    const res  = await fetch('https://www.twse.com.tw/rwd/zh/holidaySchedule/holidaySchedule?response=json',{ headers: {'Accept':'application/json'} });
-    const data = await res.json();
-    const map  = {};
-    (data.data || []).forEach(item => { map[item[0]] = item[1]; });
-    _twHolidayCache = map;
-    return map;
-  } catch(e) { return {}; }
-}
-
-async function isTradingDay(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00+08:00');
-  const dow = d.getDay();
-  if (dow === 0 || dow === 6) return false;
-  const holidays = await fetchTwHolidays();
-  if (holidays[dateStr]) return TRADING_DAY_EXCEPTIONS.has(holidays[dateStr]);
-  return true;
-}
-
-async function nextTradingDay(fromDateStr) {
-  const d = new Date(fromDateStr + 'T00:00:00+08:00');
-  for (let i = 1; i <= 30; i++) {
-    d.setDate(d.getDate() + 1);
-    const iso = d.toISOString().slice(0, 10);
-    if (await isTradingDay(iso)) return iso;
-  }
-  return null;
-}
-
-function getTodayTW() {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-}
-
+// ── HOLIDAY DETECTION（統一由後端 /api/trading_status 判斷）─────────────────
 async function initHolidayBanner() {
-  const today   = getTodayTW();
-  const trading = await isTradingDay(today);
-  if (!trading) {
-    document.getElementById('holiday-banner').style.display = 'block';
-    document.body.classList.add('holiday-mode');
-    const d   = new Date(today + 'T00:00:00+08:00');
-    const dow = d.getDay();
-    let reason = '';
-    if (dow === 6) reason = '週六 ・ 本日無交易';
-    else if (dow === 0) reason = '週日 ・ 本日無交易';
-    else {
-      const holidays = await fetchTwHolidays();
-      reason = '國定假日：' + (holidays[today] || '休市') + ' ・ 本日無交易';
+  try {
+    const res  = await fetch(`${API_BASE}/api/trading_status`);
+    const data = await res.json();
+
+    if (!data.is_trading_day) {
+      document.getElementById('holiday-banner').style.display = 'block';
+      document.body.classList.add('holiday-mode');
+
+      // 判斷休市原因文字
+      const today  = data.today; // "2026-04-12"
+      const d      = new Date(today + 'T00:00:00+08:00');
+      const dow    = d.getDay();
+      let reason   = '';
+      if (dow === 6)      reason = '週六 ・ 本日無交易';
+      else if (dow === 0) reason = '週日 ・ 本日無交易';
+      else                reason = '國定假日 ・ 本日無交易';
+
+      const isWeekend = (dow === 0 || dow === 6);
+      document.getElementById('holiday-title-text').textContent = isWeekend ? '週末休市' : '國定假日休市';
+      document.getElementById('holiday-reason').textContent     = reason;
+
+      // 下一個交易日（由後端算好回傳）
+      if (data.next_trading_day) {
+        const nd = new Date(data.next_trading_day + 'T00:00:00+08:00');
+        const weekdayNames = ['日','一','二','三','四','五','六'];
+        document.getElementById('holiday-next-trading-day').textContent =
+          data.next_trading_day.slice(5).replace('-', '/') + ' (週' + weekdayNames[nd.getDay()] + ')';
+      }
+
+      const dot = document.querySelector('.status-dot');
+      if (dot) { dot.style.background = 'var(--red)'; dot.style.animation = 'pulse 1.5s infinite'; }
     }
-    const isWeekend = (dow === 0 || dow === 6);
-    document.getElementById('holiday-title-text').textContent = isWeekend ? '週末休市' : '國定假日休市';
-    document.getElementById('holiday-reason').textContent    = reason;
-    const nextDay = await nextTradingDay(today);
-    if (nextDay) {
-      const nd = new Date(nextDay + 'T00:00:00+08:00');
-      const weekdayNames = ['日','一','二','三','四','五','六'];
-      document.getElementById('holiday-next-trading-day').textContent =
-        nextDay.slice(5).replace('-','/') + ' (週' + weekdayNames[nd.getDay()] + ')';
-    }
-    const dot = document.querySelector('.status-dot');
-    if (dot) { dot.style.background = 'var(--red)'; dot.style.animation = 'pulse 1.5s infinite'; }
+  } catch(e) {
+    console.warn('trading_status API 失敗，略過休市 Banner', e);
   }
 }
 initHolidayBanner();
