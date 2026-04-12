@@ -19,10 +19,10 @@
       --green:     #00e676;
       --red:       #ff3d5a;
       --yellow:    #ffd600;
-      --muted:     #2a3d5a;
-      --text:      #b8cceb;
-      --text-dim:  #516070;
-      --text-faint:#273040;
+      --muted:     #3a5070;
+      --text:      #ccdaf5;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
       --glow:      0 0 32px rgba(0,229,255,.25);
       --glow-red:  0 0 20px rgba(255,61,90,.4);
       --glow-grn:  0 0 20px rgba(0,230,118,.4);
@@ -238,9 +238,9 @@
     main {
       position: relative;
       z-index: 1;
-      max-width: 1180px;
+      max-width: 100%;
       margin: 0 auto;
-      padding: 44px 28px 100px;
+      padding: 36px 32px 100px;
     }
 
     /* ── MUSIC BUTTON ── */
@@ -1156,6 +1156,377 @@
       .metrics-grid { grid-template-columns: 1fr; }
       .market-grid  { grid-template-columns: 1fr; }
     }
+
+    /* ── SIDEBAR ── */
+    .page-body {
+      display: flex;
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 57px);
+    }
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: rgba(4,8,15,.97);
+      border-right: 1px solid rgba(0,229,255,.07);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 57px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      z-index: 8;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .sidebar-section {
+      padding: 4px 14px;
+    }
+    .sidebar-section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .25em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .84rem;
+      letter-spacing: .06em;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all .2s;
+      white-space: nowrap;
+      background: none;
+      border: 1px solid transparent;
+      width: 100%;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--accent);
+      opacity: 0;
+      border-radius: 2px;
+      transition: opacity .2s;
+    }
+    .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(0,229,255,.05);
+      border-color: rgba(0,229,255,.1);
+    }
+    .nav-item.active {
+      color: var(--accent);
+      background: rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.2);
+      text-shadow: 0 0 10px rgba(0,229,255,.25);
+    }
+    .nav-item.active::before { opacity: 1; }
+    .nav-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .55rem;
+      background: rgba(0,229,255,.12);
+      border: 1px solid rgba(0,229,255,.2);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: .06em;
+      margin-left: auto;
+    }
+    .sidebar-divider {
+      height: 1px;
+      background: rgba(0,229,255,.06);
+      margin: 2px 14px;
+    }
+    /* 主內容區 */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn .2s ease;
+    }
+    .modal-overlay.open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid rgba(0,229,255,.15);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,0,0,.6), 0 0 30px rgba(0,229,255,.06);
+      animation: modalUp .25s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes modalUp {
+      from { opacity: 0; transform: translateY(20px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* Top sweep */
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), rgba(0,170,255,.9), var(--accent), transparent);
+      background-size: 300% 100%;
+      animation: edgeSweep 4s ease-in-out infinite;
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid rgba(0,229,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-title svg { color: var(--accent); }
+    .modal-close {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,229,255,.15);
+      background: rgba(0,229,255,.05);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,61,90,.08);
+    }
+    .modal-close svg { width: 14px; height: 14px; }
+
+    /* Tab 切換 */
+    .modal-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(0,229,255,.08);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      background: rgba(0,229,255,.02);
+    }
+    .modal-tab {
+      padding: 7px 22px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      letter-spacing: .1em;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-radius: 8px;
+      border: 1px solid rgba(0,229,255,.1);
+      transition: all .2s;
+      background: transparent;
+      white-space: nowrap;
+    }
+    .modal-tab:hover { color: var(--text); border-color: rgba(0,229,255,.25); background: rgba(0,229,255,.05); }
+    .modal-tab.active {
+      color: var(--accent);
+      border-color: rgba(0,229,255,.4);
+      background: rgba(0,229,255,.1);
+      text-shadow: 0 0 8px rgba(0,229,255,.3);
+      box-shadow: 0 0 12px rgba(0,229,255,.08);
+    }
+
+    /* Buy / Sell 切換 */
+    .modal-toggle {
+      display: flex;
+      gap: 10px;
+      padding: 12px 24px;
+      flex-shrink: 0;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,229,255,.06);
+    }
+    .toggle-btn {
+      padding: 7px 22px;
+      border-radius: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      letter-spacing: .08em;
+      cursor: pointer;
+      border: 1px solid rgba(0,229,255,.15);
+      background: transparent;
+      color: var(--text-dim);
+      transition: all .2s;
+    }
+    .toggle-btn.buy.active {
+      background: rgba(255,61,90,.14);
+      border-color: rgba(255,61,90,.5);
+      color: var(--red);
+      text-shadow: 0 0 10px rgba(255,61,90,.4);
+      box-shadow: 0 0 12px rgba(255,61,90,.1);
+    }
+    .toggle-btn.sell.active {
+      background: rgba(0,230,118,.12);
+      border-color: rgba(0,230,118,.45);
+      color: var(--green);
+      text-shadow: 0 0 10px rgba(0,230,118,.4);
+      box-shadow: 0 0 12px rgba(0,230,118,.1);
+    }
+    .toggle-btn:hover { border-color: rgba(0,229,255,.3); color: var(--text); }
+    .modal-date {
+      margin-left: auto;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      color: var(--text-dim);
+      letter-spacing: .08em;
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    /* 表格區 */
+    .modal-body {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0 24px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    .modal-body::-webkit-scrollbar { width: 4px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.2); border-radius: 4px; }
+
+    .top50-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .top50-table th {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .14em;
+      color: var(--accent);
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0,229,255,.15);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 2;
+      text-transform: uppercase;
+    }
+    .top50-table th:last-child { text-align: right; }
+    .top50-table td {
+      padding: 10px 14px;
+      font-size: .84rem;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+      transition: background .15s;
+      color: var(--text);
+    }
+    .top50-table tr:hover td { background: rgba(0,229,255,.05); }
+    .top50-table tr:last-child td { border-bottom: none; }
+    .rank-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      color: var(--text-dim);
+      width: 36px;
+      text-align: center;
+    }
+    .rank-num.top3 {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .82rem;
+      text-shadow: 0 0 8px rgba(0,229,255,.4);
+    }
+    .stock-id-cell {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .8rem;
+      color: var(--accent);
+      letter-spacing: .06em;
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.12);
+      border-radius: 5px;
+      padding: 2px 8px;
+      display: inline-block;
+    }
+    .stock-name-cell {
+      color: var(--text);
+      font-size: .86rem;
+      font-weight: 500;
+    }
+    .net-cell {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .88rem;
+      font-weight: 700;
+      text-align: right;
+    }
+    .net-cell.buy  { color: var(--red);   text-shadow: 0 0 8px rgba(255,61,90,.3); }
+    .net-cell.sell { color: var(--green); text-shadow: 0 0 8px rgba(0,230,118,.3); }
+
+    /* 載入中 */
+    .modal-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 60px 24px;
+      color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      letter-spacing: .1em;
+    }
+    .modal-loading svg { animation: spin 1s linear infinite; color: var(--accent); opacity: .7; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .page-body { display: block; }
+    }
+    @media (max-width: 600px) {
+      .nav-item { padding: 10px 12px; font-size: .68rem; }
+      .modal { border-radius: 16px; }
+      .modal-header { padding: 16px 16px 12px; }
+      .modal-tabs { padding: 10px 16px 0; }
+      .modal-toggle { padding: 10px 16px; }
+      .modal-body { padding: 0 16px 16px; }
+      .top50-table td, .top50-table th { padding: 8px 8px; }
+    }
   </style>
 </head>
 <body>
@@ -1192,6 +1563,99 @@
     <div id="clock">--:--:--</div>
   </div>
 </header>
+
+
+<!-- LAYOUT WRAPPER -->
+<div class="page-body">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section" style="padding-top:16px;">
+    <button class="nav-item active" onclick="scrollToMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      個股查詢
+    </button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <button class="nav-item" onclick="openTop50Modal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      上市買賣超排行
+      <span class="nav-badge">TOP 50</span>
+    </button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <button class="nav-item" onclick="scrollToMarket()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      法人大盤資訊
+    </button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <button class="nav-item" onclick="scrollToTimeline()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      更新時程
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<!-- TOP50 MODAL -->
+<div class="modal-overlay" id="top50Modal" onclick="handleModalClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        上市三大法人買賣超排行
+      </div>
+      <button class="modal-close" onclick="closeTop50Modal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('foreign')">外資</button>
+      <button class="modal-tab" onclick="switchTab('trust')">投信</button>
+      <button class="modal-tab" onclick="switchTab('proprietary')">自營商</button>
+    </div>
+
+    <div class="modal-toggle">
+      <button class="toggle-btn buy active" onclick="switchSide('buy')">📈 買超前50</button>
+      <button class="toggle-btn sell" onclick="switchSide('sell')">📉 賣超前50</button>
+      <span class="modal-date" id="top50Date">--</span>
+    </div>
+
+    <div class="modal-body" id="top50Body">
+      <div class="modal-loading">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        LOADING DATA...
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- HOLIDAY BANNER -->
 <div id="holiday-banner">
@@ -1423,6 +1887,9 @@
 
 </main>
 
+</div><!-- /main-content -->
+</div><!-- /page-body -->
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-disclaimer">
@@ -1440,8 +1907,8 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
-//const API_BASE = 'http://127.0.0.1:5000';
+//const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+const API_BASE = 'http://127.0.0.1:5000';
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
 (function initParticles() {
@@ -1542,6 +2009,7 @@ const API_BASE = 'https://linebot-project-oxnw.onrender.com';
 
 // ── HOLIDAY DETECTION（統一由後端 /api/trading_status 判斷）─────────────────
 async function initHolidayBanner() {
+  //return; // 先暫時關閉休市偵測功能，避免開發期間頻繁呼叫 API
   try {
     const res  = await fetch(`${API_BASE}/api/trading_status`);
     const data = await res.json();
@@ -1797,6 +2265,127 @@ function renderStock(d) {
 document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') queryStock();
 });
+
+// ── SIDEBAR SCROLL HELPERS ────────────────────────────────────────────────────
+function scrollToMain() {
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setActiveNav(0);
+}
+function scrollToMarket() {
+  document.querySelector('.market-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setActiveNav(2);
+}
+function scrollToTimeline() {
+  document.querySelector('.timeline').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setActiveNav(3);
+}
+function setActiveNav(idx) {
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+// ── TOP50 MODAL ───────────────────────────────────────────────────────────────
+let _top50Cache   = null;
+let _top50Tab     = 'foreign';
+let _top50Side    = 'buy';
+
+async function openTop50Modal() {
+  setActiveNav(1);
+  document.getElementById('top50Modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!_top50Cache) await loadTop50();
+  else renderTop50();
+}
+
+function closeTop50Modal() {
+  document.getElementById('top50Modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleModalClick(e) {
+  if (e.target === document.getElementById('top50Modal')) closeTop50Modal();
+}
+
+// ESC 關閉
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop50Modal(); });
+
+function switchTab(tab) {
+  _top50Tab = tab;
+  document.querySelectorAll('.modal-tab').forEach((el, i) => {
+    el.classList.toggle('active', ['foreign','trust','proprietary'][i] === tab);
+  });
+  renderTop50();
+}
+
+function switchSide(side) {
+  _top50Side = side;
+  document.querySelectorAll('.toggle-btn').forEach(el => {
+    el.classList.toggle('active', el.classList.contains(side));
+  });
+  renderTop50();
+}
+
+async function loadTop50() {
+  document.getElementById('top50Body').innerHTML = `
+    <div class="modal-loading">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      LOADING DATA...
+    </div>`;
+  try {
+    const res  = await fetch(`${API_BASE}/api/top50`);
+    _top50Cache = await res.json();
+    const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+    document.getElementById('top50Date').textContent = today + ' 盤後';
+    renderTop50();
+  } catch(e) {
+    document.getElementById('top50Body').innerHTML =
+      `<div class="modal-loading" style="color:var(--red)">⚠️ 無法載入資料，請稍後再試</div>`;
+  }
+}
+
+function renderTop50() {
+  if (!_top50Cache) return;
+  const section = _top50Cache[_top50Tab];
+  if (section.error) {
+    document.getElementById('top50Body').innerHTML =
+      `<div class="modal-loading" style="color:var(--text-dim)">${section.error}</div>`;
+    return;
+  }
+  const data = section[_top50Side] || [];
+  const isBuy = _top50Side === 'buy';
+
+  let html = `
+    <table class="top50-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>代碼</th>
+          <th>名稱</th>
+          <th>${isBuy ? '買超（張）' : '賣超（張）'}</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  data.forEach((item, idx) => {
+    const rank  = idx + 1;
+    const isTop = rank <= 3;
+    const netStr = Math.abs(item.net).toLocaleString();
+    html += `
+      <tr>
+        <td class="rank-num ${isTop ? 'top3' : ''}">${rank}</td>
+        <td class="stock-id-cell">${item.id}</td>
+        <td class="stock-name-cell">${item.name}</td>
+        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}</td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('top50Body').innerHTML = html;
+}
+
 </script>
 </body>
 </html>

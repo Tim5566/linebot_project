@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from flask_cors import CORS
-from post_Info import stock_info, market_pnfo, get_today
+from post_Info import stock_info, market_pnfo, get_today, twse_top50
 from get_trading_holidays import get_trading_status
 import re
 
@@ -12,6 +12,11 @@ def register_api(app):
     @app.route("/api/trading_status")
     def api_trading_status():
         return jsonify(get_trading_status())
+
+    # ── 上市三大法人買賣超前50 API ────────────────────────────────────────
+    @app.route("/api/top50")
+    def api_top50():
+        return jsonify(twse_top50())
 
     # ── 個股查詢 API ───────────────────────────────────────────────────
     @app.route("/api/stock")

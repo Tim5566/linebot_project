@@ -193,7 +193,7 @@ def stock_info(keyword):
     today = get_today()
 
     if not is_trading_day():
-        return f"📢 今日週末或連假未開盤❗0"
+        return f"📢 今日週末或連假未開盤❗"
     elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
         return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
@@ -300,44 +300,37 @@ def market_pnfo():
 
 # ── 上市上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────────
 def twse_top50(today=None):
-    """
-    回傳上市外資、投信、自營商的買超/賣超前50名。
-    回傳格式：
-    {
-        "foreign":     {"buy": [...], "sell": [...]},
-        "trust":       {"buy": [...], "sell": [...]},
-        "proprietary": {"buy": [...], "sell": [...]}
-    }
-    每筆資料：{"id": "2330", "name": "台積電", "net": 8159}  (單位：張)
-    """
     if today is None:
         today = get_today()
+
+    #TEST_DATE = "20260410"  # 測試用，完成後刪掉此行
+
+    #API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={TEST_DATE}"
+    #API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={TEST_DATE}"
+    #API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={TEST_DATE}"
 
     API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
     API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
 
-    def _parse_top50(api_url, net_col):
-        """
-        net_col：買賣超欄位索引
-          外資  TWT38U → row[5]  (index 5)
-          投信  TWT44U → row[5]  (index 5)
-          自營商 TWT43U → row[10] (index 10)
-        """
+    def _parse_top50(api_url, id_col, name_col, net_col):
         try:
-            data = fetch_with_retry(api_url, today)
-            if data is None:
+            # 直接 GET，不用 fetch_with_retry（TWSE 這支 API 的 date 欄位不可靠）
+            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
+            data = res.json()
+
+            if data.get("stat") != "OK":
+                print(f"[twse_top50] API stat: {data.get('stat')}")
                 return None, None
 
             processed = []
             for row in data["data"]:
-                # 過濾權證、認購認售
-                name = row[2].strip() if len(row) > 2 else row[1].strip()
+                name = row[name_col].strip()
                 if re.search(r'購|售|認購|認售', name):
                     continue
-                stock_id = row[1].strip() if len(row) > 2 else row[0].strip()
+                stock_id = row[id_col].strip()
                 try:
-                    net = int(row[net_col].replace(",", "")) // 1000  # 股 → 張
+                    net = int(row[net_col].replace(",", "")) // 1000
                 except (ValueError, IndexError):
                     continue
                 processed.append({"id": stock_id, "name": name, "net": net})
@@ -350,11 +343,10 @@ def twse_top50(today=None):
             print(f"[twse_top50] 查詢失敗: {e}")
             return None, None
 
-    # 並行抓三支 API
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        f_foreign     = executor.submit(_parse_top50, API_Foreign,     5)
-        f_trust       = executor.submit(_parse_top50, API_Trust,       5)
-        f_proprietary = executor.submit(_parse_top50, API_Proprietary, 10)
+        f_foreign     = executor.submit(_parse_top50, API_Foreign,     1, 2,  5)
+        f_trust       = executor.submit(_parse_top50, API_Trust,       1, 2,  5)
+        f_proprietary = executor.submit(_parse_top50, API_Proprietary, 0, 1, 10)
 
         foreign_buy,     foreign_sell     = f_foreign.result()
         trust_buy,       trust_sell       = f_trust.result()
