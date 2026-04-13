@@ -83,15 +83,22 @@
 
     /* ── HEADER ── */
     header {
-      position: relative;
-      z-index: 10;
+      position: sticky;
+      top: 0;
+      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 40px;
+      padding: 0 28px 0 16px;
+      height: 58px;
       border-bottom: 1px solid rgba(0,229,255,.08);
-      background: rgba(4,8,15,.94);
+      background: rgba(4,8,15,.96);
       backdrop-filter: blur(20px);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
     /* Animated header bottom line */
     header::after {
@@ -116,7 +123,7 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 30px;
+      gap: 14px;
     }
     .logo-icon {
       width: 48px; height: 48px;
@@ -1112,14 +1119,15 @@
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
     @media (max-width: 600px) {
-      header { padding: 12px 16px; }
+      header { padding: 0 12px 0 10px; height: 52px; }
       .header-right .market-status { display: none; }
-      .logo-text { font-size: .9rem; }
-      .logo-sub  { font-size: .52rem; }
-      .logo-icon { width: 36px; height: 36px; overflow: hidden; }
-      .logo-icon img { width: 36px; height: 36px; position: static; }
+      .logo-text { font-size: .88rem; }
+      .logo-sub  { font-size: .5rem; }
+      .logo-icon { width: 34px; height: 34px; overflow: hidden; }
+      .logo-icon img { width: 34px; height: 34px; position: static; }
       .logo { gap: 10px; }
-      #clock { font-size: .68rem; letter-spacing: .04em; padding: 4px 10px; }
+      .hamburger { margin-right: 10px; width: 36px; height: 36px; }
+      #clock { font-size: .65rem; letter-spacing: .03em; padding: 4px 9px; }
       #musicBtn { width: 30px; height: 30px; }
       main { padding: 20px 12px 60px; }
       h2.section-title { font-size: 1.1rem; }
@@ -1157,47 +1165,133 @@
       .market-grid  { grid-template-columns: 1fr; }
     }
 
-    /* ── SIDEBAR ── */
-    .page-body {
-      display: flex;
-      position: relative;
-      z-index: 1;
-      min-height: calc(100vh - 57px);
-    }
-    .sidebar {
-      width: 220px;
-      flex-shrink: 0;
-      background: rgba(4,8,15,.97);
-      border-right: 1px solid rgba(0,229,255,.07);
+    /* ── HAMBURGER BUTTON ── */
+    .hamburger {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,229,255,.15);
+      background: rgba(0,229,255,.05);
+      color: var(--accent);
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: calc(100vh - 57px);
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-shrink: 0;
+      transition: all .2s;
+      margin-right: 16px;
+    }
+    .hamburger:hover {
+      background: rgba(0,229,255,.12);
+      border-color: rgba(0,229,255,.35);
+      box-shadow: 0 0 14px rgba(0,229,255,.2);
+    }
+    .hamburger span {
+      display: block;
+      width: 18px; height: 1.5px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: all .3s cubic-bezier(.22,1,.36,1);
+      transform-origin: center;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── DRAWER OVERLAY ── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(3px);
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── DRAWER ── */
+    .drawer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(4,8,15,.99);
+      border-right: 1px solid rgba(0,229,255,.1);
+      z-index: 160;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform .32s cubic-bezier(.22,1,.36,1);
       overflow-y: auto;
       scrollbar-width: none;
-      z-index: 8;
+      box-shadow: 4px 0 40px rgba(0,0,0,.5);
     }
-    .sidebar::-webkit-scrollbar { display: none; }
-    .sidebar-section {
-      padding: 4px 14px;
+    .drawer::-webkit-scrollbar { display: none; }
+    .drawer.open { transform: translateX(0); }
+    .drawer::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(to bottom,
+        transparent,
+        rgba(0,229,255,.5) 30%,
+        rgba(0,229,255,.5) 70%,
+        transparent);
+      animation: borderGlow 3s ease-in-out infinite;
     }
-    .sidebar-section-label {
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid rgba(0,229,255,.07);
+      flex-shrink: 0;
+    }
+    .drawer-brand {
+      font-family: 'Orbitron', monospace;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .14em;
+      text-shadow: 0 0 12px rgba(0,229,255,.3);
+    }
+    .drawer-close {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      border: 1px solid rgba(0,229,255,.15);
+      background: rgba(0,229,255,.04);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+    }
+    .drawer-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.08); }
+    .drawer-close svg { width: 13px; height: 13px; }
+
+    .drawer-section { padding: 12px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-section-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .58rem;
-      letter-spacing: .25em;
+      font-size: .57rem;
+      letter-spacing: .28em;
       color: var(--text-faint);
       text-transform: uppercase;
-      padding: 0 8px;
-      margin-bottom: 6px;
+      padding: 0 8px 8px;
+      display: block;
     }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
+      gap: 11px;
+      padding: 11px 12px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .84rem;
+      font-size: .73rem;
       letter-spacing: .06em;
       color: var(--text-dim);
       cursor: pointer;
@@ -1214,50 +1308,40 @@
     .nav-item::before {
       content: '';
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: 0; top: 20%; bottom: 20%;
       width: 2px;
       background: var(--accent);
       opacity: 0;
       border-radius: 2px;
       transition: opacity .2s;
     }
-    .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .nav-item:hover {
-      color: var(--text);
-      background: rgba(0,229,255,.05);
-      border-color: rgba(0,229,255,.1);
-    }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .65; transition: opacity .2s; }
+    .nav-item:hover { color: var(--text); background: rgba(0,229,255,.05); border-color: rgba(0,229,255,.1); }
+    .nav-item:hover svg { opacity: 1; }
     .nav-item.active {
       color: var(--accent);
       background: rgba(0,229,255,.08);
-      border-color: rgba(0,229,255,.2);
-      text-shadow: 0 0 10px rgba(0,229,255,.25);
+      border-color: rgba(0,229,255,.18);
+      text-shadow: 0 0 10px rgba(0,229,255,.2);
     }
     .nav-item.active::before { opacity: 1; }
+    .nav-item.active svg { opacity: 1; color: var(--accent); }
     .nav-badge {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .55rem;
+      font-size: .54rem;
       background: rgba(0,229,255,.12);
-      border: 1px solid rgba(0,229,255,.2);
+      border: 1px solid rgba(0,229,255,.22);
       color: var(--accent);
       border-radius: 4px;
-      padding: 1px 5px;
+      padding: 1px 6px;
       letter-spacing: .06em;
       margin-left: auto;
     }
-    .sidebar-divider {
-      height: 1px;
-      background: rgba(0,229,255,.06);
-      margin: 2px 14px;
-    }
-    /* 主內容區 */
-    .main-content {
-      flex: 1;
-      min-width: 0;
-      overflow-x: hidden;
-    }
+    .drawer-divider { height: 1px; background: rgba(0,229,255,.06); margin: 6px 12px; }
+    .page-body { position: relative; z-index: 1; }
+    .main-content { min-width: 0; overflow-x: hidden; }
 
-    /* ── MODAL OVERLAY ── */
+        /* ── MODAL OVERLAY ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1303,7 +1387,7 @@
     }
 
     .modal-header {
-      padding: 20px 24px 16px;
+      padding: 20px 26px 16px;
       border-bottom: 1px solid rgba(0,229,255,.08);
       display: flex;
       align-items: center;
@@ -1312,18 +1396,19 @@
     }
     .modal-title {
       font-family: 'Orbitron', monospace;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: #fff;
-      letter-spacing: .06em;
+      letter-spacing: .07em;
       display: flex;
       align-items: center;
       gap: 10px;
+      text-shadow: 0 0 20px rgba(0,229,255,.2);
     }
-    .modal-title svg { color: var(--accent); }
+    .modal-title svg { color: var(--accent); width: 18px; height: 18px; }
     .modal-close {
-      width: 32px; height: 32px;
-      border-radius: 8px;
+      width: 34px; height: 34px;
+      border-radius: 9px;
       border: 1px solid rgba(0,229,255,.15);
       background: rgba(0,229,255,.05);
       color: var(--text-dim);
@@ -1334,79 +1419,74 @@
       transition: all .2s;
       flex-shrink: 0;
     }
-    .modal-close:hover {
-      border-color: var(--red);
-      color: var(--red);
-      background: rgba(255,61,90,.08);
-    }
+    .modal-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.08); }
     .modal-close svg { width: 14px; height: 14px; }
 
-    /* Tab 切換 */
+    /* ── Tab 切換 ── */
     .modal-tabs {
       display: flex;
-      gap: 6px;
-      padding: 14px 24px;
-      border-bottom: 1px solid rgba(0,229,255,.08);
+      gap: 8px;
+      padding: 14px 26px;
+      border-bottom: 1px solid rgba(0,229,255,.07);
       flex-shrink: 0;
-      flex-wrap: wrap;
-      background: rgba(0,229,255,.02);
+      background: rgba(0,229,255,.015);
     }
     .modal-tab {
-      padding: 7px 22px;
+      padding: 8px 26px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
-      letter-spacing: .1em;
+      font-size: .8rem;
+      letter-spacing: .12em;
       color: var(--text-dim);
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 9px;
       border: 1px solid rgba(0,229,255,.1);
-      transition: all .2s;
+      transition: all .22s;
       background: transparent;
       white-space: nowrap;
     }
     .modal-tab:hover { color: var(--text); border-color: rgba(0,229,255,.25); background: rgba(0,229,255,.05); }
     .modal-tab.active {
       color: var(--accent);
-      border-color: rgba(0,229,255,.4);
+      border-color: rgba(0,229,255,.45);
       background: rgba(0,229,255,.1);
-      text-shadow: 0 0 8px rgba(0,229,255,.3);
-      box-shadow: 0 0 12px rgba(0,229,255,.08);
+      text-shadow: 0 0 10px rgba(0,229,255,.35);
+      box-shadow: 0 0 14px rgba(0,229,255,.08);
     }
 
-    /* Buy / Sell 切換 */
+    /* ── Buy / Sell 切換 ── */
     .modal-toggle {
       display: flex;
       gap: 10px;
-      padding: 12px 24px;
+      padding: 14px 26px;
       flex-shrink: 0;
       align-items: center;
       border-bottom: 1px solid rgba(0,229,255,.06);
     }
     .toggle-btn {
-      padding: 7px 22px;
-      border-radius: 8px;
+      padding: 8px 24px;
+      border-radius: 9px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
-      letter-spacing: .08em;
+      font-size: .78rem;
+      letter-spacing: .1em;
       cursor: pointer;
       border: 1px solid rgba(0,229,255,.15);
       background: transparent;
       color: var(--text-dim);
-      transition: all .2s;
+      transition: all .22s;
     }
     .toggle-btn.buy.active {
-      background: rgba(255,61,90,.14);
+      background: rgba(255,61,90,.12);
       border-color: rgba(255,61,90,.5);
       color: var(--red);
       text-shadow: 0 0 10px rgba(255,61,90,.4);
-      box-shadow: 0 0 12px rgba(255,61,90,.1);
+      box-shadow: 0 0 14px rgba(255,61,90,.1);
     }
     .toggle-btn.sell.active {
-      background: rgba(0,230,118,.12);
+      background: rgba(0,230,118,.1);
       border-color: rgba(0,230,118,.45);
       color: var(--green);
       text-shadow: 0 0 10px rgba(0,230,118,.4);
-      box-shadow: 0 0 12px rgba(0,230,118,.1);
+      box-shadow: 0 0 14px rgba(0,230,118,.1);
     }
     .toggle-btn:hover { border-color: rgba(0,229,255,.3); color: var(--text); }
     .modal-date {
@@ -1415,17 +1495,17 @@
       font-size: .7rem;
       color: var(--text-dim);
       letter-spacing: .08em;
-      background: rgba(0,229,255,.05);
+      background: rgba(0,229,255,.04);
       border: 1px solid rgba(0,229,255,.1);
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 4px 12px;
     }
 
-    /* 表格區 */
+    /* ── 表格區 ── */
     .modal-body {
       overflow-y: auto;
       flex: 1;
-      padding: 0 24px 20px;
+      padding: 0 20px 20px;
       scrollbar-width: thin;
       scrollbar-color: rgba(0,229,255,.2) transparent;
     }
@@ -1433,18 +1513,15 @@
     .modal-body::-webkit-scrollbar-track { background: transparent; }
     .modal-body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.2); border-radius: 4px; }
 
-    .top50-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    .top50-table { width: 100%; border-collapse: collapse; }
     .top50-table th {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .68rem;
-      letter-spacing: .14em;
-      color: var(--accent);
+      font-size: .7rem;
+      letter-spacing: .18em;
+      color: rgba(0,229,255,.55);
       padding: 12px 14px;
       text-align: left;
-      border-bottom: 1px solid rgba(0,229,255,.15);
+      border-bottom: 1px solid rgba(0,229,255,.12);
       position: sticky;
       top: 0;
       background: var(--surface);
@@ -1453,51 +1530,74 @@
     }
     .top50-table th:last-child { text-align: right; }
     .top50-table td {
-      padding: 10px 14px;
-      font-size: .84rem;
-      border-bottom: 1px solid rgba(0,229,255,.05);
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(0,229,255,.04);
       transition: background .15s;
-      color: var(--text);
     }
-    .top50-table tr:hover td { background: rgba(0,229,255,.05); }
+    .top50-table tr:hover td { background: rgba(0,229,255,.04); }
     .top50-table tr:last-child td { border-bottom: none; }
+
+    /* 排名 */
     .rank-num {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
-      color: var(--text-dim);
+      font-size: .78rem;
+      color: var(--text-faint);
       width: 36px;
       text-align: center;
     }
     .rank-num.top3 {
-      color: var(--accent);
+      font-size: .85rem;
       font-weight: 700;
-      font-size: .82rem;
-      text-shadow: 0 0 8px rgba(0,229,255,.4);
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(0,229,255,.5);
     }
+    .rank-num.top1 { color: #ffd600; text-shadow: 0 0 10px rgba(255,214,0,.5); }
+
+    /* 代碼 */
     .stock-id-cell {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .8rem;
+      font-size: .82rem;
       color: var(--accent);
-      letter-spacing: .06em;
+      letter-spacing: .08em;
       background: rgba(0,229,255,.06);
-      border: 1px solid rgba(0,229,255,.12);
-      border-radius: 5px;
-      padding: 2px 8px;
+      border: 1px solid rgba(0,229,255,.14);
+      border-radius: 6px;
+      padding: 3px 10px;
       display: inline-block;
     }
+
+    /* 名稱 */
     .stock-name-cell {
+      font-family: 'Noto Sans TC', sans-serif;
       color: var(--text);
-      font-size: .86rem;
+      font-size: .92rem;
       font-weight: 500;
     }
+
+    /* 數值 — 跟大盤卡片一樣用 Share Tech Mono 大字 */
     .net-cell {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .88rem;
+      font-size: 1.15rem;
       font-weight: 700;
       text-align: right;
+      letter-spacing: .02em;
+      line-height: 1;
     }
-    .net-cell.buy  { color: var(--red);   text-shadow: 0 0 8px rgba(255,61,90,.3); }
-    .net-cell.sell { color: var(--green); text-shadow: 0 0 8px rgba(0,230,118,.3); }
+    .net-cell .net-unit {
+      font-size: .68rem;
+      font-weight: 400;
+      opacity: .6;
+      margin-left: 3px;
+      letter-spacing: .06em;
+    }
+    .net-cell.buy  {
+      color: var(--red);
+      text-shadow: 0 0 14px rgba(255,61,90,.4);
+    }
+    .net-cell.sell {
+      color: var(--green);
+      text-shadow: 0 0 14px rgba(0,230,118,.4);
+    }
 
     /* 載入中 */
     .modal-loading {
@@ -1506,18 +1606,15 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
-      padding: 60px 24px;
+      padding: 70px 24px;
       color: var(--text-dim);
       font-family: 'Share Tech Mono', monospace;
       font-size: .78rem;
-      letter-spacing: .1em;
+      letter-spacing: .14em;
     }
     .modal-loading svg { animation: spin 1s linear infinite; color: var(--accent); opacity: .7; }
 
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .page-body { display: block; }
-    }
+
     @media (max-width: 600px) {
       .nav-item { padding: 10px 12px; font-size: .68rem; }
       .modal { border-radius: 16px; }
@@ -1541,13 +1638,21 @@
 
 <!-- HEADER -->
 <header>
-  <div class="logo">
-    <div class="logo-icon">
-      <img src="images/jelly.png" alt="JellyStock Logo" />
-    </div>
-    <div>
-      <div class="logo-text">盤後雷達</div>
-      <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
+  <div class="header-left">
+    <!-- HAMBURGER -->
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleDrawer()" aria-label="選單">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="images/jelly.png" alt="JellyStock Logo" />
+      </div>
+      <div>
+        <div class="logo-text">盤後雷達</div>
+        <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
+      </div>
     </div>
   </div>
   <div class="header-right">
@@ -1568,43 +1673,40 @@
 <!-- LAYOUT WRAPPER -->
 <div class="page-body">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-section" style="padding-top:16px;">
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<aside class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-brand">JELLYSTOCK</div>
+    <button class="drawer-close" onclick="closeDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="drawer-section">
     <button class="nav-item active" onclick="scrollToMain()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       個股查詢
     </button>
-  </div>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="sidebar-section">
     <button class="nav-item" onclick="openTop50Modal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
       </svg>
-      上市買賣超排行
+      上市買賣超
       <span class="nav-badge">TOP 50</span>
     </button>
-  </div>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="sidebar-section">
     <button class="nav-item" onclick="scrollToMarket()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
       </svg>
       法人大盤資訊
     </button>
-  </div>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="sidebar-section">
     <button class="nav-item" onclick="scrollToTimeline()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -1907,8 +2009,8 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
-//const API_BASE = 'http://127.0.0.1:5000';
+//const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+const API_BASE = 'http://127.0.0.1:5000';
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
 (function initParticles() {
@@ -2266,23 +2368,56 @@ document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') queryStock();
 });
 
-// ── SIDEBAR SCROLL HELPERS ────────────────────────────────────────────────────
-function scrollToMain() {
-  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setActiveNav(0);
+// ── DRAWER ────────────────────────────────────────────────────────────────────
+function toggleDrawer() {
+  const isOpen = document.getElementById('drawer').classList.contains('open');
+  isOpen ? closeDrawer() : openDrawer();
 }
-function scrollToMarket() {
-  document.querySelector('.market-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setActiveNav(2);
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('hamburgerBtn').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function scrollToTimeline() {
-  document.querySelector('.timeline').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setActiveNav(3);
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.body.style.overflow = '';
 }
+// ESC 也能關閉 drawer
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeDrawer();
+    closeTop50Modal();
+  }
+});
+
 function setActiveNav(idx) {
   document.querySelectorAll('.nav-item').forEach((el, i) => {
     el.classList.toggle('active', i === idx);
   });
+}
+function scrollToMain() {
+  closeDrawer();
+  setTimeout(() => {
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 120);
+  setActiveNav(0);
+}
+function scrollToMarket() {
+  closeDrawer();
+  setTimeout(() => {
+    document.querySelector('.market-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
+  setActiveNav(2);
+}
+function scrollToTimeline() {
+  closeDrawer();
+  setTimeout(() => {
+    document.querySelector('.timeline').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 120);
+  setActiveNav(3);
 }
 
 // ── TOP50 MODAL ───────────────────────────────────────────────────────────────
@@ -2291,6 +2426,7 @@ let _top50Tab     = 'foreign';
 let _top50Side    = 'buy';
 
 async function openTop50Modal() {
+  closeDrawer();
   setActiveNav(1);
   document.getElementById('top50Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -2307,8 +2443,7 @@ function handleModalClick(e) {
   if (e.target === document.getElementById('top50Modal')) closeTop50Modal();
 }
 
-// ESC 關閉
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop50Modal(); });
+
 
 function switchTab(tab) {
   _top50Tab = tab;
@@ -2364,21 +2499,21 @@ function renderTop50() {
           <th>#</th>
           <th>代碼</th>
           <th>名稱</th>
-          <th>${isBuy ? '買超（張）' : '賣超（張）'}</th>
+          <th>${isBuy ? '買超' : '賣超'}</th>
         </tr>
       </thead>
       <tbody>`;
 
   data.forEach((item, idx) => {
-    const rank  = idx + 1;
-    const isTop = rank <= 3;
-    const netStr = Math.abs(item.net).toLocaleString();
+    const rank    = idx + 1;
+    const rankCls = rank === 1 ? 'top3 top1' : rank <= 3 ? 'top3' : '';
+    const netStr  = Math.abs(item.net).toLocaleString();
     html += `
       <tr>
-        <td class="rank-num ${isTop ? 'top3' : ''}">${rank}</td>
-        <td class="stock-id-cell">${item.id}</td>
+        <td class="rank-num ${rankCls}">${rank}</td>
+        <td><span class="stock-id-cell">${item.id}</span></td>
         <td class="stock-name-cell">${item.name}</td>
-        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}</td>
+        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
       </tr>`;
   });
 
