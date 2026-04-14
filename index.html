@@ -46,16 +46,30 @@
       pointer-events: none;
       z-index: 0;
     }
-    /* Perspective grid */
+    /* Perspective grid - more refined */
     .bg-layer-grid {
       background-image:
-        linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
-      background-size: 56px 56px;
+        linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: gridPulse 8s ease-in-out infinite;
     }
-    /* Radial vignette */
+    @keyframes gridPulse {
+      0%,100% { opacity: .8; }
+      50%      { opacity: 1.2; }
+    }
+    /* Aurora mesh - new dynamic layer */
     .bg-layer-vignette {
-      background: radial-gradient(ellipse 90% 70% at 50% -10%, rgba(0,120,180,.1) 0%, transparent 65%);
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,80,160,.12) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,160,100,.07) 0%, transparent 50%),
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0,120,200,.1) 0%, transparent 60%);
+      animation: auroraShift 14s ease-in-out infinite alternate;
+    }
+    @keyframes auroraShift {
+      0%   { background-position: 0% 0%, 100% 100%, 50% -10%; }
+      50%  { background-position: 10% 5%, 90% 90%, 55% -5%; }
+      100% { background-position: 5% 10%, 95% 85%, 45% -15%; }
     }
     /* Scanline effect */
     .bg-layer-scanlines {
@@ -63,14 +77,14 @@
         0deg,
         transparent,
         transparent 3px,
-        rgba(0,0,0,.07) 3px,
-        rgba(0,0,0,.07) 4px
+        rgba(0,0,0,.06) 3px,
+        rgba(0,0,0,.06) 4px
       );
-      animation: scanlineShift 8s linear infinite;
+      animation: scanlineShift 10s linear infinite;
     }
     @keyframes scanlineShift {
       from { background-position: 0 0; }
-      to   { background-position: 0 100px; }
+      to   { background-position: 0 120px; }
     }
     /* Floating particles canvas */
     #particleCanvas {
@@ -78,7 +92,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      opacity: .55;
+      opacity: .6;
     }
 
     /* ── HEADER ── */
@@ -99,6 +113,7 @@
       display: flex;
       align-items: center;
       gap: 0;
+      padding-left: 4px;
     }
     /* Animated header bottom line */
     header::after {
@@ -123,16 +138,19 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 18px;
+      margin-left: 6px;
     }
     .logo-icon {
-      width: 48px; height: 48px;
+      width: 44px; height: 44px;
       border-radius: 10px;
       display: grid;
       place-items: center;
       position: relative;
+      flex-shrink: 0;
+      overflow: visible;
     }
-    .logo-icon img { width: 68px; height: 68px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 6px rgba(0,229,255,.3)); position: relative; top: -10px; left: -10px; }
+    .logo-icon img { width: 58px; height: 58px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -6px; left: -6px; }
     .logo-text {
       font-family: 'Orbitron', monospace;
       font-size: 1.05rem;
@@ -611,10 +629,10 @@
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(0,0,0,.3), 0 0 16px rgba(0,229,255,.05);
     }
-    .metric-cell:hover::after { transform: scaleX(1); }
-    .metric-cell:has(.metric-value.positive):hover::after { background: var(--red); }
-    .metric-cell:has(.metric-value.negative):hover::after { background: var(--green); }
-    .metric-cell:has(.metric-value.warning):hover::after  { background: var(--yellow); }
+    .metric-cell:hover::after { transform: scaleX(1); background: var(--accent); }
+    .metric-cell:has(.metric-value.positive):hover::after { background: var(--accent); }
+    .metric-cell:has(.metric-value.negative):hover::after { background: var(--accent); }
+    .metric-cell:has(.metric-value.warning):hover::after  { background: var(--accent); }
     .metric-cell:has(.metric-value.neutral):hover::after  { background: var(--accent); }
 
     .metric-label {
@@ -703,40 +721,43 @@
       cursor: default;
     }
     .market-card:hover {
-      border-color: rgba(0,229,255,.3);
+      border-color: rgba(0,229,255,.35);
       transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 20px rgba(0,229,255,.07);
+      box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 28px rgba(0,229,255,.1);
     }
-    /* Hover top line */
+    /* Hover top line - all blue */
     .market-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
       opacity: 0;
       transition: opacity .3s;
     }
     .market-card:hover::before { opacity: 1; }
-    .market-card.blue::before   { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
-    .market-card.green::before  { background: linear-gradient(90deg, transparent, var(--green), transparent); }
-    .market-card.yellow::before { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
-    .market-card.red::before    { background: linear-gradient(90deg, transparent, var(--red), transparent); }
-    .market-card.muted::before  { background: linear-gradient(90deg, transparent, var(--muted), transparent); }
-    /* Bottom bar */
+    /* Bottom bar - all blue */
     .market-card::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
+      background: var(--accent);
       transform: scaleX(0);
       transition: transform .3s ease;
     }
     .market-card:hover::after { transform: scaleX(1); }
-    .market-card.blue::after   { background: var(--accent); }
-    .market-card.green::after  { background: var(--green); }
-    .market-card.yellow::after { background: var(--yellow); }
-    .market-card.red::after    { background: var(--red); }
-    .market-card.muted::after  { background: var(--muted); }
+    /* Remove color variants - all become unified */
+    .market-card.blue::before, .market-card.green::before,
+    .market-card.yellow::before, .market-card.red::before,
+    .market-card.muted::before {
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .market-card.blue::after, .market-card.green::after,
+    .market-card.yellow::after, .market-card.red::after,
+    .market-card.muted::after {
+      background: linear-gradient(90deg, rgba(0,229,255,.3), var(--accent), rgba(0,229,255,.3));
+    }
 
     /* Light sweep on hover */
     .market-card .card-sweep {
@@ -1119,15 +1140,24 @@
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
     @media (max-width: 600px) {
-      header { padding: 0 12px 0 10px; height: 52px; }
+      header { padding: 0 12px 0 10px; height: 54px; }
       .header-right .market-status { display: none; }
       .logo-text { font-size: .88rem; }
       .logo-sub  { font-size: .5rem; }
-      .logo-icon { width: 34px; height: 34px; overflow: hidden; }
-      .logo-icon img { width: 34px; height: 34px; position: static; }
-      .logo { gap: 10px; }
+      .logo-icon {
+        width: 40px; height: 40px;
+        overflow: visible;
+        clip-path: none;
+      }
+      .logo-icon img {
+        width: 46px; height: 46px;
+        position: relative;
+        top: -3px; left: -3px;
+        object-fit: contain;
+      }
+      .logo { gap: 12px; margin-left: 4px; }
       .hamburger { margin-right: 10px; width: 36px; height: 36px; }
-      #clock { font-size: .65rem; letter-spacing: .03em; padding: 4px 9px; }
+      #clock { font-size: .62rem; letter-spacing: .02em; padding: 4px 9px; }
       #musicBtn { width: 30px; height: 30px; }
       main { padding: 20px 12px 60px; }
       h2.section-title { font-size: 1.1rem; }
@@ -1159,6 +1189,15 @@
       .holiday-title { font-size: .88rem; }
       .holiday-next-box { padding: 8px 14px; }
       .holiday-next-val { font-size: .85rem; }
+      /* Fix modal on mobile - ensure full visibility */
+      .modal-overlay { padding: 12px 10px; align-items: flex-start; padding-top: 60px; }
+      .modal { max-height: calc(100vh - 80px); border-radius: 16px; }
+      .modal-header { padding: 16px 16px 12px; }
+      .modal-tabs { padding: 10px 16px 0; gap: 6px; }
+      .modal-tab { padding: 7px 16px; font-size: .74rem; }
+      .modal-toggle { padding: 10px 16px; }
+      .modal-body { padding: 0 12px 12px; }
+      .top50-table td, .top50-table th { padding: 8px 8px; }
     }
     @media (max-width: 360px) {
       .metrics-grid { grid-template-columns: 1fr; }
@@ -1341,17 +1380,17 @@
     .page-body { position: relative; z-index: 1; }
     .main-content { min-width: 0; overflow-x: hidden; }
 
-        /* ── MODAL OVERLAY ── */
+    /* ── MODAL OVERLAY ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(6px);
-      z-index: 100;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(8px);
+      z-index: 300;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px 20px;
       animation: fadeIn .2s ease;
     }
     .modal-overlay.open { display: flex; }
@@ -1359,20 +1398,25 @@
 
     .modal {
       background: var(--surface);
-      border: 1px solid rgba(0,229,255,.15);
+      border: 1px solid rgba(0,229,255,.2);
       border-radius: 20px;
       width: 100%;
-      max-width: 900px;
-      max-height: 88vh;
+      max-width: 860px;
+      max-height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 60px rgba(0,0,0,.6), 0 0 30px rgba(0,229,255,.06);
-      animation: modalUp .25s cubic-bezier(.22,1,.36,1);
+      box-shadow:
+        0 0 0 1px rgba(0,229,255,.05),
+        0 0 80px rgba(0,0,0,.7),
+        0 0 40px rgba(0,229,255,.08),
+        inset 0 1px 0 rgba(0,229,255,.12);
+      animation: modalUp .28s cubic-bezier(.22,1,.36,1);
+      margin-top: 0;
     }
     @keyframes modalUp {
-      from { opacity: 0; transform: translateY(20px) scale(.98); }
+      from { opacity: 0; transform: translateY(24px) scale(.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
     /* Top sweep */
@@ -1385,25 +1429,36 @@
       background-size: 300% 100%;
       animation: edgeSweep 4s ease-in-out infinite;
     }
+    /* Subtle corner glow */
+    .modal::after {
+      content: '';
+      position: absolute;
+      top: -1px; left: -1px; right: -1px; bottom: -1px;
+      border-radius: 20px;
+      background: transparent;
+      pointer-events: none;
+      box-shadow: inset 0 0 60px rgba(0,229,255,.03);
+    }
 
     .modal-header {
-      padding: 20px 26px 16px;
-      border-bottom: 1px solid rgba(0,229,255,.08);
+      padding: 22px 28px 18px;
+      border-bottom: 1px solid rgba(0,229,255,.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
+      background: rgba(0,229,255,.02);
     }
     .modal-title {
       font-family: 'Orbitron', monospace;
-      font-size: 1.05rem;
+      font-size: 1.08rem;
       font-weight: 700;
       color: #fff;
       letter-spacing: .07em;
       display: flex;
       align-items: center;
       gap: 10px;
-      text-shadow: 0 0 20px rgba(0,229,255,.2);
+      text-shadow: 0 0 24px rgba(0,229,255,.3);
     }
     .modal-title svg { color: var(--accent); width: 18px; height: 18px; }
     .modal-close {
@@ -1426,13 +1481,13 @@
     .modal-tabs {
       display: flex;
       gap: 8px;
-      padding: 14px 26px;
+      padding: 16px 28px;
       border-bottom: 1px solid rgba(0,229,255,.07);
       flex-shrink: 0;
-      background: rgba(0,229,255,.015);
+      background: rgba(0,0,0,.2);
     }
     .modal-tab {
-      padding: 8px 26px;
+      padding: 8px 28px;
       font-family: 'Share Tech Mono', monospace;
       font-size: .8rem;
       letter-spacing: .12em;
@@ -1443,14 +1498,26 @@
       transition: all .22s;
       background: transparent;
       white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-tab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(0,229,255,.06) 50%, transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
     }
     .modal-tab:hover { color: var(--text); border-color: rgba(0,229,255,.25); background: rgba(0,229,255,.05); }
+    .modal-tab:hover::before { opacity: 1; }
     .modal-tab.active {
       color: var(--accent);
-      border-color: rgba(0,229,255,.45);
+      border-color: rgba(0,229,255,.5);
       background: rgba(0,229,255,.1);
-      text-shadow: 0 0 10px rgba(0,229,255,.35);
-      box-shadow: 0 0 14px rgba(0,229,255,.08);
+      text-shadow: 0 0 12px rgba(0,229,255,.5);
+      box-shadow: 0 0 18px rgba(0,229,255,.1), inset 0 0 12px rgba(0,229,255,.05);
     }
 
     /* ── Buy / Sell 切換 ── */
@@ -1617,12 +1684,6 @@
 
     @media (max-width: 600px) {
       .nav-item { padding: 10px 12px; font-size: .68rem; }
-      .modal { border-radius: 16px; }
-      .modal-header { padding: 16px 16px 12px; }
-      .modal-tabs { padding: 10px 16px 0; }
-      .modal-toggle { padding: 10px 16px; }
-      .modal-body { padding: 0 16px 16px; }
-      .top50-table td, .top50-table th { padding: 8px 8px; }
     }
   </style>
 </head>
@@ -1701,6 +1762,13 @@
       上市買賣超
       <span class="nav-badge">TOP 50</span>
     </button>
+    <button class="nav-item" onclick="openOtcTop50Modal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      櫃買買賣超
+      <span class="nav-badge">TOP 50</span>
+    </button>
     <button class="nav-item" onclick="scrollToMarket()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
@@ -1749,6 +1817,46 @@
     </div>
 
     <div class="modal-body" id="top50Body">
+      <div class="modal-loading">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        LOADING DATA...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OTC TOP50 MODAL -->
+<div class="modal-overlay" id="otcTop50Modal" onclick="handleOtcModalClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        櫃買三大法人買賣超排行
+      </div>
+      <button class="modal-close" onclick="closeOtcTop50Modal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-tabs" id="otcModalTabs">
+      <button class="modal-tab active" onclick="switchOtcTab('foreign')">外資</button>
+      <button class="modal-tab" onclick="switchOtcTab('trust')">投信</button>
+      <button class="modal-tab" onclick="switchOtcTab('proprietary')">自營商</button>
+    </div>
+
+    <div class="modal-toggle" id="otcModalToggle">
+      <button class="toggle-btn buy active" onclick="switchOtcSide('buy')">📈 買超前50</button>
+      <button class="toggle-btn sell" onclick="switchOtcSide('sell')">📉 賣超前50</button>
+      <span class="modal-date" id="otcTop50Date">--</span>
+    </div>
+
+    <div class="modal-body" id="otcTop50Body">
       <div class="modal-loading">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -2009,8 +2117,8 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
-//const API_BASE = 'http://127.0.0.1:5000';
+//const API_BASE = 'https://linebot-project-oxnw.onrender.com';
+const API_BASE = 'http://127.0.0.1:5000';
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
 (function initParticles() {
@@ -2032,40 +2140,64 @@ const API_BASE = 'https://linebot-project-oxnw.onrender.com';
       y: Math.random() * H,
       vx: (Math.random() - .5) * .35,
       vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.4 + .3,
-      a: Math.random() * .5 + .15,
+      r: Math.random() * 1.6 + .4,
+      a: Math.random() * .55 + .15,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      life: Math.random() * 200 + 100,
+      life: Math.random() * 250 + 120,
       age: 0,
     };
   }
 
-  for (let i = 0; i < 80; i++) particles.push(mkParticle());
+  for (let i = 0; i < 100; i++) particles.push(mkParticle());
 
-  // Data lines (occasional streaks)
+  // Data lines (occasional streaks) - enhanced
   let streaks = [];
   function mkStreak() {
     return {
       x: Math.random() * W, y: -10,
-      speed: Math.random() * 2.5 + 1,
-      len: Math.random() * 60 + 30,
-      a: Math.random() * .3 + .1,
-      w: Math.random() * .8 + .3,
+      speed: Math.random() * 3 + 1.2,
+      len: Math.random() * 80 + 40,
+      a: Math.random() * .35 + .1,
+      w: Math.random() * 1 + .3,
+      color: Math.random() > .7 ? 'rgba(0,230,118,' : 'rgba(0,229,255,',
     };
   }
-  setInterval(() => { if (streaks.length < 12) streaks.push(mkStreak()); }, 600);
+  setInterval(() => { if (streaks.length < 16) streaks.push(mkStreak()); }, 500);
+
+  // Floating hex glyphs
+  const HEX_CHARS = '01アイウエ∑∂∆◈◉▣';
+  let glyphs = [];
+  function mkGlyph() {
+    return {
+      x: Math.random() * W, y: -20,
+      speed: Math.random() * .6 + .2,
+      char: HEX_CHARS[Math.floor(Math.random() * HEX_CHARS.length)],
+      a: Math.random() * .08 + .02,
+      size: Math.random() * 8 + 8,
+    };
+  }
+  setInterval(() => { if (glyphs.length < 20) glyphs.push(mkGlyph()); }, 1200);
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // Draw connections
+    // Draw glyphs
+    glyphs = glyphs.filter(g => g.y < H + 30);
+    glyphs.forEach(g => {
+      g.y += g.speed;
+      ctx.font = `${g.size}px "Share Tech Mono", monospace`;
+      ctx.fillStyle = `rgba(0,229,255,${g.a})`;
+      ctx.fillText(g.char, g.x, g.y);
+    });
+
+    // Draw connections - slightly wider range
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
         const d  = Math.sqrt(dx*dx + dy*dy);
-        if (d < 120) {
-          ctx.strokeStyle = `rgba(0,229,255,${.08 * (1 - d/120)})`;
+        if (d < 140) {
+          ctx.strokeStyle = `rgba(0,229,255,${.09 * (1 - d/140)})`;
           ctx.lineWidth = .5;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
@@ -2088,14 +2220,15 @@ const API_BASE = 'https://linebot-project-oxnw.onrender.com';
       ctx.fill();
     });
 
-    // Draw streaks
+    // Draw streaks - with dynamic color
     streaks = streaks.filter(s => s.y < H + s.len);
     streaks.forEach(s => {
       s.y += s.speed;
+      const col = s.color || 'rgba(0,229,255,';
       const grad = ctx.createLinearGradient(s.x, s.y - s.len, s.x, s.y);
-      grad.addColorStop(0, `rgba(0,229,255,0)`);
-      grad.addColorStop(.5, `rgba(0,229,255,${s.a})`);
-      grad.addColorStop(1, `rgba(0,229,255,0)`);
+      grad.addColorStop(0, col + '0)');
+      grad.addColorStop(.4, col + s.a + ')');
+      grad.addColorStop(1, col + '0)');
       ctx.strokeStyle = grad;
       ctx.lineWidth = s.w;
       ctx.beginPath();
@@ -2343,11 +2476,13 @@ function renderStock(d) {
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : 'neutral';
   const disposalDisplay = disposal ? disposal.replace('處置：','') : '🚫 暫未更新';
 
+  const codeDisplay = d.keyword && /^\d/.test(d.keyword) ? d.keyword : (d.name ? d.keyword : d.keyword);
+  const nameDisplay = d.name && d.name !== d.keyword ? d.name : '';
   resultEl.innerHTML = `
     <div class="stock-card">
       <div class="card-header">
-        <div class="stock-badge">${d.code || d.keyword}</div>
-        <div class="stock-name-title">${d.name || d.keyword}</div>
+        <div class="stock-badge">${d.keyword}</div>
+        ${nameDisplay ? `<div class="stock-name-title">${nameDisplay}</div>` : ''}
         <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
         <div class="card-timestamp">${d.date || ''} 盤後</div>
       </div>
@@ -2390,6 +2525,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeDrawer();
     closeTop50Modal();
+    closeOtcTop50Modal();
   }
 });
 
@@ -2519,6 +2655,104 @@ function renderTop50() {
 
   html += '</tbody></table>';
   document.getElementById('top50Body').innerHTML = html;
+}
+
+// ── OTC TOP50 MODAL ───────────────────────────────────────────────────────────
+let _otcTop50Cache = null;
+let _otcTop50Tab   = 'foreign';
+let _otcTop50Side  = 'buy';
+
+async function openOtcTop50Modal() {
+  closeDrawer();
+  document.getElementById('otcTop50Modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!_otcTop50Cache) await loadOtcTop50();
+  else renderOtcTop50();
+}
+
+function closeOtcTop50Modal() {
+  document.getElementById('otcTop50Modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOtcModalClick(e) {
+  if (e.target === document.getElementById('otcTop50Modal')) closeOtcTop50Modal();
+}
+
+function switchOtcTab(tab) {
+  _otcTop50Tab = tab;
+  document.querySelectorAll('#otcModalTabs .modal-tab').forEach((el, i) => {
+    el.classList.toggle('active', ['foreign','trust','proprietary'][i] === tab);
+  });
+  renderOtcTop50();
+}
+
+function switchOtcSide(side) {
+  _otcTop50Side = side;
+  document.querySelectorAll('#otcModalToggle .toggle-btn').forEach(el => {
+    el.classList.toggle('active', el.classList.contains(side));
+  });
+  renderOtcTop50();
+}
+
+async function loadOtcTop50() {
+  document.getElementById('otcTop50Body').innerHTML = `
+    <div class="modal-loading">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      LOADING DATA...
+    </div>`;
+  try {
+    const res = await fetch(`${API_BASE}/api/otc_top50`);
+    _otcTop50Cache = await res.json();
+    const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+    document.getElementById('otcTop50Date').textContent = today + ' 盤後';
+    renderOtcTop50();
+  } catch(e) {
+    document.getElementById('otcTop50Body').innerHTML =
+      `<div class="modal-loading" style="color:var(--red)">⚠️ 無法載入資料，請稍後再試</div>`;
+  }
+}
+
+function renderOtcTop50() {
+  if (!_otcTop50Cache) return;
+  const section = _otcTop50Cache[_otcTop50Tab];
+  if (!section || section.error) {
+    document.getElementById('otcTop50Body').innerHTML =
+      `<div class="modal-loading" style="color:var(--text-dim)">${section ? section.error : '資料異常'}</div>`;
+    return;
+  }
+  const data  = section[_otcTop50Side] || [];
+  const isBuy = _otcTop50Side === 'buy';
+
+  let html = `
+    <table class="top50-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>代碼</th>
+          <th>名稱</th>
+          <th>${isBuy ? '買超' : '賣超'}</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  data.forEach((item, idx) => {
+    const rank    = idx + 1;
+    const rankCls = rank === 1 ? 'top3 top1' : rank <= 3 ? 'top3' : '';
+    const netStr  = Math.abs(item.net).toLocaleString();
+    html += `
+      <tr>
+        <td class="rank-num ${rankCls}">${rank}</td>
+        <td><span class="stock-id-cell">${item.id}</span></td>
+        <td class="stock-name-cell">${item.name}</td>
+        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('otcTop50Body').innerHTML = html;
 }
 
 </script>

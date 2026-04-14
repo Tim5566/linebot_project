@@ -369,3 +369,77 @@ def twse_top50(today=None):
             "error": "🚫 暫未更新" if proprietary_buy is None else None,
         },
     }
+
+# ── 上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────
+def otc_top50():
+    """
+    回傳上櫃外資、投信、自營商的買超/賣超前50名。
+    資料來源：TPEx openapi（不需帶日期，永遠回傳最新盤後資料）
+    回傳格式與 twse_top50 相同：
+    {
+        "foreign":     {"buy": [...], "sell": [...], "error": None},
+        "trust":       {"buy": [...], "sell": [...], "error": None},
+        "proprietary": {"buy": [...], "sell": [...], "error": None},
+    }
+    每筆資料：{"id": "6531", "name": "愛普", "net": 123}  (單位：張)
+    """
+    API_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
+
+    def _parse_otc_top50():
+        try:
+            res  = requests.get(API_URL, headers=headers, verify=False, timeout=10)
+            data = res.json()
+
+            foreign_list = []
+            trust_list   = []
+            dealer_list  = []
+
+            for row in data:
+                stock_id   = row["SecuritiesCompanyCode"].strip()
+                stock_name = row["CompanyName"].strip()
+
+                # 過濾權證、認購認售
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+
+                try:
+                    foreign = int(row["Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference"]) // 1000
+                    trust   = int(row["SecuritiesInvestmentTrustCompanies-Difference"]) // 1000
+                    dealer  = int(row["Dealers-Difference"]) // 1000
+                except (KeyError, ValueError):
+                    continue
+
+                foreign_list.append({"id": stock_id, "name": stock_name, "net": foreign})
+                trust_list.append(  {"id": stock_id, "name": stock_name, "net": trust})
+                dealer_list.append( {"id": stock_id, "name": stock_name, "net": dealer})
+
+            def top50(lst):
+                buy  = sorted(lst, key=lambda x: x["net"], reverse=True)[:50]
+                sell = sorted(lst, key=lambda x: x["net"])[:50]
+                return buy, sell
+
+            return top50(foreign_list), top50(trust_list), top50(dealer_list)
+
+        except Exception as e:
+            print(f"[otc_top50] 查詢失敗: {e}")
+            return (None, None), (None, None), (None, None)
+
+    (foreign_buy, foreign_sell), (trust_buy, trust_sell), (dealer_buy, dealer_sell) = _parse_otc_top50()
+
+    return {
+        "foreign": {
+            "buy":   foreign_buy  if foreign_buy  is not None else [],
+            "sell":  foreign_sell if foreign_sell is not None else [],
+            "error": "🚫 暫未更新" if foreign_buy is None else None,
+        },
+        "trust": {
+            "buy":   trust_buy  if trust_buy  is not None else [],
+            "sell":  trust_sell if trust_sell is not None else [],
+            "error": "🚫 暫未更新" if trust_buy is None else None,
+        },
+        "proprietary": {
+            "buy":   dealer_buy  if dealer_buy  is not None else [],
+            "sell":  dealer_sell if dealer_sell is not None else [],
+            "error": "🚫 暫未更新" if dealer_buy is None else None,
+        },
+    }
