@@ -1837,46 +1837,56 @@
     }
     .auth-logout-btn svg { width: 13px; height: 13px; }
   </style>
-  <!-- Google Identity Services（OAuth Popup 方式，相容性最佳） -->
-  <script src="https://accounts.google.com/gsi/client"></script>
+  <!-- Google Identity Services（OAuth Popup 方式） -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
     const GOOGLE_CLIENT_ID = '55383548448-irv83cd3m4j043dq4k0do6q7feafo7uk.apps.googleusercontent.com';
 
-    let _gisClient = null;
+    let _gisClient    = null;
+    let _gisInitTries = 0;
 
-    // GIS script 載入完成後立刻初始化（同步載入，不用等 load 事件）
+    // ── 帶重試的初始化：最多等 10 秒，每 300ms 嘗試一次 ──
     function _initGIS() {
-      if (typeof google === 'undefined' || !google.accounts) return;
-      _gisClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'openid email profile',
-        callback: async (tokenResponse) => {
-          if (tokenResponse.error) {
-            console.error('Google 登入失敗:', tokenResponse.error);
-            return;
-          }
-          // 用 access_token 取得用戶資訊
-          try {
-            const res  = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: { Authorization: 'Bearer ' + tokenResponse.access_token }
-            });
-            const info = await res.json();
-            window._currentUser = {
-              name:    info.name    || '',
-              email:   info.email   || '',
-              picture: info.picture || '',
-              token:   tokenResponse.access_token,
-            };
-            _updateAuthUI(window._currentUser);
-          } catch(e) {
-            console.error('取得用戶資訊失敗:', e);
-          }
-        },
-      });
+      if (typeof google !== 'undefined' && google.accounts) {
+        _gisClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'openid email profile',
+          callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+              console.error('Google 登入失敗:', tokenResponse.error);
+              return;
+            }
+            try {
+              const res  = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: 'Bearer ' + tokenResponse.access_token }
+              });
+              const info = await res.json();
+              window._currentUser = {
+                name:    info.name    || '',
+                email:   info.email   || '',
+                picture: info.picture || '',
+                token:   tokenResponse.access_token,
+              };
+              _updateAuthUI(window._currentUser);
+            } catch(e) {
+              console.error('取得用戶資訊失敗:', e);
+            }
+          },
+        });
+        console.log('[Auth] GIS 初始化成功');
+      } else {
+        // google.accounts 還沒就緒，最多重試 33 次（約 10 秒）
+        if (_gisInitTries < 33) {
+          _gisInitTries++;
+          setTimeout(_initGIS, 300);
+        } else {
+          console.warn('[Auth] GIS 載入逾時，Google 登入可能無法使用');
+        }
+      }
     }
 
-    // 頁面載入後初始化
-    window.addEventListener('load', _initGIS);
+    // DOMContentLoaded 後開始嘗試初始化
+    document.addEventListener('DOMContentLoaded', _initGIS);
 
     function _updateAuthUI(user) {
       const loginWrap = document.getElementById('authLoginWrap');
@@ -1904,20 +1914,24 @@
       }
     }
 
-    // 觸發 Google OAuth Popup 登入
+    // ── 觸發 Google OAuth Popup 登入 ──
     window._googleSignIn = () => {
       if (!_gisClient) {
-        // GIS 還沒初始化，嘗試重新初始化
-        _initGIS();
-        if (!_gisClient) {
-          alert('Google 登入初始化中，請稍後 1 秒再試');
-          return;
-        }
+        // 還在初始化中，再等一下
+        console.warn('[Auth] _gisClient 尚未就緒，稍後重試...');
+        setTimeout(() => {
+          if (_gisClient) {
+            _gisClient.requestAccessToken();
+          } else {
+            alert('Google 登入服務載入中，請稍後再試');
+          }
+        }, 800);
+        return;
       }
       _gisClient.requestAccessToken();
     };
 
-    // 登出
+    // ── 登出 ──
     window._googleSignOut = () => {
       if (window._currentUser?.token && typeof google !== 'undefined') {
         google.accounts.oauth2.revoke(window._currentUser.token);
@@ -2434,8 +2448,14 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
-const API_BASE = 'https://linebot-project-oxnw.onrender.com';
-//const API_BASE = 'http://127.0.0.1:5000';
+// ── 自動判斷環境，不需要手動切換 ──────────────────────────────
+const API_BASE = (() => {
+  const host = window.location.hostname;
+  if (host === '127.0.0.1' || host === 'localhost') {
+    return 'http://127.0.0.1:5000';           // 本地開發
+  }
+  return 'https://linebot-project-oxnw.onrender.com'; // GitHub Pages / 正式環境
+})();
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
 (function initParticles() {

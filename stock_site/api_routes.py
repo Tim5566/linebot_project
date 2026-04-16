@@ -4,9 +4,15 @@ from post_Info import stock_info, market_pnfo, get_today, twse_top50, otc_top50
 from get_trading_holidays import get_trading_status
 import re
 
+from flask import Flask, request, abort, send_from_directory
 
 def register_api(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # 在 register_api(app) 上面加：
+    @app.route("/")
+    def index():
+        return send_from_directory('.', 'index.html')
 
     # ── 交易日狀態 API ─────────────────────────────────────────────────
     @app.route("/api/trading_status")
