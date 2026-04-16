@@ -372,17 +372,6 @@ def twse_top50(today=None):
 
 # ── 上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────
 def otc_top50():
-    """
-    回傳上櫃外資、投信、自營商的買超/賣超前50名。
-    資料來源：TPEx openapi（不需帶日期，永遠回傳最新盤後資料）
-    回傳格式與 twse_top50 相同：
-    {
-        "foreign":     {"buy": [...], "sell": [...], "error": None},
-        "trust":       {"buy": [...], "sell": [...], "error": None},
-        "proprietary": {"buy": [...], "sell": [...], "error": None},
-    }
-    每筆資料：{"id": "6531", "name": "愛普", "net": 123}  (單位：張)
-    """
     API_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
 
     def _parse_otc_top50():

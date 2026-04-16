@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>免責聲明 — 盤後雷達 JellyStock</title>
+  <meta name="description" content="盤後雷達 JellyStock 免責聲明。本網站提供之台股資訊僅供參考，不構成任何投資建議，使用者應自行承擔一切風險。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#04080f; --surface:#080f1c; --surface2:#0c1422;
+      --border:#0f1a2e; --border2:#172438;
+      --accent:#00e5ff; --accent2:#0099bb;
+      --green:#00e676; --red:#ff3d5a; --yellow:#ffd600;
+      --muted:#3a5070; --text:#ccdaf5; --text-dim:#7a9ab8; --text-faint:#4a6888;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .bg-layer-grid { background-image: linear-gradient(rgba(0,229,255,.022) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,.022) 1px, transparent 1px); background-size: 48px 48px; }
+    .bg-layer-vignette { background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,80,160,.1) 0%, transparent 55%), radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0,120,200,.08) 0%, transparent 60%); }
+    .bg-layer-scanlines { background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.055) 3px, rgba(0,0,0,.055) 4px); animation: scanShift 10s linear infinite; }
+    @keyframes scanShift { from { background-position: 0 0; } to { background-position: 0 120px; } }
+
+    header { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 16px; height: 58px; border-bottom: 1px solid rgba(0,229,255,.08); background: rgba(4,8,15,.96); backdrop-filter: blur(20px); }
+    header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.7) 20%, rgba(0,170,255,.9) 50%, rgba(0,229,255,.7) 80%, transparent 100%); background-size: 200% 100%; animation: hSweep 4s linear infinite; }
+    @keyframes hSweep { from { background-position: -100% 0; } to { background-position: 200% 0; } }
+    .header-left { display: flex; align-items: center; padding-left: 4px; }
+    .logo { display: flex; align-items: center; gap: 18px; margin-left: 6px; }
+    .logo-icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; position: relative; flex-shrink: 0; overflow: visible; }
+    .logo-icon img { width: 58px; height: 58px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -6px; left: -6px; }
+    .logo-text { font-family: 'Orbitron', monospace; font-size: 1.05rem; font-weight: 700; letter-spacing: .1em; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,.4); }
+    .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--accent); letter-spacing: .22em; opacity: .65; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .btn-back { display: flex; align-items: center; gap: 7px; font-family: 'Share Tech Mono', monospace; font-size: .7rem; letter-spacing: .1em; color: var(--text-dim); text-decoration: none; background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.1); border-radius: 20px; padding: 5px 14px; transition: all .22s; }
+    .btn-back:hover { color: var(--accent); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.08); }
+    .btn-back svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    .page-wrap { position: relative; z-index: 1; max-width: 840px; margin: 0 auto; padding: 52px 32px 100px; }
+    .page-hero { margin-bottom: 44px; padding-bottom: 30px; border-bottom: 1px solid rgba(0,229,255,.06); }
+    .page-tag { font-family: 'Share Tech Mono', monospace; font-size: .6rem; letter-spacing: .3em; color: var(--accent); opacity: .65; text-transform: uppercase; margin-bottom: 10px; }
+    .page-title { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: .06em; line-height: 1.2; text-shadow: 0 0 40px rgba(0,229,255,.2); margin-bottom: 12px; }
+    .page-title .hl { color: var(--accent); }
+    .page-meta { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--text-faint); letter-spacing: .05em; }
+    .page-meta b { color: var(--text-dim); }
+
+    .warning-banner { background: rgba(255,61,90,.04); border: 1px solid rgba(255,61,90,.2); border-left: 3px solid var(--red); border-radius: 0 16px 16px 0; padding: 22px 28px; margin-bottom: 28px; display: flex; align-items: flex-start; gap: 16px; }
+    .warning-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,61,90,.08); border: 1px solid rgba(255,61,90,.2); display: grid; place-items: center; flex-shrink: 0; margin-top: 2px; }
+    .warning-icon svg { width: 18px; height: 18px; color: var(--red); }
+    .warning-text { font-size: .9rem; color: var(--text-dim); line-height: 1.85; }
+    .warning-text strong { color: var(--red); }
+
+    .doc-card { background: var(--surface); border: 1px solid rgba(0,229,255,.08); border-radius: 18px; padding: 30px 34px; margin-bottom: 18px; position: relative; overflow: hidden; transition: border-color .3s; }
+    .doc-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,229,255,.35), transparent); opacity: 0; transition: opacity .3s; }
+    .doc-card:hover { border-color: rgba(0,229,255,.16); }
+    .doc-card:hover::before { opacity: 1; }
+    .doc-card::after { content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,229,255,.018), transparent); animation: cardSweep 8s ease-in-out infinite; pointer-events: none; }
+    @keyframes cardSweep { 0% { left: -60%; } 60%,100% { left: 120%; } }
+    .sec-num { font-family: 'Share Tech Mono', monospace; font-size: .58rem; letter-spacing: .24em; color: var(--accent); opacity: .5; margin-bottom: 7px; text-transform: uppercase; }
+    .sec-title { font-family: 'Orbitron', monospace; font-size: .98rem; font-weight: 700; color: #fff; letter-spacing: .06em; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+    .sec-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,.18), transparent); }
+    .doc-body { font-size: .88rem; color: var(--text-dim); line-height: 1.95; }
+    .doc-body p { margin-bottom: 13px; }
+    .doc-body p:last-child { margin-bottom: 0; }
+    .doc-body strong { color: var(--text); }
+    .doc-body ul { list-style: none; padding: 0; margin: 8px 0 13px; display: flex; flex-direction: column; gap: 7px; }
+    .doc-body li { display: flex; align-items: flex-start; gap: 10px; font-size: .86rem; line-height: 1.75; }
+    .doc-body li::before { content: '▸'; color: var(--accent); font-size: .7rem; flex-shrink: 0; margin-top: 5px; opacity: .65; }
+
+    .hl-box { background: rgba(0,229,255,.035); border: 1px solid rgba(0,229,255,.1); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 14px 0; font-size: .84rem; color: var(--text-dim); line-height: 1.8; }
+    .hl-box strong { color: var(--accent); }
+
+    .invest-warning { background: linear-gradient(135deg, rgba(255,214,0,.04) 0%, rgba(255,61,90,.03) 100%); border: 1px solid rgba(255,214,0,.2); border-radius: 16px; padding: 28px 32px; margin: 24px 0; text-align: center; position: relative; overflow: hidden; }
+    .invest-warning::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,214,0,.5), transparent); }
+    .invest-warning-title { font-family: 'Orbitron', monospace; font-size: .78rem; font-weight: 700; color: var(--yellow); letter-spacing: .15em; margin-bottom: 12px; text-shadow: 0 0 14px rgba(255,214,0,.3); }
+    .invest-warning-body { font-size: .88rem; color: var(--text-dim); line-height: 1.9; }
+    .invest-warning-body strong { color: var(--yellow); }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid rgba(0,229,255,.06); background: rgba(4,8,15,.95); padding: 20px 40px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .footer-brand { font-family: 'Orbitron', monospace; font-size: .62rem; color: var(--accent); letter-spacing: .14em; opacity: .5; margin-bottom: 3px; }
+    .footer-copy { font-size: .68rem; color: var(--text-faint); }
+    .footer-nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    .footer-nav a { font-family: 'Share Tech Mono', monospace; font-size: .64rem; color: var(--text-faint); text-decoration: none; letter-spacing: .06em; transition: color .2s; }
+    .footer-nav a:hover, .footer-nav a.active { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      header { padding: 0 12px 0 10px; height: 54px; }
+      .logo-icon img { width: 46px; height: 46px; top: -3px; left: -3px; }
+      .logo-text { font-size: .88rem; } .logo-sub { font-size: .5rem; }
+      .page-wrap { padding: 28px 16px 80px; }
+      .page-title { font-size: 1.5rem; }
+      .doc-card { padding: 20px 18px; }
+      .warning-banner { flex-direction: column; gap: 10px; }
+      .invest-warning { padding: 22px 18px; }
+      footer { padding: 16px 16px 20px; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer bg-layer-grid"></div>
+<div class="bg-layer bg-layer-vignette"></div>
+<div class="bg-layer bg-layer-scanlines"></div>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="../images/jelly.png" alt="JellyStock Logo" /></div>
+      <div>
+        <div class="logo-text">盤後雷達</div>
+        <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="../index.html" class="btn-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-hero">
+    <div class="page-tag">· Legal · Disclaimer ·</div>
+    <h1 class="page-title">免責<span class="hl">聲明</span></h1>
+    <div class="page-meta">最後更新：<b>2026 年 4 月</b> &nbsp;·&nbsp; 適用網站：<b>盤後雷達 JellyStock</b></div>
+  </div>
+
+  <div class="warning-banner">
+    <div class="warning-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="warning-text">
+      <strong>重要提示：</strong>本網站所提供之所有台股資訊，<strong>均僅供參考，不構成任何投資建議或買賣依據</strong>。因使用本站資訊所致之任何損失，本站概不負責。
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 01</div>
+    <div class="sec-title">資料性質聲明</div>
+    <div class="doc-body">
+      <p>盤後雷達（JellyStock）所提供之所有資料，來源為臺灣證券交易所（TWSE）及櫃買中心（TPEx）等官方機構之公開資訊，本站僅進行資料整合與呈現，<strong>不進行任何資料加工、預測或投資建議</strong>。</p>
+      <p>本網站提供之資訊包括但不限於：</p>
+      <ul>
+        <li>三大法人（外資、投信、自營商）當日個股買賣超股數</li>
+        <li>三大法人合計買賣超金額統計</li>
+        <li>個股融資融券、借券賣出差額</li>
+        <li>處置股、注意股公告狀態</li>
+        <li>大盤融資水位統計</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 02</div>
+    <div class="sec-title">資料準確性與即時性</div>
+    <div class="doc-body">
+      <p>本網站資料雖來源於官方公開資訊，但本站<strong>不保證資料之絕對準確性、完整性及即時性</strong>。以下情況均可能造成資料異常或中斷，本站對此不承擔任何責任：</p>
+      <ul>
+        <li>官方資料來源（TWSE / TPEx）尚未更新、延遲公告或網站異常</li>
+        <li>雲端伺服器、主機服務商（含 Render 等平台）發生中斷、故障或維護</li>
+        <li>網路連線不穩定或中斷導致資料抓取失敗</li>
+        <li>程式本身發生錯誤、例外或未預期的行為</li>
+        <li>資料格式遭官方變更，本站尚未完成相應調整</li>
+        <li>特殊交易日、節假日或非常規情況造成的資料缺漏</li>
+        <li>任何超出本站控制範圍之第三方服務異常</li>
+      </ul>
+      <div class="hl-box">
+        <strong>以官方公告為準：</strong>如發現本站資料與官方網站有所出入，請以臺灣證券交易所（www.twse.com.tw）及櫃買中心（www.tpex.org.tw）官方公告為準。
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 03</div>
+    <div class="sec-title">投資風險警語</div>
+    <div class="doc-body">
+      <div class="invest-warning">
+        <div class="invest-warning-title">⚠ 投資風險警語 ⚠</div>
+        <div class="invest-warning-body">
+          本網站資訊<strong>不構成投資建議</strong>，亦不代表對任何個股或市場走向之推薦或保證。<br>
+          台股投資涉及市場風險，<strong>過去的法人買賣超數據不代表未來股價走勢</strong>。<br>
+          用戶應依據自身財務狀況與風險承受能力進行獨立判斷，<br>
+          並對自身的投資行為及其結果<strong>負完全責任</strong>。
+        </div>
+      </div>
+      <p>本網站並非合法之投資顧問、證券商或金融機構，不具備提供投資建議之資格。如需專業投資諮詢，請洽合法之持牌金融機構或投資顧問。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 04</div>
+    <div class="sec-title">責任限制</div>
+    <div class="doc-body">
+      <p>在法律允許的最大範圍內，本網站對於因使用或無法使用本站所造成的任何直接、間接、附隨或特別損害，<strong>概不負任何責任</strong>，包括但不限於：</p>
+      <ul>
+        <li>依據本站資料進行投資決策所造成的財務損失</li>
+        <li>因資料錯誤、缺漏或延遲所導致的任何損害</li>
+        <li>因伺服器中斷、雲端平台故障、網路異常或程式錯誤所導致的服務不可用</li>
+        <li>因官方來源網站（TWSE / TPEx）異常導致本站無法即時更新資料</li>
+        <li>使用者設備故障、瀏覽器相容問題或其他用戶端環境問題</li>
+        <li>因不可抗力（天災、停電、駭客攻擊等）所導致的任何損失</li>
+      </ul>
+      <p><strong>本站提供之一切服務均以「現狀」提供，不附帶任何明示或默示之保證。</strong>使用本網站即表示您已充分理解並自行承擔上述所有風險。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 05</div>
+    <div class="sec-title">第三方連結</div>
+    <div class="doc-body">
+      <p>本網站可能包含指向第三方網站（如 TWSE、TPEx 等）的連結，僅供用戶方便參考。本站對第三方網站之內容、準確性及隱私政策<strong>不負任何責任</strong>，用戶應自行審閱各第三方網站之相關條款。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 06</div>
+    <div class="sec-title">著作權聲明</div>
+    <div class="doc-body">
+      <p>本網站之頁面設計、介面佈局、程式碼及原創文字內容，均受著作權法保護，<strong>未經本站書面授權，不得複製、重製、轉載或作為商業用途</strong>。</p>
+      <p>本站引用之台股資料來源於官方機構公開資訊，相關資料之著作權歸屬原發布機構所有。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 07</div>
+    <div class="sec-title">準據法與管轄</div>
+    <div class="doc-body">
+      <p>本免責聲明及本網站相關條款，均依據<strong>中華民國法律</strong>解釋與執行。如因本網站使用而產生任何爭議，雙方同意以台灣台北地方法院為第一審管轄法院。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 08</div>
+    <div class="sec-title">條款修訂</div>
+    <div class="doc-body">
+      <p>本免責聲明可能因應法規變更或服務調整而不定期更新。更新後版本將於本頁面公告，並標示最新修訂日期。繼續使用本網站服務即表示您接受修訂後的條款。</p>
+      <p>如對本免責聲明有任何疑問，歡迎透過 <strong style="color:var(--accent)">llowoll5566@gmail.com</strong> 與我們聯繫。</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>
+    <div class="footer-brand">盤後雷達 · JELLYSTOCK</div>
+    <div class="footer-copy">© 2026 JellyStock. All rights reserved.</div>
+  </div>
+  <nav class="footer-nav">
+    <a href="../index.html">首頁</a>
+    <a href="privacy.html">隱私政策</a>
+    <a href="about.html">關於本站</a>
+    <a href="disclaimer.html" class="active">免責聲明</a>
+  </nav>
+</footer>
+
+</body>
+</html>
