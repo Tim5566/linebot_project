@@ -583,6 +583,185 @@
       color: var(--muted);
     }
 
+    /* ── FAVORITE HEART BUTTON ── */
+    .fav-btn {
+      margin-left: auto;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,61,90,.2);
+      background: rgba(255,61,90,.04);
+      color: rgba(255,61,90,.4);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
+      position: relative;
+    }
+    .fav-btn svg { width: 16px; height: 16px; transition: all .25s; }
+    .fav-btn:hover {
+      border-color: rgba(255,61,90,.5);
+      background: rgba(255,61,90,.12);
+      color: #ff3d5a;
+      transform: scale(1.1);
+    }
+    .fav-btn.active {
+      border-color: rgba(255,61,90,.6);
+      background: rgba(255,61,90,.14);
+      color: #ff3d5a;
+      box-shadow: 0 0 14px rgba(255,61,90,.3);
+      animation: heartPop .3s cubic-bezier(.22,1,.36,1);
+    }
+    .fav-btn.active svg { fill: #ff3d5a; }
+    @keyframes heartPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.35); }
+      100% { transform: scale(1); }
+    }
+    .fav-btn.guest {
+      border-color: rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color: rgba(255,255,255,.15);
+      cursor: not-allowed;
+    }
+    .fav-toast {
+      position: fixed;
+      bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(15,25,45,.95);
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      color: var(--text);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s cubic-bezier(.22,1,.36,1);
+      white-space: nowrap;
+      backdrop-filter: blur(12px);
+    }
+    .fav-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── WATCHLIST MODAL ── */
+    #watchlistModal .modal { max-width: 780px; }
+    .wl-empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 14px;
+      padding: 60px 24px;
+      color: var(--text-dim); font-size: .88rem; text-align: center;
+    }
+    .wl-empty svg { width: 48px; height: 48px; opacity: .2; color: var(--red); }
+    .wl-empty-title { font-size: .95rem; font-weight: 600; color: var(--text-dim); }
+    .wl-empty-sub { font-size: .8rem; color: var(--text-faint); line-height: 1.7; }
+    .wl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+    .wl-card {
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      transition: all .25s;
+      animation: fadeUp .3s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .wl-card:hover {
+      border-color: rgba(0,229,255,.25);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,.3), 0 0 12px rgba(0,229,255,.06);
+    }
+    .wl-card-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    .wl-code {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .8rem; font-weight: 700;
+      color: var(--accent);
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.18);
+      border-radius: 6px; padding: 3px 9px;
+    }
+    .wl-name {
+      font-size: .8rem; font-weight: 600; color: #fff;
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .wl-del-btn {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1px solid rgba(255,61,90,.2);
+      background: transparent; color: rgba(255,61,90,.4);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all .2s;
+    }
+    .wl-del-btn:hover { background: rgba(255,61,90,.15); color: #ff3d5a; border-color: rgba(255,61,90,.5); }
+    .wl-del-btn svg { width: 11px; height: 11px; }
+    .wl-metrics {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .wl-metric {
+      background: rgba(0,229,255,.03); border: 1px solid rgba(0,229,255,.06);
+      border-radius: 8px; padding: 8px 10px;
+    }
+    .wl-metric-label {
+      font-size: .64rem; color: var(--text-faint); letter-spacing: .06em; margin-bottom: 4px;
+    }
+    .wl-metric-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .82rem; font-weight: 700;
+    }
+    .wl-metric-val.pos { color: var(--red); }
+    .wl-metric-val.neg { color: var(--green); }
+    .wl-metric-val.neu { color: var(--text-dim); }
+    .wl-metric-val.loading { color: var(--muted); animation: pulse 1.5s infinite; }
+    .wl-card-footer {
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid rgba(0,229,255,.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .wl-card-date { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--text-faint); }
+    .wl-card-query {
+      font-family: 'Share Tech Mono', monospace; font-size: .62rem;
+      color: var(--accent); cursor: pointer; opacity: .6;
+      transition: opacity .2s; background: none; border: none; padding: 0;
+    }
+    .wl-card-query:hover { opacity: 1; }
+    .wl-header-actions {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wl-refresh-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Share Tech Mono', monospace; font-size: .68rem;
+      color: var(--text-dim); background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.12); border-radius: 8px;
+      padding: 5px 12px; cursor: pointer; transition: all .2s;
+    }
+    .wl-refresh-btn:hover { color: var(--accent); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.1); }
+    .wl-refresh-btn svg { width: 12px; height: 12px; }
+    .wl-guest-notice {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; padding: 60px 24px; text-align: center;
+    }
+    .wl-guest-notice svg { width: 48px; height: 48px; opacity: .2; color: var(--accent); }
+    .wl-guest-title { font-size: .95rem; color: var(--text-dim); }
+    .wl-guest-sub { font-size: .8rem; color: var(--text-faint); line-height: 1.7; }
+    .wl-login-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 10px;
+      background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.25);
+      color: var(--accent); font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem; letter-spacing: .06em; cursor: pointer;
+      transition: all .2s;
+    }
+    .wl-login-btn:hover { background: rgba(0,229,255,.18); border-color: rgba(0,229,255,.45); }
+    .wl-login-btn svg { width: 15px; height: 15px; }
+
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1868,8 +2047,9 @@
                 token:   tokenResponse.access_token,
               };
               _updateAuthUI(window._currentUser);
+              document.dispatchEvent(new Event('_authChanged'));
             } catch(e) {
-              console.error('取得用戶資訊失敗:', e);
+              console.error('[Auth] 取得用戶資訊失敗:', e);
             }
           },
         });
@@ -1938,6 +2118,7 @@
       }
       window._currentUser = null;
       _updateAuthUI(null);
+      document.dispatchEvent(new Event('_authChanged'));
     };
   </script>
 </head>
@@ -2008,6 +2189,13 @@
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       個股查詢
+    </button>
+    <button class="nav-item" id="navWatchlist" onclick="openWatchlistModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      我的最愛
+      <span class="nav-badge" id="favCountBadge" style="display:none">0</span>
     </button>
     <button class="nav-item" onclick="openTop50Modal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2190,7 +2378,39 @@
   </div>
 </div>
 
-<!-- HOLIDAY BANNER -->
+<!-- WATCHLIST MODAL -->
+<div class="modal-overlay" id="watchlistModal" onclick="handleWatchlistModalClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff3d5a" stroke="#ff3d5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        我的最愛
+      </div>
+      <div class="wl-header-actions">
+        <button class="wl-refresh-btn" id="wlRefreshBtn" onclick="loadWatchlist()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          重新整理
+        </button>
+        <button class="modal-close" onclick="closeWatchlistModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="watchlistBody" style="min-height:240px;"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="fav-toast" id="favToast"></div>
+
+
 <div id="holiday-banner">
   <div class="holiday-inner">
     <div class="holiday-left">
@@ -2820,6 +3040,12 @@ function renderStock(d) {
 
   const codeDisplay = d.keyword && /^\d/.test(d.keyword) ? d.keyword : (d.name ? d.keyword : d.keyword);
   const nameDisplay = d.name && d.name !== d.keyword ? d.name : '';
+
+  const isLoggedIn = !!window._currentUser;
+  const isFav = isLoggedIn && _isFavorite(d.keyword);
+  const favBtnClass = isLoggedIn ? (isFav ? 'fav-btn active' : 'fav-btn') : 'fav-btn guest';
+  const favTitle = isLoggedIn ? (isFav ? '移除最愛' : '加入最愛') : '請先登入';
+
   resultEl.innerHTML = `
     <div class="stock-card">
       <div class="card-header">
@@ -2827,6 +3053,13 @@ function renderStock(d) {
         ${nameDisplay ? `<div class="stock-name-title">${nameDisplay}</div>` : ''}
         <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
         <div class="card-timestamp">${d.date || ''} 盤後</div>
+        <button class="${favBtnClass}" title="${favTitle}"
+          onclick="toggleFavorite('${d.keyword}', '${nameDisplay || d.keyword}', this)"
+          id="favBtn_${d.keyword}">
+          <svg viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </div>
       <div class="metrics-grid">
         ${metricCell('外資買賣超', d.foreign,      '🌏')}
@@ -3096,7 +3329,220 @@ function renderOtcTop50() {
   html += '</tbody></table>';
   document.getElementById('otcTop50Body').innerHTML = html;
 }
+// ── FAVORITES / WATCHLIST ─────────────────────────────────────────────────────
+
+function _favKey() {
+  const email = window._currentUser?.email || 'guest';
+  return `wl_${email}`;
+}
+
+function _loadFavs() {
+  try { return JSON.parse(localStorage.getItem(_favKey()) || '[]'); }
+  catch { return []; }
+}
+
+function _saveFavs(list) {
+  localStorage.setItem(_favKey(), JSON.stringify(list));
+  _updateFavBadge();
+}
+
+function _isFavorite(code) {
+  return _loadFavs().some(f => f.code === code);
+}
+
+function _updateFavBadge() {
+  const count = _loadFavs().length;
+  const badge = document.getElementById('favCountBadge');
+  if (!badge) return;
+  if (count > 0 && window._currentUser) {
+    badge.textContent = count;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function _showToast(msg) {
+  const el = document.getElementById('favToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function toggleFavorite(code, name, btnEl) {
+  if (!window._currentUser) {
+    _showToast('請先登入 Google 帳號才能使用最愛功能');
+    return;
+  }
+  const favs = _loadFavs();
+  const idx  = favs.findIndex(f => f.code === code);
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+    btnEl.classList.remove('active');
+    btnEl.querySelector('svg').setAttribute('fill', 'none');
+    btnEl.title = '加入最愛';
+    _showToast(`✕ 已從最愛移除：${name}`);
+  } else {
+    favs.push({ code, name, addedAt: Date.now() });
+    btnEl.classList.add('active');
+    btnEl.querySelector('svg').setAttribute('fill', 'currentColor');
+    btnEl.title = '移除最愛';
+    _showToast(`♥ 已加入最愛：${name}`);
+  }
+  _saveFavs(favs);
+}
+
+// ── WATCHLIST MODAL ──
+function openWatchlistModal() {
+  closeDrawer();
+  document.getElementById('watchlistModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadWatchlist();
+}
+
+function closeWatchlistModal() {
+  document.getElementById('watchlistModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleWatchlistModalClick(e) {
+  if (e.target === document.getElementById('watchlistModal')) closeWatchlistModal();
+}
+
+async function loadWatchlist() {
+  const body = document.getElementById('watchlistBody');
+
+  if (!window._currentUser) {
+    body.innerHTML = `
+      <div class="wl-guest-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <div class="wl-guest-title">請先登入 Google 帳號</div>
+        <div class="wl-guest-sub">登入後即可收藏個股，<br>隨時查看法人買賣超動態</div>
+        <button class="wl-login-btn" onclick="closeWatchlistModal(); window._googleSignIn && window._googleSignIn()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Google 登入
+        </button>
+      </div>`;
+    return;
+  }
+
+  const favs = _loadFavs();
+  if (favs.length === 0) {
+    body.innerHTML = `
+      <div class="wl-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <div class="wl-empty-title">尚無收藏個股</div>
+        <div class="wl-empty-sub">查詢個股後，點擊右上角 ♥ 愛心<br>即可加入最愛清單</div>
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = `<div class="wl-grid" id="wlGrid"></div>`;
+  const grid = document.getElementById('wlGrid');
+
+  grid.innerHTML = favs.map(f => `
+    <div class="wl-card" id="wlcard_${f.code}">
+      <div class="wl-card-header">
+        <div class="wl-code">${f.code}</div>
+        <div class="wl-name">${f.name}</div>
+        <button class="wl-del-btn" onclick="removeFav('${f.code}')" title="移除">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="wl-metrics">
+        <div class="wl-metric">
+          <div class="wl-metric-label">🌏 外資</div>
+          <div class="wl-metric-val loading" id="wl_f_${f.code}">載入中...</div>
+        </div>
+        <div class="wl-metric">
+          <div class="wl-metric-label">🏦 投信</div>
+          <div class="wl-metric-val loading" id="wl_t_${f.code}">載入中...</div>
+        </div>
+        <div class="wl-metric">
+          <div class="wl-metric-label">🏢 自營商</div>
+          <div class="wl-metric-val loading" id="wl_p_${f.code}">載入中...</div>
+        </div>
+        <div class="wl-metric">
+          <div class="wl-metric-label">📉 借券賣出</div>
+          <div class="wl-metric-val loading" id="wl_s_${f.code}">載入中...</div>
+        </div>
+      </div>
+      <div class="wl-card-footer">
+        <div class="wl-card-date">盤後資料</div>
+        <button class="wl-card-query" onclick="closeWatchlistModal(); document.getElementById('stockInput').value='${f.code}'; queryStock()">
+          詳細查詢 →
+        </button>
+      </div>
+    </div>`).join('');
+
+  // 並行查詢所有收藏個股
+  await Promise.all(favs.map(f => _fetchWlCard(f.code)));
+}
+
+async function _fetchWlCard(code) {
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (val == null) {
+      el.textContent = '🚫 未更新';
+      el.className = 'wl-metric-val neu';
+    } else {
+      const n = parseInt(String(val).replace(/,/g, ''));
+      el.className = `wl-metric-val ${isNaN(n) ? 'neu' : n > 0 ? 'pos' : n < 0 ? 'neg' : 'neu'}`;
+      el.textContent = val;
+    }
+  };
+  try {
+    const res  = await fetch(`${API_BASE}/api/stock?keyword=${encodeURIComponent(code)}`);
+    const data = await res.json();
+    if (data.error) {
+      ['f','t','p','s'].forEach(k => set(`wl_${k}_${code}`, null));
+      return;
+    }
+    set(`wl_f_${code}`, data.foreign);
+    set(`wl_t_${code}`, data.trust);
+    set(`wl_p_${code}`, data.proprietary);
+    set(`wl_s_${code}`, data.short_sale);
+  } catch {
+    ['f','t','p','s'].forEach(k => set(`wl_${k}_${code}`, null));
+  }
+}
+
+function removeFav(code) {
+  const favs = _loadFavs().filter(f => f.code !== code);
+  _saveFavs(favs);
+  const card = document.getElementById(`wlcard_${code}`);
+  if (card) {
+    card.style.opacity = '0';
+    card.style.transform = 'scale(.92)';
+    card.style.transition = 'all .25s';
+    setTimeout(() => loadWatchlist(), 260);
+  }
+  // 同步更新查詢結果的愛心按鈕
+  const favBtn = document.getElementById(`favBtn_${code}`);
+  if (favBtn) {
+    favBtn.classList.remove('active');
+    favBtn.querySelector('svg').setAttribute('fill', 'none');
+    favBtn.title = '加入最愛';
+  }
+  _showToast(`✕ 已移除：${code}`);
+}
+
+// 登入後自動更新 badge
+const _origUpdateAuthUI = window._updateAuthUI;
+// 登入/登出後更新 badge
+document.addEventListener('_authChanged', _updateFavBadge);
+setTimeout(_updateFavBadge, 800);
 
 </script>
-</body>
 </html>
