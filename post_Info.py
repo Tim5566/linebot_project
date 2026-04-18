@@ -14,15 +14,24 @@ import time as _time
 
 headers = {"User-Agent": "Mozilla/5.0"}
 
+# ── 盤後資料 session 快取（避免同一天同一股重複呼叫 API）────────────────────
+_stock_cache: dict = {}   # {date_keyword: raw_text}
+
+def _cache_key(keyword: str) -> str:
+    return f"{get_today()}_{keyword}"
+
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
-def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
-    """發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。"""
+def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.0):
+    """
+    發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。
+    優化：第一次失敗縮短等待（0.5s），後續才用 delay。
+    """
     today_d = re.sub(r"[^\d]", "", today)
     for attempt in range(retries):
         try:
-            res = requests.get(url, headers=headers, verify=False, timeout=10)
+            res = requests.get(url, headers=headers, verify=False, timeout=8)
             data = res.json()
             api_date = re.sub(r"[^\d]", "", str(data.get(date_key, "")))
             if today_d in api_date:
@@ -30,29 +39,72 @@ def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.5):
             print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_date} today={today_d}")
         except Exception as e:
             print(f"[retry {attempt+1}/{retries}] 請求失敗: {e}")
-        _time.sleep(delay)
+        _time.sleep(0.5 if attempt == 0 else delay)
     return None
 
 
 # ── 上市 / 上櫃公司代碼名稱存檔（初始讀取一次）────────────────────────────────
+# 改用 dict 做 O(1) 查詢，大幅加速關鍵字比對
+# code→name, name→code 雙向索引
+
+def _load_stock_list():
+    """自動往前找近 10 個工作日的資料，避免硬編碼日期失效。"""
+    from datetime import date, timedelta
+    twse_code2name, twse_name2code = {}, {}
+    otc_code2name,  otc_name2code  = {}, {}
+
+    # 往前找最多 10 天
+    d = date.today()
+    for _ in range(10):
+        d -= timedelta(days=1)
+        if d.weekday() >= 5:
+            continue
+        date_str = d.strftime("%Y%m%d")
+        try:
+            r = requests.get(
+                f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={date_str}",
+                headers=headers, verify=False, timeout=8)
+            raw = r.json()
+            if raw.get("stat") == "OK" and raw.get("data"):
+                for item in raw["data"]:
+                    twse_code2name[item[0].strip()] = item[1].strip()
+                    twse_name2code[item[1].strip()] = item[0].strip()
+                break
+        except Exception:
+            continue
+
+    d = date.today()
+    for _ in range(10):
+        d -= timedelta(days=1)
+        if d.weekday() >= 5:
+            continue
+        date_str = d.strftime("%Y%m%d")
+        try:
+            r = requests.get(
+                f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={date_str}",
+                headers=headers, verify=False, timeout=8)
+            raw = r.json()
+            if raw.get("tables") and raw["tables"][0].get("data"):
+                for item in raw["tables"][0]["data"]:
+                    otc_code2name[item[0].strip()] = item[1].strip()
+                    otc_name2code[item[1].strip()] = item[0].strip()
+                break
+        except Exception:
+            continue
+
+    return twse_code2name, twse_name2code, otc_code2name, otc_name2code
+
 try:
-    TWSE_res = requests.get(
-        "https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date=20260309",
-        headers=headers, verify=False)
-    OTC_res = requests.get(
-        "https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date=20260309",
-        headers=headers, verify=False)
-    TWSE_data_raw  = TWSE_res.json()
-    OTC_data_raw   = OTC_res.json()
-    TWSE_data_code = [item[0] for item in TWSE_data_raw["data"]]
-    TWSE_data_name = [item[1] for item in TWSE_data_raw["data"]]
-    OTC_data_code  = [item[0] for item in OTC_data_raw["tables"][0]["data"]]
-    OTC_data_name  = [item[1] for item in OTC_data_raw["tables"][0]["data"]]
+    TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE = _load_stock_list()
+    # 保留舊 list 介面相容性（twse_top50 / otc_top50 用到）
+    TWSE_data_code = list(TWSE_CODE2NAME.keys())
+    TWSE_data_name = list(TWSE_CODE2NAME.values())
+    OTC_data_code  = list(OTC_CODE2NAME.keys())
+    OTC_data_name  = list(OTC_CODE2NAME.values())
+    print(f"✅ 代碼清單載入：上市 {len(TWSE_data_code)} 筆，上櫃 {len(OTC_data_code)} 筆")
 except Exception as e:
-    TWSE_data_code = []
-    TWSE_data_name = []
-    OTC_data_code  = []
-    OTC_data_name  = []
+    TWSE_CODE2NAME = TWSE_NAME2CODE = OTC_CODE2NAME = OTC_NAME2CODE = {}
+    TWSE_data_code = TWSE_data_name = OTC_data_code = OTC_data_name = []
     print(f"❌ 無法取得代碼清單: {e}")
 
 
@@ -179,8 +231,7 @@ def _otc_short_sale(keyword, api_url, today):
             return None
         kw = keyword
         if not kw.isdigit():
-            idx = OTC_data_name.index(kw)
-            kw  = OTC_data_code[idx]
+            kw = OTC_NAME2CODE.get(kw, kw)  # dict O(1) 查代碼
         for row in data["tables"][0]["data"]:
             if kw in row[0]:
                 return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
@@ -197,10 +248,15 @@ def stock_info(keyword):
     elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
         return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
+    # 快取命中 → 直接回傳，省去重複 API 呼叫
+    ck = _cache_key(keyword)
+    if ck in _stock_cache:
+        return _stock_cache[ck]
+
     reply = f"{keyword} (今盤後買賣超)\n"
 
-    # ── 上市 ──────────────────────────────────────────────────────────────────
-    if keyword in TWSE_data_code or keyword in TWSE_data_name:
+    # ── 上市（dict O(1) 查詢）────────────────────────────────────────────────
+    if keyword in TWSE_CODE2NAME or keyword in TWSE_NAME2CODE:
         API_Disposal    = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
         API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
         API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
@@ -225,10 +281,11 @@ def stock_info(keyword):
         reply += (Trust_text       + "\n") if Trust_text       else "投信：🚫 暫未更新\n"
         reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫 暫未更新\n"
         reply += (Short_sale_text  + "\n") if Short_sale_text  else "借卷賣出：🚫 暫未更新\n"
-        return reply.strip()
+        _stock_cache[ck] = reply.strip()
+        return _stock_cache[ck]
 
-    # ── 上櫃 ──────────────────────────────────────────────────────────────────
-    elif keyword in OTC_data_code or keyword in OTC_data_name:
+    # ── 上櫃（dict O(1) 查詢）────────────────────────────────────────────────
+    elif keyword in OTC_CODE2NAME or keyword in OTC_NAME2CODE:
         API_institutional = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
         API_Disposal      = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
         API_Short_Sale    = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
@@ -247,7 +304,8 @@ def stock_info(keyword):
         reply += (Trust_text       + "\n") if Trust_text       else "投信：🚫 暫未更新\n"
         reply += (Proprietary_text + "\n") if Proprietary_text else "自營商：🚫 暫未更新\n"
         reply += (Short_sale_text  + "\n") if Short_sale_text  else "借卷賣出：🚫 暫未更新\n"
-        return reply.strip()
+        _stock_cache[ck] = reply.strip()
+        return _stock_cache[ck]
 
     else:
         return f"❌找不到「{keyword}」今盤後資料。"
@@ -298,16 +356,10 @@ def market_pnfo():
 
     return reply.strip()
 
-# ── 上市上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────────
+# ── 上市三大法人買賣超排行前50 ────────────────────────────────────────────────────
 def twse_top50(today=None):
     if today is None:
         today = get_today()
-
-    #TEST_DATE = "20260410"  # 測試用，完成後刪掉此行
-
-    #API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={TEST_DATE}"
-    #API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={TEST_DATE}"
-    #API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={TEST_DATE}"
 
     API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"

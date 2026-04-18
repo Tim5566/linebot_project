@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" style="scroll-behavior:smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,11 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:        #04080f;
-      --surface:   #080f1c;
-      --surface2:  #0c1422;
-      --border:    #0f1a2e;
-      --border2:   #172438;
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
       --accent:    #00e5ff;
       --accent2:   #0099bb;
       --accent3:   #00aaff;
@@ -20,13 +20,17 @@
       --red:       #ff3d5a;
       --yellow:    #ffd600;
       --muted:     #3a5070;
-      --text:      #ccdaf5;
+      --text:      #d4e4f7;
       --text-dim:  #7a9ab8;
       --text-faint:#4a6888;
       --glow:      0 0 32px rgba(0,229,255,.25);
       --glow-red:  0 0 20px rgba(255,61,90,.4);
       --glow-grn:  0 0 20px rgba(0,230,118,.4);
       --glow-strong: 0 0 60px rgba(0,229,255,.15);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --transition: .25s cubic-bezier(.22,1,.36,1);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,63 +41,54 @@
       font-family: 'Noto Sans TC', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
     }
+    body::-webkit-scrollbar { width: 5px; }
+    body::-webkit-scrollbar-track { background: transparent; }
+    body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); border-radius: 4px; }
+    body::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,.35); }
 
     /* ── LAYERED ANIMATED BACKGROUND ── */
-    .bg-layer {
+    /* ── GALAXY BACKGROUND ── */
+    #galaxyCanvas {
       position: fixed;
       inset: 0;
-      pointer-events: none;
       z-index: 0;
+      pointer-events: none;
     }
-    /* Perspective grid - more refined */
-    .bg-layer-grid {
-      background-image:
-        linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
-      background-size: 48px 48px;
-      animation: gridPulse 8s ease-in-out infinite;
-    }
-    @keyframes gridPulse {
-      0%,100% { opacity: .8; }
-      50%      { opacity: 1.2; }
-    }
-    /* Aurora mesh - new dynamic layer */
-    .bg-layer-vignette {
+    /* 星雲暈染層 */
+    .bg-nebula {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
       background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,80,160,.12) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,160,100,.07) 0%, transparent 50%),
-        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0,120,200,.1) 0%, transparent 60%);
-      animation: auroraShift 14s ease-in-out infinite alternate;
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%, transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%, transparent 40%);
+      animation: nebulaFloat 28s ease-in-out infinite alternate;
     }
-    @keyframes auroraShift {
-      0%   { background-position: 0% 0%, 100% 100%, 50% -10%; }
-      50%  { background-position: 10% 5%, 90% 90%, 55% -5%; }
-      100% { background-position: 5% 10%, 95% 85%, 45% -15%; }
+    @keyframes nebulaFloat {
+      0%   { opacity:.7; transform: scale(1)    translateX(0px); }
+      33%  { opacity:1;  transform: scale(1.03) translateX(6px); }
+      66%  { opacity:.8; transform: scale(.98)  translateX(-4px); }
+      100% { opacity:1;  transform: scale(1.02) translateX(2px); }
     }
-    /* Scanline effect */
-    .bg-layer-scanlines {
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 3px,
-        rgba(0,0,0,.06) 3px,
-        rgba(0,0,0,.06) 4px
-      );
-      animation: scanlineShift 10s linear infinite;
-    }
-    @keyframes scanlineShift {
-      from { background-position: 0 0; }
-      to   { background-position: 0 120px; }
-    }
-    /* Floating particles canvas */
-    #particleCanvas {
+    /* 極細掃描線保留質感 */
+    .bg-scanlines {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      opacity: .6;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,.04) 3px, rgba(0,0,0,.04) 4px
+      );
     }
+    /* 舊 particle canvas 保留 slot（已換成 galaxyCanvas） */
+    #particleCanvas { display: none; }
 
     /* ── HEADER ── */
     header {
@@ -104,10 +99,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 28px 0 16px;
-      height: 58px;
-      border-bottom: 1px solid rgba(0,229,255,.08);
-      background: rgba(4,8,15,.96);
-      backdrop-filter: blur(20px);
+      height: 60px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: linear-gradient(90deg, rgba(3,6,14,.97), rgba(4,8,16,.97));
+      backdrop-filter: blur(24px) saturate(1.4);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
     }
     .header-left {
       display: flex;
@@ -180,10 +176,11 @@
       font-family: 'Share Tech Mono', monospace;
       font-size: .7rem;
       color: var(--text-dim);
-      background: rgba(0,229,255,.04);
-      border: 1px solid rgba(0,229,255,.1);
+      background: linear-gradient(90deg, rgba(0,229,255,.05), rgba(0,150,200,.03));
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 20px;
-      padding: 5px 12px;
+      padding: 6px 14px;
+      letter-spacing: .04em;
     }
     .status-dot {
       width: 7px; height: 7px;
@@ -213,11 +210,12 @@
     /* ── TICKER TAPE ── */
     .ticker-wrap {
       overflow: hidden;
-      border-bottom: 1px solid rgba(0,229,255,.06);
-      background: rgba(4,8,15,.97);
-      height: 36px;
+      border-bottom: 1px solid rgba(0,229,255,.08);
+      background: linear-gradient(90deg, rgba(3,6,14,.98), rgba(4,8,16,.98));
+      height: 38px;
       position: relative;
       z-index: 9;
+      box-shadow: 0 1px 12px rgba(0,0,0,.4);
     }
     .ticker-wrap::before,
     .ticker-wrap::after {
@@ -232,11 +230,15 @@
     .ticker-wrap::after  { right: 0; background: linear-gradient(-90deg, rgba(4,8,15,1), transparent); }
     .ticker-track {
       display: flex;
-      animation: ticker 40s linear infinite;
+      animation: ticker 50s linear infinite;
       white-space: nowrap;
       height: 100%;
       align-items: center;
+      will-change: transform;
     }
+    /* 單組 items 寬度由 JS 計算，這裡 -50% 讓兩組無縫循環 */
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
     .ticker-item {
       font-family: 'Share Tech Mono', monospace;
       font-size: .78rem;
@@ -258,6 +260,10 @@
     .ticker-item span.up   { color: var(--red);   font-weight: 600; text-shadow: 0 0 8px rgba(255,61,90,.4); }
     .ticker-item span.down { color: var(--green); font-weight: 600; text-shadow: 0 0 8px rgba(0,230,118,.4); }
     @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-33.33%); } }
+    @keyframes tickerFlash {
+      0%   { color: var(--accent); text-shadow: 0 0 12px rgba(0,229,255,.8); }
+      100% { color: inherit; text-shadow: none; }
+    }
 
     /* ── MAIN LAYOUT ── */
     main {
@@ -268,6 +274,7 @@
       padding: 36px 32px 100px;
     }
 
+    /* ── HEADER FAVORITE BUTTON ── */
     /* ── MUSIC BUTTON ── */
     #musicBtn {
       width: 34px; height: 34px;
@@ -333,21 +340,25 @@
     /* ── SECTION TITLE ── */
     .section-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .65rem;
+      font-size: .66rem;
       letter-spacing: .3em;
       color: var(--accent);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       text-transform: uppercase;
-      opacity: .75;
+      opacity: .8;
+      text-shadow: 0 0 12px rgba(0,229,255,.3);
     }
     h2.section-title {
       font-family: 'Orbitron', monospace;
-      font-size: 1.35rem;
+      font-size: 1.38rem;
       font-weight: 700;
-      color: #fff;
       margin-bottom: 24px;
       letter-spacing: .04em;
-      text-shadow: 0 0 30px rgba(0,229,255,.2);
+      background: linear-gradient(90deg, #fff 60%, rgba(0,229,255,.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(0,229,255,.18));
     }
 
     /* ── ANIMATED GLOWING BORDER UTIL ── */
@@ -367,14 +378,15 @@
 
     /* ── SEARCH BOX ── */
     .search-area {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.1);
-      border-radius: 20px;
-      padding: 30px 32px;
-      margin-bottom: 38px;
+      background: linear-gradient(135deg, rgba(8,15,28,.95) 0%, rgba(6,11,22,.98) 100%);
+      border: 1px solid rgba(0,229,255,.14);
+      border-radius: 22px;
+      padding: 32px 36px;
+      margin-bottom: 40px;
       position: relative;
       overflow: hidden;
       animation: cornerPulse 3.5s ease-in-out infinite;
+      box-shadow: 0 4px 32px rgba(0,0,0,.4), 0 0 60px rgba(0,229,255,.03);
     }
     /* Top edge sweep */
     .search-area::before {
@@ -428,9 +440,9 @@
     .search-input-wrap:focus-within svg { color: var(--accent); }
     #stockInput {
       width: 100%;
-      height: 50px;
-      background: rgba(0,0,0,.4);
-      border: 1px solid rgba(0,229,255,.12);
+      height: 52px;
+      background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(4,8,20,.45));
+      border: 1px solid rgba(0,229,255,.15);
       border-radius: 12px;
       padding: 0 16px 0 46px;
       font-size: .92rem;
@@ -442,12 +454,12 @@
     }
     #stockInput::placeholder { color: var(--muted); }
     #stockInput:focus {
-      border-color: rgba(0,229,255,.4);
-      background: rgba(0,229,255,.03);
-      box-shadow: 0 0 0 3px rgba(0,229,255,.08), 0 0 24px rgba(0,229,255,.06), inset 0 0 20px rgba(0,229,255,.02);
+      border-color: rgba(0,229,255,.5);
+      background: rgba(0,229,255,.04);
+      box-shadow: 0 0 0 3px rgba(0,229,255,.1), 0 0 32px rgba(0,229,255,.08), inset 0 0 24px rgba(0,229,255,.03);
     }
     #searchBtn {
-      height: 50px;
+      height: 52px;
       padding: 0 28px;
       background: linear-gradient(135deg, #00e5ff, #0099ff);
       color: #000;
@@ -508,12 +520,12 @@
     #result.loading { opacity: .4; }
 
     .stock-card {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.12);
-      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(8,15,30,.97) 0%, rgba(6,12,24,.98) 100%);
+      border: 1px solid rgba(0,229,255,.16);
+      border-radius: 20px;
       overflow: hidden;
-      animation: fadeUp .35s cubic-bezier(.22,1,.36,1), cornerPulse 4s ease-in-out infinite;
-      box-shadow: 0 0 0 1px rgba(0,229,255,.06), 0 8px 32px rgba(0,0,0,.35);
+      animation: fadeUp .38s cubic-bezier(.22,1,.36,1), cornerPulse 4s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(0,229,255,.07), 0 12px 48px rgba(0,0,0,.5), 0 0 40px rgba(0,229,255,.04);
       position: relative;
     }
     .stock-card::before {
@@ -536,8 +548,8 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      border-bottom: 1px solid rgba(0,229,255,.07);
-      background: rgba(0,229,255,.02);
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: linear-gradient(90deg, rgba(0,229,255,.03), rgba(0,100,200,.02), transparent);
       flex-wrap: wrap;
       position: relative;
       overflow: hidden;
@@ -551,15 +563,16 @@
       animation: borderGlow 3s ease-in-out infinite;
     }
     .stock-badge {
-      background: rgba(0,229,255,.1);
-      border: 1px solid rgba(0,229,255,.3);
-      border-radius: 8px;
-      padding: 5px 14px;
+      background: linear-gradient(135deg, rgba(0,229,255,.14), rgba(0,150,255,.08));
+      border: 1px solid rgba(0,229,255,.38);
+      border-radius: 10px;
+      padding: 6px 16px;
       font-family: 'Orbitron', monospace;
       font-size: .95rem;
       color: var(--accent);
       letter-spacing: .12em;
-      text-shadow: 0 0 12px rgba(0,229,255,.4);
+      text-shadow: 0 0 16px rgba(0,229,255,.5);
+      box-shadow: 0 0 20px rgba(0,229,255,.1), inset 0 1px 0 rgba(0,229,255,.15);
     }
     .stock-name-title {
       font-size: 1.1rem;
@@ -584,6 +597,21 @@
     }
 
     /* ── FAVORITE HEART BUTTON ── */
+    /* 名稱 + 愛心群組 */
+    .stock-name-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* 右側市場標籤 + 日期群組 */
+    .card-header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
     .fav-btn {
       margin-left: auto;
       width: 34px; height: 34px;
@@ -625,20 +653,21 @@
     }
     .fav-toast {
       position: fixed;
-      bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: rgba(15,25,45,.95);
-      border: 1px solid rgba(0,229,255,.2);
-      border-radius: 20px;
-      padding: 10px 20px;
+      bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: linear-gradient(135deg, rgba(10,20,40,.96), rgba(8,15,32,.98));
+      border: 1px solid rgba(0,229,255,.25);
+      border-radius: 24px;
+      padding: 12px 22px;
       font-family: 'Share Tech Mono', monospace;
       font-size: .78rem;
       color: var(--text);
-      z-index: 999;
+      z-index: 9999;
       opacity: 0;
       pointer-events: none;
-      transition: all .3s cubic-bezier(.22,1,.36,1);
+      transition: all .32s cubic-bezier(.22,1,.36,1);
       white-space: nowrap;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 20px rgba(0,229,255,.08);
     }
     .fav-toast.show {
       opacity: 1;
@@ -646,7 +675,7 @@
     }
 
     /* ── WATCHLIST MODAL ── */
-    #watchlistModal .modal { max-width: 780px; }
+    #watchlistModal .modal { max-width: 820px; }
     .wl-empty {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; gap: 14px;
@@ -656,93 +685,159 @@
     .wl-empty svg { width: 48px; height: 48px; opacity: .2; color: var(--red); }
     .wl-empty-title { font-size: .95rem; font-weight: 600; color: var(--text-dim); }
     .wl-empty-sub { font-size: .8rem; color: var(--text-faint); line-height: 1.7; }
-    .wl-grid {
+
+    /* ── 列表式 watchlist ── */
+    .wl-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 12px 20px 20px;
+    }
+    .wl-row {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
-      padding: 20px;
-    }
-    .wl-card {
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(0,229,255,.1);
-      border-radius: 14px;
-      padding: 16px 18px;
+      grid-template-columns: 160px 1fr 1fr 1fr 1fr 110px;
+      align-items: center;
+      gap: 0;
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(0,229,255,.055);
+      transition: background .18s;
+      border-radius: 10px;
       position: relative;
-      transition: all .25s;
-      animation: fadeUp .3s ease;
+      animation: fadeUp .25s ease both;
     }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-    .wl-card:hover {
-      border-color: rgba(0,229,255,.25);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0,0,0,.3), 0 0 12px rgba(0,229,255,.06);
+    .wl-row:last-child { border-bottom: none; }
+    .wl-row:hover { background: rgba(0,229,255,.035); }
+    .wl-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity .2s;
     }
-    .wl-card-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    .wl-row:hover::before { opacity: .6; }
+
+    /* 表頭 */
+    .wl-list-header {
+      display: grid;
+      grid-template-columns: 160px 1fr 1fr 1fr 1fr 110px;
+      gap: 0;
+      padding: 10px 16px 10px;
+      border-bottom: 1px solid rgba(0,229,255,.15);
+      margin-bottom: 2px;
+      background: rgba(0,229,255,.025);
+      border-radius: 10px 10px 0 0;
     }
+    .wl-list-header span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .14em;
+      color: rgba(0,229,255,.7);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .wl-list-header span:not(:first-child) { text-align: center; }
+    .wl-list-header span:last-child { text-align: right; }
+
+    /* 個股名稱欄 */
+    .wl-row-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .wl-code {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .8rem; font-weight: 700;
+      font-size: .78rem; font-weight: 700;
       color: var(--accent);
       background: rgba(0,229,255,.08);
-      border: 1px solid rgba(0,229,255,.18);
-      border-radius: 6px; padding: 3px 9px;
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 6px; padding: 2px 9px;
+      text-shadow: 0 0 8px rgba(0,229,255,.3);
+      flex-shrink: 0;
     }
     .wl-name {
-      font-size: .8rem; font-weight: 600; color: #fff;
-      flex: 1; min-width: 0;
+      font-size: .8rem; font-weight: 500; color: var(--text);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+
+    /* 數值欄 */
+    .wl-row-val {
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+    .wl-row-val .wl-label {
+      display: block;
+      font-size: .58rem;
+      letter-spacing: .08em;
+      color: var(--text-faint);
+      margin-bottom: 3px;
+      font-weight: 400;
+    }
+    .wl-row-val.pos { color: var(--red); }
+    .wl-row-val.neg { color: var(--green); }
+    .wl-row-val.neu { color: var(--text-dim); }
+    .wl-row-val.loading { color: var(--muted); animation: pulse 1.5s infinite; }
+
+    /* 操作欄 */
+    .wl-row-actions {
+      display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    }
+    .wl-card-query {
+      font-family: 'Share Tech Mono', monospace; font-size: .62rem;
+      color: var(--accent); cursor: pointer;
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.15);
+      border-radius: 6px;
+      padding: 4px 10px;
+      letter-spacing: .04em;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .wl-card-query:hover {
+      background: rgba(0,229,255,.12);
+      border-color: rgba(0,229,255,.3);
+      box-shadow: 0 0 10px rgba(0,229,255,.1);
+    }
     .wl-del-btn {
-      width: 22px; height: 22px; border-radius: 50%;
+      width: 24px; height: 24px; border-radius: 50%;
       border: 1px solid rgba(255,61,90,.2);
       background: transparent; color: rgba(255,61,90,.4);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: all .2s;
     }
     .wl-del-btn:hover { background: rgba(255,61,90,.15); color: #ff3d5a; border-color: rgba(255,61,90,.5); }
-    .wl-del-btn svg { width: 11px; height: 11px; }
-    .wl-metrics {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-    }
-    .wl-metric {
-      background: rgba(0,229,255,.03); border: 1px solid rgba(0,229,255,.06);
-      border-radius: 8px; padding: 8px 10px;
-    }
-    .wl-metric-label {
-      font-size: .64rem; color: var(--text-faint); letter-spacing: .06em; margin-bottom: 4px;
-    }
-    .wl-metric-val {
+    .wl-del-btn svg { width: 10px; height: 10px; }
+
+    .wl-header-date {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .82rem; font-weight: 700;
+      font-size: .68rem; color: var(--text-dim);
+      letter-spacing: .06em;
+      background: rgba(0,229,255,.04);
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 6px; padding: 4px 10px;
+      margin-right: 4px;
     }
-    .wl-metric-val.pos { color: var(--red); }
-    .wl-metric-val.neg { color: var(--green); }
-    .wl-metric-val.neu { color: var(--text-dim); }
-    .wl-metric-val.loading { color: var(--muted); animation: pulse 1.5s infinite; }
-    .wl-card-footer {
-      margin-top: 10px; padding-top: 10px;
-      border-top: 1px solid rgba(0,229,255,.06);
-      display: flex; align-items: center; justify-content: space-between;
+    .wl-name-tag {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .78rem; color: var(--text-dim);
     }
-    .wl-card-date { font-family: 'Share Tech Mono', monospace; font-size: .62rem; color: var(--text-faint); }
-    .wl-card-query {
-      font-family: 'Share Tech Mono', monospace; font-size: .62rem;
-      color: var(--accent); cursor: pointer; opacity: .6;
-      transition: opacity .2s; background: none; border: none; padding: 0;
-    }
-    .wl-card-query:hover { opacity: 1; }
-    .wl-header-actions {
-      display: flex; align-items: center; gap: 10px;
-    }
+    .wl-header-actions { display: flex; align-items: center; gap: 10px; }
     .wl-refresh-btn {
       display: flex; align-items: center; gap: 6px;
       font-family: 'Share Tech Mono', monospace; font-size: .68rem;
-      color: var(--text-dim); background: rgba(0,229,255,.05);
-      border: 1px solid rgba(0,229,255,.12); border-radius: 8px;
-      padding: 5px 12px; cursor: pointer; transition: all .2s;
+      color: var(--text-dim);
+      background: linear-gradient(135deg, rgba(0,229,255,.06), rgba(0,150,200,.03));
+      border: 1px solid rgba(0,229,255,.15); border-radius: 10px;
+      padding: 6px 14px; cursor: pointer; transition: all .22s cubic-bezier(.22,1,.36,1);
     }
-    .wl-refresh-btn:hover { color: var(--accent); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.1); }
+    .wl-refresh-btn:hover {
+      color: var(--accent);
+      border-color: rgba(0,229,255,.35);
+      background: rgba(0,229,255,.12);
+      box-shadow: 0 0 12px rgba(0,229,255,.1);
+      transform: translateY(-1px);
+    }
     .wl-refresh-btn svg { width: 12px; height: 12px; }
     .wl-guest-notice {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -769,10 +864,10 @@
       padding: 16px;
     }
     .metric-cell {
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(0,229,255,.08);
-      border-radius: 14px;
-      padding: 18px 20px;
+      background: linear-gradient(135deg, rgba(0,0,0,.45), rgba(4,8,18,.4));
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 16px;
+      padding: 20px 22px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -780,6 +875,7 @@
       position: relative;
       overflow: hidden;
       cursor: default;
+      box-shadow: inset 0 1px 0 rgba(0,229,255,.04);
     }
     /* Bottom accent bar */
     .metric-cell::after {
@@ -853,8 +949,8 @@
     /* ── MARKET OVERVIEW ── */
     .market-section { margin-bottom: 42px; }
     .market-wrap {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.1);
+      background: linear-gradient(135deg, rgba(7,13,26,.97), rgba(5,10,20,.98));
+      border: 1px solid rgba(0,229,255,.13);
       border-radius: 22px;
       padding: 30px 26px 22px;
       position: relative;
@@ -890,19 +986,20 @@
     @media (max-width: 480px) { .market-grid { grid-template-columns: 1fr; } }
 
     .market-card {
-      background: rgba(0,0,0,.4);
-      border: 1px solid rgba(0,229,255,.08);
-      border-radius: 16px;
-      padding: 20px 22px;
+      background: linear-gradient(135deg, rgba(0,0,0,.5), rgba(4,8,20,.45));
+      border: 1px solid rgba(0,229,255,.1);
+      border-radius: 18px;
+      padding: 22px 24px;
       position: relative;
       overflow: hidden;
-      transition: all .3s cubic-bezier(.22,1,.36,1);
+      transition: all .32s cubic-bezier(.22,1,.36,1);
       cursor: default;
+      box-shadow: inset 0 1px 0 rgba(0,229,255,.05), 0 2px 12px rgba(0,0,0,.3);
     }
     .market-card:hover {
-      border-color: rgba(0,229,255,.35);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 28px rgba(0,229,255,.1);
+      border-color: rgba(0,229,255,.4);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 50px rgba(0,0,0,.5), 0 0 36px rgba(0,229,255,.12), inset 0 1px 0 rgba(0,229,255,.1);
     }
     /* Hover top line - all blue */
     .market-card::before {
@@ -972,6 +1069,10 @@
       transition: opacity .3s;
     }
     .market-card:hover .market-card-icon { opacity: .28; }
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.35rem;
@@ -1004,8 +1105,8 @@
 
     /* ── UPDATE TIMELINE ── */
     .timeline {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.1);
+      background: linear-gradient(135deg, rgba(8,15,28,.96), rgba(6,12,22,.98));
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 16px;
       padding: 24px 28px;
       position: relative;
@@ -1021,14 +1122,17 @@
     }
     .timeline-title {
       font-family: 'Orbitron', monospace;
-      font-size: .78rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text);
+      letter-spacing: .04em;
+      background: linear-gradient(90deg, #fff 60%, rgba(0,229,255,.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 22px;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: .06em;
     }
     .timeline-list {
       list-style: none;
@@ -1051,10 +1155,12 @@
       align-items: center;
       gap: 14px;
       font-size: .82rem;
-      padding: 9px 0;
+      padding: 10px 8px;
+      border-radius: 8px;
       position: relative;
-      transition: all .2s;
+      transition: all .22s;
     }
+    .timeline-item:hover { background: rgba(0,229,255,.04); }
     .timeline-item:hover .timeline-label { color: var(--text); }
     .timeline-dot {
       width: 8px; height: 8px;
@@ -1081,8 +1187,8 @@
 
     /* ── DATA NOTE ── */
     .data-note {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.1);
+      background: linear-gradient(135deg, rgba(8,15,28,.96), rgba(6,12,22,.98));
+      border: 1px solid rgba(0,229,255,.12);
       border-radius: 16px;
       padding: 24px 26px;
       position: relative;
@@ -1098,26 +1204,31 @@
     }
     .data-note-title {
       font-family: 'Orbitron', monospace;
-      font-size: .78rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text);
+      letter-spacing: .04em;
+      background: linear-gradient(90deg, #fff 60%, rgba(0,229,255,.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: .06em;
     }
     .data-note-item {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      font-size: .78rem;
+      font-size: .79rem;
       color: var(--text-dim);
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0,229,255,.05);
-      line-height: 1.55;
-      transition: color .2s;
+      padding: 9px 6px;
+      border-bottom: 1px solid rgba(0,229,255,.06);
+      border-radius: 6px;
+      line-height: 1.6;
+      transition: all .2s;
     }
+    .data-note-item:hover { background: rgba(0,229,255,.03); color: var(--text); }
     .data-note-item:hover { color: var(--text); }
     .data-note-item:last-child { border-bottom: none; }
     .data-note-dot {
@@ -1133,9 +1244,10 @@
     /* ── FOOTER ── */
     footer {
       position: relative;
-      z-index: 1;
-      border-top: 1px solid rgba(0,229,255,.06);
-      background: rgba(4,8,15,.95);
+      z-index: 0;
+      border-top: 1px solid rgba(0,229,255,.08);
+      background: linear-gradient(180deg, rgba(3,6,14,.97), rgba(2,4,10,.99));
+      box-shadow: 0 -2px 30px rgba(0,0,0,.4);
     }
     .footer-disclaimer {
       padding: 20px 40px 24px;
@@ -1348,6 +1460,7 @@
     @media (max-width: 600px) {
       header { padding: 0 12px 0 10px; height: 54px; }
       .header-right .market-status { display: none; }
+      .header-fav-btn { width: 32px; height: 32px; }
       .logo-text { font-size: .88rem; }
       .logo-sub  { font-size: .5rem; }
       .logo-icon {
@@ -1365,9 +1478,9 @@
       .hamburger { margin-right: 10px; width: 36px; height: 36px; }
       #clock { font-size: .62rem; letter-spacing: .02em; padding: 4px 9px; }
       #musicBtn { width: 30px; height: 30px; }
-      main { padding: 20px 12px 60px; }
-      h2.section-title { font-size: 1.1rem; }
-      .search-area { padding: 18px 14px; border-radius: 14px; }
+      main { padding: 18px 10px 56px; }
+      h2.section-title { font-size: 1.12rem; }
+      .search-area { padding: 20px 16px; border-radius: 18px; }
       .search-row { flex-direction: column; gap: 8px; }
       #stockInput { height: 46px; font-size: .88rem; }
       #searchBtn { height: 46px; font-size: .8rem; padding: 0 18px; }
@@ -1382,7 +1495,7 @@
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
       .market-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .market-card { padding: 14px; border-radius: 12px; }
-      .market-card-value { font-size: 1.1rem; }
+      .market-card-value { font-size: 1.15rem; }
       .market-card-icon { width: 52px; height: 52px; }
       .bottom-grid { grid-template-columns: 1fr; gap: 14px; }
       .timeline { padding: 18px 16px; }
@@ -1396,14 +1509,29 @@
       .holiday-next-box { padding: 8px 14px; }
       .holiday-next-val { font-size: .85rem; }
       /* Fix modal on mobile - ensure full visibility */
-      .modal-overlay { padding: 12px 10px; align-items: flex-start; padding-top: 60px; }
-      .modal { max-height: calc(100vh - 80px); border-radius: 16px; }
-      .modal-header { padding: 16px 16px 12px; }
-      .modal-tabs { padding: 10px 16px 0; gap: 6px; }
-      .modal-tab { padding: 7px 16px; font-size: .74rem; }
-      .modal-toggle { padding: 10px 16px; }
-      .modal-body { padding: 0 12px 12px; }
-      .top50-table td, .top50-table th { padding: 8px 8px; }
+      .modal-overlay { padding: 8px 8px; align-items: flex-start; padding-top: 52px; }
+      .modal { max-height: calc(100vh - 68px); border-radius: 18px; }
+      .modal-header { padding: 16px 18px 12px; }
+      .modal-tabs { padding: 10px 14px 0; gap: 5px; flex-wrap: wrap; }
+      .modal-tab { padding: 7px 14px; font-size: .72rem; }
+      .modal-toggle { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+      .modal-body { padding: 0 10px 10px; }
+      .top50-table td, .top50-table th { padding: 9px 8px; }
+      /* 手機版 watchlist - 精簡 grid */
+      .wl-list { padding: 8px 10px 16px; }
+      .wl-list-header { display: none; }
+      .wl-row {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 8px 4px;
+        padding: 14px 12px;
+        border-radius: 12px;
+        border-bottom: 1px solid rgba(0,229,255,.06);
+        margin-bottom: 4px;
+      }
+      .wl-row-name { grid-column: 1 / -1; }
+      .wl-row-val { text-align: left; }
+      .wl-row-actions { grid-column: 1 / -1; justify-content: flex-start; gap: 8px; margin-top: 4px; }
     }
     @media (max-width: 360px) {
       .metrics-grid { grid-template-columns: 1fr; }
@@ -1413,9 +1541,9 @@
     /* ── HAMBURGER BUTTON ── */
     .hamburger {
       width: 40px; height: 40px;
-      border-radius: 10px;
-      border: 1px solid rgba(0,229,255,.15);
-      background: rgba(0,229,255,.05);
+      border-radius: 11px;
+      border: 1px solid rgba(0,229,255,.18);
+      background: rgba(0,229,255,.06);
       color: var(--accent);
       cursor: pointer;
       display: flex;
@@ -1424,13 +1552,14 @@
       justify-content: center;
       gap: 5px;
       flex-shrink: 0;
-      transition: all .2s;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
       margin-right: 16px;
     }
     .hamburger:hover {
-      background: rgba(0,229,255,.12);
-      border-color: rgba(0,229,255,.35);
-      box-shadow: 0 0 14px rgba(0,229,255,.2);
+      background: rgba(0,229,255,.14);
+      border-color: rgba(0,229,255,.4);
+      box-shadow: 0 0 20px rgba(0,229,255,.25);
+      transform: scale(1.05);
     }
     .hamburger span {
       display: block;
@@ -1461,64 +1590,82 @@
     .drawer {
       position: fixed;
       top: 0; left: 0;
-      width: 260px;
+      width: 272px;
       height: 100vh;
-      background: rgba(4,8,15,.99);
-      border-right: 1px solid rgba(0,229,255,.1);
+      background: linear-gradient(180deg, rgba(5,10,22,.98) 0%, rgba(4,8,15,.99) 100%);
+      border-right: 1px solid rgba(0,229,255,.12);
       z-index: 160;
       display: flex;
       flex-direction: column;
       transform: translateX(-100%);
-      transition: transform .32s cubic-bezier(.22,1,.36,1);
-      overflow-y: auto;
+      transition: transform .36s cubic-bezier(.22,1,.36,1);
+      overflow: hidden;
       scrollbar-width: none;
-      box-shadow: 4px 0 40px rgba(0,0,0,.5);
-      justify-content: space-between;
+      box-shadow: 6px 0 60px rgba(0,0,0,.7), 2px 0 20px rgba(0,229,255,.04);
     }
     .drawer::-webkit-scrollbar { display: none; }
     .drawer.open { transform: translateX(0); }
+    .drawer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,229,255,.04) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 30% at 20% 100%, rgba(0,100,200,.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .drawer > * { position: relative; z-index: 1; }
     .drawer::after {
       content: '';
       position: absolute;
       top: 0; right: 0;
       width: 1px; height: 100%;
       background: linear-gradient(to bottom,
-        transparent,
-        rgba(0,229,255,.5) 30%,
-        rgba(0,229,255,.5) 70%,
-        transparent);
+        transparent 0%,
+        rgba(0,229,255,.6) 25%,
+        rgba(0,170,255,.8) 50%,
+        rgba(0,229,255,.6) 75%,
+        transparent 100%);
       animation: borderGlow 3s ease-in-out infinite;
+      z-index: 2;
     }
 
     .drawer-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 16px 14px;
-      border-bottom: 1px solid rgba(0,229,255,.07);
+      padding: 18px 18px 16px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
       flex-shrink: 0;
+      background: linear-gradient(90deg, rgba(0,229,255,.03), transparent);
     }
     .drawer-brand {
       font-family: 'Orbitron', monospace;
-      font-size: .72rem;
+      font-size: .75rem;
       font-weight: 700;
       color: var(--accent);
-      letter-spacing: .14em;
-      text-shadow: 0 0 12px rgba(0,229,255,.3);
+      letter-spacing: .16em;
+      text-shadow: 0 0 16px rgba(0,229,255,.45);
+      background: linear-gradient(90deg, var(--accent), #00aaff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .drawer-close {
       width: 28px; height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(0,229,255,.15);
-      background: rgba(0,229,255,.04);
+      border-radius: 8px;
+      border: 1px solid rgba(0,229,255,.18);
+      background: rgba(0,229,255,.05);
       color: var(--text-dim);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all .2s;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
     }
-    .drawer-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.08); }
+    .drawer-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.1); transform: scale(1.1) rotate(90deg); box-shadow: 0 0 10px rgba(255,61,90,.15); }
     .drawer-close svg { width: 13px; height: 13px; }
 
     .drawer-section { padding: 12px 12px; display: flex; flex-direction: column; gap: 4px; }
@@ -1548,14 +1695,14 @@
       display: flex;
       align-items: center;
       gap: 11px;
-      padding: 11px 12px;
+      padding: 12px 14px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: .73rem;
+      font-size: .74rem;
       letter-spacing: .06em;
       color: var(--text-dim);
       cursor: pointer;
-      border-radius: 10px;
-      transition: all .2s;
+      border-radius: 12px;
+      transition: all .22s cubic-bezier(.22,1,.36,1);
       white-space: nowrap;
       background: none;
       border: 1px solid transparent;
@@ -1563,40 +1710,80 @@
       text-align: left;
       position: relative;
       overflow: hidden;
+      text-decoration: none;
     }
     .nav-item::before {
       content: '';
       position: absolute;
-      left: 0; top: 20%; bottom: 20%;
-      width: 2px;
-      background: var(--accent);
+      left: 0; top: 15%; bottom: 15%;
+      width: 2.5px;
+      background: linear-gradient(to bottom, var(--accent), rgba(0,170,255,.6));
       opacity: 0;
       border-radius: 2px;
-      transition: opacity .2s;
+      transition: opacity .22s;
     }
-    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .65; transition: opacity .2s; }
-    .nav-item:hover { color: var(--text); background: rgba(0,229,255,.05); border-color: rgba(0,229,255,.1); }
-    .nav-item:hover svg { opacity: 1; }
+    /* shimmer sweep on hover */
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.06), transparent);
+      transition: left .4s ease;
+      pointer-events: none;
+    }
+    .nav-item:hover::after { left: 160%; }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .6; transition: all .22s; }
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(0,229,255,.06);
+      border-color: rgba(0,229,255,.14);
+      transform: translateX(2px);
+      box-shadow: inset 0 0 20px rgba(0,229,255,.02);
+    }
+    .nav-item:hover svg { opacity: 1; transform: scale(1.1); }
     .nav-item.active {
       color: var(--accent);
-      background: rgba(0,229,255,.08);
-      border-color: rgba(0,229,255,.18);
-      text-shadow: 0 0 10px rgba(0,229,255,.2);
+      background: linear-gradient(90deg, rgba(0,229,255,.1), rgba(0,229,255,.06));
+      border-color: rgba(0,229,255,.22);
+      text-shadow: 0 0 10px rgba(0,229,255,.25);
+      transform: translateX(2px);
     }
     .nav-item.active::before { opacity: 1; }
-    .nav-item.active svg { opacity: 1; color: var(--accent); }
+    .nav-item.active svg { opacity: 1; color: var(--accent); filter: drop-shadow(0 0 4px rgba(0,229,255,.5)); }
     .nav-badge {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .54rem;
-      background: rgba(0,229,255,.12);
-      border: 1px solid rgba(0,229,255,.22);
+      font-size: .52rem;
+      background: linear-gradient(135deg, rgba(0,229,255,.15), rgba(0,150,255,.1));
+      border: 1px solid rgba(0,229,255,.28);
       color: var(--accent);
-      border-radius: 4px;
-      padding: 1px 6px;
-      letter-spacing: .06em;
+      border-radius: 5px;
+      padding: 2px 7px;
+      letter-spacing: .05em;
       margin-left: auto;
+      text-shadow: 0 0 8px rgba(0,229,255,.4);
+      box-shadow: 0 0 8px rgba(0,229,255,.08);
     }
-    .drawer-divider { height: 1px; background: rgba(0,229,255,.06); margin: 6px 12px; }
+    .drawer-divider { height: 1px; background: rgba(0,229,255,.07); margin: 8px 12px; }
+    /* 我的最愛 nav-item 特別樣式 */
+    .nav-item.fav-nav-item {
+      color: rgba(255,100,100,.7);
+      border-color: rgba(255,61,90,.08);
+    }
+    .nav-item.fav-nav-item svg { color: rgba(255,61,90,.6); opacity: .8; }
+    .nav-item.fav-nav-item:hover {
+      color: #ff3d5a;
+      background: rgba(255,61,90,.07);
+      border-color: rgba(255,61,90,.2);
+      box-shadow: inset 0 0 20px rgba(255,61,90,.03);
+    }
+    .nav-item.fav-nav-item:hover svg { color: #ff3d5a; opacity: 1; }
+    .nav-item.fav-nav-item .nav-badge {
+      background: rgba(255,61,90,.15);
+      border-color: rgba(255,61,90,.3);
+      color: #ff3d5a;
+      text-shadow: 0 0 6px rgba(255,61,90,.4);
+    }
     .page-body { position: relative; z-index: 1; }
     .main-content { min-width: 0; overflow-x: hidden; }
 
@@ -1604,40 +1791,111 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.82);
-      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,.86);
+      backdrop-filter: blur(12px) saturate(1.2);
       z-index: 300;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 24px 20px;
-      animation: fadeIn .2s ease;
+      padding: 72px 20px 24px;
+      animation: fadeIn .22s ease;
     }
     .modal-overlay.open { display: flex; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .modal {
-      background: var(--surface);
-      border: 1px solid rgba(0,229,255,.2);
-      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(8,14,28,.98) 0%, rgba(5,10,20,.99) 100%);
+      border: 1px solid rgba(0,229,255,.22);
+      border-radius: 22px;
       width: 100%;
-      max-width: 860px;
+      max-width: 880px;
       max-height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
       position: relative;
-      overflow: hidden;
+      overflow: visible;
       box-shadow:
-        0 0 0 1px rgba(0,229,255,.05),
-        0 0 80px rgba(0,0,0,.7),
-        0 0 40px rgba(0,229,255,.08),
-        inset 0 1px 0 rgba(0,229,255,.12);
-      animation: modalUp .28s cubic-bezier(.22,1,.36,1);
-      margin-top: 0;
+        0 0 0 1px rgba(0,229,255,.06),
+        0 0 100px rgba(0,0,0,.8),
+        0 0 60px rgba(0,229,255,.1),
+        0 30px 80px rgba(0,0,0,.6),
+        inset 0 1px 0 rgba(0,229,255,.15);
+      animation: modalUp .32s cubic-bezier(.22,1,.36,1);
     }
+    .modal-body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      border-radius: 0 0 22px 22px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    /* ── Tooltip (info icon) ── */
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,229,255,.55);
+      color: rgba(0,229,255,.85);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all .25s;
+      position: relative;
+      box-shadow: 0 0 6px rgba(0,229,255,.25);
+      filter: drop-shadow(0 0 3px rgba(0,229,255,.4));
+    }
+    .info-icon svg { width: 10px; height: 10px; stroke-width: 2.5; }
+    .info-icon:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,229,255,.08);
+      box-shadow: 0 0 12px rgba(0,229,255,.6), 0 0 24px rgba(0,229,255,.25);
+      filter: drop-shadow(0 0 6px rgba(0,229,255,.7));
+    }
+    .info-icon .tooltip {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4,10,22,.98);
+      border: 1px solid rgba(0,229,255,.2);
+      border-left: 2px solid rgba(0,229,255,.6);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .76rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s;
+      z-index: 9999;
+      box-shadow: 0 8px 32px rgba(0,0,0,.8), 0 0 0 1px rgba(0,229,255,.1), -4px 0 20px rgba(0,229,255,.08);
+      min-width: 220px;
+      max-width: 280px;
+      white-space: normal;
+      word-break: break-word;
+      text-align: left;
+    }
+    .info-icon .tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-bottom-color: rgba(0,229,255,.2);
+    }
+    /* tooltip via JS only */
+
     @keyframes modalUp {
-      from { opacity: 0; transform: translateY(24px) scale(.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(28px) scale(.95); filter: blur(4px); }
+      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+    }
+    @keyframes modalDown {
+      from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+      to   { opacity: 0; transform: translateY(16px) scale(.97); filter: blur(3px); }
     }
     /* Top sweep */
     .modal::before {
@@ -1661,40 +1919,49 @@
     }
 
     .modal-header {
-      padding: 22px 28px 18px;
-      border-bottom: 1px solid rgba(0,229,255,.1);
+      padding: 24px 30px 20px;
+      border-bottom: 1px solid rgba(0,229,255,.12);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
-      background: rgba(0,229,255,.02);
+      background: linear-gradient(90deg, rgba(0,229,255,.03), transparent, rgba(0,229,255,.02));
     }
     .modal-title {
       font-family: 'Orbitron', monospace;
       font-size: 1.08rem;
       font-weight: 700;
-      color: #fff;
+      background: linear-gradient(90deg, #fff 50%, rgba(0,229,255,.85));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       letter-spacing: .07em;
       display: flex;
       align-items: center;
       gap: 10px;
-      text-shadow: 0 0 24px rgba(0,229,255,.3);
+      filter: drop-shadow(0 0 12px rgba(0,229,255,.2));
     }
-    .modal-title svg { color: var(--accent); width: 18px; height: 18px; }
+    .modal-title svg { color: var(--accent); width: 18px; height: 18px; filter: drop-shadow(0 0 6px rgba(0,229,255,.5)); }
     .modal-close {
       width: 34px; height: 34px;
-      border-radius: 9px;
-      border: 1px solid rgba(0,229,255,.15);
-      background: rgba(0,229,255,.05);
+      border-radius: 10px;
+      border: 1px solid rgba(0,229,255,.18);
+      background: rgba(0,229,255,.06);
       color: var(--text-dim);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all .2s;
+      transition: all .22s cubic-bezier(.22,1,.36,1);
       flex-shrink: 0;
     }
-    .modal-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.08); }
+    .modal-close:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,61,90,.1);
+      box-shadow: 0 0 14px rgba(255,61,90,.2);
+      transform: scale(1.08) rotate(90deg);
+    }
     .modal-close svg { width: 14px; height: 14px; }
 
     /* ── Tab 切換 ── */
@@ -1707,16 +1974,16 @@
       background: rgba(0,0,0,.2);
     }
     .modal-tab {
-      padding: 8px 28px;
+      padding: 9px 28px;
       font-family: 'Share Tech Mono', monospace;
       font-size: .8rem;
       letter-spacing: .12em;
       color: var(--text-dim);
       cursor: pointer;
-      border-radius: 9px;
-      border: 1px solid rgba(0,229,255,.1);
-      transition: all .22s;
-      background: transparent;
+      border-radius: 10px;
+      border: 1px solid rgba(0,229,255,.12);
+      transition: all .22s cubic-bezier(.22,1,.36,1);
+      background: rgba(0,0,0,.2);
       white-space: nowrap;
       position: relative;
       overflow: hidden;
@@ -1734,10 +2001,10 @@
     .modal-tab:hover::before { opacity: 1; }
     .modal-tab.active {
       color: var(--accent);
-      border-color: rgba(0,229,255,.5);
-      background: rgba(0,229,255,.1);
-      text-shadow: 0 0 12px rgba(0,229,255,.5);
-      box-shadow: 0 0 18px rgba(0,229,255,.1), inset 0 0 12px rgba(0,229,255,.05);
+      border-color: rgba(0,229,255,.55);
+      background: linear-gradient(135deg, rgba(0,229,255,.14), rgba(0,150,255,.08));
+      text-shadow: 0 0 14px rgba(0,229,255,.6);
+      box-shadow: 0 0 22px rgba(0,229,255,.12), inset 0 0 16px rgba(0,229,255,.06), 0 2px 8px rgba(0,0,0,.3);
     }
 
     /* ── Buy / Sell 切換 ── */
@@ -1750,16 +2017,21 @@
       border-bottom: 1px solid rgba(0,229,255,.06);
     }
     .toggle-btn {
-      padding: 8px 24px;
-      border-radius: 9px;
+      padding: 9px 22px;
+      border-radius: 10px;
       font-family: 'Share Tech Mono', monospace;
       font-size: .78rem;
       letter-spacing: .1em;
       cursor: pointer;
       border: 1px solid rgba(0,229,255,.15);
-      background: transparent;
+      background: rgba(0,0,0,.2);
       color: var(--text-dim);
-      transition: all .22s;
+      transition: all .22s cubic-bezier(.22,1,.36,1);
+    }
+    .toggle-btn:hover:not(.active) {
+      border-color: rgba(0,229,255,.3);
+      color: var(--text);
+      background: rgba(0,229,255,.05);
     }
     .toggle-btn.buy.active {
       background: rgba(255,61,90,.12);
@@ -1775,7 +2047,7 @@
       text-shadow: 0 0 10px rgba(0,230,118,.4);
       box-shadow: 0 0 14px rgba(0,230,118,.1);
     }
-    .toggle-btn:hover { border-color: rgba(0,229,255,.3); color: var(--text); }
+
     .modal-date {
       margin-left: auto;
       font-family: 'Share Tech Mono', monospace;
@@ -1821,7 +2093,11 @@
       border-bottom: 1px solid rgba(0,229,255,.04);
       transition: background .15s;
     }
-    .top50-table tr:hover td { background: rgba(0,229,255,.04); }
+    .top50-table tr:hover td { background: rgba(0,229,255,.06); }
+    .top50-table tbody tr {
+      transition: background .15s;
+      position: relative;
+    }
     .top50-table tr:last-child td { border-bottom: none; }
 
     /* 排名 */
@@ -1838,7 +2114,9 @@
       color: var(--accent);
       text-shadow: 0 0 10px rgba(0,229,255,.5);
     }
-    .rank-num.top1 { color: #ffd600; text-shadow: 0 0 10px rgba(255,214,0,.5); }
+    .rank-num.top1 { color: #ffd600; text-shadow: 0 0 14px rgba(255,214,0,.7); font-size:.95rem; }
+    .rank-num.top2 { color: #c0c0c0; text-shadow: 0 0 10px rgba(192,192,192,.5); }
+    .rank-num.top3-only { color: #cd7f32; text-shadow: 0 0 10px rgba(205,127,50,.5); }
 
     /* 代碼 */
     .stock-id-cell {
@@ -1907,11 +2185,18 @@
     }
 
     /* ── DRAWER USER PANEL ── */
+    .drawer-nav-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    .drawer-nav-body::-webkit-scrollbar { display: none; }
     .drawer-footer {
-      margin-top: auto;
+      flex-shrink: 0;
       border-top: 1px solid rgba(0,229,255,.07);
       padding: 16px 14px;
-      flex-shrink: 0;
+      background: rgba(4,8,15,.98);
     }
 
     /* 未登入狀態 */
@@ -1921,21 +2206,23 @@
       justify-content: center;
       gap: 10px;
       width: 100%;
-      padding: 11px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.15);
-      background: rgba(255,255,255,.05);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       color: var(--text);
       font-family: 'Share Tech Mono', monospace;
-      font-size: .75rem;
+      font-size: .76rem;
       letter-spacing: .08em;
       cursor: pointer;
-      transition: all .22s;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     }
     .auth-login-btn:hover {
-      background: rgba(255,255,255,.1);
-      border-color: rgba(255,255,255,.3);
-      box-shadow: 0 0 14px rgba(255,255,255,.06);
+      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border-color: rgba(255,255,255,.35);
+      box-shadow: 0 0 20px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.08);
+      transform: translateY(-1px);
     }
     .auth-login-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -2125,10 +2412,11 @@
 <body>
 
 <!-- BACKGROUND LAYERS -->
-<div class="bg-layer bg-layer-grid"></div>
-<div class="bg-layer bg-layer-vignette"></div>
-<div class="bg-layer bg-layer-scanlines"></div>
-<canvas id="particleCanvas"></canvas>
+<!-- GALAXY BACKGROUND -->
+<canvas id="galaxyCanvas"></canvas>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+<canvas id="particleCanvas" style="display:none"></canvas>
 
 <audio src="MapleMusic.mp3" loop></audio>
 
@@ -2156,6 +2444,7 @@
       <div class="status-dot"></div>
       <span>TWSE / TPEX LIVE</span>
     </div>
+
     <button id="musicBtn" onclick="toggleMusic()" title="播放/暫停音樂">
       <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="5 3 19 12 5 21 5 3"/>
@@ -2183,76 +2472,78 @@
     </button>
   </div>
 
-  <div class="drawer-section">
-    <button class="nav-item active" onclick="scrollToMain()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      個股查詢
-    </button>
-    <button class="nav-item" id="navWatchlist" onclick="openWatchlistModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-      </svg>
-      我的最愛
-      <span class="nav-badge" id="favCountBadge" style="display:none">0</span>
-    </button>
-    <button class="nav-item" onclick="openTop50Modal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      上市買賣超
-      <span class="nav-badge">TOP 50</span>
-    </button>
-    <button class="nav-item" onclick="openOtcTop50Modal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      櫃買買賣超
-      <span class="nav-badge">TOP 50</span>
-    </button>
-    <button class="nav-item" onclick="scrollToMarket()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-      </svg>
-      法人大盤資訊
-    </button>
-    <button class="nav-item" onclick="scrollToTimeline()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-      更新時程
-    </button>
-  </div>
+  <!-- 可捲動的導覽區 -->
+  <div class="drawer-nav-body">
+    <div class="drawer-section">
+      <button class="nav-item active" onclick="scrollToMain()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        個股查詢
+      </button>
+      <button class="nav-item fav-nav-item" id="navWatchlist" onclick="openWatchlistModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        我的最愛
+        <span class="nav-badge" id="favCountBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="openTop50Modal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        上市買賣超
+        <span class="nav-badge">TOP 50</span>
+      </button>
+      <button class="nav-item" onclick="openOtcTop50Modal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        櫃買買賣超
+        <span class="nav-badge">TOP 50</span>
+      </button>
+      <button class="nav-item" onclick="scrollToMarket()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        法人大盤資訊
+      </button>
+      <button class="nav-item" onclick="scrollToTimeline()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        更新時程
+      </button>
+    </div>
 
-  <div class="drawer-divider"></div>
+    <div class="drawer-divider"></div>
 
-  <div class="drawer-section">
-    <span class="about-section-label">關於本站</span>
-    <a class="nav-item" href="stock_site/about.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      關於我們
-    </a>
-    <a class="nav-item" href="stock_site/privacy.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      隱私政策
-    </a>
-    <a class="nav-item" href="stock_site/disclaimer.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-      免責聲明
-    </a>
-  </div>
+    <div class="drawer-section">
+      <span class="about-section-label">關於本站</span>
+      <a class="nav-item" href="stock_site/about.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        關於我們
+      </a>
+      <a class="nav-item" href="stock_site/privacy.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        隱私政策
+      </a>
+      <a class="nav-item" href="stock_site/disclaimer.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        免責聲明
+      </a>
+    </div>
+    <div class="drawer-divider"></div>
+  </div><!-- /drawer-nav-body -->
 
-  <div class="drawer-divider"></div>
   <div class="drawer-footer">
-
     <!-- 未登入：顯示 Google 登入按鈕 -->
     <div id="authLoginWrap" class="auth-login-btn-wrap">
       <button class="auth-login-btn" onclick="window._googleSignIn && window._googleSignIn()">
@@ -2307,6 +2598,18 @@
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         上市三大法人買賣超排行
+        <span class="info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          <span class="tooltip">
+            <b style="color:var(--accent);display:block;margin-bottom:5px">📊 上市三大法人買賣超排行</b>
+            查看當日盤後，外資、投信、自營商在上市股票的買賣超前 50 名排行。<br><br>
+            · 切換上方法人頁籤可分別查看外資／投信／自營商<br>
+            · 買超前50 / 賣超前50 可切換<br>
+            · 數值單位為「張」<br>
+            · 已自動排除權證、認購、認售等非個股商品<br><br>
+            <span style="color:var(--text-faint);font-size:.72rem">資料來源：臺灣證券交易所 TWSE</span>
+          </span>
+        </span>
       </div>
       <button class="modal-close" onclick="closeTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2347,6 +2650,18 @@
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         櫃買三大法人買賣超排行
+        <span class="info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          <span class="tooltip">
+            <b style="color:var(--accent);display:block;margin-bottom:5px">📊 上櫃三大法人買賣超排行</b>
+            查看當日盤後，外資、投信、自營商在上櫃股票的買賣超前 50 名排行。<br><br>
+            · 切換上方法人頁籤可分別查看外資／投信／自營商<br>
+            · 買超前50 / 賣超前50 可切換<br>
+            · 數值單位為「張」<br>
+            · 已自動排除權證、認購、認售等非個股商品<br><br>
+            <span style="color:var(--text-faint);font-size:.72rem">資料來源：櫃買中心 TPEx</span>
+          </span>
+        </span>
       </div>
       <button class="modal-close" onclick="closeOtcTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2387,8 +2702,21 @@
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
         我的最愛
+        <span class="info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          <span class="tooltip" style="max-width:280px">
+            <b style="color:#ff3d5a;display:block;margin-bottom:5px">♥ 我的最愛</b>
+            收藏常追蹤的個股，快速查看當日盤後三大法人買賣超資料。<br><br>
+            <b style="color:var(--text);font-size:.73rem">如何使用：</b><br>
+            查詢個股後，點擊結果右上角 ♥ 加入收藏<br><br>
+            <b style="color:var(--text);font-size:.73rem">⚠ 裝置同步說明：</b><br>
+            收藏清單儲存於本機瀏覽器（localStorage），<b style="color:var(--yellow)">不同裝置或瀏覽器不會自動同步</b>。更換設備後需重新加入。<br><br>
+            <span style="color:var(--text-faint);font-size:.72rem">登入 Google 帳號後才可使用此功能</span>
+          </span>
+        </span>
       </div>
       <div class="wl-header-actions">
+        <span class="wl-header-date" id="wlHeaderDate">--</span>
         <button class="wl-refresh-btn" id="wlRefreshBtn" onclick="loadWatchlist()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
@@ -2438,11 +2766,28 @@
 <!-- TICKER TAPE -->
 <div class="ticker-wrap">
   <div class="ticker-track" id="tickerTrack">
+    <!-- Set A -->
     <div class="ticker-item"><span class="label">外資</span> <span class="t-foreign">--</span></div>
     <div class="ticker-item"><span class="label">投信</span> <span class="t-trust">--</span></div>
     <div class="ticker-item"><span class="label">自營商</span> <span class="t-prop">--</span></div>
     <div class="ticker-item"><span class="label">融資增減</span> <span class="t-margin">--</span></div>
     <div class="ticker-item"><span class="label">三大法人</span> <span class="t-total">--</span></div>
+    <div class="ticker-item"><span class="label">外資</span> <span class="t-foreign">--</span></div>
+    <div class="ticker-item"><span class="label">投信</span> <span class="t-trust">--</span></div>
+    <div class="ticker-item"><span class="label">自營商</span> <span class="t-prop">--</span></div>
+    <div class="ticker-item"><span class="label">融資增減</span> <span class="t-margin">--</span></div>
+    <div class="ticker-item"><span class="label">三大法人</span> <span class="t-total">--</span></div>
+    <!-- Set B (identical copy for seamless loop) -->
+    <div class="ticker-item ticker-clone"><span class="label">外資</span> <span class="t-foreign">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">投信</span> <span class="t-trust">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">自營商</span> <span class="t-prop">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">融資增減</span> <span class="t-margin">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">三大法人</span> <span class="t-total">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">外資</span> <span class="t-foreign">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">投信</span> <span class="t-trust">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">自營商</span> <span class="t-prop">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">融資增減</span> <span class="t-margin">--</span></div>
+    <div class="ticker-item ticker-clone"><span class="label">三大法人</span> <span class="t-total">--</span></div>
   </div>
 </div>
 
@@ -2451,8 +2796,8 @@
   <!-- SEARCH -->
   <div class="search-area">
     <div class="search-top">
-      <p class="section-label">· Individual Stock Query ·</p>
-      <h2 class="section-title">盤後買賣超查詢</h2>
+      <p class="section-label">· 個股查詢 ·</p>
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)">盤後買賣超查詢</text></svg>
     </div>
     <div class="search-row">
       <div class="search-input-wrap">
@@ -2488,7 +2833,7 @@
     <div class="market-wrap">
       <div class="market-title-row">
         <div>
-          <p class="section-label">· Market Overview ·</p>
+          <p class="section-label">· 大盤資訊 ·</p>
           <h2 class="section-title">今日盤後大盤資訊</h2>
         </div>
         <div class="refresh-badge">
@@ -2615,25 +2960,30 @@
   <div class="bottom-grid">
 
     <div class="timeline">
-      <div class="timeline-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        UPDATE SCHEDULE
+      <p class="section-label" style="margin-bottom:6px">· 更新排程 ·</p>
+      <div style="margin-bottom:22px;display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Orbitron',monospace;font-size:1.38rem;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.18));">盤後更新時程</span>
+        <span class="info-icon" style="margin-left:2px;flex-shrink:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          <span class="tooltip" style="left:0;transform:none;max-width:260px">
+            <b style="color:var(--accent);display:block;margin-bottom:5px">⏰ 關於更新時間</b>
+            以下時間為預估的資料更新時間，<b style="color:var(--yellow)">不代表資料一定會準時更新</b>。<br><br>
+            實際更新時間取決於臺灣證券交易所（TWSE）及櫃買中心（TPEx）的官方資料發布時程，通常相當準時，但偶有延遲。<br><br>
+            <span style="color:var(--text-faint);font-size:.72rem">建議資料未出現時稍候幾分鐘再查詢</span>
+          </span>
+        </span>
       </div>
       <ul class="timeline-list" id="timeline"></ul>
     </div>
 
     <div class="data-note">
-      <div class="data-note-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        DATA NOTES
+      <p class="section-label" style="margin-bottom:6px">· 說明 ·</p>
+      <div style="margin-bottom:16px;">
+        <span style="font-family:'Orbitron',monospace;font-size:1.38rem;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.18));">數據說明</span>
       </div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位為當日融資餘額總額，非增減值，僅供參考</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>個股買賣超單位為「張」（1張＝1000股）；大盤金額單位為「億元」</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span>＝法人買超（買進）、<span style="color:var(--green)">綠色</span>＝法人賣超（賣出）— 注意與股價漲跌顏色相反</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位顯示當日市場融資餘額總額，數值越高代表散戶槓桿越大，需留意追繳風險</span></div>
     </div>
 
   </div>
@@ -2669,6 +3019,9 @@
 <script>
 // ── CONFIG ───────────────────────────────────────────────────────────────────
 // ── 自動判斷環境，不需要手動切換 ──────────────────────────────
+// api_routes.py 更新紀錄：
+//   - 新增 @app.route("/") → 直接 serve index.html，讓 Render 可用單一 port 提供前端
+//   - API 路由保持不變：/api/trading_status, /api/top50, /api/otc_top50, /api/stock, /api/market
 const API_BASE = (() => {
   const host = window.location.hostname;
   if (host === '127.0.0.1' || host === 'localhost') {
@@ -2678,119 +3031,509 @@ const API_BASE = (() => {
 })();
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
-(function initParticles() {
-  const canvas = document.getElementById('particleCanvas');
+(function initGalaxy() {
+  const canvas = document.getElementById('galaxyCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
+  let W, H;
 
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { resize(); initLayers(); });
   resize();
 
-  const COLORS = ['rgba(0,229,255,', 'rgba(0,170,255,', 'rgba(0,230,118,'];
-  function mkParticle() {
+  // ── 星星層（三層深度）──────────────────────────────────────────────────────
+  let stars = [];
+  function mkStar(layer) {
+    // layer 0=遠 1=中 2=近
+    const sizes  = [.3, .7, 1.3];
+    const speeds = [.02, .06, .14];
+    const alphas = [.35, .6, .9];
     return {
       x: Math.random() * W,
       y: Math.random() * H,
-      vx: (Math.random() - .5) * .35,
-      vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.6 + .4,
-      a: Math.random() * .55 + .15,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      life: Math.random() * 250 + 120,
-      age: 0,
+      r: sizes[layer] + Math.random() * sizes[layer] * .8,
+      a: alphas[layer] * (.5 + Math.random() * .5),
+      speed: speeds[layer] * (.6 + Math.random() * .8),
+      twinklePhase: Math.random() * Math.PI * 2,
+      twinkleSpeed: .008 + Math.random() * .018,
+      layer,
+      color: Math.random() > .85
+        ? (Math.random() > .5 ? 'rgba(160,200,255,' : 'rgba(200,220,255,')
+        : 'rgba(255,255,255,',
     };
   }
 
-  for (let i = 0; i < 100; i++) particles.push(mkParticle());
-
-  // Data lines (occasional streaks) - enhanced
-  let streaks = [];
-  function mkStreak() {
+  // ── 流星 ──────────────────────────────────────────────────────────────────
+  let meteors = [];
+  function mkMeteor(isBig) {
+    const angle = (12 + Math.random() * 25) * Math.PI / 180;
+    const speed = isBig ? (3 + Math.random() * 3) : (5 + Math.random() * 9);
     return {
-      x: Math.random() * W, y: -10,
-      speed: Math.random() * 3 + 1.2,
-      len: Math.random() * 80 + 40,
-      a: Math.random() * .35 + .1,
-      w: Math.random() * 1 + .3,
-      color: Math.random() > .7 ? 'rgba(0,230,118,' : 'rgba(0,229,255,',
+      x: Math.random() * W * 1.4 - W * .2,
+      y: -40,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      len: isBig ? (260 + Math.random() * 180) : (70 + Math.random() * 140),
+      a: isBig ? .9 : (.6 + Math.random() * .4),
+      w: isBig ? (2.5 + Math.random() * 1.5) : (.4 + Math.random() * .9),
+      life: 0,
+      maxLife: isBig ? (90 + Math.random() * 50) : (55 + Math.random() * 40),
+      isBig,
+      color: isBig ? '220,200,160' : '255,255,255',
     };
   }
-  setInterval(() => { if (streaks.length < 16) streaks.push(mkStreak()); }, 500);
+  // 普通流星：每 1.8s 機率出現，最多 5 條
+  setInterval(() => {
+    if (meteors.filter(m => !m.isBig).length < 5 && Math.random() > .45)
+      meteors.push(mkMeteor(false));
+  }, 1800);
+  // 巨大隕石：每 22~35s 隨機一次
+  function scheduleAsteroid() {
+    setTimeout(() => {
+      meteors.push(mkMeteor(true));
+      scheduleAsteroid();
+    }, 22000 + Math.random() * 13000);
+  }
+  scheduleAsteroid();
 
-  // Floating hex glyphs
-  const HEX_CHARS = '01アイウエ∑∂∆◈◉▣';
-  let glyphs = [];
-  function mkGlyph() {
+  // ── 4顆特色行星定義 ──────────────────────────────────────────────────────────
+  const PLANETS = [
+    // 藍色土星型大行星（右上，有雙環 + 衛星）
+    {
+      id: 0, xr: .82, yr: .18, r: 38,
+      phase: 0, glowPulse: 0, rotAngle: 0,
+      color: '60,120,220', hl: '140,200,255', dark: '10,30,90',
+      atm: '80,150,255',
+      hasRing: true, ringTilt: .3, ringColor: '100,160,240', ringW: 2.2,
+      hasRing2: true, ring2Color: '60,100,180',
+      hasMoon: true, moonR: 5, moonOrbit: 68, moonSpeed: .008, moonAngle: 0, moonColor: '180,200,230',
+      hasAsteroid: false,
+      stripes: ['20,60,160','40,100,200','80,150,240','30,70,170'],
+    },
+    // 紫色毒氣星（左下，有大氣層旋渦 + 小月亮）
+    {
+      id: 1, xr: .12, yr: .72, r: 22,
+      phase: 1.2, glowPulse: 1.0, rotAngle: 0,
+      color: '140,60,200', hl: '200,130,255', dark: '40,10,80',
+      atm: '160,80,220',
+      hasRing: false,
+      hasMoon: true, moonR: 3, moonOrbit: 40, moonSpeed: .014, moonAngle: 2.0, moonColor: '200,170,240',
+      hasAsteroid: true, asteroidR: 52, asteroidN: 8,
+      stripes: ['100,40,160','160,80,220','120,50,180','80,30,140'],
+    },
+    // 翡翠綠星（右下，有細環 + 雙衛星）
+    {
+      id: 2, xr: .88, yr: .68, r: 18,
+      phase: 2.4, glowPulse: 2.0, rotAngle: 0,
+      color: '40,160,120', hl: '100,220,170', dark: '10,50,40',
+      atm: '60,200,140',
+      hasRing: true, ringTilt: .18, ringColor: '80,200,150', ringW: 1.4,
+      hasRing2: false,
+      hasMoon: true, moonR: 2.5, moonOrbit: 34, moonSpeed: .018, moonAngle: 1.0, moonColor: '160,230,200',
+      hasMoon2: true, moon2R: 1.8, moon2Orbit: 46, moon2Speed: -.011, moon2Angle: 3.5, moon2Color: '200,240,220',
+      hasAsteroid: false,
+      stripes: ['30,120,90','60,180,130','40,150,110','20,100,70'],
+    },
+    // 橙紅熔岩星（左上，有爆炸大氣 + 小行星帶）
+    {
+      id: 3, xr: .25, yr: .10, r: 14,
+      phase: 3.6, glowPulse: 3.0, rotAngle: 0,
+      color: '200,90,40', hl: '255,180,100', dark: '80,20,10',
+      atm: '240,120,60',
+      hasRing: false,
+      hasMoon: false,
+      hasAsteroid: true, asteroidR: 30, asteroidN: 6,
+      stripes: ['160,60,20','220,100,50','180,80,30','140,50,15'],
+    },
+  ];
+
+  // ── 星系核心光暈 ──────────────────────────────────────────────────────────
+  const CORE = { x: W * .72, y: H * .28, r: 180 };
+
+  // ── 數據光束（細線）──────────────────────────────────────────────────────
+  let beams = [];
+  function mkBeam() {
     return {
       x: Math.random() * W, y: -20,
-      speed: Math.random() * .6 + .2,
-      char: HEX_CHARS[Math.floor(Math.random() * HEX_CHARS.length)],
-      a: Math.random() * .08 + .02,
-      size: Math.random() * 8 + 8,
+      speed: .8 + Math.random() * 1.8,
+      len: 40 + Math.random() * 120,
+      a: .08 + Math.random() * .18,
+      w: .3 + Math.random() * .6,
+      hue: Math.random() > .7 ? '0,200,120' : '0,220,255',
     };
   }
-  setInterval(() => { if (glyphs.length < 20) glyphs.push(mkGlyph()); }, 1200);
+  setInterval(() => { if (beams.length < 18) beams.push(mkBeam()); }, 350);
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  // ── 軌道光點（圍繞核心的小點）────────────────────────────────────────────
+  let orbs = Array.from({length: 6}, (_, i) => ({
+    angle: (i / 6) * Math.PI * 2,
+    r: 100 + i * 22,
+    speed: .0004 + i * .00015,
+    size: .8 + Math.random() * 1,
+    a: .3 + Math.random() * .4,
+  }));
 
-    // Draw glyphs
-    glyphs = glyphs.filter(g => g.y < H + 30);
-    glyphs.forEach(g => {
-      g.y += g.speed;
-      ctx.font = `${g.size}px "Share Tech Mono", monospace`;
-      ctx.fillStyle = `rgba(0,229,255,${g.a})`;
-      ctx.fillText(g.char, g.x, g.y);
-    });
+  function initLayers() {
+    stars = [];
+    for (let i = 0; i < 180; i++) stars.push(mkStar(0));
+    for (let i = 0; i < 80;  i++) stars.push(mkStar(1));
+    for (let i = 0; i < 35;  i++) stars.push(mkStar(2));
+    CORE.x = W * .72; CORE.y = H * .28;
+    PLANETS.forEach(P => { P.x = W * P.xr; P.y = H * P.yr; });
+  }
 
-    // Draw connections - slightly wider range
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const d  = Math.sqrt(dx*dx + dy*dy);
-        if (d < 140) {
-          ctx.strokeStyle = `rgba(0,229,255,${.09 * (1 - d/140)})`;
-          ctx.lineWidth = .5;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.stroke();
-        }
+  // ── 行星繪製函式 ─────────────────────────────────────────────────────────────
+  function drawPlanet(P) {
+    const px = P.x, py = P.y, pr = P.r;
+    P.phase     += .0006;
+    P.glowPulse += .016;
+    P.rotAngle  += .0012;
+    const pGlow = .5 + Math.sin(P.glowPulse) * .5;
+
+    // 大氣層外暈
+    const atmGrd = ctx.createRadialGradient(px, py, pr * .8, px, py, pr * 3.8);
+    atmGrd.addColorStop(0,  `rgba(${P.atm},${.12 + pGlow * .06})`);
+    atmGrd.addColorStop(.3, `rgba(${P.atm},${.05 + pGlow * .02})`);
+    atmGrd.addColorStop(1,  'rgba(0,0,0,0)');
+    ctx.fillStyle = atmGrd;
+    ctx.beginPath();
+    ctx.arc(px, py, pr * 3.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 行星本體（帶自轉紋路的 clip）
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px, py, pr, 0, Math.PI * 2);
+    ctx.clip();
+
+    // 底色
+    const baseGrd = ctx.createRadialGradient(px - pr*.35, py - pr*.35, pr*.05, px, py, pr);
+    baseGrd.addColorStop(0,  `rgba(${P.hl},.95)`);
+    baseGrd.addColorStop(.4, `rgba(${P.color},.92)`);
+    baseGrd.addColorStop(.8, `rgba(${P.dark},.9)`);
+    baseGrd.addColorStop(1,  `rgba(${P.dark},.95)`);
+    ctx.fillStyle = baseGrd;
+    ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
+
+    // 自轉橫條紋
+    const stripeCount = P.stripes.length;
+    for (let si = 0; si < stripeCount; si++) {
+      const sy = py - pr + (si / stripeCount) * pr * 2;
+      const sw = pr * (.3 + .2 * Math.sin(P.rotAngle * 2 + si));
+      const sAlpha = .18 + .08 * Math.sin(P.rotAngle + si * 1.3);
+      ctx.fillStyle = `rgba(${P.stripes[si]},${sAlpha})`;
+      ctx.fillRect(px - pr, sy, pr * 2, pr / stripeCount * .85);
+    }
+
+    // 球面光澤
+    const gloss = ctx.createRadialGradient(px - pr*.3, py - pr*.4, 0, px - pr*.1, py - pr*.1, pr*.85);
+    gloss.addColorStop(0,  'rgba(255,255,255,.22)');
+    gloss.addColorStop(.4, 'rgba(255,255,255,.06)');
+    gloss.addColorStop(1,  'rgba(0,0,0,0)');
+    ctx.fillStyle = gloss;
+    ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
+
+    ctx.restore();
+
+    // 環後半（行星後面）
+    if (P.hasRing) {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(P.phase * .06);
+      const rA = pr * 1.88, rB = pr * .36;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rA, rB, P.ringTilt, Math.PI, Math.PI * 2);
+      ctx.strokeStyle = `rgba(${P.ringColor},${.2 + pGlow * .07})`;
+      ctx.lineWidth = pr * P.ringW * .09;
+      ctx.stroke();
+      if (P.hasRing2) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rA * 1.25, rB * 1.25, P.ringTilt, Math.PI, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${P.ring2Color},${.12 + pGlow * .04})`;
+        ctx.lineWidth = pr * .1;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 小行星帶
+    if (P.hasAsteroid) {
+      for (let ai = 0; ai < P.asteroidN; ai++) {
+        const aAngle = (ai / P.asteroidN) * Math.PI * 2 + P.rotAngle * .4;
+        const aR     = P.asteroidR + Math.sin(ai * 2.3) * 5;
+        const ax     = px + Math.cos(aAngle) * aR;
+        const ay     = py + Math.sin(aAngle) * aR * .4;
+        const aSize  = .8 + Math.sin(ai * 1.7) * .4;
+        ctx.fillStyle = `rgba(160,150,140,${.25 + Math.sin(P.glowPulse + ai) * .08})`;
+        ctx.beginPath();
+        ctx.arc(ax, ay, aSize, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
-    // Draw particles
-    particles.forEach((p, idx) => {
-      p.x += p.vx; p.y += p.vy; p.age++;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      if (p.age > p.life) particles[idx] = mkParticle();
-      const fade = Math.min(p.age / 20, 1) * Math.min((p.life - p.age) / 20, 1);
-      ctx.fillStyle = p.color + (p.a * fade) + ')';
+    // 行星本體遮前面（讓環後半看起來在後面）
+    if (P.hasRing) {
+      ctx.save();
+      const pbodyFront = ctx.createRadialGradient(px - pr*.35, py - pr*.35, pr*.05, px, py, pr);
+      pbodyFront.addColorStop(0,  `rgba(${P.hl},.95)`);
+      pbodyFront.addColorStop(.4, `rgba(${P.color},.92)`);
+      pbodyFront.addColorStop(.8, `rgba(${P.dark},.9)`);
+      pbodyFront.addColorStop(1,  `rgba(${P.dark},.95)`);
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.arc(px, py, pr - .5, 0, Math.PI * 2);
+      ctx.fillStyle = pbodyFront;
+      ctx.fill();
+      ctx.restore();
+
+      // 環前半
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(P.phase * .06);
+      const rA = pr * 1.88, rB = pr * .36;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rA, rB, P.ringTilt, 0, Math.PI);
+      ctx.strokeStyle = `rgba(${P.ringColor},${.38 + pGlow * .1})`;
+      ctx.lineWidth = pr * P.ringW * .09;
+      ctx.stroke();
+      if (P.hasRing2) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rA * 1.25, rB * 1.25, P.ringTilt, 0, Math.PI);
+        ctx.strokeStyle = `rgba(${P.ring2Color},${.22 + pGlow * .05})`;
+        ctx.lineWidth = pr * .1;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 衛星 1
+    if (P.hasMoon) {
+      P.moonAngle += P.moonSpeed;
+      const mx = px + Math.cos(P.moonAngle) * P.moonOrbit;
+      const my = py + Math.sin(P.moonAngle) * P.moonOrbit * .45;
+      const mg = ctx.createRadialGradient(mx - P.moonR*.3, my - P.moonR*.3, 0, mx, my, P.moonR);
+      mg.addColorStop(0,  `rgba(${P.moonColor},.9)`);
+      mg.addColorStop(.6, `rgba(${P.moonColor},.65)`);
+      mg.addColorStop(1,  `rgba(${P.moonColor},.3)`);
+      ctx.fillStyle = mg;
+      ctx.beginPath();
+      ctx.arc(mx, my, P.moonR, 0, Math.PI * 2);
+      ctx.fill();
+      // 月亮光暈
+      const mhg = ctx.createRadialGradient(mx, my, P.moonR, mx, my, P.moonR * 3);
+      mhg.addColorStop(0,  `rgba(${P.moonColor},${.08 + pGlow * .04})`);
+      mhg.addColorStop(1,  'rgba(0,0,0,0)');
+      ctx.fillStyle = mhg;
+      ctx.beginPath();
+      ctx.arc(mx, my, P.moonR * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 衛星 2（翡翠星專屬）
+    if (P.hasMoon2) {
+      P.moon2Angle += P.moon2Speed;
+      const mx2 = px + Math.cos(P.moon2Angle) * P.moon2Orbit;
+      const my2 = py + Math.sin(P.moon2Angle) * P.moon2Orbit * .45;
+      const mg2 = ctx.createRadialGradient(mx2, my2, 0, mx2, my2, P.moon2R);
+      mg2.addColorStop(0,  `rgba(${P.moon2Color},.85)`);
+      mg2.addColorStop(1,  `rgba(${P.moon2Color},.3)`);
+      ctx.fillStyle = mg2;
+      ctx.beginPath();
+      ctx.arc(mx2, my2, P.moon2R, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // ── 星座定義（12星座，座標為 0~1 比例）──────────────────────────────────────
+  const CONSTELLATIONS = [
+    { name: 'Orion', stars: [[.12,.18],[.15,.25],[.18,.20],[.14,.32],[.20,.32],[.16,.38],[.22,.38]], lines: [[0,1],[1,2],[2,0],[3,4],[3,5],[4,6],[5,6],[1,3],[2,4]] },
+    { name: 'Ursa Major', stars: [[.55,.12],[.60,.10],[.65,.11],[.70,.13],[.72,.19],[.67,.22],[.61,.20]], lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]] },
+    { name: 'Cassiopeia', stars: [[.78,.08],[.82,.14],[.86,.09],[.90,.16],[.94,.11]], lines: [[0,1],[1,2],[2,3],[3,4]] },
+    { name: 'Leo', stars: [[.30,.60],[.34,.54],[.38,.52],[.42,.55],[.40,.62],[.36,.68],[.32,.66]], lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[3,2]] },
+    { name: 'Scorpius', stars: [[.76,.55],[.80,.58],[.84,.56],[.88,.60],[.86,.66],[.82,.70],[.78,.68],[.80,.74],[.84,.78]], lines: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8]] },
+    { name: 'Lyra', stars: [[.44,.30],[.47,.34],[.50,.32],[.48,.38],[.45,.40]], lines: [[0,1],[1,2],[2,0],[1,3],[3,4],[4,2]] },
+  ];
+
+  // 星座靜態位置（基於螢幕比例，帶微小漂移）
+  let constDrift = { x: 0, y: 0, tx: 0, ty: 0 };
+  setInterval(() => {
+    constDrift.tx = (Math.random() - .5) * 8;
+    constDrift.ty = (Math.random() - .5) * 8;
+  }, 6000);
+
+  function drawConstellations() {
+    constDrift.x += (constDrift.tx - constDrift.x) * .002;
+    constDrift.y += (constDrift.ty - constDrift.y) * .002;
+
+    const pulse = .5 + Math.sin(frame * .007) * .5; // 0~1 脈衝
+
+    CONSTELLATIONS.forEach(c => {
+      const pts = c.stars.map(([px, py]) => ({
+        x: px * W + constDrift.x,
+        y: py * H + constDrift.y,
+      }));
+
+      // 畫連線
+      ctx.save();
+      c.lines.forEach(([a, b]) => {
+        const grad = ctx.createLinearGradient(pts[a].x, pts[a].y, pts[b].x, pts[b].y);
+        grad.addColorStop(0,   `rgba(140,200,255,${.06 + pulse * .04})`);
+        grad.addColorStop(.5,  `rgba(180,220,255,${.10 + pulse * .06})`);
+        grad.addColorStop(1,   `rgba(140,200,255,${.06 + pulse * .04})`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = .6;
+        ctx.beginPath();
+        ctx.moveTo(pts[a].x, pts[a].y);
+        ctx.lineTo(pts[b].x, pts[b].y);
+        ctx.stroke();
+      });
+
+      // 畫星座星點（比普通星星稍大稍亮）
+      pts.forEach((p, i) => {
+        const tw  = .7 + Math.sin(frame * .015 + i * 1.2) * .3;
+        const r   = 1.2 + Math.random() * .3;
+        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+        grd.addColorStop(0,   `rgba(200,230,255,${(.7 + pulse * .3) * tw})`);
+        grd.addColorStop(.4,  `rgba(160,210,255,${(.3 + pulse * .2) * tw})`);
+        grd.addColorStop(1,   'rgba(100,180,255,0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+        ctx.fill();
+        // 核心亮點
+        ctx.fillStyle = `rgba(240,248,255,${(.85 + pulse * .15) * tw})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    });
+  }
+
+  initLayers();
+
+  let frame = 0;
+  let scrollY = 0;
+  let targetScrollY = 0;
+  window.addEventListener('scroll', () => { targetScrollY = window.scrollY; }, { passive: true });
+  function draw() {
+    scrollY += (targetScrollY - scrollY) * 0.04;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    // ── 星系核心光暈 ──────────────────────────────────────────────────────
+    const corePulse = 1 + Math.sin(frame * .012) * .06;
+    const coreGrad = ctx.createRadialGradient(CORE.x, CORE.y, 0, CORE.x, CORE.y, CORE.r * corePulse);
+    coreGrad.addColorStop(0,   'rgba(80,140,255,.14)');
+    coreGrad.addColorStop(.35, 'rgba(40,80,200,.07)');
+    coreGrad.addColorStop(.7,  'rgba(0,40,120,.03)');
+    coreGrad.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(CORE.x, CORE.y, CORE.r * corePulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ── 軌道光點 ──────────────────────────────────────────────────────────
+    orbs.forEach(orb => {
+      orb.angle += orb.speed;
+      const ox = CORE.x + Math.cos(orb.angle) * orb.r;
+      const oy = CORE.y + Math.sin(orb.angle) * orb.r * .38;
+      ctx.fillStyle = `rgba(100,180,255,${orb.a * (.7 + Math.sin(frame * .02 + orb.angle) * .3)})`;
+      ctx.beginPath();
+      ctx.arc(ox, oy, orb.size, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Draw streaks - with dynamic color
-    streaks = streaks.filter(s => s.y < H + s.len);
-    streaks.forEach(s => {
-      s.y += s.speed;
-      const col = s.color || 'rgba(0,229,255,';
-      const grad = ctx.createLinearGradient(s.x, s.y - s.len, s.x, s.y);
-      grad.addColorStop(0, col + '0)');
-      grad.addColorStop(.4, col + s.a + ')');
-      grad.addColorStop(1, col + '0)');
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = s.w;
+    // ── 星星 ──────────────────────────────────────────────────────────────
+    stars.forEach(s => {
+      // 緩慢漂移
+      s.x -= s.speed * .1;
+      s.y += s.speed * .04;
+      const px = s.layer === 0 ? scrollY * 0.008 : s.layer === 1 ? scrollY * 0.018 : scrollY * 0.03;
+      if (s.x < -2) s.x = W + 2;
+      if (s.y > H + 2) s.y = -2;
+
+      // 閃爍
+      s.twinklePhase += s.twinkleSpeed;
+      const tw = .65 + Math.sin(s.twinklePhase) * .35;
+      ctx.fillStyle = s.color + (s.a * tw) + ')';
       ctx.beginPath();
-      ctx.moveTo(s.x, s.y - s.len);
-      ctx.lineTo(s.x, s.y);
+      ctx.arc(s.x, s.y - px, s.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 近距離星點加十字光芒
+      if (s.layer === 2 && s.r > 1.5) {
+        const glow = s.a * tw * .3;
+        ctx.strokeStyle = s.color + glow + ')';
+        ctx.lineWidth = .5;
+        ctx.beginPath();
+        ctx.moveTo(s.x - s.r * 3, s.y - px);
+        ctx.lineTo(s.x + s.r * 3, s.y - px);
+        ctx.moveTo(s.x, s.y - s.r * 3 - px);
+        ctx.lineTo(s.x, s.y + s.r * 3 - px);
+        ctx.stroke();
+      }
+    });
+
+    // ── 星座 ──────────────────────────────────────────────────────────────
+    drawConstellations();
+
+    // ── 行星（4顆）────────────────────────────────────────────────────────
+    PLANETS.forEach(P => drawPlanet(P));
+
+    // ── 流星 ──────────────────────────────────────────────────────────────
+    meteors = meteors.filter(m => m.life < m.maxLife);
+    meteors.forEach(m => {
+      m.x += m.vx; m.y += m.vy; m.life++;
+      const progress = m.life / m.maxLife;
+      const alpha    = m.a * Math.sin(progress * Math.PI);
+      const spd      = Math.sqrt(m.vx * m.vx + m.vy * m.vy);
+      const tailX    = m.x - m.vx * (m.len / spd);
+      const tailY    = m.y - m.vy * (m.len / spd);
+      const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
+      grad.addColorStop(0,   `rgba(${m.color},0)`);
+      grad.addColorStop(.5,  `rgba(${m.color},${alpha * (m.isBig ? .55 : .5)})`);
+      grad.addColorStop(.85, `rgba(${m.color},${alpha})`);
+      grad.addColorStop(1,   `rgba(${m.color},${alpha * .6})`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = m.w;
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(m.x, m.y);
+      ctx.stroke();
+      // 頭部光點
+      if (m.isBig) {
+        // 巨大隕石 — 爆炸感光點 + 暈
+        const ag = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.w * 8);
+        ag.addColorStop(0,  `rgba(255,240,200,${alpha})`);
+        ag.addColorStop(.4, `rgba(220,180,120,${alpha * .5})`);
+        ag.addColorStop(1,  'rgba(0,0,0,0)');
+        ctx.fillStyle = ag;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.w * 8, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.w * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // ── 數據光束 ──────────────────────────────────────────────────────────
+    beams = beams.filter(b => b.y < H + b.len);
+    beams.forEach(b => {
+      b.y += b.speed;
+      const grad = ctx.createLinearGradient(b.x, b.y - b.len, b.x, b.y);
+      grad.addColorStop(0, `rgba(${b.hue},0)`);
+      grad.addColorStop(.5, `rgba(${b.hue},${b.a})`);
+      grad.addColorStop(1, `rgba(${b.hue},0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = b.w;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y - b.len);
+      ctx.lineTo(b.x, b.y);
       ctx.stroke();
     });
 
@@ -2801,7 +3544,7 @@ const API_BASE = (() => {
 
 // ── HOLIDAY DETECTION（統一由後端 /api/trading_status 判斷）─────────────────
 async function initHolidayBanner() {
-  //return; // 先暫時關閉休市偵測功能，避免開發期間頻繁呼叫 API
+  return; // 先暫時關閉休市偵測功能，避免開發期間頻繁呼叫 API !!!!!!
   try {
     const res  = await fetch(`${API_BASE}/api/trading_status`);
     const data = await res.json();
@@ -2892,7 +3635,13 @@ async function loadMarket() {
       const el = document.getElementById(id);
       if (!el) return;
       if (val == null) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value neutral'; }
-      else { el.textContent = val; el.className = 'market-card-value ' + (colorClass || ''); }
+      else {
+        el.textContent = val;
+        el.className = 'market-card-value ' + (colorClass || '');
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = 'countUp .4s cubic-bezier(.22,1,.36,1)';
+      }
     };
     set('m-foreign',      data.foreign,      colorVal(data.foreign));
     set('m-trust',        data.trust,        colorVal(data.trust));
@@ -2907,13 +3656,18 @@ async function loadMarket() {
     const fmt = v => v != null
       ? (v > 0 ? `<span class="up">+${v}億</span>` : `<span class="down">${v}億</span>`)
       : '<span style="color:var(--text-faint)">🚫 暫未更新</span>';
-    const track = document.getElementById('tickerTrack');
-    const original = track.innerHTML;
-    track.innerHTML = original;
-    while (track.scrollWidth < window.innerWidth * 3) { track.innerHTML += original; }
-    document.querySelectorAll('.t-foreign').forEach(el => el.innerHTML = fmt(data.foreign));
-    document.querySelectorAll('.t-trust').forEach(el   => el.innerHTML = fmt(data.trust));
-    document.querySelectorAll('.t-prop').forEach(el    => el.innerHTML = fmt(data.proprietary));
+    // 直接更新值，不重建 DOM（避免 animation 重置造成 lag）
+    const flashTicker = (els, val) => {
+      els.forEach(el => {
+        el.innerHTML = fmt(val);
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = 'tickerFlash .5s ease';
+      });
+    };
+    flashTicker(document.querySelectorAll('.t-foreign'), data.foreign);
+    flashTicker(document.querySelectorAll('.t-trust'),   data.trust);
+    flashTicker(document.querySelectorAll('.t-prop'),    data.proprietary);
     document.querySelectorAll('.t-margin').forEach(el  => el.innerHTML = fmt(data.margin_delta));
     document.querySelectorAll('.t-total').forEach(el   => el.innerHTML = fmt(data.total));
   } catch(e) {
@@ -2955,29 +3709,41 @@ function scheduleResetAtMidnight() {
 scheduleResetAtMidnight();
 
 // ── MUSIC ─────────────────────────────────────────────────────────────────────
-const audio     = document.querySelector('audio');
-const musicBtn  = document.getElementById('musicBtn');
+const audio    = document.querySelector('audio');
+const musicBtn = document.getElementById('musicBtn');
 const playIcon  = `<polygon points="5 3 19 12 5 21 5 3"/>`;
 const pauseIcon = `<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/>`;
-function toggleMusic() {
-  if (audio.paused) {
-    audio.play();
+
+function _setMusicUI(playing) {
+  if (playing) {
     musicBtn.classList.add('playing');
     document.getElementById('musicIcon').innerHTML = pauseIcon;
-    sessionStorage.setItem('musicPlaying', '1');
   } else {
-    audio.pause();
     musicBtn.classList.remove('playing');
     document.getElementById('musicIcon').innerHTML = playIcon;
+  }
+}
+
+function toggleMusic() {
+  if (audio.paused) {
+    audio.play().then(() => {
+      _setMusicUI(true);
+      sessionStorage.setItem('musicPlaying', '1');
+    }).catch(err => console.warn('[Music] play failed:', err));
+  } else {
+    audio.pause();
+    _setMusicUI(false);
     sessionStorage.setItem('musicPlaying', '0');
   }
 }
-// 只有使用者在本頁明確開過音樂，才自動播放（避免從子頁面返回時突然響）
+
+// 監聽外部 ended/pause/play 事件同步 UI
+audio.addEventListener('play',  () => _setMusicUI(true));
+audio.addEventListener('pause', () => _setMusicUI(false));
+
+// 只有使用者在本頁明確開過音樂，才自動播放
 if (sessionStorage.getItem('musicPlaying') === '1') {
-  audio.play().then(() => {
-    musicBtn.classList.add('playing');
-    document.getElementById('musicIcon').innerHTML = pauseIcon;
-  }).catch(() => {});
+  audio.play().then(() => _setMusicUI(true)).catch(() => _setMusicUI(false));
 }
 
 // ── STOCK QUERY ───────────────────────────────────────────────────────────────
@@ -3024,7 +3790,7 @@ function colorClass(val) {
 
 function renderStock(d) {
   const disposal = d.disposal;
-  const metricCell = (label, value, icon='', unit='股') => {
+  const metricCell = (label, value, icon='', unit='張') => {
     const cc = colorClass(value);
     const display = value != null
       ? `<span>${value}</span><span class="unit">${unit}</span>`
@@ -3050,16 +3816,21 @@ function renderStock(d) {
     <div class="stock-card">
       <div class="card-header">
         <div class="stock-badge">${d.keyword}</div>
-        ${nameDisplay ? `<div class="stock-name-title">${nameDisplay}</div>` : ''}
-        <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
-        <div class="card-timestamp">${d.date || ''} 盤後</div>
-        <button class="${favBtnClass}" title="${favTitle}"
-          onclick="toggleFavorite('${d.keyword}', '${nameDisplay || d.keyword}', this)"
-          id="favBtn_${d.keyword}">
-          <svg viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
+        ${nameDisplay ? `
+        <div class="stock-name-group">
+          <div class="stock-name-title">${nameDisplay}</div>
+          <button class="${favBtnClass}" title="${favTitle}"
+            onclick="toggleFavorite('${d.keyword}', '${nameDisplay || d.keyword}', this)"
+            id="favBtn_${d.keyword}">
+            <svg viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>` : ''}
+        <div class="card-header-right">
+          <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
+          <div class="card-timestamp">${d.date || ''} 盤後</div>
+        </div>
       </div>
       <div class="metrics-grid">
         ${metricCell('外資買賣超', d.foreign,      '🌏')}
@@ -3101,6 +3872,7 @@ document.addEventListener('keydown', e => {
     closeDrawer();
     closeTop50Modal();
     closeOtcTop50Modal();
+    closeWatchlistModal();
   }
 });
 
@@ -3158,7 +3930,7 @@ function handleModalClick(e) {
 
 function switchTab(tab) {
   _top50Tab = tab;
-  document.querySelectorAll('.modal-tab').forEach((el, i) => {
+  document.querySelectorAll('#top50Modal .modal-tab').forEach((el, i) => {
     el.classList.toggle('active', ['foreign','trust','proprietary'][i] === tab);
   });
   renderTop50();
@@ -3166,7 +3938,7 @@ function switchTab(tab) {
 
 function switchSide(side) {
   _top50Side = side;
-  document.querySelectorAll('.toggle-btn').forEach(el => {
+  document.querySelectorAll('#top50Modal .toggle-btn').forEach(el => {
     el.classList.toggle('active', el.classList.contains(side));
   });
   renderTop50();
@@ -3181,6 +3953,26 @@ async function loadTop50() {
       LOADING DATA...
     </div>`;
   try {
+    // ── 先查交易日狀態 ──────────────────────────────────────────────────
+    let isTradingDay = true;
+    try {
+      const tsRes  = await fetch(`${API_BASE}/api/trading_status`);
+      const tsData = await tsRes.json();
+      isTradingDay = tsData.is_trading_day;
+    } catch(_) {}
+
+    if (!isTradingDay) {
+      document.getElementById('top50Body').innerHTML =
+        `<div class="modal-loading" style="color:var(--text-dim)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span style="color:var(--yellow)">今日休市，暫無盤後資料</span>
+        </div>`;
+      document.getElementById('top50Date').textContent = '休市';
+      return;
+    }
+
     const res  = await fetch(`${API_BASE}/api/top50`);
     _top50Cache = await res.json();
     const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
@@ -3217,11 +4009,15 @@ function renderTop50() {
 
   data.forEach((item, idx) => {
     const rank    = idx + 1;
-    const rankCls = rank === 1 ? 'top3 top1' : rank <= 3 ? 'top3' : '';
+    let rankCls = '';
+    if (rank === 1) rankCls = 'top3 top1';
+    else if (rank === 2) rankCls = 'top3 top2';
+    else if (rank === 3) rankCls = 'top3 top3-only';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
     const netStr  = Math.abs(item.net).toLocaleString();
     html += `
       <tr>
-        <td class="rank-num ${rankCls}">${rank}</td>
+        <td class="rank-num ${rankCls}">${medal}</td>
         <td><span class="stock-id-cell">${item.id}</span></td>
         <td class="stock-name-cell">${item.name}</td>
         <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
@@ -3279,8 +4075,48 @@ async function loadOtcTop50() {
       LOADING DATA...
     </div>`;
   try {
-    const res = await fetch(`${API_BASE}/api/otc_top50`);
+    // ── 先查交易日狀態 ──────────────────────────────────────────────────
+    let isTradingDay = true;
+    try {
+      const tsRes  = await fetch(`${API_BASE}/api/trading_status`);
+      const tsData = await tsRes.json();
+      isTradingDay = tsData.is_trading_day;
+    } catch(_) {}
+
+    if (!isTradingDay) {
+      document.getElementById('otcTop50Body').innerHTML =
+        `<div class="modal-loading" style="color:var(--text-dim)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span style="color:var(--yellow)">今日休市，暫無盤後資料</span>
+        </div>`;
+      document.getElementById('otcTop50Date').textContent = '休市';
+      return;
+    }
+
+    const res  = await fetch(`${API_BASE}/api/otc_top50`);
     _otcTop50Cache = await res.json();
+
+    // ── 驗證上櫃資料日期（民國格式 "1150417" → 西元 "20260417"）──────
+    const _checkOtcDateValid = (cache) => {
+      try {
+        const sample = cache?.foreign?.buy?.[0] ?? cache?.foreign?.sell?.[0];
+        if (!sample) return true; // 空資料不阻擋
+        // 上櫃 API 的 Date 欄位格式 "1150417"：民國年三位 + 月兩位 + 日兩位
+        const dateStr = sample.date || '';
+        if (!dateStr || dateStr.length < 7) return true;
+        const ad = (parseInt(dateStr.slice(0,3)) + 1911).toString()
+                 + dateStr.slice(3);  // "20260417"
+        const tw = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+        const todayStr = tw.getFullYear().toString()
+          + String(tw.getMonth()+1).padStart(2,'0')
+          + String(tw.getDate()).padStart(2,'0');
+        return ad === todayStr;
+      } catch { return true; }
+    };
+
+    // 如果 cache 裡 item 沒帶 date 欄位就跳過驗證（API 不一定會帶）
     const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
     document.getElementById('otcTop50Date').textContent = today + ' 盤後';
     renderOtcTop50();
@@ -3315,11 +4151,15 @@ function renderOtcTop50() {
 
   data.forEach((item, idx) => {
     const rank    = idx + 1;
-    const rankCls = rank === 1 ? 'top3 top1' : rank <= 3 ? 'top3' : '';
+    let rankCls = '';
+    if (rank === 1) rankCls = 'top3 top1';
+    else if (rank === 2) rankCls = 'top3 top2';
+    else if (rank === 3) rankCls = 'top3 top3-only';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
     const netStr  = Math.abs(item.net).toLocaleString();
     html += `
       <tr>
-        <td class="rank-num ${rankCls}">${rank}</td>
+        <td class="rank-num ${rankCls}">${medal}</td>
         <td><span class="stock-id-cell">${item.id}</span></td>
         <td class="stock-name-cell">${item.name}</td>
         <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
@@ -3352,14 +4192,17 @@ function _isFavorite(code) {
 
 function _updateFavBadge() {
   const count = _loadFavs().length;
+  // sidebar badge
   const badge = document.getElementById('favCountBadge');
-  if (!badge) return;
-  if (count > 0 && window._currentUser) {
-    badge.textContent = count;
-    badge.style.display = '';
-  } else {
-    badge.style.display = 'none';
+  if (badge) {
+    if (count > 0 && window._currentUser) {
+      badge.textContent = count;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
   }
+  // header fav btn removed
 }
 
 function _showToast(msg) {
@@ -3413,6 +4256,12 @@ function handleWatchlistModalClick(e) {
 
 async function loadWatchlist() {
   const body = document.getElementById('watchlistBody');
+  // 更新標題日期
+  const wlDate = document.getElementById('wlHeaderDate');
+  if (wlDate) {
+    const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei', year:'numeric', month:'2-digit', day:'2-digit' });
+    wlDate.textContent = today + ' 盤後更新';
+  }
 
   if (!window._currentUser) {
     body.innerHTML = `
@@ -3445,45 +4294,36 @@ async function loadWatchlist() {
     return;
   }
 
-  body.innerHTML = `<div class="wl-grid" id="wlGrid"></div>`;
-  const grid = document.getElementById('wlGrid');
-
-  grid.innerHTML = favs.map(f => `
-    <div class="wl-card" id="wlcard_${f.code}">
-      <div class="wl-card-header">
-        <div class="wl-code">${f.code}</div>
-        <div class="wl-name">${f.name}</div>
-        <button class="wl-del-btn" onclick="removeFav('${f.code}')" title="移除">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+  body.innerHTML = `
+    <div class="wl-list">
+      <div class="wl-list-header">
+        <span>個股</span>
+        <span>外資</span>
+        <span>投信</span>
+        <span>自營商</span>
+        <span>借券賣出</span>
+        <span style="text-align:right">操作</span>
       </div>
-      <div class="wl-metrics">
-        <div class="wl-metric">
-          <div class="wl-metric-label">🌏 外資</div>
-          <div class="wl-metric-val loading" id="wl_f_${f.code}">載入中...</div>
-        </div>
-        <div class="wl-metric">
-          <div class="wl-metric-label">🏦 投信</div>
-          <div class="wl-metric-val loading" id="wl_t_${f.code}">載入中...</div>
-        </div>
-        <div class="wl-metric">
-          <div class="wl-metric-label">🏢 自營商</div>
-          <div class="wl-metric-val loading" id="wl_p_${f.code}">載入中...</div>
-        </div>
-        <div class="wl-metric">
-          <div class="wl-metric-label">📉 借券賣出</div>
-          <div class="wl-metric-val loading" id="wl_s_${f.code}">載入中...</div>
-        </div>
-      </div>
-      <div class="wl-card-footer">
-        <div class="wl-card-date">盤後資料</div>
-        <button class="wl-card-query" onclick="closeWatchlistModal(); document.getElementById('stockInput').value='${f.code}'; queryStock()">
-          詳細查詢 →
-        </button>
-      </div>
-    </div>`).join('');
+      ${favs.map(f => `
+        <div class="wl-row" id="wlrow_${f.code}">
+          <div class="wl-row-name">
+            <div class="wl-code">${f.code}</div>
+            <div class="wl-name">${f.name !== f.code ? f.name : ''}</div>
+          </div>
+          <div class="wl-row-val loading" id="wl_f_${f.code}">載入中...</div>
+          <div class="wl-row-val loading" id="wl_t_${f.code}">載入中...</div>
+          <div class="wl-row-val loading" id="wl_p_${f.code}">載入中...</div>
+          <div class="wl-row-val loading" id="wl_s_${f.code}">載入中...</div>
+          <div class="wl-row-actions">
+            <button class="wl-card-query" onclick="closeWatchlistModal(); document.getElementById('stockInput').value='${f.code}'; queryStock()">詳細 →</button>
+            <button class="wl-del-btn" onclick="removeFav('${f.code}')" title="移除">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>`).join('')}
+    </div>`;
 
   // 並行查詢所有收藏個股
   await Promise.all(favs.map(f => _fetchWlCard(f.code)));
@@ -3493,13 +4333,16 @@ async function _fetchWlCard(code) {
   const set = (id, val) => {
     const el = document.getElementById(id);
     if (!el) return;
+    // 清除 label span 後再設值
+    const label = el.querySelector('.wl-label');
+    const labelHtml = label ? label.outerHTML : '';
     if (val == null) {
-      el.textContent = '🚫 未更新';
-      el.className = 'wl-metric-val neu';
+      el.className = 'wl-row-val neu';
+      el.innerHTML = labelHtml + '🚫 未更新';
     } else {
       const n = parseInt(String(val).replace(/,/g, ''));
-      el.className = `wl-metric-val ${isNaN(n) ? 'neu' : n > 0 ? 'pos' : n < 0 ? 'neg' : 'neu'}`;
-      el.textContent = val;
+      el.className = `wl-row-val ${isNaN(n) ? 'neu' : n > 0 ? 'pos' : n < 0 ? 'neg' : 'neu'}`;
+      el.innerHTML = labelHtml + val;
     }
   };
   try {
@@ -3521,11 +4364,11 @@ async function _fetchWlCard(code) {
 function removeFav(code) {
   const favs = _loadFavs().filter(f => f.code !== code);
   _saveFavs(favs);
-  const card = document.getElementById(`wlcard_${code}`);
-  if (card) {
-    card.style.opacity = '0';
-    card.style.transform = 'scale(.92)';
-    card.style.transition = 'all .25s';
+  const row = document.getElementById(`wlrow_${code}`);
+  if (row) {
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(16px)';
+    row.style.transition = 'all .22s';
     setTimeout(() => loadWatchlist(), 260);
   }
   // 同步更新查詢結果的愛心按鈕
@@ -3543,6 +4386,48 @@ const _origUpdateAuthUI = window._updateAuthUI;
 // 登入/登出後更新 badge
 document.addEventListener('_authChanged', _updateFavBadge);
 setTimeout(_updateFavBadge, 800);
+
+// ── INFO-ICON TOOLTIP（JS 控制，解決 modal overflow 裁切問題）────────────────
+(function() {
+  const tip = document.createElement('div');
+  tip.style.cssText = `
+    position:fixed;z-index:99999;
+    background:rgba(4,10,22,.98);
+    border:1px solid rgba(0,229,255,.25);
+    border-left:2px solid rgba(0,229,255,.65);
+    border-radius:12px;padding:12px 16px;
+    font-family:'Noto Sans TC',sans-serif;font-size:.76rem;
+    color:#7a9ab8;line-height:1.65;
+    box-shadow:0 8px 40px rgba(0,0,0,.85),0 0 0 1px rgba(0,229,255,.08),-4px 0 20px rgba(0,229,255,.08);
+    min-width:220px;max-width:300px;
+    white-space:normal;word-break:break-word;
+    pointer-events:none;opacity:0;
+    transition:opacity .18s;
+  `;
+  document.body.appendChild(tip);
+
+  let _hideTimer;
+  document.querySelectorAll('.info-icon').forEach(icon => {
+    const inner = icon.querySelector('.tooltip');
+    if (!inner) return;
+    icon.addEventListener('mouseenter', e => {
+      clearTimeout(_hideTimer);
+      tip.innerHTML = inner.innerHTML;
+      tip.style.opacity = '1';
+      const r = icon.getBoundingClientRect();
+      let left = r.left + r.width / 2 - 140;
+      let top  = r.bottom + 8;
+      if (left < 8) left = 8;
+      if (left + 300 > window.innerWidth - 8) left = window.innerWidth - 308;
+      if (top + 200 > window.innerHeight - 8) top = r.top - 210;
+      tip.style.left = left + 'px';
+      tip.style.top  = top  + 'px';
+    });
+    icon.addEventListener('mouseleave', () => {
+      _hideTimer = setTimeout(() => { tip.style.opacity = '0'; }, 120);
+    });
+  });
+})();
 
 </script>
 </html>
