@@ -260,10 +260,6 @@
     .ticker-item span.up   { color: var(--red);   font-weight: 600; text-shadow: 0 0 8px rgba(255,61,90,.4); }
     .ticker-item span.down { color: var(--green); font-weight: 600; text-shadow: 0 0 8px rgba(0,230,118,.4); }
     @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-33.33%); } }
-    @keyframes tickerFlash {
-      0%   { color: var(--accent); text-shadow: 0 0 12px rgba(0,229,255,.8); }
-      100% { color: inherit; text-shadow: none; }
-    }
 
     /* ── MAIN LAYOUT ── */
     main {
@@ -1069,10 +1065,6 @@
       transition: opacity .3s;
     }
     .market-card:hover .market-card-icon { opacity: .28; }
-    @keyframes countUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.35rem;
@@ -1458,84 +1450,152 @@
       .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
     @media (max-width: 600px) {
+      /* ── Header ── */
       header { padding: 0 12px 0 10px; height: 54px; }
       .header-right .market-status { display: none; }
-      .header-fav-btn { width: 32px; height: 32px; }
       .logo-text { font-size: .88rem; }
       .logo-sub  { font-size: .5rem; }
-      .logo-icon {
-        width: 40px; height: 40px;
-        overflow: visible;
-        clip-path: none;
-      }
-      .logo-icon img {
-        width: 46px; height: 46px;
-        position: relative;
-        top: -3px; left: -3px;
-        object-fit: contain;
-      }
+      .logo-icon { width: 40px; height: 40px; overflow: visible; clip-path: none; }
+      .logo-icon img { width: 46px; height: 46px; position: relative; top: -3px; left: -3px; }
       .logo { gap: 12px; margin-left: 4px; }
       .hamburger { margin-right: 10px; width: 36px; height: 36px; }
       #clock { font-size: .62rem; letter-spacing: .02em; padding: 4px 9px; }
       #musicBtn { width: 30px; height: 30px; }
-      main { padding: 18px 10px 56px; }
-      h2.section-title { font-size: 1.12rem; }
-      .search-area { padding: 20px 16px; border-radius: 18px; }
+
+      /* ── Main layout ── */
+      main { padding: 16px 12px 72px; }
+      h2.section-title { font-size: 1.05rem; }
+
+      /* ── Search ── */
+      .search-area { padding: 18px 14px; border-radius: 16px; }
       .search-row { flex-direction: column; gap: 8px; }
       #stockInput { height: 46px; font-size: .88rem; }
-      #searchBtn { height: 46px; font-size: .8rem; padding: 0 18px; }
-      .card-header { padding: 14px 16px; gap: 10px; }
-      .stock-badge { font-size: .85rem; padding: 4px 10px; }
-      .stock-name-title { font-size: .98rem; }
-      .stock-market-tag { font-size: .62rem; }
+      #searchBtn { height: 46px; font-size: .82rem; padding: 0 18px; width: 100%; justify-content: center; }
+
+      /* ── Stock result card ── */
+      .card-header { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+      .stock-badge { font-size: .82rem; padding: 4px 10px; }
+      .stock-name-title { font-size: .95rem; }
+      .stock-market-tag { font-size: .6rem; }
+      .card-header-right { flex-direction: column; gap: 3px; align-items: flex-end; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; }
-      .metric-cell { padding: 14px; }
+      .metric-cell { padding: 12px 10px; }
+      .metric-label { font-size: .64rem; }
       .metric-value { font-size: 1rem; }
-      .market-wrap { padding: 18px 14px 14px; border-radius: 16px; }
-      .market-title-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .market-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .market-card { padding: 14px; border-radius: 12px; }
-      .market-card-value { font-size: 1.15rem; }
-      .market-card-icon { width: 52px; height: 52px; }
-      .bottom-grid { grid-template-columns: 1fr; gap: 14px; }
-      .timeline { padding: 18px 16px; }
-      .data-note { padding: 18px 16px; }
+
+      /* ── Market overview ── */
+      .market-wrap { padding: 16px 12px 14px; border-radius: 16px; }
+      .market-title-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .refresh-badge { font-size: .62rem; padding: 5px 10px; }
+      .market-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .market-card { padding: 12px 10px; border-radius: 12px; }
+      .market-card-value { font-size: 1.08rem; }
+      .market-card-icon { width: 44px; height: 44px; }
+      .market-card-label { font-size: .6rem; }
+
+      /* ── Bottom grid ── */
+      .bottom-grid { grid-template-columns: 1fr; gap: 12px; }
+      .timeline { padding: 16px 14px; }
+      .data-note { padding: 16px 14px; }
+      .data-note-item { font-size: .78rem; }
+
+      /* ── Footer ── */
       footer { border-top: 1px solid rgba(0,229,255,.05); }
-      .footer-disclaimer { padding: 16px 16px 20px; }
+      .footer-disclaimer { padding: 14px 14px 20px; }
       .footer-disclaimer-top { flex-direction: column; gap: 8px; }
       .footer-brand { text-align: left; }
-      .holiday-inner { padding: 14px 16px; }
-      .holiday-title { font-size: .88rem; }
-      .holiday-next-box { padding: 8px 14px; }
-      .holiday-next-val { font-size: .85rem; }
-      /* Fix modal on mobile - ensure full visibility */
-      .modal-overlay { padding: 8px 8px; align-items: flex-start; padding-top: 52px; }
-      .modal { max-height: calc(100vh - 68px); border-radius: 18px; }
-      .modal-header { padding: 16px 18px 12px; }
-      .modal-tabs { padding: 10px 14px 0; gap: 5px; flex-wrap: wrap; }
-      .modal-tab { padding: 7px 14px; font-size: .72rem; }
-      .modal-toggle { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
-      .modal-body { padding: 0 10px 10px; }
-      .top50-table td, .top50-table th { padding: 9px 8px; }
-      /* 手機版 watchlist - 精簡 grid */
-      .wl-list { padding: 8px 10px 16px; }
+
+      /* ── Holiday banner ── */
+      .holiday-inner { padding: 12px 14px; }
+      .holiday-title { font-size: .86rem; }
+      .holiday-next-box { padding: 7px 12px; }
+      .holiday-next-val { font-size: .82rem; }
+
+      /* ── Modal ── */
+      .modal-overlay { padding: 6px; align-items: flex-end; padding-bottom: 0; }
+      .modal {
+        max-height: 92vh;
+        border-radius: 20px 20px 0 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      .modal-header { padding: 14px 16px 12px; }
+      .modal-title { font-size: .9rem; }
+      .modal-close { width: 30px; height: 30px; }
+      .modal-tabs { padding: 8px 12px 0; gap: 5px; flex-wrap: wrap; }
+      .modal-tab { padding: 7px 12px; font-size: .7rem; }
+      .modal-toggle { padding: 8px 12px; gap: 6px; flex-wrap: wrap; }
+      .modal-body { padding: 0 8px 16px; max-height: calc(92vh - 160px); }
+      .top50-table { font-size: .76rem; }
+      .top50-table td, .top50-table th { padding: 8px 6px; }
+
+      /* ── Watchlist modal - 手機版卡片式佈局 ── */
+      .wl-list { padding: 6px 8px 20px; gap: 8px; display: flex; flex-direction: column; }
       .wl-list-header { display: none; }
       .wl-row {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 8px 4px;
-        padding: 14px 12px;
-        border-radius: 12px;
-        border-bottom: 1px solid rgba(0,229,255,.06);
-        margin-bottom: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        border: 1px solid rgba(0,229,255,.12);
+        border-radius: 14px;
+        background: rgba(0,229,255,.025);
+        overflow: hidden;
+        margin-bottom: 0;
+        animation: fadeUp .25s ease both;
       }
-      .wl-row-name { grid-column: 1 / -1; }
-      .wl-row-val { text-align: left; }
-      .wl-row-actions { grid-column: 1 / -1; justify-content: flex-start; gap: 8px; margin-top: 4px; }
+      .wl-row::before { display: none; }
+      .wl-row:hover { background: rgba(0,229,255,.045); }
+      /* 個股名稱列 */
+      .wl-row-name {
+        grid-column: unset;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px 8px;
+        border-bottom: 1px solid rgba(0,229,255,.08);
+        background: rgba(0,229,255,.035);
+      }
+      .wl-code { font-size: .8rem; }
+      .wl-name { font-size: .82rem; }
+      /* 數值區：2x2 grid */
+      .wl-mobile-vals {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+      .wl-row-val {
+        text-align: center;
+        padding: 8px 6px;
+        border-right: 1px solid rgba(0,229,255,.06);
+        border-bottom: 1px solid rgba(0,229,255,.06);
+        font-size: .8rem;
+      }
+      .wl-row-val:nth-child(2n) { border-right: none; }
+      .wl-row-val .wl-label {
+        display: block;
+        font-size: .58rem;
+        color: var(--text-faint);
+        margin-bottom: 3px;
+      }
+      /* 操作列 */
+      .wl-row-actions {
+        grid-column: unset;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-top: 1px solid rgba(0,229,255,.06);
+        margin-top: 0;
+      }
+      .wl-card-query { font-size: .66rem; padding: 5px 14px; }
+      .wl-del-btn { width: 26px; height: 26px; }
     }
+
     @media (max-width: 360px) {
       .metrics-grid { grid-template-columns: 1fr; }
       .market-grid  { grid-template-columns: 1fr; }
+      .wl-mobile-vals { grid-template-columns: 1fr 1fr; }
     }
 
     /* ── HAMBURGER BUTTON ── */
@@ -1861,7 +1921,6 @@
       transform: translateX(-50%);
       background: rgba(4,10,22,.98);
       border: 1px solid rgba(0,229,255,.2);
-      border-left: 2px solid rgba(0,229,255,.6);
       border-radius: 12px;
       padding: 12px 16px;
       font-family: 'Noto Sans TC', sans-serif;
@@ -1872,7 +1931,7 @@
       opacity: 0;
       transition: opacity .2s;
       z-index: 9999;
-      box-shadow: 0 8px 32px rgba(0,0,0,.8), 0 0 0 1px rgba(0,229,255,.1), -4px 0 20px rgba(0,229,255,.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,.8), 0 0 0 1px rgba(0,229,255,.1);
       min-width: 220px;
       max-width: 280px;
       white-space: normal;
@@ -1890,12 +1949,8 @@
     /* tooltip via JS only */
 
     @keyframes modalUp {
-      from { opacity: 0; transform: translateY(28px) scale(.95); filter: blur(4px); }
-      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
-    }
-    @keyframes modalDown {
-      from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
-      to   { opacity: 0; transform: translateY(16px) scale(.97); filter: blur(3px); }
+      from { opacity: 0; transform: translateY(32px) scale(.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
     /* Top sweep */
     .modal::before {
@@ -2302,6 +2357,63 @@
       color: var(--red);
     }
     .auth-logout-btn svg { width: 13px; height: 13px; }
+
+    /* ── VISITOR PANEL (admin only) ── */
+    #visitorPanel {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 500;
+      background: rgba(4,10,22,.97);
+      border: 1px solid rgba(0,229,255,.25);
+      border-left: 2px solid rgba(0,229,255,.6);
+      border-radius: 14px;
+      padding: 12px 16px;
+      min-width: 180px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 20px rgba(0,229,255,.08);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeUp .35s cubic-bezier(.22,1,.36,1);
+      backdrop-filter: blur(12px);
+    }
+    #visitorPanel.show { display: flex; }
+    .vp-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .2em;
+      color: rgba(0,229,255,.6);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.1);
+      padding-bottom: 6px;
+    }
+    .vp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .vp-label {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .68rem;
+      color: var(--text-dim);
+    }
+    .vp-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(0,229,255,.4);
+    }
+    .vp-updated {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .55rem;
+      color: var(--text-faint);
+      text-align: right;
+      margin-top: 2px;
+    }
+    @media (max-width: 600px) {
+      #visitorPanel { bottom: 16px; right: 12px; padding: 10px 14px; min-width: 160px; }
+    }
   </style>
   <!-- Google Identity Services（OAuth Popup 方式） -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -2981,9 +3093,9 @@
       <div style="margin-bottom:16px;">
         <span style="font-family:'Orbitron',monospace;font-size:1.38rem;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.18));">數據說明</span>
       </div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>個股買賣超單位為「張」（1張＝1000股）；大盤金額單位為「億元」</span></div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span>＝法人買超（買進）、<span style="color:var(--green)">綠色</span>＝法人賣超（賣出）— 注意與股價漲跌顏色相反</span></div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位顯示當日市場融資餘額總額，數值越高代表散戶槓桿越大，需留意追繳風險</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位為當日融資餘額總額，非增減值，僅供參考</span></div>
     </div>
 
   </div>
@@ -3414,11 +3526,7 @@ const API_BASE = (() => {
   initLayers();
 
   let frame = 0;
-  let scrollY = 0;
-  let targetScrollY = 0;
-  window.addEventListener('scroll', () => { targetScrollY = window.scrollY; }, { passive: true });
   function draw() {
-    scrollY += (targetScrollY - scrollY) * 0.04;
     ctx.clearRect(0, 0, W, H);
     frame++;
 
@@ -3450,7 +3558,6 @@ const API_BASE = (() => {
       // 緩慢漂移
       s.x -= s.speed * .1;
       s.y += s.speed * .04;
-      const px = s.layer === 0 ? scrollY * 0.008 : s.layer === 1 ? scrollY * 0.018 : scrollY * 0.03;
       if (s.x < -2) s.x = W + 2;
       if (s.y > H + 2) s.y = -2;
 
@@ -3459,7 +3566,7 @@ const API_BASE = (() => {
       const tw = .65 + Math.sin(s.twinklePhase) * .35;
       ctx.fillStyle = s.color + (s.a * tw) + ')';
       ctx.beginPath();
-      ctx.arc(s.x, s.y - px, s.r, 0, Math.PI * 2);
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
 
       // 近距離星點加十字光芒
@@ -3468,10 +3575,10 @@ const API_BASE = (() => {
         ctx.strokeStyle = s.color + glow + ')';
         ctx.lineWidth = .5;
         ctx.beginPath();
-        ctx.moveTo(s.x - s.r * 3, s.y - px);
-        ctx.lineTo(s.x + s.r * 3, s.y - px);
-        ctx.moveTo(s.x, s.y - s.r * 3 - px);
-        ctx.lineTo(s.x, s.y + s.r * 3 - px);
+        ctx.moveTo(s.x - s.r * 3, s.y);
+        ctx.lineTo(s.x + s.r * 3, s.y);
+        ctx.moveTo(s.x, s.y - s.r * 3);
+        ctx.lineTo(s.x, s.y + s.r * 3);
         ctx.stroke();
       }
     });
@@ -3635,13 +3742,7 @@ async function loadMarket() {
       const el = document.getElementById(id);
       if (!el) return;
       if (val == null) { el.textContent = '🚫 暫未更新'; el.className = 'market-card-value neutral'; }
-      else {
-        el.textContent = val;
-        el.className = 'market-card-value ' + (colorClass || '');
-        el.style.animation = 'none';
-        el.offsetHeight;
-        el.style.animation = 'countUp .4s cubic-bezier(.22,1,.36,1)';
-      }
+      else { el.textContent = val; el.className = 'market-card-value ' + (colorClass || ''); }
     };
     set('m-foreign',      data.foreign,      colorVal(data.foreign));
     set('m-trust',        data.trust,        colorVal(data.trust));
@@ -3657,17 +3758,9 @@ async function loadMarket() {
       ? (v > 0 ? `<span class="up">+${v}億</span>` : `<span class="down">${v}億</span>`)
       : '<span style="color:var(--text-faint)">🚫 暫未更新</span>';
     // 直接更新值，不重建 DOM（避免 animation 重置造成 lag）
-    const flashTicker = (els, val) => {
-      els.forEach(el => {
-        el.innerHTML = fmt(val);
-        el.style.animation = 'none';
-        el.offsetHeight;
-        el.style.animation = 'tickerFlash .5s ease';
-      });
-    };
-    flashTicker(document.querySelectorAll('.t-foreign'), data.foreign);
-    flashTicker(document.querySelectorAll('.t-trust'),   data.trust);
-    flashTicker(document.querySelectorAll('.t-prop'),    data.proprietary);
+    document.querySelectorAll('.t-foreign').forEach(el => el.innerHTML = fmt(data.foreign));
+    document.querySelectorAll('.t-trust').forEach(el   => el.innerHTML = fmt(data.trust));
+    document.querySelectorAll('.t-prop').forEach(el    => el.innerHTML = fmt(data.proprietary));
     document.querySelectorAll('.t-margin').forEach(el  => el.innerHTML = fmt(data.margin_delta));
     document.querySelectorAll('.t-total').forEach(el   => el.innerHTML = fmt(data.total));
   } catch(e) {
@@ -3790,7 +3883,7 @@ function colorClass(val) {
 
 function renderStock(d) {
   const disposal = d.disposal;
-  const metricCell = (label, value, icon='', unit='張') => {
+  const metricCell = (label, value, icon='', unit='股') => {
     const cc = colorClass(value);
     const display = value != null
       ? `<span>${value}</span><span class="unit">${unit}</span>`
@@ -4310,12 +4403,14 @@ async function loadWatchlist() {
             <div class="wl-code">${f.code}</div>
             <div class="wl-name">${f.name !== f.code ? f.name : ''}</div>
           </div>
-          <div class="wl-row-val loading" id="wl_f_${f.code}">載入中...</div>
-          <div class="wl-row-val loading" id="wl_t_${f.code}">載入中...</div>
-          <div class="wl-row-val loading" id="wl_p_${f.code}">載入中...</div>
-          <div class="wl-row-val loading" id="wl_s_${f.code}">載入中...</div>
+          <div class="wl-mobile-vals">
+            <div class="wl-row-val loading" id="wl_f_${f.code}"><span class="wl-label">外資</span>載入中...</div>
+            <div class="wl-row-val loading" id="wl_t_${f.code}"><span class="wl-label">投信</span>載入中...</div>
+            <div class="wl-row-val loading" id="wl_p_${f.code}"><span class="wl-label">自營商</span>載入中...</div>
+            <div class="wl-row-val loading" id="wl_s_${f.code}"><span class="wl-label">借券賣出</span>載入中...</div>
+          </div>
           <div class="wl-row-actions">
-            <button class="wl-card-query" onclick="closeWatchlistModal(); document.getElementById('stockInput').value='${f.code}'; queryStock()">詳細 →</button>
+            <button class="wl-card-query" onclick="closeWatchlistModal(); document.getElementById('stockInput').value='${f.code}'; queryStock()">詳細查詢 →</button>
             <button class="wl-del-btn" onclick="removeFav('${f.code}')" title="移除">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -4394,11 +4489,10 @@ setTimeout(_updateFavBadge, 800);
     position:fixed;z-index:99999;
     background:rgba(4,10,22,.98);
     border:1px solid rgba(0,229,255,.25);
-    border-left:2px solid rgba(0,229,255,.65);
     border-radius:12px;padding:12px 16px;
     font-family:'Noto Sans TC',sans-serif;font-size:.76rem;
     color:#7a9ab8;line-height:1.65;
-    box-shadow:0 8px 40px rgba(0,0,0,.85),0 0 0 1px rgba(0,229,255,.08),-4px 0 20px rgba(0,229,255,.08);
+    box-shadow:0 8px 40px rgba(0,0,0,.85),0 0 0 1px rgba(0,229,255,.08);
     min-width:220px;max-width:300px;
     white-space:normal;word-break:break-word;
     pointer-events:none;opacity:0;
@@ -4428,6 +4522,45 @@ setTimeout(_updateFavBadge, 800);
     });
   });
 })();
+
+
+
+// ── VISITOR TRACKING (admin only: llomoll5566) ──────────────────────
+async function initVisitorTracking() {
+  const email = window._currentUser?.email || '';
+  if (!email.includes('llomoll5566')) return;
+
+  const panel = document.getElementById('visitorPanel');
+  if (!panel) return;
+  panel.classList.add('show');
+
+  try {
+    // 記錄本次訪問並取得統計
+    const res  = await fetch(`${API_BASE}/api/visitor`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    document.getElementById('vpToday').textContent  = (data.today  ?? '--').toLocaleString();
+    document.getElementById('vpTotal').textContent  = (data.total  ?? '--').toLocaleString();
+    const now = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
+    document.getElementById('vpUpdated').textContent = '更新於 ' + now;
+  } catch(e) {
+    document.getElementById('vpToday').textContent = 'N/A';
+    document.getElementById('vpTotal').textContent = 'N/A';
+    console.warn('[Visitor] API 失敗', e);
+  }
+}
+
+// 登入後觸發
+document.addEventListener('_authChanged', () => {
+  initVisitorTracking();
+});
+// 頁面載入時若已登入也觸發（延遲等 auth 就緒）
+setTimeout(() => {
+  if (window._currentUser) initVisitorTracking();
+}, 1500);
 
 </script>
 </html>

@@ -1,35 +1,47 @@
-from flask import jsonify, request
+from flask import jsonify, request, send_from_directory
 from flask_cors import CORS
 from post_Info import stock_info, market_pnfo, get_today, twse_top50, otc_top50
 from get_trading_holidays import get_trading_status
 import re
+import os
+import requests as http_requests  # 避免與 flask request 衝突
 
-from flask import Flask, request, abort, send_from_directory
+# ── Supabase 設定 ──────────────────────────────────────────────────────────────
+SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+
+def _supabase_headers():
+    return {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': f'Bearer {SUPABASE_KEY}',
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation',
+    }
+
 
 def register_api(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # 在 register_api(app) 上面加：
     @app.route("/")
     def index():
         return send_from_directory('.', 'index.html')
 
-    # ── 交易日狀態 API ─────────────────────────────────────────────────
+    # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
     def api_trading_status():
         return jsonify(get_trading_status())
 
-    # ── 上市三大法人買賣超前50 API ────────────────────────────────────────
+    # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")
     def api_top50():
         return jsonify(twse_top50())
 
-    # ── 上櫃三大法人買賣超前50 API ────────────────────────────────────────
+    # ── 上櫃三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/otc_top50")
     def api_otc_top50():
         return jsonify(otc_top50())
 
-    # ── 個股查詢 API ───────────────────────────────────────────────────
+    # ── 個股查詢 API ───────────────────────────────────────────────────────────
     @app.route("/api/stock")
     def api_stock():
         keyword = request.args.get("keyword", "").strip()
@@ -45,7 +57,7 @@ def register_api(app):
         result = {
             "keyword":     keyword,
             "name":        lines[0].split("(")[0].strip() if lines else keyword,
-            "date":        get_today(),   # 統一使用 post_Info 的 get_today()
+            "date":        get_today(),
             "market":      None,
             "foreign":     None,
             "trust":       None,
@@ -68,7 +80,7 @@ def register_api(app):
 
         return jsonify(result)
 
-    # ── 大盤資訊 API ───────────────────────────────────────────────────
+    # ── 大盤資訊 API ───────────────────────────────────────────────────────────
     @app.route("/api/market")
     def api_market():
         raw    = market_pnfo()
@@ -97,10 +109,74 @@ def register_api(app):
 
         return jsonify(result)
 
+    # ── 訪客統計 API ───────────────────────────────────────────────────────────
+    @app.route("/api/visitor", methods=["POST"])
+    def api_visitor():
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            return jsonify({"error": "Supabase 未設定"}), 500
+
+        from datetime import datetime, timezone, timedelta
+        today   = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d')
+        headers = _supabase_headers()
+
+        try:
+            # ── 1. 今日訪客數 +1 ──────────────────────────────────────────
+            check = http_requests.get(
+                f"{SUPABASE_URL}/rest/v1/visitors_daily"
+                f"?visit_date=eq.{today}&select=id,count",
+                headers=headers
+            )
+            rows = check.json()
+
+            if rows:
+                row_id      = rows[0]['id']
+                today_count = rows[0]['count'] + 1
+                http_requests.patch(
+                    f"{SUPABASE_URL}/rest/v1/visitors_daily?id=eq.{row_id}",
+                    headers=headers,
+                    json={"count": today_count}
+                )
+            else:
+                today_count = 1
+                http_requests.post(
+                    f"{SUPABASE_URL}/rest/v1/visitors_daily",
+                    headers=headers,
+                    json={"visit_date": today, "count": 1}
+                )
+
+            # ── 2. 累積總訪客數 +1 ────────────────────────────────────────
+            total_res  = http_requests.get(
+                f"{SUPABASE_URL}/rest/v1/visitors_total?id=eq.1&select=count",
+                headers=headers
+            )
+            total_rows = total_res.json()
+
+            if total_rows:
+                new_total = total_rows[0]['count'] + 1
+                http_requests.patch(
+                    f"{SUPABASE_URL}/rest/v1/visitors_total?id=eq.1",
+                    headers=headers,
+                    json={"count": new_total}
+                )
+            else:
+                new_total = 1
+                http_requests.post(
+                    f"{SUPABASE_URL}/rest/v1/visitors_total",
+                    headers=headers,
+                    json={"id": 1, "count": 1}
+                )
+
+            return jsonify({"today": today_count, "total": new_total})
+
+        except Exception as e:
+            print(f"[Visitor] Supabase 錯誤: {e}")
+            return jsonify({"error": str(e)}), 500
+
 
 # ── 工具函式 ──────────────────────────────────────────────────────────────────
 def _extract_val(line):
-    m = re.search(r"：\s*([^\s]+)\s*股", line)
+    # 同時支援「張」和「股」
+    m = re.search(r"：\s*([^\s]+)\s*[張股]", line)
     return m.group(1) if m else None
 
 def _extract_float(line):
