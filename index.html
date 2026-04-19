@@ -754,6 +754,9 @@
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
+    /* 桌面版：wl-mobile-vals 透明容器，讓子元素直接參與 wl-row 的 grid */
+    .wl-mobile-vals { display: contents; }
+
     /* 數值欄 */
     .wl-row-val {
       text-align: center;
@@ -763,7 +766,7 @@
       letter-spacing: .02em;
     }
     .wl-row-val .wl-label {
-      display: block;
+      display: none;
       font-size: .58rem;
       letter-spacing: .08em;
       color: var(--text-faint);
@@ -1578,6 +1581,8 @@
         color: var(--text-faint);
         margin-bottom: 3px;
       }
+      .wl-row-val:last-child { border-bottom: none; }
+      .wl-row-val:nth-last-child(-n+2) { border-bottom: none; }
       /* 操作列 */
       .wl-row-actions {
         grid-column: unset;
@@ -2367,24 +2372,64 @@
       border: 1px solid rgba(0,229,255,.25);
       border-left: 2px solid rgba(0,229,255,.6);
       border-radius: 14px;
-      padding: 12px 16px;
+      padding: 0;
       min-width: 180px;
       box-shadow: 0 8px 40px rgba(0,0,0,.7), 0 0 20px rgba(0,229,255,.08);
       display: none;
       flex-direction: column;
-      gap: 8px;
+      gap: 0;
       animation: fadeUp .35s cubic-bezier(.22,1,.36,1);
       backdrop-filter: blur(12px);
+      overflow: hidden;
     }
     #visitorPanel.show { display: flex; }
+
+    /* 頂部收合列 */
+    .vp-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 12px;
+      cursor: pointer;
+      background: rgba(0,229,255,.04);
+      border-bottom: 1px solid rgba(0,229,255,.1);
+      color: rgba(0,229,255,.6);
+      transition: background .2s, color .2s;
+      user-select: none;
+    }
+    .vp-toggle:hover {
+      background: rgba(0,229,255,.10);
+      color: var(--accent);
+    }
+    .vp-toggle-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .56rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    .vp-toggle svg.vp-arrow {
+      transition: transform .3s cubic-bezier(.22,1,.36,1);
+      flex-shrink: 0;
+    }
+    /* 收合時箭頭旋轉，body 隱藏 */
+    #visitorPanel.collapsed .vp-arrow { transform: rotate(180deg); }
+    #visitorPanel.collapsed .vp-body  { display: none !important; }
+
     .vp-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       font-family: 'Share Tech Mono', monospace;
       font-size: .58rem;
       letter-spacing: .2em;
-      color: rgba(0,229,255,.6);
+      color: rgba(0,229,255,.65);
       text-transform: uppercase;
       border-bottom: 1px solid rgba(0,229,255,.1);
       padding-bottom: 6px;
+    }
+    .vp-title svg {
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 4px rgba(0,229,255,.5));
     }
     .vp-row {
       display: flex;
@@ -4525,6 +4570,15 @@ setTimeout(_updateFavBadge, 800);
 
 
 
+// ── VISITOR PANEL TOGGLE ─────────────────────────────────────────────
+function toggleVisitorPanel() {
+  const panel = document.getElementById('visitorPanel');
+  if (!panel) return;
+  panel.classList.toggle('collapsed');
+  // 記住收合狀態
+  localStorage.setItem('vp_collapsed', panel.classList.contains('collapsed') ? '1' : '0');
+}
+
 // ── VISITOR TRACKING (admin only: llomoll5566) ──────────────────────
 async function initVisitorTracking() {
   const email = window._currentUser?.email || '';
@@ -4533,6 +4587,9 @@ async function initVisitorTracking() {
   const panel = document.getElementById('visitorPanel');
   if (!panel) return;
   panel.classList.add('show');
+  if (localStorage.getItem('vp_collapsed') === '1') {
+    panel.classList.add('collapsed');
+  }
 
   try {
     // 記錄本次訪問並取得統計
@@ -4563,4 +4620,36 @@ setTimeout(() => {
 }, 1500);
 
 </script>
+
+<!-- VISITOR PANEL (admin only: llomoll5566) -->
+<div id="visitorPanel">
+  <!-- 頂部收合列 -->
+  <div class="vp-toggle" onclick="toggleVisitorPanel()">
+    <div style="display:flex;align-items:center;gap:7px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6"  y1="20" x2="6"  y2="14"/>
+        <line x1="2"  y1="20" x2="22" y2="20"/>
+      </svg>
+      <span class="vp-toggle-label">訪客統計</span>
+    </div>
+    <svg class="vp-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </div>
+  <!-- 主體內容 -->
+  <div class="vp-body" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+    <div class="vp-row">
+      <span class="vp-label">今日訪客</span>
+      <span class="vp-val" id="vpToday">--</span>
+    </div>
+    <div class="vp-row">
+      <span class="vp-label">累積訪客</span>
+      <span class="vp-val" id="vpTotal">--</span>
+    </div>
+    <div class="vp-updated" id="vpUpdated">--</div>
+  </div>
+</div>
+
 </html>
