@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from push_service import start_scheduler
 from post_Info import stock_info
-from stock_site.api_routes import register_api
+from api_routes import register_api
 
 app = Flask(__name__)
 
