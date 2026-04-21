@@ -118,7 +118,7 @@
 <header>
   <div class="header-left">
     <div class="logo">
-      <div class="logo-icon"><img src="../images/jelly.png" alt="JellyStock Logo" /></div>
+      <div class="logo-icon"><img src="../../images/jelly.png" alt="JellyStock Logo" /></div>
       <div>
         <div class="logo-text">盤後雷達</div>
         <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
@@ -126,7 +126,7 @@
     </div>
   </div>
   <div class="header-right">
-    <a href="../index.html" class="btn-back">
+    <a href="/" class="btn-back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
     </a>
@@ -248,12 +248,31 @@
     <div class="footer-copy">© 2026 JellyStock. All rights reserved.</div>
   </div>
   <nav class="footer-nav">
-    <a href="../index.html">首頁</a>
+    <a href="../../index.html">首頁</a>
     <a href="privacy.html">隱私政策</a>
     <a href="about.html" class="active">關於本站</a>
     <a href="disclaimer.html">免責聲明</a>
   </nav>
 </footer>
 
+<script>
+// 跨頁面主題同步
+(function(){
+  function applyPageTheme(t){
+    if(t==='day') document.body.classList.add('theme-day');
+    else document.body.classList.remove('theme-day');
+  }
+  // 讀取已儲存的主題
+  try {
+    const uid = Object.keys(localStorage).find(k=>k.startsWith('jls_'));
+    if(uid){const s=JSON.parse(localStorage.getItem(uid)||'{}');if(s.theme)applyPageTheme(s.theme);}
+  } catch(e){}
+  // 監聽其他分頁切換
+  try {
+    const bc = new BroadcastChannel('jellystock_theme');
+    bc.onmessage = function(e){ if(e.data&&e.data.theme) applyPageTheme(e.data.theme); };
+  } catch(e){}
+})();
+</script>
 </body>
 </html>

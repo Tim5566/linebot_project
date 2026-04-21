@@ -149,9 +149,9 @@
     .logo-icon img { width: 58px; height: 58px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -6px; left: -6px; }
     .logo-text {
       font-family: 'Orbitron', monospace;
-      font-size: 1.05rem;
+      font-size: .88rem;
       font-weight: 700;
-      letter-spacing: .1em;
+      letter-spacing: .08em;
       color: #fff;
       text-shadow: 0 0 20px rgba(0,229,255,.4);
     }
@@ -162,6 +162,25 @@
       letter-spacing: .22em;
       opacity: .65;
       margin-top: 2px;
+    }
+    .logo-sub-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem;
+      color: var(--text-dim);
+      letter-spacing: .08em;
+      margin-top: 3px;
+      opacity: .8;
+    }
+    .status-dot-inline {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(0,230,118,.6);
+      animation: sonarPulse 2s infinite;
+      flex-shrink: 0;
     }
 
     .header-right {
@@ -1455,8 +1474,8 @@
     @media (max-width: 600px) {
       /* ── Header ── */
       header { padding: 0 12px 0 10px; height: 54px; }
-      .header-right .market-status { display: none; }
-      .logo-text { font-size: .88rem; }
+      .logo-sub-status { display: none; }
+      .logo-text { font-size: .72rem; }
       .logo-sub  { font-size: .5rem; }
       .logo-icon { width: 40px; height: 40px; overflow: visible; clip-path: none; }
       .logo-icon img { width: 46px; height: 46px; position: relative; top: -3px; left: -3px; }
@@ -1532,69 +1551,172 @@
       .top50-table { font-size: .76rem; }
       .top50-table td, .top50-table th { padding: 8px 6px; }
 
-      /* ── Watchlist modal - 手機版卡片式佈局 ── */
-      .wl-list { padding: 6px 8px 20px; gap: 8px; display: flex; flex-direction: column; }
+      /* ── Watchlist modal - 手機版重新排版 ── */
+      .wl-list { padding: 8px 10px 24px; gap: 10px; display: flex; flex-direction: column; }
       .wl-list-header { display: none; }
+
+      /* 卡片外框 */
       .wl-row {
         display: flex;
         flex-direction: column;
         gap: 0;
         padding: 0;
-        border: 1px solid rgba(0,229,255,.12);
-        border-radius: 14px;
-        background: rgba(0,229,255,.025);
+        border: 1px solid rgba(0,229,255,.18);
+        border-radius: 16px;
+        background: rgba(5,12,28,.88);
         overflow: hidden;
         margin-bottom: 0;
         animation: fadeUp .25s ease both;
+        box-shadow: 0 3px 16px rgba(0,0,0,.4);
       }
       .wl-row::before { display: none; }
-      .wl-row:hover { background: rgba(0,229,255,.045); }
-      /* 個股名稱列 */
+      .wl-row:hover { background: rgba(5,14,32,.95); }
+
+      /* ── 手機版：整體卡片重新設計 ── */
+      /* 新佈局：左欄=名稱區 | 右欄=2x2數據格 + 操作列 */
+      .wl-row {
+        display: grid !important;
+        grid-template-columns: 88px 1fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "name vals"
+          "name actions";
+        min-height: 110px;
+      }
+      /* ── 左欄：股票名稱區 ── */
       .wl-row-name {
+        grid-area: name;
         grid-column: unset;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 8px;
-        padding: 10px 12px 8px;
-        border-bottom: 1px solid rgba(0,229,255,.08);
-        background: rgba(0,229,255,.035);
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 8px;
+        border-bottom: none;
+        border-right: 1px solid rgba(0,229,255,.15);
+        background: rgba(255,61,90,.055);
+        border-left: 3px solid rgba(255,61,90,.7);
       }
-      .wl-code { font-size: .8rem; }
-      .wl-name { font-size: .82rem; }
-      /* 數值區：2x2 grid */
+      .wl-code {
+        font-size: .78rem;
+        padding: 4px 8px;
+        background: rgba(255,61,90,.12);
+        border: 1px solid rgba(255,61,90,.45);
+        border-radius: 7px;
+        color: #ff7080;
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-align: center;
+        text-shadow: 0 0 8px rgba(255,61,90,.4);
+        white-space: nowrap;
+      }
+      .wl-name {
+        font-size: .72rem;
+        font-weight: 600;
+        color: rgba(255,255,255,.8);
+        text-align: center;
+        word-break: break-all;
+        line-height: 1.3;
+      }
+
+      /* ── 右上：四宮格盤後數據 ── */
       .wl-mobile-vals {
+        grid-area: vals;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0;
       }
       .wl-row-val {
         text-align: center;
-        padding: 8px 6px;
-        border-right: 1px solid rgba(0,229,255,.06);
-        border-bottom: 1px solid rgba(0,229,255,.06);
-        font-size: .8rem;
+        padding: 9px 6px;
+        border-right: 1px solid rgba(0,229,255,.1);
+        border-bottom: 1px solid rgba(0,229,255,.1);
+        font-size: .85rem;
+        font-family: 'Share Tech Mono', monospace;
+        font-weight: 700;
+        position: relative;
       }
       .wl-row-val:nth-child(2n) { border-right: none; }
       .wl-row-val .wl-label {
         display: block;
-        font-size: .58rem;
-        color: var(--text-faint);
+        font-size: .55rem;
+        color: rgba(0,229,255,.55);
         margin-bottom: 3px;
+        font-family: 'Share Tech Mono', monospace;
+        letter-spacing: .1em;
+        text-transform: uppercase;
       }
       .wl-row-val:last-child { border-bottom: none; }
       .wl-row-val:nth-last-child(-n+2) { border-bottom: none; }
-      /* 操作列 */
+
+      /* ── 右下：操作列 ── */
       .wl-row-actions {
-        grid-column: unset;
+        grid-area: actions;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 8px 12px;
-        border-top: 1px solid rgba(0,229,255,.06);
-        margin-top: 0;
+        gap: 8px;
+        padding: 7px 10px;
+        border-top: 1px solid rgba(0,229,255,.1);
+        background: rgba(0,229,255,.02);
       }
-      .wl-card-query { font-size: .66rem; padding: 5px 14px; }
-      .wl-del-btn { width: 26px; height: 26px; }
+      .wl-card-query {
+        flex: 1;
+        font-size: .7rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+        letter-spacing: .03em;
+        text-align: center;
+        background: rgba(0,230,118,.08);
+        border-color: rgba(0,230,118,.3);
+        color: #00e676;
+        font-weight: 600;
+      }
+      .wl-card-query:hover {
+        background: rgba(0,230,118,.15);
+        border-color: rgba(0,230,118,.5);
+        box-shadow: 0 0 10px rgba(0,230,118,.2);
+      }
+      .wl-del-btn {
+        width: 28px; height: 28px;
+        border-radius: 7px;
+        flex-shrink: 0;
+      }
+
+      /* 手機版 watchlist modal header 微調 */
+      #watchlistModal .modal-header {
+        padding: 12px 14px 10px;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      #watchlistModal .modal-title {
+        font-size: .88rem;
+        flex: 1;
+        min-width: 0;
+      }
+      #watchlistModal .wl-header-actions {
+        flex-shrink: 0;
+        gap: 6px;
+      }
+      #watchlistModal .wl-header-date {
+        font-size: .6rem;
+        padding: 3px 7px;
+        white-space: nowrap;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #watchlistModal .wl-refresh-btn {
+        width: 30px; height: 30px;
+        padding: 0;
+        justify-content: center;
+        min-width: unset;
+      }
+      #watchlistModal .wl-refresh-btn svg {
+        width: 14px; height: 14px;
+        flex-shrink: 0;
+      }
     }
 
     @media (max-width: 360px) {
@@ -1829,7 +1951,7 @@
       text-shadow: 0 0 8px rgba(0,229,255,.4);
       box-shadow: 0 0 8px rgba(0,229,255,.08);
     }
-    .drawer-divider { height: 1px; background: rgba(0,229,255,.07); margin: 8px 12px; }
+    .drawer-divider { height: 1px; background: rgba(0,229,255,.07); margin: 4px 12px; }
     /* 我的最愛 nav-item 特別樣式 */
     .nav-item.fav-nav-item {
       color: rgba(255,100,100,.7);
@@ -2248,8 +2370,8 @@
     .drawer-nav-body {
       flex: 1;
       overflow-y: auto;
-      overflow-x: hidden;
       scrollbar-width: none;
+      padding-bottom: 16px;
     }
     .drawer-nav-body::-webkit-scrollbar { display: none; }
     .drawer-footer {
@@ -2259,109 +2381,235 @@
       background: rgba(4,8,15,.98);
     }
 
-    /* 未登入狀態 */
-    .auth-login-btn {
+    /* ── 登入區塊（整合在 drawer-nav-body 內） ── */
+    .drawer-auth-block {
+      padding: 10px 12px 6px;
+    }
+
+    /* ── 未登入態：頭像列 + 登入按鈕 ── */
+    .auth-guest-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 2px 0 2px;
+    }
+    .auth-avatar-placeholder-static {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      position: relative;
+    }
+    .auth-avatar-placeholder-static svg {
+      width: 52px; height: 52px;
+    }
+    .auth-guest-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .auth-guest-name {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .84rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .auth-guest-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .56rem;
+      color: var(--text-faint);
+      letter-spacing: .04em;
+      margin-top: 4px;
+    }
+
+    /* ── 未登入：Google 按鈕 ── */
+    .auth-login-btn-wrap { display: block; }
+    .auth-login-btn-wrap.hidden { display: none; }
+    /* 舊大按鈕已改為 icon 按鈕，保留隱藏 */
+    .auth-login-btn { display: none; }
+
+    /* Google icon 登入按鈕（右側小方圓按鈕）*/
+    .auth-login-icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .76rem;
-      letter-spacing: .08em;
-      cursor: pointer;
-      transition: all .25s cubic-bezier(.22,1,.36,1);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: all .22s cubic-bezier(.22,1,.36,1);
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
+      position: relative;
+      overflow: hidden;
     }
-    .auth-login-btn:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+    .auth-login-icon-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(66,133,244,.15), rgba(52,168,83,.1));
+      opacity: 0;
+      transition: opacity .22s;
+    }
+    .auth-login-icon-btn:hover::before { opacity: 1; }
+    .auth-login-icon-btn:hover {
       border-color: rgba(255,255,255,.35);
-      box-shadow: 0 0 20px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.08);
-      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(66,133,244,.25), 0 0 0 1px rgba(66,133,244,.2);
+      transform: translateY(-1px) scale(1.04);
     }
-    .auth-login-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .auth-login-icon-btn:active { transform: scale(.96); }
 
-    /* 已登入狀態 */
+    /* ── 已登入：用戶面板 ── */
     .auth-user-panel { display: none; }
     .auth-user-panel.visible { display: block; }
-    .auth-login-btn-wrap { display: block; }
-    .auth-login-btn-wrap.hidden { display: none; }
 
     .auth-user-info {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 6px 10px;
+      gap: 12px;
+      padding: 2px 2px 4px;
+    }
+
+    /* 頭像容器 */
+    .auth-avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
     }
     .auth-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,229,255,.3);
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(0,229,255,.4);
       object-fit: cover;
-      flex-shrink: 0;
-      box-shadow: 0 0 12px rgba(0,229,255,.2);
+      box-shadow: 0 0 16px rgba(0,229,255,.25), 0 2px 8px rgba(0,0,0,.5);
+      display: block;
     }
     .auth-avatar-placeholder {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,229,255,.3);
-      background: rgba(0,229,255,.1);
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(0,229,255,.35);
+      background: linear-gradient(135deg, rgba(0,229,255,.1), rgba(0,100,200,.06));
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      color: var(--accent);
+      box-shadow: 0 0 14px rgba(0,229,255,.18);
     }
-    .auth-avatar-placeholder svg { width: 20px; height: 20px; }
+    .auth-avatar-placeholder svg { width: 22px; height: 22px; color: var(--accent); }
+
+    /* 在線綠點 */
+    .auth-online-dot {
+      position: absolute;
+      bottom: 1px; right: 1px;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid rgba(5,10,22,.98);
+      box-shadow: 0 0 7px rgba(0,230,118,.8);
+    }
+    /* 未登入紅點 */
+    .auth-offline-dot {
+      position: absolute;
+      bottom: 1px; right: 1px;
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid rgba(5,10,22,.98);
+      box-shadow: 0 0 7px rgba(255,61,90,.8);
+    }
+
+    /* 用戶文字 */
     .auth-user-text { flex: 1; min-width: 0; }
     .auth-user-name {
       font-family: 'Noto Sans TC', sans-serif;
-      font-size: .82rem;
-      font-weight: 600;
+      font-size: .88rem;
+      font-weight: 700;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-shadow: 0 0 20px rgba(255,255,255,.15);
+      margin-bottom: 3px;
     }
     .auth-user-email {
       font-family: 'Share Tech Mono', monospace;
       font-size: .6rem;
-      color: var(--text-dim);
+      color: var(--text-faint);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      letter-spacing: .03em;
       margin-top: 2px;
-      letter-spacing: .04em;
     }
-    .auth-logout-btn {
-      display: flex;
+    .auth-status-badge {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 7px;
-      width: 100%;
-      padding: 8px 14px;
-      margin-top: 6px;
+      gap: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .52rem;
+      letter-spacing: .12em;
+      color: var(--green);
+      background: rgba(0,230,118,.08);
+      border: 1px solid rgba(0,230,118,.2);
+      border-radius: 5px;
+      padding: 2px 7px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .auth-status-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px rgba(0,230,118,.8);
+    }
+    /* 未登入膠囊 badge */
+    .auth-status-badge--offline {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .52rem;
+      letter-spacing: .12em;
+      color: #fff;
+      background: rgba(255,61,90,.08);
+      border: 1px solid rgba(255,61,90,.25);
+      border-radius: 5px;
+      padding: 2px 7px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .auth-status-badge--offline::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 5px rgba(255,61,90,.8);
+    }
+
+    /* 登出按鈕（原大按鈕保留備用，現改用 icon 按鈕）*/
+    .auth-logout-btn { display: none; }
+
+    /* 登出 icon 按鈕（右上角小圓）*/
+    .auth-logout-icon-btn {
+      width: 32px; height: 32px;
       border-radius: 8px;
       border: 1px solid rgba(255,61,90,.2);
       background: rgba(255,61,90,.06);
-      color: rgba(255,100,100,.8);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .7rem;
-      letter-spacing: .1em;
+      color: rgba(255,100,100,.7);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-left: auto;
       transition: all .2s;
     }
-    .auth-logout-btn:hover {
-      background: rgba(255,61,90,.14);
-      border-color: rgba(255,61,90,.45);
+    .auth-logout-icon-btn svg { width: 14px; height: 14px; }
+    .auth-logout-icon-btn:hover {
+      border-color: rgba(255,61,90,.5);
+      background: rgba(255,61,90,.15);
       color: var(--red);
+      box-shadow: 0 0 12px rgba(255,61,90,.2);
     }
-    .auth-logout-btn svg { width: 13px; height: 13px; }
 
     /* ── VISITOR PANEL (admin only) ── */
     #visitorPanel {
@@ -2458,6 +2706,652 @@
     }
     @media (max-width: 600px) {
       #visitorPanel { bottom: 16px; right: 12px; padding: 10px 14px; min-width: 160px; }
+    }
+
+    /* ── SETTINGS MODAL ── */
+    #settingsModal { z-index: 400; }
+    .settings-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 20px; }
+    .settings-section-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .22em;
+      color: rgba(0,229,255,.6);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.1);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .settings-row-label {
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .82rem;
+      color: var(--text);
+    }
+    .settings-row-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      color: var(--text-faint);
+      margin-top: 3px;
+      letter-spacing: .04em;
+    }
+    /* 主題切換按鈕組 */
+    .theme-switcher {
+      display: flex;
+      gap: 8px;
+    }
+    .theme-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,229,255,.15);
+      background: rgba(0,229,255,.04);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all .22s;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .06em;
+      min-width: 72px;
+    }
+    .theme-btn svg { width: 20px; height: 20px; opacity: .7; transition: opacity .2s; }
+    .theme-btn:hover { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.3); color: var(--text); }
+    .theme-btn:hover svg { opacity: 1; }
+    .theme-btn.active {
+      background: rgba(0,229,255,.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 14px rgba(0,229,255,.2);
+    }
+    .theme-btn.active svg { opacity: 1; }
+    /* 設定未登入提示 */
+    .settings-login-notice {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 16px;
+      color: var(--text-faint);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .06em;
+      text-align: center;
+    }
+    .settings-login-notice svg { color: var(--muted); }
+
+    /* ══════════════════════════════════════════════════════════════
+       ☀️  白天日光主題（Daylight Theme）
+       ══════════════════════════════════════════════════════════════ */
+
+    /* ── CSS 變數覆蓋 ── */
+    body.theme-day {
+      --bg:         #cce0f2;
+      --surface:    rgba(255,255,255,.85);
+      --surface2:   rgba(232,246,255,.92);
+      --border:     rgba(26,101,168,.2);
+      --border2:    rgba(26,101,168,.32);
+      --accent:     #1265a8;
+      --accent2:    #0d5090;
+      --accent3:    #1a88cc;
+      --green:      #157a32;
+      --red:        #b03020;
+      --yellow:     #b8880e;
+      --muted:      #6a90b0;
+      --text:       #0c1c2e;
+      --text-dim:   #1a3550;
+      --text-faint: #3a6080;
+      --glow:       0 2px 14px rgba(26,101,168,.2);
+      --glow-red:   0 2px 10px rgba(176,48,32,.28);
+      --glow-grn:   0 2px 10px rgba(21,122,50,.28);
+      --glow-strong:0 4px 28px rgba(26,101,168,.16);
+    }
+
+    /* ── 背景：隱藏太空，顯示天空 ── */
+    body.theme-day #galaxyCanvas  { opacity: 0; transition: opacity .8s ease; }
+    body.theme-day .bg-nebula     { opacity: 0; transition: opacity .8s ease; }
+    body.theme-day .bg-scanlines  { opacity: 0; }
+    body.theme-day .bg-day        { opacity: 1; }
+    body.theme-day {
+      background: #c8dff2;
+      scrollbar-color: rgba(26,123,191,.3) transparent;
+    }
+    body.theme-day::-webkit-scrollbar-thumb { background: rgba(26,123,191,.25); }
+
+    /* ── bg-day：天空漸層 + Canvas 雲 ── */
+    .bg-day {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .8s ease;
+      background:
+        linear-gradient(180deg,
+          #6ab8e8 0%,
+          #8ecff5 18%,
+          #b2e0fb 40%,
+          #cceeff 62%,
+          #d8f0f8 78%,
+          #e8f8f0 90%,
+          #c8ecd4 100%);
+    }
+    /* 山脈 SVG 層 */
+    #mountainCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+    body.theme-day #mountainCanvas { opacity: 1; }
+    /* 雲 Canvas */
+    #skyCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+    body.theme-day #skyCanvas { opacity: 1; }
+
+    /* 太陽實體（右上） */
+    body.theme-day .bg-day::before {
+      content: '';
+      position: absolute;
+      top: 28px; right: 80px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        #fff8c0 0%,
+        #ffe066 40%,
+        #ffc820 70%,
+        transparent 100%);
+      box-shadow:
+        0 0 0 16px rgba(255,220,80,.15),
+        0 0 0 36px rgba(255,200,60,.08),
+        0 0 0 64px rgba(255,180,40,.04);
+      animation: sunPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0%   { transform: scale(1);    box-shadow: 0 0 0 16px rgba(255,220,80,.15), 0 0 0 36px rgba(255,200,60,.08), 0 0 0 64px rgba(255,180,40,.04); }
+      100% { transform: scale(1.06); box-shadow: 0 0 0 20px rgba(255,220,80,.2),  0 0 0 48px rgba(255,200,60,.1),  0 0 0 80px rgba(255,180,40,.06); }
+    }
+    /* 底部大地 */
+    body.theme-day .bg-day::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 18%;
+      background: linear-gradient(0deg,
+        rgba(80,160,80,.22) 0%,
+        rgba(100,180,100,.1) 50%,
+        transparent 100%);
+    }
+
+    /* ── HEADER ── */
+    body.theme-day header {
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(26,123,191,.15);
+      box-shadow: 0 2px 20px rgba(26,100,180,.1);
+    }
+    body.theme-day header::after {
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(26,123,191,.5) 25%,
+        rgba(33,150,211,.7) 50%,
+        rgba(26,123,191,.5) 75%,
+        transparent 100%);
+      background-size: 200% 100%;
+    }
+    body.theme-day .logo-text {
+      color: #0a1828;
+      text-shadow: 0 1px 4px rgba(26,80,160,.2);
+    }
+    body.theme-day .logo-sub { color: var(--accent); opacity: .8; }
+    body.theme-day .logo-icon img {
+      filter: drop-shadow(0 2px 6px rgba(26,100,180,.2));
+    }
+    body.theme-day #clock {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.2);
+      color: #1a5080;
+    }
+    body.theme-day .status-dot-inline { background: #1a8a3c; box-shadow: 0 0 6px rgba(26,138,60,.4); }
+    body.theme-day .market-status { color: #3a6080; }
+
+    /* ── TICKER ── */
+    body.theme-day .ticker-wrap {
+      background: rgba(255,255,255,.75);
+      border-bottom: 1px solid rgba(26,123,191,.12);
+    }
+    body.theme-day .ticker-wrap::before { background: linear-gradient(90deg, rgba(255,255,255,.9), transparent); }
+    body.theme-day .ticker-wrap::after  { background: linear-gradient(-90deg, rgba(255,255,255,.9), transparent); }
+    body.theme-day .ticker-item { color: #1a3550; border-right-color: rgba(26,101,168,.12); }
+    body.theme-day .ticker-item .label { color: #2a5070; font-weight: 500; }
+    body.theme-day .ticker-item span.up   { color: #c0392b; }
+    body.theme-day .ticker-item span.down { color: #1a8a3c; }
+
+    /* ── DRAWER ── */
+    body.theme-day .drawer {
+      background: rgba(240,247,255,.97);
+      border-right: 1px solid rgba(26,123,191,.15);
+      box-shadow: 4px 0 32px rgba(26,100,180,.12);
+    }
+    body.theme-day .drawer-overlay { background: rgba(60,100,140,.3); }
+    body.theme-day .drawer-header {
+      border-bottom-color: rgba(26,123,191,.12);
+      background: rgba(255,255,255,.6);
+    }
+    body.theme-day .drawer-brand { color: #1a5080; }
+    body.theme-day .drawer-close { color: #3a5570; border-color: rgba(26,123,191,.2); }
+    body.theme-day .drawer-auth-top {
+      background: rgba(26,123,191,.05);
+      border-bottom-color: rgba(26,123,191,.12);
+    }
+    body.theme-day .drawer-section-label { color: #2a5070; font-weight: 600; }
+    body.theme-day .nav-item {
+      color: #3a5570;
+      border-color: transparent;
+    }
+    body.theme-day .nav-item:hover {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.2);
+      color: #1a2d40;
+    }
+    body.theme-day .nav-item.active {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,123,191,.35);
+      color: var(--accent);
+      box-shadow: none;
+    }
+    body.theme-day .nav-badge {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,123,191,.25);
+      color: var(--accent);
+    }
+    body.theme-day .drawer-divider { background: rgba(26,123,191,.1); }
+    body.theme-day .about-section-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .auth-login-btn {
+      background: linear-gradient(135deg, #1a7bbf, #1565a0);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 12px rgba(26,123,191,.3);
+    }
+    body.theme-day .auth-login-btn:hover {
+      background: linear-gradient(135deg, #2196d3, #1a7bbf);
+      box-shadow: 0 4px 18px rgba(26,123,191,.4);
+      transform: translateY(-1px);
+    }
+    body.theme-day .auth-user-info { border-bottom-color: rgba(26,123,191,.12); }
+    body.theme-day .auth-user-name { color: #1a2d40; }
+    body.theme-day .auth-user-email { color: #6a88a8; }
+    body.theme-day .auth-logout-btn {
+      color: #c0392b;
+      border-color: rgba(192,57,43,.2);
+      background: rgba(192,57,43,.04);
+    }
+    body.theme-day .auth-logout-btn:hover {
+      background: rgba(192,57,43,.08);
+      border-color: rgba(192,57,43,.35);
+    }
+
+    /* ── SEARCH / CARD ── */
+    body.theme-day .search-area {
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 8px 36px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.8);
+      border-color: rgba(26,101,168,.22);
+      border-color: rgba(26,123,191,.18);
+      box-shadow: 0 4px 24px rgba(26,100,180,.1), 0 1px 4px rgba(26,100,180,.08);
+      animation: none;
+    }
+    body.theme-day .search-area::before { background: linear-gradient(90deg, transparent, rgba(26,123,191,.4), transparent); }
+    body.theme-day .search-area::after  { background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), transparent); }
+    body.theme-day #stockInput {
+      background: rgba(255,255,255,.96);
+      border-color: rgba(26,101,168,.28);
+      color: #0a1828;
+    }
+    body.theme-day #stockInput::placeholder { color: #4a7090; }
+    body.theme-day #stockInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,123,191,.12);
+    }
+    body.theme-day #searchBtn {
+      background: linear-gradient(135deg, #1265a8, #0d5090);
+      color: #fff;
+      box-shadow: 0 2px 16px rgba(26,123,191,.3);
+    }
+    body.theme-day #searchBtn:hover {
+      background: linear-gradient(135deg, #2196d3, #1a7bbf);
+      box-shadow: 0 4px 20px rgba(26,123,191,.4);
+      transform: translateY(-1px);
+    }
+    body.theme-day .hint { color: #7a9cb8; }
+    body.theme-day .hint kbd { background: rgba(26,123,191,.1); color: #1a7bbf; border-color: rgba(26,123,191,.2); }
+    body.theme-day .section-label { color: #0e5a9a; opacity: 1; font-weight: 600; text-shadow: none; }
+    body.theme-day h2.section-title {
+      background: linear-gradient(90deg, #0a1828 60%, #1265a8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      font-weight: 800;
+    }
+    body.theme-day .timeline-title {
+      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    body.theme-day .data-note-title {
+      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── STOCK RESULT CARD ── */
+    body.theme-day .stock-card {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(26,123,191,.2);
+      box-shadow: 0 4px 24px rgba(26,100,180,.1);
+      animation: fadeUp .3s ease;
+    }
+    body.theme-day .card-header {
+      background: rgba(26,123,191,.04);
+      border-bottom-color: rgba(26,123,191,.1);
+    }
+    body.theme-day .stock-badge {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.3);
+      color: var(--accent);
+      text-shadow: none;
+    }
+    body.theme-day .stock-name-title { color: #1a2d40; }
+    body.theme-day .stock-market-tag {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.2);
+      color: #3a5570;
+    }
+    body.theme-day .card-timestamp { color: #7a9cb8; }
+    body.theme-day .metric-cell {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 2px 10px rgba(26,80,160,.08), inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    body.theme-day .metric-cell:hover {
+      border-color: rgba(26,101,168,.34);
+      box-shadow: 0 6px 20px rgba(26,80,160,.13);
+      transform: translateY(-2px);
+    }
+    body.theme-day .metric-label { color: #2a5070; font-weight: 500; letter-spacing: .04em; }
+    body.theme-day .metric-value.positive { color: #a02818; text-shadow: none; font-weight: 700; }
+    body.theme-day .metric-value.negative { color: #126e28; text-shadow: none; font-weight: 700; }
+    body.theme-day .metric-value.neutral  { color: #2a5070; font-weight: 600; }
+    body.theme-day .unit { color: #7a9cb8; }
+
+    /* ── MARKET SECTION ── */
+    body.theme-day .market-wrap {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.22);
+      box-shadow: 0 6px 36px rgba(26,80,160,.12), inset 0 1px 0 rgba(255,255,255,.7);
+      animation: none;
+    }
+    body.theme-day .market-wrap::before { background: linear-gradient(90deg, transparent, rgba(26,123,191,.35), transparent); }
+    body.theme-day .market-wrap::after  { background: linear-gradient(90deg, transparent, rgba(26,123,191,.4), transparent); }
+    body.theme-day .market-card {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 2px 16px rgba(26,80,160,.09), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    body.theme-day .market-card:hover {
+      border-color: rgba(26,101,168,.38);
+      box-shadow: 0 8px 28px rgba(26,80,160,.15), inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    body.theme-day .market-card-label { color: #2a5070; font-weight: 500; }
+    body.theme-day .market-card-value { color: #0a1828; font-weight: 700; }
+    body.theme-day .market-card-value.positive { color: #961c10; text-shadow: none; font-weight: 700; }
+    body.theme-day .market-card-value.negative { color: #0e6b28; text-shadow: none; font-weight: 700; }
+    body.theme-day .market-card-sub { color: #7a9cb8; }
+    body.theme-day .market-card-icon { opacity: .18; filter: hue-rotate(20deg) saturate(.7); }
+    body.theme-day .refresh-badge {
+      background: rgba(26,101,168,.1);
+      border-color: rgba(26,123,191,.2);
+      color: #3a5570;
+    }
+    body.theme-day .countdown { color: var(--accent); }
+
+    /* ── TIMELINE & DATA NOTE ── */
+    body.theme-day .timeline {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,123,191,.16);
+      box-shadow: 0 3px 16px rgba(26,100,180,.08);
+    }
+    body.theme-day .timeline::before { background: linear-gradient(90deg, transparent, rgba(26,123,191,.25), transparent); }
+    body.theme-day .timeline-list::before { background: linear-gradient(to bottom, var(--accent), rgba(26,123,191,.1)); }
+    body.theme-day .timeline-dot.done    { background: #1a8a3c; box-shadow: 0 0 5px rgba(26,138,60,.4); }
+    body.theme-day .timeline-dot.active  { background: var(--accent); box-shadow: 0 0 8px rgba(26,123,191,.5); }
+    body.theme-day .timeline-dot.pending { background: #b0c8e0; border-color: #8aafc8; }
+    body.theme-day .timeline-time { color: #2a5070; font-weight: 500; }
+    body.theme-day .timeline-label { color: #1a3550; }
+    body.theme-day .timeline-label.done { color: #0a1828; font-weight: 600; }
+    body.theme-day .data-note {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,123,191,.16);
+      box-shadow: 0 3px 16px rgba(26,100,180,.08);
+    }
+    body.theme-day .data-note-item { color: #3a5570; border-bottom-color: rgba(26,123,191,.08); }
+    body.theme-day .data-note-dot { background: var(--accent); }
+
+    /* ── MODAL ── */
+    body.theme-day .modal-overlay { background: rgba(60,100,140,.35); backdrop-filter: blur(8px); }
+    body.theme-day .modal {
+      background: linear-gradient(180deg, rgba(255,255,255,.97), rgba(245,252,255,.99));
+      border-color: rgba(26,123,191,.2);
+      box-shadow: 0 8px 60px rgba(26,100,180,.18), 0 0 0 1px rgba(26,123,191,.1);
+    }
+    body.theme-day .modal::before { background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), rgba(33,150,211,.6), rgba(26,123,191,.5), transparent); }
+    body.theme-day .modal-header {
+      background: rgba(26,123,191,.03);
+      border-bottom-color: rgba(26,123,191,.12);
+    }
+    body.theme-day .modal-title {
+      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    body.theme-day .modal-close {
+      border-color: rgba(26,123,191,.2);
+      color: #3a5570;
+    }
+    body.theme-day .modal-close:hover { border-color: #c0392b; color: #c0392b; background: rgba(192,57,43,.06); }
+    body.theme-day .modal-tabs { background: rgba(26,123,191,.03); border-bottom-color: rgba(26,123,191,.1); }
+    body.theme-day .modal-tab {
+      color: #6a88a8;
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .modal-tab:hover { color: #1a2d40; background: rgba(26,123,191,.07); }
+    body.theme-day .modal-tab.active {
+      color: var(--accent);
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.4);
+      box-shadow: none;
+      text-shadow: none;
+    }
+    body.theme-day .modal-body { border-bottom-color: rgba(26,123,191,.08); }
+    body.theme-day .toggle-btn { border-color: rgba(26,123,191,.18); color: #6a88a8; }
+    body.theme-day .toggle-btn.buy.active {
+      background: rgba(192,57,43,.08);
+      border-color: rgba(192,57,43,.4);
+      color: #c0392b;
+      box-shadow: none;
+    }
+    body.theme-day .toggle-btn.sell.active {
+      background: rgba(26,138,60,.08);
+      border-color: rgba(26,138,60,.4);
+      color: #1a8a3c;
+      box-shadow: none;
+    }
+    body.theme-day .modal-date { background: rgba(26,123,191,.05); border-color: rgba(26,123,191,.15); color: #6a88a8; }
+    body.theme-day .modal-loading { color: #3a5570; }
+
+    /* TOP50 table */
+    body.theme-day .top50-table th {
+      background: rgba(26,123,191,.06);
+      color: #1a7bbf;
+      border-bottom-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .top50-table td { border-bottom-color: rgba(26,123,191,.07); color: #1a2d40; }
+    body.theme-day .top50-table tr:hover td { background: rgba(26,123,191,.05); }
+    body.theme-day .rank-num.top3 { color: #d4a017; }
+    body.theme-day .net-cell.buy  { color: #c0392b; }
+    body.theme-day .net-cell.sell { color: #1a8a3c; }
+
+    /* ── INFO ICON TOOLTIP ── */
+    body.theme-day .info-icon {
+      border-color: rgba(26,101,168,.4);
+      color: rgba(18,80,140,.8);
+      background: rgba(240,248,255,.7);
+    }
+    body.theme-day .info-icon:hover { border-color: var(--accent); background: rgba(26,101,168,.12); color: var(--accent); }
+    body.theme-day .info-icon .tooltip {
+      background: rgba(255,255,255,.97);
+      border: 1px solid rgba(26,101,168,.25);
+      color: #1a3550;
+      box-shadow: 0 8px 32px rgba(26,80,160,.18), 0 0 0 1px rgba(26,101,168,.1);
+    }
+    body.theme-day .info-icon .tooltip::before {
+      border-bottom-color: rgba(26,101,168,.22);
+    }
+    body.theme-day .data-note {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 4px 24px rgba(26,80,160,.1);
+    }
+
+    /* ── FAVORITES / WATCHLIST ── */
+    body.theme-day .fav-btn {
+      border-color: rgba(192,57,43,.2);
+      background: rgba(192,57,43,.04);
+      color: rgba(192,57,43,.5);
+    }
+    body.theme-day .fav-btn:hover { background: rgba(192,57,43,.1); color: #c0392b; border-color: rgba(192,57,43,.4); }
+    body.theme-day .fav-btn.active { background: rgba(192,57,43,.1); color: #c0392b; border-color: rgba(192,57,43,.5); box-shadow: 0 2px 10px rgba(192,57,43,.2); }
+    body.theme-day .fav-toast {
+      background: rgba(240,247,255,.97);
+      border-color: rgba(26,123,191,.25);
+      color: #1a2d40;
+      box-shadow: 0 4px 20px rgba(26,100,180,.15);
+    }
+    body.theme-day .wl-list-header { background: rgba(26,123,191,.05); border-bottom-color: rgba(26,123,191,.15); }
+    body.theme-day .wl-list-header span { color: #1a7bbf; }
+    body.theme-day .wl-row { border-bottom-color: rgba(26,123,191,.08); }
+    body.theme-day .wl-row:hover { background: rgba(26,123,191,.04); }
+    body.theme-day .wl-code { background: rgba(26,123,191,.08); border-color: rgba(26,123,191,.25); color: var(--accent); }
+    body.theme-day .wl-name { color: #1a2d40; }
+    body.theme-day .wl-row-val { color: #1a2d40; }
+    body.theme-day .wl-row-val .wl-label { color: #7a9cb8; }
+    body.theme-day .wl-row-val.pos { color: #c0392b; }
+    body.theme-day .wl-row-val.neg { color: #1a8a3c; }
+    body.theme-day .wl-row-val.neu { color: #6a88a8; }
+    body.theme-day .wl-card-query { color: var(--accent); background: rgba(26,123,191,.06); border-color: rgba(26,123,191,.2); }
+    body.theme-day .wl-del-btn { border-color: rgba(192,57,43,.2); color: rgba(192,57,43,.5); }
+    body.theme-day .wl-del-btn:hover { background: rgba(192,57,43,.08); color: #c0392b; }
+    body.theme-day .wl-refresh-btn { background: rgba(26,123,191,.06); border-color: rgba(26,123,191,.2); color: #3a5570; }
+    body.theme-day .wl-refresh-btn:hover { color: var(--accent); border-color: rgba(26,123,191,.4); }
+    body.theme-day .wl-header-date { background: rgba(26,123,191,.05); border-color: rgba(26,123,191,.15); color: #6a88a8; }
+
+    /* ── FOOTER ── */
+    body.theme-day footer {
+      background: rgba(240,247,255,.95);
+      border-top-color: rgba(26,123,191,.12);
+      box-shadow: 0 -2px 20px rgba(26,100,180,.08);
+    }
+    body.theme-day .footer-disclaimer-title { color: #6a88a8; }
+    body.theme-day .footer-disclaimer-text  { color: #7a9cb8; }
+    body.theme-day .footer-brand-name { color: var(--accent); }
+    body.theme-day .footer-brand-sub  { color: #7a9cb8; }
+    body.theme-day .footer-legal-links a { color: #7a9cb8; }
+    body.theme-day .footer-legal-links a:hover { color: var(--accent); }
+    body.theme-day .footer-sep { color: #b0c8e0; }
+
+    /* ── SETTINGS MODAL ── */
+    body.theme-day .theme-btn {
+      border-color: rgba(26,123,191,.18);
+      background: rgba(26,123,191,.04);
+      color: #3a5570;
+    }
+    body.theme-day .theme-btn:hover { background: rgba(26,123,191,.1); border-color: rgba(26,123,191,.35); }
+    body.theme-day .theme-btn.active {
+      background: rgba(26,123,191,.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 2px 12px rgba(26,123,191,.15);
+    }
+
+    /* ── VISITOR PANEL ── */
+    body.theme-day #visitorPanel {
+      background: rgba(255,255,255,.95);
+      border-color: rgba(26,123,191,.25);
+      border-left-color: rgba(26,123,191,.6);
+      box-shadow: 0 4px 20px rgba(26,100,180,.12);
+    }
+    body.theme-day .vp-toggle { background: rgba(26,123,191,.04); border-bottom-color: rgba(26,123,191,.1); color: rgba(26,123,191,.7); }
+    body.theme-day .vp-toggle:hover { background: rgba(26,123,191,.09); color: var(--accent); }
+    body.theme-day .vp-label { color: #3a5570; }
+    body.theme-day .vp-val   { color: var(--accent); text-shadow: none; }
+    body.theme-day .vp-updated { color: #7a9cb8; }
+
+    /* ── 移除所有 neon glow 動畫（白天不需要脈衝）── */
+    body.theme-day .status-dot {
+      animation: none;
+      box-shadow: 0 0 4px rgba(26,138,60,.5);
+    }
+    body.theme-day .market-card  { animation: none; }
+    body.theme-day .search-area  { animation: none; }
+    body.theme-day .metric-cell  { animation: none; }
+    body.theme-day header::after { animation: headerLineSweep 6s linear infinite; opacity: .6; }
+
+    /* ── 白天模式 mobile watchlist 微調 ── */
+    @media (max-width: 600px) {
+      body.theme-day .wl-row {
+        background: rgba(255,255,255,.93);
+        border-color: rgba(26,101,168,.28);
+        box-shadow: 0 4px 18px rgba(26,80,160,.12);
+      }
+      body.theme-day .wl-row-name {
+        background: rgba(176,48,32,.04);
+        border-right-color: rgba(26,101,168,.18);
+        border-left-color: rgba(176,48,32,.55);
+      }
+      body.theme-day .wl-code {
+        background: rgba(176,48,32,.07);
+        border-color: rgba(176,48,32,.38);
+        color: #a02818;
+        text-shadow: none;
+      }
+      body.theme-day .wl-name { color: #1a3550; }
+      body.theme-day .wl-row-val { border-right-color: rgba(26,101,168,.14); border-bottom-color: rgba(26,101,168,.14); }
+      body.theme-day .wl-row-val .wl-label { color: rgba(18,80,140,.55); }
+      body.theme-day .wl-row-actions { background: rgba(26,101,168,.03); border-top-color: rgba(26,101,168,.14); }
+      body.theme-day .wl-card-query {
+        background: rgba(21,122,50,.07);
+        border-color: rgba(21,122,50,.28);
+        color: #126e28;
+      }
+      body.theme-day .wl-card-query:hover {
+        background: rgba(21,122,50,.13);
+        border-color: rgba(21,122,50,.48);
+      }
     }
   </style>
   <!-- Google Identity Services（OAuth Popup 方式） -->
@@ -2573,6 +3467,9 @@
 <canvas id="galaxyCanvas"></canvas>
 <div class="bg-nebula"></div>
 <div class="bg-scanlines"></div>
+<div class="bg-day"></div>
+<canvas id="mountainCanvas"></canvas>
+<canvas id="skyCanvas"></canvas>
 <canvas id="particleCanvas" style="display:none"></canvas>
 
 <audio src="MapleMusic.mp3" loop></audio>
@@ -2591,17 +3488,15 @@
         <img src="images/jelly.png" alt="JellyStock Logo" />
       </div>
       <div>
-        <div class="logo-text">盤後雷達</div>
-        <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
+        <div class="logo-text">JELLYSTOCK · SYSTEM</div>
+        <div class="logo-sub-status">
+          <div class="status-dot-inline"></div>
+          <span>TWSE / TPEX LIVE</span>
+        </div>
       </div>
     </div>
   </div>
   <div class="header-right">
-    <div class="market-status">
-      <div class="status-dot"></div>
-      <span>TWSE / TPEX LIVE</span>
-    </div>
-
     <button id="musicBtn" onclick="toggleMusic()" title="播放/暫停音樂">
       <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="5 3 19 12 5 21 5 3"/>
@@ -2629,8 +3524,131 @@
     </button>
   </div>
 
-  <!-- 可捲動的導覽區 -->
+  <!-- 可捲動的導覽區（登入區整合在內） -->
   <div class="drawer-nav-body">
+
+    <!-- ── 登入/用戶區塊（整合在選單內，個股查詢上方）── -->
+    <div class="drawer-auth-block">
+
+      <!-- 未登入態 -->
+      <div id="authLoginWrap" class="auth-login-btn-wrap">
+        <div class="auth-guest-row">
+          <!-- 精緻頭像：仿 0.png 圓角方形底 + 青色人形 -->
+          <div class="auth-avatar-placeholder-static">
+            <div class="auth-offline-dot"></div>
+            <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="avatarBg" cx="50%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#0a2040"/>
+                  <stop offset="100%" stop-color="#040c1c"/>
+                </radialGradient>
+                <filter id="avatarGlow">
+                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <!-- 圓角方形底板 -->
+              <rect x="1" y="1" width="50" height="50" rx="14" ry="14"
+                fill="url(#avatarBg)"
+                stroke="rgba(0,229,255,.35)" stroke-width="1.2"/>
+              <!-- 內框光邊 -->
+              <rect x="3" y="3" width="46" height="46" rx="12" ry="12"
+                fill="none"
+                stroke="rgba(0,229,255,.1)" stroke-width=".8"/>
+              <!-- 身體弧形 -->
+              <path d="M10 46 Q10 34 26 34 Q42 34 42 46"
+                fill="rgba(0,180,220,.18)"
+                stroke="#00ccee" stroke-width="1.6"
+                stroke-linecap="round" filter="url(#avatarGlow)"/>
+              <!-- 頭部圓 -->
+              <circle cx="26" cy="22" r="8.5"
+                fill="rgba(0,180,220,.15)"
+                stroke="#00ccee" stroke-width="1.8"
+                filter="url(#avatarGlow)"/>
+              <!-- 頭部高光 -->
+              <circle cx="23" cy="19.5" r="2"
+                fill="rgba(160,240,255,.3)"/>
+              <!-- 肩膀線條 -->
+              <path d="M14 38 Q26 32 38 38"
+                fill="none"
+                stroke="rgba(0,200,240,.25)" stroke-width="1"/>
+            </svg>
+          </div>
+
+          <div class="auth-guest-info">
+            <div class="auth-guest-name">未登入</div>
+            <div class="auth-guest-sub">點擊右側按鈕登入</div>
+          </div>
+
+          <!-- Google 登入按鈕移到右側 -->
+          <button class="auth-login-icon-btn" onclick="window._googleSignIn && window._googleSignIn()" title="以 Google 帳號登入">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 已登入態 -->
+      <div id="authUserPanel" class="auth-user-panel">
+        <div class="auth-user-info">
+          <div class="auth-avatar-wrap">
+            <img id="authAvatarImg" class="auth-avatar" src="" alt="avatar" style="display:none" />
+            <div id="authAvatarPlaceholder" class="auth-avatar-placeholder" style="display:none">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="avatarBg3" cx="50%" cy="35%" r="65%">
+                    <stop offset="0%" stop-color="#0a2040"/>
+                    <stop offset="100%" stop-color="#040c1c"/>
+                  </radialGradient>
+                  <filter id="avatarGlow2">
+                    <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <rect x="1" y="1" width="50" height="50" rx="14" ry="14"
+                  fill="url(#avatarBg3)"
+                  stroke="rgba(0,229,255,.4)" stroke-width="1.2"/>
+                <rect x="3" y="3" width="46" height="46" rx="12" ry="12"
+                  fill="none" stroke="rgba(0,229,255,.12)" stroke-width=".8"/>
+                <path d="M10 46 Q10 34 26 34 Q42 34 42 46"
+                  fill="rgba(0,180,220,.2)"
+                  stroke="#00ccee" stroke-width="1.8"
+                  stroke-linecap="round" filter="url(#avatarGlow2)"/>
+                <circle cx="26" cy="22" r="8.5"
+                  fill="rgba(0,180,220,.18)"
+                  stroke="#00ccee" stroke-width="1.8"
+                  filter="url(#avatarGlow2)"/>
+                <circle cx="23" cy="19.5" r="2"
+                  fill="rgba(160,240,255,.35)"/>
+                <path d="M14 38 Q26 32 38 38"
+                  fill="none" stroke="rgba(0,200,240,.28)" stroke-width="1"/>
+              </svg>
+            </div>
+            <div class="auth-online-dot"></div>
+          </div>
+          <div class="auth-user-text">
+            <div id="authUserName" class="auth-user-name">--</div>
+            <div id="authUserEmail" class="auth-user-email">--</div>
+          </div>
+          <!-- 登出按鈕移到右上角 -->
+          <button class="auth-logout-icon-btn" onclick="window._googleSignOut && window._googleSignOut()" title="登出">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /drawer-auth-block -->
+
+    <div class="drawer-divider"></div>
+
     <div class="drawer-section">
       <button class="nav-item active" onclick="scrollToMain()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2671,25 +3689,32 @@
         </svg>
         更新時程
       </button>
+      <button class="nav-item" onclick="openSettingsModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        設定
+      </button>
     </div>
 
     <div class="drawer-divider"></div>
 
     <div class="drawer-section">
       <span class="about-section-label">關於本站</span>
-      <a class="nav-item" href="stock_site/about.html">
+      <a class="nav-item" href="stock_site/legal/about.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
         關於我們
       </a>
-      <a class="nav-item" href="stock_site/privacy.html">
+      <a class="nav-item" href="stock_site/legal/privacy.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
         隱私政策
       </a>
-      <a class="nav-item" href="stock_site/disclaimer.html">
+      <a class="nav-item" href="stock_site/legal/disclaimer.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
           <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -2700,47 +3725,6 @@
     <div class="drawer-divider"></div>
   </div><!-- /drawer-nav-body -->
 
-  <div class="drawer-footer">
-    <!-- 未登入：顯示 Google 登入按鈕 -->
-    <div id="authLoginWrap" class="auth-login-btn-wrap">
-      <button class="auth-login-btn" onclick="window._googleSignIn && window._googleSignIn()">
-        <!-- Google G Logo SVG -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Google 帳號登入
-      </button>
-    </div>
-
-    <!-- 已登入：顯示大頭貼 + 名稱 + 登出 -->
-    <div id="authUserPanel" class="auth-user-panel">
-      <div class="auth-user-info">
-        <img id="authAvatarImg" class="auth-avatar" src="" alt="avatar" style="display:none" />
-        <div id="authAvatarPlaceholder" class="auth-avatar-placeholder" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        </div>
-        <div class="auth-user-text">
-          <div id="authUserName" class="auth-user-name">--</div>
-          <div id="authUserEmail" class="auth-user-email">--</div>
-        </div>
-      </div>
-      <button class="auth-logout-btn" onclick="window._googleSignOut && window._googleSignOut()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        登出
-      </button>
-    </div>
-
-  </div>
 </aside>
 
 <!-- MAIN CONTENT -->
@@ -2850,6 +3834,30 @@
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" onclick="handleSettingsModalClick(event)">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        設定
+      </div>
+      <button class="modal-close" onclick="closeSettingsModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="settingsContent"></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- WATCHLIST MODAL -->
 <div class="modal-overlay" id="watchlistModal" onclick="handleWatchlistModalClick(event)">
   <div class="modal">
@@ -2874,12 +3882,11 @@
       </div>
       <div class="wl-header-actions">
         <span class="wl-header-date" id="wlHeaderDate">--</span>
-        <button class="wl-refresh-btn" id="wlRefreshBtn" onclick="loadWatchlist()">
+        <button class="wl-refresh-btn" id="wlRefreshBtn" onclick="loadWatchlist()" title="重新整理">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
           </svg>
-          重新整理
         </button>
         <button class="modal-close" onclick="closeWatchlistModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3162,11 +4169,11 @@
     </div>
     <p class="footer-disclaimer-text">本網站資料來源為臺灣證券交易所（TWSE）、櫃買中心（TPEx）等官方公開資訊，資料僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
     <div class="footer-legal-links">
-      <a href="stock_site/about.html">關於本站</a>
+      <a href="stock_site/legal/about.html">關於本站</a>
       <span class="footer-sep">·</span>
-      <a href="stock_site/privacy.html">隱私政策</a>
+      <a href="stock_site/legal/privacy.html">隱私政策</a>
       <span class="footer-sep">·</span>
-      <a href="stock_site/disclaimer.html">免責聲明</a>
+      <a href="stock_site/legal/disclaimer.html">免責聲明</a>
       <span class="footer-sep">·</span>
       <a href="mailto:llowoll5566@gmail.com">聯絡我們</a>
     </div>
@@ -3256,73 +4263,116 @@ const API_BASE = (() => {
   }
   scheduleAsteroid();
 
-  // ── 4顆特色行星定義 ──────────────────────────────────────────────────────────
+  // ── 太陽系風格：太陽＋5顆特色行星 ──────────────────────────────────────────
+
+  // 太陽（左上角，超大發光球體）
+  const SUN = {
+    xr: .04, yr: .05, r: 80,
+    phase: 0, glowPulse: 0,
+    hasSunspot: true,
+    sunspots: [
+      { angle: .3, dist: .35, r: 5 },
+      { angle: 2.1, dist: .45, r: 3.5 },
+      { angle: 4.5, dist: .3, r: 4 },
+    ],
+    coronaRays: 12,
+  };
+
   const PLANETS = [
-    // 藍色土星型大行星（右上，有雙環 + 衛星）
+    // ── 土星（右上，超大，黃棕色帶黃金雙環）──
     {
-      id: 0, xr: .82, yr: .18, r: 38,
+      id: 0, xr: .82, yr: .16, r: 44,
       phase: 0, glowPulse: 0, rotAngle: 0,
-      color: '60,120,220', hl: '140,200,255', dark: '10,30,90',
-      atm: '80,150,255',
-      hasRing: true, ringTilt: .3, ringColor: '100,160,240', ringW: 2.2,
-      hasRing2: true, ring2Color: '60,100,180',
-      hasMoon: true, moonR: 5, moonOrbit: 68, moonSpeed: .008, moonAngle: 0, moonColor: '180,200,230',
+      color: '180,140,70', hl: '240,210,130', dark: '80,55,20',
+      atm: '220,175,90',
+      hasRing: true, ringTilt: .28, ringColor: '210,175,100', ringW: 2.8,
+      hasRing2: true, ring2Color: '160,120,50',
+      hasRing3: true,
+      hasMoon: true, moonR: 5, moonOrbit: 80, moonSpeed: .006, moonAngle: 0, moonColor: '220,200,180',
+      hasMoon2: true, moon2R: 3, moon2Orbit: 105, moon2Speed: -.009, moon2Angle: 2.8, moon2Color: '200,190,170',
       hasAsteroid: false,
-      stripes: ['20,60,160','40,100,200','80,150,240','30,70,170'],
+      stripes: ['150,110,50','200,160,80','240,200,120','170,130,60','190,150,70'],
+      label: 'SATURN',
     },
-    // 紫色毒氣星（左下，有大氣層旋渦 + 小月亮）
+    // ── 火星（右下偏中，橙紅色，有極冠）──
     {
-      id: 1, xr: .12, yr: .72, r: 22,
-      phase: 1.2, glowPulse: 1.0, rotAngle: 0,
-      color: '140,60,200', hl: '200,130,255', dark: '40,10,80',
-      atm: '160,80,220',
+      id: 1, xr: .78, yr: .72, r: 22,
+      phase: 1.5, glowPulse: 1.2, rotAngle: 0,
+      color: '180,70,30', hl: '240,130,80', dark: '90,25,10',
+      atm: '210,90,50',
       hasRing: false,
-      hasMoon: true, moonR: 3, moonOrbit: 40, moonSpeed: .014, moonAngle: 2.0, moonColor: '200,170,240',
-      hasAsteroid: true, asteroidR: 52, asteroidN: 8,
-      stripes: ['100,40,160','160,80,220','120,50,180','80,30,140'],
+      hasMoon: true, moonR: 2.5, moonOrbit: 42, moonSpeed: .018, moonAngle: 1.0, moonColor: '190,160,150',
+      hasAsteroid: false,
+      hasPolarCap: true,
+      stripes: ['160,55,25','200,85,40','230,110,60','170,65,30','190,80,35'],
+      label: 'MARS',
     },
-    // 翡翠綠星（右下，有細環 + 雙衛星）
+    // ── 木星（左中，大型，棕橙雙色大紅斑）──
     {
-      id: 2, xr: .88, yr: .68, r: 18,
-      phase: 2.4, glowPulse: 2.0, rotAngle: 0,
-      color: '40,160,120', hl: '100,220,170', dark: '10,50,40',
-      atm: '60,200,140',
-      hasRing: true, ringTilt: .18, ringColor: '80,200,150', ringW: 1.4,
+      id: 2, xr: .08, yr: .45, r: 32,
+      phase: 2.8, glowPulse: 2.0, rotAngle: 0,
+      color: '170,120,70', hl: '220,175,120', dark: '70,40,20',
+      atm: '200,150,90',
+      hasRing: false,
+      hasMoon: true, moonR: 4, moonOrbit: 58, moonSpeed: .01, moonAngle: 0.5, moonColor: '230,200,160',
+      hasMoon2: true, moon2R: 2.8, moon2Orbit: 76, moon2Speed: -.007, moon2Angle: 3.2, moon2Color: '210,185,150',
+      hasAsteroid: false,
+      hasRedSpot: true,
+      stripes: ['140,90,50','190,140,80','220,170,100','160,110,60','200,155,90','130,85,45'],
+      label: 'JUPITER',
+    },
+    // ── 地球（右中偏下，藍綠色，有大氣層）──
+    {
+      id: 3, xr: .88, yr: .45, r: 19,
+      phase: 3.5, glowPulse: 3.0, rotAngle: 0,
+      color: '30,100,180', hl: '80,180,240', dark: '10,40,80',
+      atm: '100,180,255',
+      hasRing: false,
+      hasMoon: true, moonR: 3.5, moonOrbit: 38, moonSpeed: .012, moonAngle: 2.5, moonColor: '220,215,200',
+      hasAsteroid: false,
+      hasContinent: true,
+      stripes: ['20,80,160','50,140,200','80,170,230','25,90,170','40,120,190'],
+      label: 'EARTH',
+    },
+    // ── 天王星（左下，青色，幾乎側躺的環）──
+    {
+      id: 4, xr: .12, yr: .78, r: 16,
+      phase: 4.8, glowPulse: 4.0, rotAngle: 0,
+      color: '80,200,210', hl: '150,240,245', dark: '20,80,100',
+      atm: '120,220,230',
+      hasRing: true, ringTilt: .85, ringColor: '120,220,230', ringW: 1.2,
       hasRing2: false,
-      hasMoon: true, moonR: 2.5, moonOrbit: 34, moonSpeed: .018, moonAngle: 1.0, moonColor: '160,230,200',
-      hasMoon2: true, moon2R: 1.8, moon2Orbit: 46, moon2Speed: -.011, moon2Angle: 3.5, moon2Color: '200,240,220',
+      hasMoon: true, moonR: 2, moonOrbit: 30, moonSpeed: .02, moonAngle: 1.8, moonColor: '180,230,235',
       hasAsteroid: false,
-      stripes: ['30,120,90','60,180,130','40,150,110','20,100,70'],
-    },
-    // 橙紅熔岩星（左上，有爆炸大氣 + 小行星帶）
-    {
-      id: 3, xr: .25, yr: .10, r: 14,
-      phase: 3.6, glowPulse: 3.0, rotAngle: 0,
-      color: '200,90,40', hl: '255,180,100', dark: '80,20,10',
-      atm: '240,120,60',
-      hasRing: false,
-      hasMoon: false,
-      hasAsteroid: true, asteroidR: 30, asteroidN: 6,
-      stripes: ['160,60,20','220,100,50','180,80,30','140,50,15'],
+      stripes: ['60,170,185','100,210,215','130,235,240','70,185,195','90,200,205'],
+      label: 'URANUS',
     },
   ];
 
-  // ── 星系核心光暈 ──────────────────────────────────────────────────────────
-  const CORE = { x: W * .72, y: H * .28, r: 180 };
+  // ── 星系核心光暈（改為太陽光源中心）──
+  const CORE = { x: W * .04, y: H * .05, r: 120 };
 
   // ── 數據光束（細線）──────────────────────────────────────────────────────
   let beams = [];
   function mkBeam() {
+    // 大部分光束從太陽左上角射出
+    const fromSun = Math.random() > .3;
     return {
-      x: Math.random() * W, y: -20,
+      x: fromSun ? SUN.x + (Math.random() - .5) * 60 : Math.random() * W,
+      y: fromSun ? SUN.y + (Math.random() - .5) * 60 : -20,
+      vx: fromSun ? (Math.random() * 1.5 + .3) : 0,
+      vy: fromSun ? (Math.random() * 1.8 + .5) : (.8 + Math.random() * 1.8),
       speed: .8 + Math.random() * 1.8,
-      len: 40 + Math.random() * 120,
-      a: .08 + Math.random() * .18,
-      w: .3 + Math.random() * .6,
-      hue: Math.random() > .7 ? '0,200,120' : '0,220,255',
+      len: fromSun ? (60 + Math.random() * 180) : (40 + Math.random() * 120),
+      a: .06 + Math.random() * .14,
+      w: .3 + Math.random() * .7,
+      hue: fromSun
+        ? (Math.random() > .5 ? '255,200,80' : '255,220,120')
+        : (Math.random() > .7 ? '0,200,120' : '0,220,255'),
+      fromSun,
     };
   }
-  setInterval(() => { if (beams.length < 18) beams.push(mkBeam()); }, 350);
+  setInterval(() => { if (beams.length < 20) beams.push(mkBeam()); }, 320);
 
   // ── 軌道光點（圍繞核心的小點）────────────────────────────────────────────
   let orbs = Array.from({length: 6}, (_, i) => ({
@@ -3338,8 +4388,115 @@ const API_BASE = (() => {
     for (let i = 0; i < 180; i++) stars.push(mkStar(0));
     for (let i = 0; i < 80;  i++) stars.push(mkStar(1));
     for (let i = 0; i < 35;  i++) stars.push(mkStar(2));
-    CORE.x = W * .72; CORE.y = H * .28;
+    CORE.x = W * SUN.xr; CORE.y = H * SUN.yr;
+    SUN.x = W * SUN.xr; SUN.y = H * SUN.yr;
     PLANETS.forEach(P => { P.x = W * P.xr; P.y = H * P.yr; });
+  }
+
+  // ── 太陽繪製函式 ─────────────────────────────────────────────────────────────
+  function drawSun() {
+    const sx = SUN.x, sy = SUN.y, sr = SUN.r;
+    SUN.phase     += .0004;
+    SUN.glowPulse += .008;
+    const glow = .5 + Math.sin(SUN.glowPulse) * .5;
+
+    // ── 外層日冕光暈（多層，超大）──
+    const layers = [
+      { r: sr * 7, a: .012 + glow * .005, c: '255,200,60' },
+      { r: sr * 5, a: .025 + glow * .01,  c: '255,210,80' },
+      { r: sr * 3.5, a: .05 + glow * .02, c: '255,220,100' },
+      { r: sr * 2.2, a: .10 + glow * .04, c: '255,225,120' },
+      { r: sr * 1.6, a: .22 + glow * .08, c: '255,235,140' },
+    ];
+    layers.forEach(l => {
+      const g = ctx.createRadialGradient(sx, sy, sr * .5, sx, sy, l.r);
+      g.addColorStop(0,   `rgba(${l.c},${l.a})`);
+      g.addColorStop(.5,  `rgba(${l.c},${l.a * .4})`);
+      g.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(sx, sy, l.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // ── 日冕射線（放射光束）──
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(SUN.phase * .3);
+    for (let i = 0; i < SUN.coronaRays; i++) {
+      const angle = (i / SUN.coronaRays) * Math.PI * 2;
+      const rayLen = sr * (2.5 + Math.sin(SUN.phase * 3 + i) * .8);
+      const rayW   = .8 + Math.sin(SUN.phase * 2 + i * 1.5) * .4;
+      const rayA   = .06 + Math.sin(SUN.glowPulse + i) * .03;
+      const rg = ctx.createLinearGradient(
+        Math.cos(angle) * sr, Math.sin(angle) * sr,
+        Math.cos(angle) * rayLen, Math.sin(angle) * rayLen
+      );
+      rg.addColorStop(0,   `rgba(255,230,100,${rayA})`);
+      rg.addColorStop(.6,  `rgba(255,215,80,${rayA * .3})`);
+      rg.addColorStop(1,   'rgba(255,200,60,0)');
+      ctx.strokeStyle = rg;
+      ctx.lineWidth   = rayW;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * sr * .9, Math.sin(angle) * sr * .9);
+      ctx.lineTo(Math.cos(angle) * rayLen,  Math.sin(angle) * rayLen);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // ── 太陽本體 ──
+    const sunGrd = ctx.createRadialGradient(sx - sr * .3, sy - sr * .3, sr * .05, sx, sy, sr);
+    sunGrd.addColorStop(0,   'rgba(255,255,220,.98)');
+    sunGrd.addColorStop(.25, 'rgba(255,245,120,.96)');
+    sunGrd.addColorStop(.55, 'rgba(255,200,40,.94)');
+    sunGrd.addColorStop(.8,  'rgba(240,140,20,.92)');
+    sunGrd.addColorStop(1,   'rgba(200,80,0,.95)');
+    ctx.fillStyle = sunGrd;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ── 表面對流紋（橫帶，自轉）──
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.clip();
+    for (let i = 0; i < 8; i++) {
+      const by = sy - sr + (i / 8) * sr * 2;
+      const bAlpha = .06 + .04 * Math.sin(SUN.phase * 2 + i * .8);
+      ctx.fillStyle = `rgba(255,160,0,${bAlpha})`;
+      ctx.fillRect(sx - sr, by, sr * 2, sr / 8 * .7);
+    }
+    // 球面光澤
+    const sg = ctx.createRadialGradient(sx - sr * .28, sy - sr * .35, 0, sx - sr * .1, sy - sr * .1, sr * .85);
+    sg.addColorStop(0,   'rgba(255,255,255,.25)');
+    sg.addColorStop(.4,  'rgba(255,255,255,.08)');
+    sg.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(sx - sr, sy - sr, sr * 2, sr * 2);
+    ctx.restore();
+
+    // ── 黑子 ──
+    if (SUN.hasSunspot) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.clip();
+      SUN.sunspots.forEach(sp => {
+        const rotA = SUN.phase * .5 + sp.angle;
+        const spx  = sx + Math.cos(rotA) * sp.dist * sr;
+        const spy  = sy + Math.sin(rotA) * sp.dist * sr * .4;
+        const sg2  = ctx.createRadialGradient(spx, spy, 0, spx, spy, sp.r);
+        sg2.addColorStop(0,   'rgba(80,30,0,.75)');
+        sg2.addColorStop(.5,  'rgba(120,55,10,.45)');
+        sg2.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = sg2;
+        ctx.beginPath();
+        ctx.arc(spx, spy, sp.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
   }
 
   // ── 行星繪製函式 ─────────────────────────────────────────────────────────────
@@ -3392,6 +4549,58 @@ const API_BASE = (() => {
     gloss.addColorStop(1,  'rgba(0,0,0,0)');
     ctx.fillStyle = gloss;
     ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
+
+    // ── 木星大紅斑 ──
+    if (P.hasRedSpot) {
+      const rsx = px + Math.cos(P.rotAngle * .8) * pr * .3;
+      const rsy = py + pr * .15;
+      const rsg = ctx.createRadialGradient(rsx, rsy, 0, rsx, rsy, pr * .28);
+      rsg.addColorStop(0,   'rgba(180,50,30,.75)');
+      rsg.addColorStop(.4,  'rgba(210,80,50,.5)');
+      rsg.addColorStop(.8,  'rgba(230,110,70,.25)');
+      rsg.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = rsg;
+      ctx.save();
+      ctx.scale(1, .55);
+      ctx.beginPath();
+      ctx.arc(rsx, rsy / .55, pr * .28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ── 火星極冠（白色頂部）──
+    if (P.hasPolarCap) {
+      const capG = ctx.createRadialGradient(px, py - pr * .7, 0, px, py - pr * .5, pr * .55);
+      capG.addColorStop(0,   'rgba(255,255,255,.7)');
+      capG.addColorStop(.5,  'rgba(230,240,255,.35)');
+      capG.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = capG;
+      ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
+    }
+
+    // ── 地球大陸（藍綠斑點）──
+    if (P.hasContinent) {
+      const continents = [
+        { dx: .2, dy: -.1, rx: .35, ry: .22 },
+        { dx: -.25, dy: .1, rx: .28, ry: .18 },
+        { dx: .1,  dy: .3, rx: .22, ry: .14 },
+      ];
+      continents.forEach(c => {
+        const cx2 = px + c.dx * pr + Math.cos(P.rotAngle * 1.5) * pr * .2;
+        const cy2 = py + c.dy * pr;
+        const cg  = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, c.rx * pr);
+        cg.addColorStop(0,   'rgba(50,160,80,.55)');
+        cg.addColorStop(.5,  'rgba(40,140,70,.3)');
+        cg.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = cg;
+        ctx.save();
+        ctx.scale(1, c.ry / c.rx);
+        ctx.beginPath();
+        ctx.arc(cx2, cy2 / (c.ry / c.rx), c.rx * pr, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
 
     ctx.restore();
 
@@ -3575,28 +4784,20 @@ const API_BASE = (() => {
     ctx.clearRect(0, 0, W, H);
     frame++;
 
-    // ── 星系核心光暈 ──────────────────────────────────────────────────────
-    const corePulse = 1 + Math.sin(frame * .012) * .06;
-    const coreGrad = ctx.createRadialGradient(CORE.x, CORE.y, 0, CORE.x, CORE.y, CORE.r * corePulse);
-    coreGrad.addColorStop(0,   'rgba(80,140,255,.14)');
-    coreGrad.addColorStop(.35, 'rgba(40,80,200,.07)');
-    coreGrad.addColorStop(.7,  'rgba(0,40,120,.03)');
-    coreGrad.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = coreGrad;
+    // ── 太陽遠場光（左上角大範圍暖光）──────────────────────────────────
+    const sunFieldPulse = 1 + Math.sin(frame * .008) * .04;
+    const sunFieldGrad = ctx.createRadialGradient(
+      SUN.x, SUN.y, SUN.r * .5,
+      SUN.x, SUN.y, W * sunFieldPulse * .7
+    );
+    sunFieldGrad.addColorStop(0,   'rgba(255,200,60,.09)');
+    sunFieldGrad.addColorStop(.2,  'rgba(255,180,40,.05)');
+    sunFieldGrad.addColorStop(.5,  'rgba(255,150,20,.02)');
+    sunFieldGrad.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = sunFieldGrad;
     ctx.beginPath();
-    ctx.arc(CORE.x, CORE.y, CORE.r * corePulse, 0, Math.PI * 2);
+    ctx.arc(SUN.x, SUN.y, W * sunFieldPulse * .7, 0, Math.PI * 2);
     ctx.fill();
-
-    // ── 軌道光點 ──────────────────────────────────────────────────────────
-    orbs.forEach(orb => {
-      orb.angle += orb.speed;
-      const ox = CORE.x + Math.cos(orb.angle) * orb.r;
-      const oy = CORE.y + Math.sin(orb.angle) * orb.r * .38;
-      ctx.fillStyle = `rgba(100,180,255,${orb.a * (.7 + Math.sin(frame * .02 + orb.angle) * .3)})`;
-      ctx.beginPath();
-      ctx.arc(ox, oy, orb.size, 0, Math.PI * 2);
-      ctx.fill();
-    });
 
     // ── 星星 ──────────────────────────────────────────────────────────────
     stars.forEach(s => {
@@ -3631,7 +4832,10 @@ const API_BASE = (() => {
     // ── 星座 ──────────────────────────────────────────────────────────────
     drawConstellations();
 
-    // ── 行星（4顆）────────────────────────────────────────────────────────
+    // ── 太陽 ─────────────────────────────────────────────────────────────
+    drawSun();
+
+    // ── 行星（5顆：土星、火星、木星、地球、天王星）──────────────────────
     PLANETS.forEach(P => drawPlanet(P));
 
     // ── 流星 ──────────────────────────────────────────────────────────────
@@ -3673,20 +4877,41 @@ const API_BASE = (() => {
       }
     });
 
-    // ── 數據光束 ──────────────────────────────────────────────────────────
-    beams = beams.filter(b => b.y < H + b.len);
+    // ── 數據光束（含從太陽射出的暖色光束）──────────────────────────────
+    beams = beams.filter(b => b.fromSun
+      ? (b.y < H + 30 && b.x > -30 && b.x < W + 30)
+      : b.y < H + b.len
+    );
     beams.forEach(b => {
-      b.y += b.speed;
-      const grad = ctx.createLinearGradient(b.x, b.y - b.len, b.x, b.y);
-      grad.addColorStop(0, `rgba(${b.hue},0)`);
-      grad.addColorStop(.5, `rgba(${b.hue},${b.a})`);
-      grad.addColorStop(1, `rgba(${b.hue},0)`);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth   = b.w;
-      ctx.beginPath();
-      ctx.moveTo(b.x, b.y - b.len);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
+      if (b.fromSun) {
+        b.x += b.vx;
+        b.y += b.vy;
+        const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+        const ex  = b.x - b.vx / spd * b.len;
+        const ey  = b.y - b.vy / spd * b.len;
+        const grad = ctx.createLinearGradient(ex, ey, b.x, b.y);
+        grad.addColorStop(0,   `rgba(${b.hue},0)`);
+        grad.addColorStop(.55, `rgba(${b.hue},${b.a * .45})`);
+        grad.addColorStop(1,   `rgba(${b.hue},${b.a})`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = b.w;
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      } else {
+        b.y += b.speed;
+        const grad = ctx.createLinearGradient(b.x, b.y - b.len, b.x, b.y);
+        grad.addColorStop(0,   `rgba(${b.hue},0)`);
+        grad.addColorStop(.5,  `rgba(${b.hue},${b.a})`);
+        grad.addColorStop(1,   `rgba(${b.hue},0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = b.w;
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y - b.len);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
     });
 
     requestAnimationFrame(draw);
@@ -3696,7 +4921,7 @@ const API_BASE = (() => {
 
 // ── HOLIDAY DETECTION（統一由後端 /api/trading_status 判斷）─────────────────
 async function initHolidayBanner() {
-  return; // 先暫時關閉休市偵測功能，避免開發期間頻繁呼叫 API !!!!!!
+  //return; // 先暫時關閉休市偵測功能，避免開發期間頻繁呼叫 API !!!!!!
   try {
     const res  = await fetch(`${API_BASE}/api/trading_status`);
     const data = await res.json();
@@ -3741,7 +4966,7 @@ function updateClock() {
   const pad = n => String(n).padStart(2, '0');
   document.getElementById('clock').textContent =
     `${tw.getFullYear()}-${pad(tw.getMonth()+1)}-${pad(tw.getDate())} ` +
-    `${pad(tw.getHours())}:${pad(tw.getMinutes())}:${pad(tw.getSeconds())} TWN`;
+    `${pad(tw.getHours())}:${pad(tw.getMinutes())}:${pad(tw.getSeconds())}`;
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -4570,6 +5795,129 @@ setTimeout(_updateFavBadge, 800);
 
 
 
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────────
+function _getSettingsKey() {
+  const email = window._currentUser?.email || '';
+  return email ? `settings_${email}` : null;
+}
+function _loadSettings() {
+  const key = _getSettingsKey();
+  if (!key) return { theme: 'space' };
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; }
+}
+function _saveSettings(obj) {
+  const key = _getSettingsKey();
+  if (!key) return;
+  const cur = _loadSettings();
+  localStorage.setItem(key, JSON.stringify({ ...cur, ...obj }));
+}
+
+function applyTheme(theme) {
+  if (theme === 'day') {
+    document.body.classList.add('theme-day');
+  } else {
+    document.body.classList.remove('theme-day');
+  }
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === theme);
+  });
+}
+
+function setTheme(theme) {
+  applyTheme(theme);
+  _saveSettings({ theme });
+  // 跨頁面同步（BroadcastChannel）
+  try {
+    const bc = new BroadcastChannel('jellystock_theme');
+    bc.postMessage({ theme });
+    bc.close();
+  } catch(e) {}
+}
+
+// 監聽其他分頁的主題切換
+try {
+  const _bc = new BroadcastChannel('jellystock_theme');
+  _bc.onmessage = (e) => {
+    if (e.data && e.data.theme) applyTheme(e.data.theme);
+  };
+} catch(e) {}
+
+function openSettingsModal() {
+  closeDrawer();
+  const modal   = document.getElementById('settingsModal');
+  const content = document.getElementById('settingsContent');
+  if (!modal || !content) return;
+
+  if (!window._currentUser) {
+    content.innerHTML = `
+      <div class="settings-login-notice">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        請先登入 Google 帳號<br>才能使用設定功能
+      </div>`;
+  } else {
+    const s = _loadSettings();
+    const curTheme = s.theme || 'space';
+    content.innerHTML = `
+      <div class="settings-body">
+        <div>
+          <div class="settings-section-title">🎨 外觀主題</div>
+          <div class="settings-row" style="margin-top:12px;">
+            <div>
+              <div class="settings-row-label">背景主題</div>
+              <div class="settings-row-sub">切換網站背景風格，設定將綁定帳號儲存</div>
+            </div>
+          </div>
+          <div class="theme-switcher" style="margin-top:14px;">
+            <button class="theme-btn ${curTheme === 'space' ? 'active' : ''}" data-theme="space" onclick="setTheme('space')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+              </svg>
+              太空星際
+            </button>
+            <button class="theme-btn ${curTheme === 'day' ? 'active' : ''}" data-theme="day" onclick="setTheme('day')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+              白天晴空
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleSettingsModalClick(e) {
+  if (e.target === document.getElementById('settingsModal')) closeSettingsModal();
+}
+
+// 登入後套用已儲存主題
+document.addEventListener('_authChanged', () => {
+  if (window._currentUser) {
+    const s = _loadSettings();
+    applyTheme(s.theme || 'space');
+  } else {
+    applyTheme('space');
+  }
+});
+setTimeout(() => {
+  if (window._currentUser) {
+    const s = _loadSettings();
+    applyTheme(s.theme || 'space');
+  }
+}, 1200);
+
 // ── VISITOR PANEL TOGGLE ─────────────────────────────────────────────
 function toggleVisitorPanel() {
   const panel = document.getElementById('visitorPanel');
@@ -4579,34 +5927,51 @@ function toggleVisitorPanel() {
   localStorage.setItem('vp_collapsed', panel.classList.contains('collapsed') ? '1' : '0');
 }
 
-// ── VISITOR TRACKING (admin only: llomoll5566) ──────────────────────
+// ── VISITOR TRACKING ─────────────────────────────────────────────────
 async function initVisitorTracking() {
-  const email = window._currentUser?.email || '';
-  if (!email.includes('llomoll5566')) return;
-
   const panel = document.getElementById('visitorPanel');
   if (!panel) return;
-  panel.classList.add('show');
-  if (localStorage.getItem('vp_collapsed') === '1') {
-    panel.classList.add('collapsed');
+
+  const email = window._currentUser?.email || '';
+
+  // 未登入 → 隱藏面板
+  if (!email) {
+    panel.classList.remove('show');
+    panel.classList.remove('collapsed');
+    document.getElementById('vpToday').textContent   = '--';
+    document.getElementById('vpTotal').textContent   = '--';
+    document.getElementById('vpUpdated').textContent = '--';
+    return;
   }
 
+  // 有登入帳號 → 呼叫 API 記錄訪客（所有帳號都計數）
   try {
-    // 記錄本次訪問並取得統計
     const res  = await fetch(`${API_BASE}/api/visitor`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
     });
     const data = await res.json();
-    document.getElementById('vpToday').textContent  = (data.today  ?? '--').toLocaleString();
-    document.getElementById('vpTotal').textContent  = (data.total  ?? '--').toLocaleString();
-    const now = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
-    document.getElementById('vpUpdated').textContent = '更新於 ' + now;
+
+    // 只有特定帳號才顯示統計面板
+    if (email.includes('llomoll5566')) {
+      panel.classList.add('show');
+      if (localStorage.getItem('vp_collapsed') === '1') {
+        panel.classList.add('collapsed');
+      }
+      document.getElementById('vpToday').textContent   = (data.today  ?? '--').toLocaleString();
+      document.getElementById('vpTotal').textContent   = (data.total  ?? '--').toLocaleString();
+      const now = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
+      document.getElementById('vpUpdated').textContent = '更新於 ' + now;
+    } else {
+      panel.classList.remove('show');
+    }
   } catch(e) {
-    document.getElementById('vpToday').textContent = 'N/A';
-    document.getElementById('vpTotal').textContent = 'N/A';
     console.warn('[Visitor] API 失敗', e);
+    if (email.includes('llomoll5566')) {
+      document.getElementById('vpToday').textContent = 'N/A';
+      document.getElementById('vpTotal').textContent = 'N/A';
+    }
   }
 }
 
@@ -4651,5 +6016,281 @@ setTimeout(() => {
     <div class="vp-updated" id="vpUpdated">--</div>
   </div>
 </div>
+
+<!-- MOUNTAIN CANVAS（白天山脈背景）-->
+<script>
+(function() {
+  const mc = document.getElementById('mountainCanvas');
+  if (!mc) return;
+  const mctx = mc.getContext('2d');
+  let MW, MH;
+
+  function mResize() {
+    MW = mc.width  = window.innerWidth;
+    MH = mc.height = window.innerHeight;
+    drawMountains();
+  }
+
+  function drawMountains() {
+    mctx.clearRect(0, 0, MW, MH);
+    if (!document.body.classList.contains('theme-day')) return;
+
+    const baseY = MH * 0.72;
+
+    // 遠山層 1（最遠、最淡）
+    mctx.save();
+    mctx.globalAlpha = 0.18;
+    const g1 = mctx.createLinearGradient(0, baseY - MH*0.32, 0, baseY);
+    g1.addColorStop(0, 'rgba(80,140,200,1)');
+    g1.addColorStop(1, 'rgba(100,160,210,.4)');
+    mctx.fillStyle = g1;
+    mctx.beginPath();
+    mctx.moveTo(0, MH);
+    const peaks1 = [
+      [0, baseY - MH*0.28], [MW*0.08, baseY - MH*0.36], [MW*0.18, baseY - MH*0.24],
+      [MW*0.30, baseY - MH*0.38], [MW*0.42, baseY - MH*0.28], [MW*0.55, baseY - MH*0.40],
+      [MW*0.68, baseY - MH*0.30], [MW*0.78, baseY - MH*0.42], [MW*0.88, baseY - MH*0.26],
+      [MW*1.0, baseY - MH*0.32], [MW, MH]
+    ];
+    peaks1.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    mctx.closePath();
+    mctx.fill();
+    mctx.restore();
+
+    // 遠山層 2（中距）
+    mctx.save();
+    mctx.globalAlpha = 0.30;
+    const g2 = mctx.createLinearGradient(0, baseY - MH*0.25, 0, baseY);
+    g2.addColorStop(0, 'rgba(60,130,80,1)');
+    g2.addColorStop(0.5, 'rgba(80,155,90,.8)');
+    g2.addColorStop(1, 'rgba(100,170,100,.3)');
+    mctx.fillStyle = g2;
+    mctx.beginPath();
+    mctx.moveTo(0, MH);
+    const peaks2 = [
+      [0, baseY - MH*0.18], [MW*0.06, baseY - MH*0.26], [MW*0.14, baseY - MH*0.16],
+      [MW*0.24, baseY - MH*0.30], [MW*0.35, baseY - MH*0.20], [MW*0.46, baseY - MH*0.32],
+      [MW*0.56, baseY - MH*0.22], [MW*0.65, baseY - MH*0.34], [MW*0.74, baseY - MH*0.18],
+      [MW*0.84, baseY - MH*0.28], [MW*0.93, baseY - MH*0.16], [MW, baseY - MH*0.22], [MW, MH]
+    ];
+    peaks2.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    mctx.closePath();
+    mctx.fill();
+    mctx.restore();
+
+    // 近山層（最深綠，帶雪頂感）
+    mctx.save();
+    mctx.globalAlpha = 0.55;
+    const g3 = mctx.createLinearGradient(0, baseY - MH*0.20, 0, baseY + 10);
+    g3.addColorStop(0, 'rgba(34,100,50,1)');
+    g3.addColorStop(0.4, 'rgba(50,130,70,.95)');
+    g3.addColorStop(1, 'rgba(70,150,80,.5)');
+    mctx.fillStyle = g3;
+    mctx.beginPath();
+    mctx.moveTo(0, MH);
+    const peaks3 = [
+      [0, baseY], [MW*0.05, baseY - MH*0.12], [MW*0.12, baseY - MH*0.06],
+      [MW*0.20, baseY - MH*0.18], [MW*0.30, baseY - MH*0.08], [MW*0.38, baseY - MH*0.20],
+      [MW*0.48, baseY - MH*0.10], [MW*0.57, baseY - MH*0.22], [MW*0.66, baseY - MH*0.10],
+      [MW*0.74, baseY - MH*0.16], [MW*0.82, baseY - MH*0.06], [MW*0.90, baseY - MH*0.14],
+      [MW*0.96, baseY - MH*0.04], [MW, baseY], [MW, MH]
+    ];
+    peaks3.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    mctx.closePath();
+    mctx.fill();
+    mctx.restore();
+
+    // 草地底部
+    mctx.save();
+    mctx.globalAlpha = 0.45;
+    const g4 = mctx.createLinearGradient(0, baseY + MH*0.02, 0, MH);
+    g4.addColorStop(0, 'rgba(80,170,90,1)');
+    g4.addColorStop(1, 'rgba(60,140,70,.6)');
+    mctx.fillStyle = g4;
+    mctx.fillRect(0, baseY + MH*0.02, MW, MH - baseY);
+    mctx.restore();
+  }
+
+  mResize();
+  window.addEventListener('resize', mResize);
+  // 監聽主題切換重繪
+  document.addEventListener('_themeChanged', drawMountains);
+  const origAdd = document.body.classList.add.bind(document.body.classList);
+  // MutationObserver 偵測 theme-day 變化
+  new MutationObserver(() => drawMountains()).observe(document.body, {attributes:true, attributeFilter:['class']});
+})();
+</script>
+
+<!-- SKY CANVAS（白天主題雲朵 + 飛鳥動畫）-->
+<script>
+(function() {
+  const cv  = document.getElementById('skyCanvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, clouds = [], birds = [], lightParts = [];
+
+  function resize() {
+    W = cv.width  = window.innerWidth;
+    H = cv.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // 建立雲朵（更豐富立體感）
+  function mkCloud(x) {
+    const scale = .7 + Math.random() * 1.2;
+    return {
+      x: x ?? Math.random() * W * 1.4 - W * .2,
+      y: H * (.03 + Math.random() * .30),
+      scale,
+      speed: .10 + Math.random() * .20,
+      alpha: .55 + Math.random() * .30,
+      puffs: Array.from({length: 6 + Math.floor(Math.random()*5)}, (_, i) => ({
+        dx: (i - 2.5) * 40 * scale,
+        dy: Math.sin(i * 1.0) * 16 * scale,
+        r:  (30 + Math.random() * 28) * scale,
+      })),
+    };
+  }
+
+  // 建立光粒子
+  function mkPart() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: .8 + Math.random() * 1.6,
+      a: .08 + Math.random() * .20,
+      vx: (Math.random() - .5) * .12,
+      vy: -Math.random() * .06,
+      phase: Math.random() * Math.PI * 2,
+    };
+  }
+
+  // 建立鳥（更大更明顯）
+  function mkBird(fromLeft) {
+    return {
+      x: fromLeft !== false ? -60 : W + 60,
+      dir: fromLeft !== false ? 1 : -1,
+      y: H * (.04 + Math.random() * .28),
+      speed: .6 + Math.random() * .8,
+      wingPhase: Math.random() * Math.PI * 2,
+      scale: .9 + Math.random() * 1.0,
+      flock: Math.floor(Math.random() * 3),  // 鳥群偏移
+    };
+  }
+
+  // 初始化
+  for (let i = 0; i < 14; i++) clouds.push(mkCloud());
+  for (let i = 0; i < 50; i++) lightParts.push(mkPart());
+  // 初始多隻鳥
+  for (let i = 0; i < 4; i++) {
+    const b = mkBird();
+    b.x = Math.random() * W;
+    b.y = H * (.04 + Math.random() * .28);
+    birds.push(b);
+  }
+
+  let frame = 0;
+
+  function drawCloud(c) {
+    ctx.save();
+    // 底部陰影（立體感）
+    ctx.globalAlpha = c.alpha * 0.18;
+    c.puffs.forEach(p => {
+      ctx.fillStyle = 'rgba(160,190,230,.6)';
+      ctx.beginPath();
+      ctx.ellipse(c.x + p.dx + 4, c.y + p.dy + 8, p.r * 0.9, p.r * 0.5, 0, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = c.alpha;
+    c.puffs.forEach(p => {
+      const grd = ctx.createRadialGradient(
+        c.x + p.dx - p.r * .25, c.y + p.dy - p.r * .25, p.r * .05,
+        c.x + p.dx, c.y + p.dy, p.r
+      );
+      grd.addColorStop(0,   'rgba(255,255,255,1)');
+      grd.addColorStop(.4,  'rgba(245,252,255,.95)');
+      grd.addColorStop(.75, 'rgba(225,242,255,.7)');
+      grd.addColorStop(1,   'rgba(200,228,255,.1)');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(c.x + p.dx, c.y + p.dy, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function drawBird(b) {
+    b.wingPhase += .10;
+    const wy = Math.sin(b.wingPhase) * 7 * b.scale;
+    // 鳥群偏移
+    const fx = b.flock * 18 * b.scale;
+    const fy = b.flock * 9 * b.scale;
+    ctx.save();
+    ctx.globalAlpha = .55;
+    ctx.strokeStyle = '#1a3860';
+    ctx.lineWidth   = 1.8 * b.scale;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.beginPath();
+    const bx = b.x + fx, by = b.y + fy;
+    const s  = b.scale * (b.dir < 0 ? -1 : 1);
+    // 左翼
+    ctx.moveTo(bx - 14 * s, by + wy);
+    ctx.quadraticCurveTo(bx - 7 * s, by - 5 * b.scale, bx, by);
+    // 右翼
+    ctx.moveTo(bx + 14 * s, by + wy);
+    ctx.quadraticCurveTo(bx + 7 * s, by - 5 * b.scale, bx, by);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function tick() {
+    if (!document.body.classList.contains('theme-day')) {
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    // 雲
+    clouds.forEach((c, i) => {
+      c.x += c.speed;
+      if (c.x > W + 400) clouds[i] = mkCloud(-420);
+      drawCloud(c);
+    });
+
+    // 光粒子
+    lightParts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.phase += .018;
+      if (p.y < -5) p.y = H + 5;
+      if (p.x < -5) p.x = W + 5;
+      if (p.x > W + 5) p.x = -5;
+      const tw = .5 + Math.sin(p.phase) * .5;
+      ctx.globalAlpha = p.a * tw;
+      ctx.fillStyle = 'rgba(255,245,180,1)';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    // 鳥
+    birds.forEach((b, i) => {
+      b.x += b.speed * b.dir;
+      if (b.x > W + 100 || b.x < -100) {
+        birds[i] = mkBird(b.dir < 0 ? true : false);
+      }
+      drawBird(b);
+    });
+    // 定期補鳥（最多8隻）
+    if (frame % 600 === 0 && birds.length < 8) birds.push(mkBird());
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
 
 </html>

@@ -22,9 +22,36 @@ def _supabase_headers():
 def register_api(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+    # ── 首頁 ───────────────────────────────────────────────────────────────────
     @app.route("/")
     def index():
         return send_from_directory('.', 'index.html')
+
+    # ── Legal 頁面（stock_site/legal/）────────────────────────────────────────
+    @app.route("/stock_site/legal/about.html")
+    def page_about():
+        return send_from_directory('stock_site/legal', 'about.html')
+
+    @app.route("/stock_site/legal/privacy.html")
+    def page_privacy():
+        return send_from_directory('stock_site/legal', 'privacy.html')
+
+    @app.route("/stock_site/legal/disclaimer.html")
+    def page_disclaimer():
+        return send_from_directory('stock_site/legal', 'disclaimer.html')
+
+    # ── Features 頁面（stock_site/features/）──────────────────────────────────
+    @app.route("/stock_site/features/watchlist.html")
+    def page_watchlist():
+        return send_from_directory('stock_site/features', 'watchlist.html')
+
+    @app.route("/stock_site/features/top50_twse.html")
+    def page_top50_twse():
+        return send_from_directory('stock_site/features', 'top50_twse.html')
+
+    @app.route("/stock_site/features/top50_otc.html")
+    def page_top50_otc():
+        return send_from_directory('stock_site/features', 'top50_otc.html')
 
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
