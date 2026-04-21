@@ -3040,24 +3040,32 @@
     body.theme-day .hint kbd { background: rgba(26,123,191,.1); color: #1a7bbf; border-color: rgba(26,123,191,.2); }
     body.theme-day .section-label { color: #0e5a9a; opacity: 1; font-weight: 600; text-shadow: none; }
     body.theme-day h2.section-title {
-      background: linear-gradient(90deg, #0a1828 60%, #1265a8);
+      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-shadow: none;
-      font-weight: 800;
+      font-weight: 900;
+      filter: none;
     }
     body.theme-day .timeline-title {
-      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      filter: none;
+    }
+    body.theme-day .timeline-title .info-icon {
+      -webkit-text-fill-color: initial;
+      background: rgba(230,242,255,.75);
+      color: rgba(10,50,110,.85);
     }
     body.theme-day .data-note-title {
-      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      filter: none;
     }
 
     /* ── STOCK RESULT CARD ── */
@@ -3123,7 +3131,8 @@
     body.theme-day .market-card-value.positive { color: #961c10; text-shadow: none; font-weight: 700; }
     body.theme-day .market-card-value.negative { color: #0e6b28; text-shadow: none; font-weight: 700; }
     body.theme-day .market-card-sub { color: #7a9cb8; }
-    body.theme-day .market-card-icon { opacity: .18; filter: hue-rotate(20deg) saturate(.7); }
+    body.theme-day .market-card-icon { opacity: .55; filter: hue-rotate(10deg) saturate(1.4) brightness(.7); }
+    body.theme-day .market-card:hover .market-card-icon { opacity: .75; }
     body.theme-day .refresh-badge {
       background: rgba(26,101,168,.1);
       border-color: rgba(26,123,191,.2);
@@ -3166,8 +3175,9 @@
       border-bottom-color: rgba(26,123,191,.12);
     }
     body.theme-day .modal-title {
-      background: linear-gradient(90deg, #1a2d40 50%, #1a7bbf);
+      background: linear-gradient(90deg, #061422 40%, #0d3a6e 70%, #1265a8 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.3));
     }
     body.theme-day .modal-close {
       border-color: rgba(26,123,191,.2);
@@ -3218,19 +3228,23 @@
 
     /* ── INFO ICON TOOLTIP ── */
     body.theme-day .info-icon {
-      border-color: rgba(26,101,168,.4);
-      color: rgba(18,80,140,.8);
-      background: rgba(240,248,255,.7);
+      border-color: rgba(18,80,160,.55);
+      color: rgba(10,50,110,.85);
+      background: rgba(230,242,255,.75);
+      box-shadow: 0 1px 6px rgba(26,101,168,.2);
+      filter: none;
     }
-    body.theme-day .info-icon:hover { border-color: var(--accent); background: rgba(26,101,168,.12); color: var(--accent); }
+    body.theme-day .info-icon:hover { border-color: var(--accent); background: rgba(26,101,168,.14); color: var(--accent); box-shadow: 0 2px 10px rgba(26,101,168,.25); }
     body.theme-day .info-icon .tooltip {
-      background: rgba(255,255,255,.97);
-      border: 1px solid rgba(26,101,168,.25);
-      color: #1a3550;
-      box-shadow: 0 8px 32px rgba(26,80,160,.18), 0 0 0 1px rgba(26,101,168,.1);
+      background: linear-gradient(160deg, rgba(255,255,255,.99) 0%, rgba(240,248,255,.99) 100%);
+      border: 1px solid rgba(26,101,168,.28);
+      color: #1a2d40;
+      box-shadow: 0 10px 40px rgba(26,80,160,.2), 0 2px 8px rgba(26,100,180,.12), 0 0 0 1px rgba(26,101,168,.08);
+      text-shadow: none;
     }
+    body.theme-day .info-icon .tooltip b { color: #0d3a6e; }
     body.theme-day .info-icon .tooltip::before {
-      border-bottom-color: rgba(26,101,168,.22);
+      border-bottom-color: rgba(26,101,168,.25);
     }
     body.theme-day .data-note {
       background: rgba(255,255,255,.85);
@@ -3329,17 +3343,23 @@
         box-shadow: 0 4px 18px rgba(26,80,160,.12);
       }
       body.theme-day .wl-row-name {
-        background: rgba(176,48,32,.04);
-        border-right-color: rgba(26,101,168,.18);
-        border-left-color: rgba(176,48,32,.55);
+        background: linear-gradient(160deg, rgba(176,48,32,.06) 0%, rgba(192,57,43,.03) 100%);
+        border-right: 1px solid rgba(26,101,168,.16);
+        border-left: 3px solid transparent;
+        border-image: linear-gradient(to bottom, rgba(176,48,32,.2) 0%, rgba(192,57,43,.75) 40%, rgba(176,48,32,.6) 70%, rgba(192,57,43,.25) 100%) 1;
+        position: relative;
       }
       body.theme-day .wl-code {
-        background: rgba(176,48,32,.07);
-        border-color: rgba(176,48,32,.38);
-        color: #a02818;
+        background: linear-gradient(135deg, rgba(176,48,32,.1) 0%, rgba(192,57,43,.07) 100%);
+        border: 1px solid rgba(176,48,32,.42);
+        color: #8b1a0c;
         text-shadow: none;
+        box-shadow: 0 1px 6px rgba(176,48,32,.12), inset 0 1px 0 rgba(255,255,255,.5);
+        border-radius: 8px;
+        font-weight: 800;
+        letter-spacing: .07em;
       }
-      body.theme-day .wl-name { color: #1a3550; }
+      body.theme-day .wl-name { color: #1a2d40; font-weight: 600; }
       body.theme-day .wl-row-val { border-right-color: rgba(26,101,168,.14); border-bottom-color: rgba(26,101,168,.14); }
       body.theme-day .wl-row-val .wl-label { color: rgba(18,80,140,.55); }
       body.theme-day .wl-row-actions { background: rgba(26,101,168,.03); border-top-color: rgba(26,101,168,.14); }
@@ -3353,6 +3373,118 @@
         border-color: rgba(21,122,50,.48);
       }
     }
+    /* ══════════════════════════════════════════════════════════
+       ☀️  白天模式補充樣式 — 可讀性全面提升
+       ══════════════════════════════════════════════════════════ */
+
+    /* ── 主標題 SVG 已由 JS applyTheme() 處理 ── */
+
+    /* ── section-label 強化 ── */
+    body.theme-day .section-label {
+      color: #0a4a8a;
+      opacity: 1;
+      font-weight: 700;
+      text-shadow: 0 1px 0 rgba(255,255,255,.6);
+      letter-spacing: .32em;
+    }
+
+    /* ── 大盤資訊區市場卡片 icon 描邊顏色加深 ── */
+    body.theme-day .market-card-icon svg {
+      stroke: #1060a8;
+    }
+    /* 大盤區 SVG path/line/circle 等也加深 */
+    body.theme-day .market-card-icon svg path,
+    body.theme-day .market-card-icon svg line,
+    body.theme-day .market-card-icon svg circle,
+    body.theme-day .market-card-icon svg ellipse,
+    body.theme-day .market-card-icon svg rect,
+    body.theme-day .market-card-icon svg polygon,
+    body.theme-day .market-card-icon svg polyline {
+      stroke: #1060a8;
+    }
+
+    /* ── data-note-item hover text ── */
+    body.theme-day .data-note-item:hover { color: #0a1828; background: rgba(26,101,168,.06); }
+    body.theme-day .data-note-item { color: #2a4a68; }
+
+    /* ── holiday banner 白天模式 ── */
+    body.theme-day #holiday-banner {
+      background: linear-gradient(90deg,
+        rgba(255,248,240,.96) 0%,
+        rgba(255,244,232,.98) 50%,
+        rgba(255,248,240,.96) 100%);
+      border-bottom: 1px solid rgba(200,80,40,.2);
+    }
+    body.theme-day #holiday-banner::before {
+      background-image:
+        linear-gradient(rgba(200,80,40,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,80,40,.03) 1px, transparent 1px);
+    }
+    body.theme-day #holiday-banner::after {
+      background: linear-gradient(90deg, transparent, rgba(200,80,40,.5), transparent);
+    }
+    body.theme-day .holiday-icon-wrap {
+      background: rgba(192,57,43,.07);
+      border-color: rgba(192,57,43,.25);
+    }
+    body.theme-day .holiday-icon-wrap svg { color: #b03020; }
+    body.theme-day .holiday-tag { color: rgba(160,40,20,.6); }
+    body.theme-day .holiday-title { color: #1a1a1a; }
+    body.theme-day .holiday-subtitle { color: rgba(30,30,30,.5); }
+    body.theme-day .holiday-next-box {
+      background: rgba(192,57,43,.05);
+      border-color: rgba(192,57,43,.22);
+    }
+    body.theme-day .holiday-next-label { color: rgba(30,30,30,.4); }
+    body.theme-day .holiday-next-val { color: #b03020; }
+
+    /* ── ticker 漲跌色對比補強 ── */
+    body.theme-day .ticker-item span.up   { color: #961c10; font-weight: 700; text-shadow: none; }
+    body.theme-day .ticker-item span.down { color: #0e6b28; font-weight: 700; text-shadow: none; }
+
+    /* ── wl-guest（未登入提示）白天樣式 ── */
+    body.theme-day .wl-guest-title { color: #1a3550; }
+    body.theme-day .wl-guest-sub   { color: #4a7090; }
+    body.theme-day .wl-login-btn {
+      background: rgba(26,101,168,.08);
+      border-color: rgba(26,101,168,.3);
+      color: #0d5090;
+    }
+    body.theme-day .wl-login-btn:hover {
+      background: rgba(26,101,168,.15);
+      border-color: rgba(26,101,168,.5);
+    }
+    body.theme-day .wl-empty-title { color: #1a3550; }
+    body.theme-day .wl-empty-sub   { color: #4a7090; }
+
+    /* ── state-box（搜尋前預設空白）── */
+    body.theme-day .state-box { color: #4a7090; }
+    body.theme-day .state-box svg { opacity: .35; }
+
+    /* ── modal loading 文字 ── */
+    body.theme-day .modal-loading {
+      color: #2a5070;
+    }
+    body.theme-day .modal-loading svg { color: var(--accent); }
+
+    /* ── 搜尋框 icon 顏色 ── */
+    body.theme-day .search-input-wrap svg { color: #5a90b8; }
+    body.theme-day .search-input-wrap:focus-within svg { color: var(--accent); }
+
+    /* ── hint 文字補強 ── */
+    body.theme-day .hint { color: #5a7898; }
+
+    /* ── refresh-badge svg ── */
+    body.theme-day .refresh-badge svg { color: var(--accent); opacity: .9; }
+
+    /* ── 市場卡片標籤對比補強 ── */
+    body.theme-day .market-card-label { color: #1e4060; font-weight: 600; letter-spacing: .06em; }
+
+    /* ── 時程標題說明文字 ── */
+    body.theme-day .data-note-item::before { /* dot 強化 */
+      filter: drop-shadow(0 0 2px rgba(26,101,168,.4));
+    }
+
   </style>
   <!-- Google Identity Services（OAuth Popup 方式） -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -3961,7 +4093,7 @@
   <div class="search-area">
     <div class="search-top">
       <p class="section-label">· 個股查詢 ·</p>
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)">盤後買賣超查詢</text></svg>
+            <svg id="mainTitleSvg" xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient><linearGradient id="tg1day" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0a1828"/><stop offset="55%" stop-color="#0d3a6e"/><stop offset="100%" stop-color="#1265a8"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)" id="mainTitleText">盤後買賣超查詢</text></svg>
     </div>
     <div class="search-row">
       <div class="search-input-wrap">
@@ -5752,17 +5884,15 @@ const _origUpdateAuthUI = window._updateAuthUI;
 document.addEventListener('_authChanged', _updateFavBadge);
 setTimeout(_updateFavBadge, 800);
 
-// ── INFO-ICON TOOLTIP（JS 控制，解決 modal overflow 裁切問題）────────────────
+// ── INFO-ICON TOOLTIP（JS 控制，動態切換主題樣式）────────────────────────────
 (function() {
   const tip = document.createElement('div');
+  tip.id = 'globalTooltip';
   tip.style.cssText = `
     position:fixed;z-index:99999;
-    background:rgba(4,10,22,.98);
-    border:1px solid rgba(0,229,255,.25);
     border-radius:12px;padding:12px 16px;
     font-family:'Noto Sans TC',sans-serif;font-size:.76rem;
-    color:#7a9ab8;line-height:1.65;
-    box-shadow:0 8px 40px rgba(0,0,0,.85),0 0 0 1px rgba(0,229,255,.08);
+    line-height:1.65;
     min-width:220px;max-width:300px;
     white-space:normal;word-break:break-word;
     pointer-events:none;opacity:0;
@@ -5770,27 +5900,61 @@ setTimeout(_updateFavBadge, 800);
   `;
   document.body.appendChild(tip);
 
+  function applyTipTheme() {
+    const isDay = document.body.classList.contains('theme-day');
+    if (isDay) {
+      tip.style.background    = 'linear-gradient(160deg,rgba(255,255,255,.99) 0%,rgba(236,247,255,.99) 100%)';
+      tip.style.border        = '1px solid rgba(26,101,168,.28)';
+      tip.style.color         = '#0a2540';
+      tip.style.boxShadow     = '0 10px 40px rgba(26,80,160,.18),0 2px 8px rgba(26,100,180,.1)';
+    } else {
+      tip.style.background    = 'rgba(4,10,22,.98)';
+      tip.style.border        = '1px solid rgba(0,229,255,.25)';
+      tip.style.color         = '#7a9ab8';
+      tip.style.boxShadow     = '0 8px 40px rgba(0,0,0,.85),0 0 0 1px rgba(0,229,255,.08)';
+    }
+  }
+
+  // MutationObserver 監聽 theme 切換
+  new MutationObserver(applyTipTheme).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  applyTipTheme();
+
   let _hideTimer;
-  document.querySelectorAll('.info-icon').forEach(icon => {
-    const inner = icon.querySelector('.tooltip');
-    if (!inner) return;
-    icon.addEventListener('mouseenter', e => {
-      clearTimeout(_hideTimer);
-      tip.innerHTML = inner.innerHTML;
-      tip.style.opacity = '1';
-      const r = icon.getBoundingClientRect();
-      let left = r.left + r.width / 2 - 140;
-      let top  = r.bottom + 8;
-      if (left < 8) left = 8;
-      if (left + 300 > window.innerWidth - 8) left = window.innerWidth - 308;
-      if (top + 200 > window.innerHeight - 8) top = r.top - 210;
-      tip.style.left = left + 'px';
-      tip.style.top  = top  + 'px';
+  function bindTooltips() {
+    document.querySelectorAll('.info-icon').forEach(icon => {
+      if (icon._tipBound) return;
+      icon._tipBound = true;
+      const inner = icon.querySelector('.tooltip');
+      if (!inner) return;
+      icon.addEventListener('mouseenter', () => {
+        clearTimeout(_hideTimer);
+        applyTipTheme();
+        tip.innerHTML = inner.innerHTML;
+        // 修正白天模式內部 b 標籤顏色
+        if (document.body.classList.contains('theme-day')) {
+          tip.querySelectorAll('b').forEach(b => { if (!b.style.color) b.style.color = '#0d3a6e'; });
+          tip.querySelectorAll('span[style*="color:var(--accent)"]').forEach(s => { s.style.color = '#1265a8'; });
+          tip.querySelectorAll('span[style*="color:var(--yellow)"]').forEach(s => { s.style.color = '#8a6000'; });
+          tip.querySelectorAll('span[style*="color:var(--text-faint)"]').forEach(s => { s.style.color = '#4a7090'; });
+        }
+        tip.style.opacity = '1';
+        const r = icon.getBoundingClientRect();
+        let left = r.left + r.width / 2 - 140;
+        let top  = r.bottom + 8;
+        if (left < 8) left = 8;
+        if (left + 300 > window.innerWidth - 8) left = window.innerWidth - 308;
+        if (top + 220 > window.innerHeight - 8) top = r.top - 230;
+        tip.style.left = left + 'px';
+        tip.style.top  = top  + 'px';
+      });
+      icon.addEventListener('mouseleave', () => {
+        _hideTimer = setTimeout(() => { tip.style.opacity = '0'; }, 120);
+      });
     });
-    icon.addEventListener('mouseleave', () => {
-      _hideTimer = setTimeout(() => { tip.style.opacity = '0'; }, 120);
-    });
-  });
+  }
+  // 初始綁定 + DOM 動態新增時也綁定
+  bindTooltips();
+  new MutationObserver(bindTooltips).observe(document.body, { childList: true, subtree: true });
 })();
 
 
@@ -5822,12 +5986,19 @@ function applyTheme(theme) {
   document.querySelectorAll('.theme-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.theme === theme);
   });
+  // SVG 主標題漸層切換
+  const titleText = document.getElementById('mainTitleText');
+  if (titleText) {
+    titleText.setAttribute('fill', theme === 'day' ? 'url(#tg1day)' : 'url(#tg1)');
+  }
 }
 
 function setTheme(theme) {
   applyTheme(theme);
   _saveSettings({ theme });
-  // 跨頁面同步（BroadcastChannel）
+  // 全站同步：寫入全域 key（所有頁面讀取）
+  localStorage.setItem('jelly_global_theme', theme);
+  // 跨頁面即時同步（BroadcastChannel）
   try {
     const bc = new BroadcastChannel('jellystock_theme');
     bc.postMessage({ theme });
@@ -5902,21 +6073,31 @@ function handleSettingsModalClick(e) {
   if (e.target === document.getElementById('settingsModal')) closeSettingsModal();
 }
 
-// 登入後套用已儲存主題
+// 登入後套用已儲存主題；登出時改讀全域 key
 document.addEventListener('_authChanged', () => {
   if (window._currentUser) {
     const s = _loadSettings();
-    applyTheme(s.theme || 'space');
+    const t = s.theme || localStorage.getItem('jelly_global_theme') || 'space';
+    applyTheme(t);
+    localStorage.setItem('jelly_global_theme', t);
   } else {
-    applyTheme('space');
+    // 登出：保留全域 key 的主題（不強制重置）
+    const t = localStorage.getItem('jelly_global_theme') || 'space';
+    applyTheme(t);
   }
 });
 setTimeout(() => {
   if (window._currentUser) {
     const s = _loadSettings();
-    applyTheme(s.theme || 'space');
+    const t = s.theme || localStorage.getItem('jelly_global_theme') || 'space';
+    applyTheme(t);
+    localStorage.setItem('jelly_global_theme', t);
+  } else {
+    // 未登入也套用全域主題
+    const t = localStorage.getItem('jelly_global_theme') || 'space';
+    applyTheme(t);
   }
-}, 1200);
+}, 800);
 
 // ── VISITOR PANEL TOGGLE ─────────────────────────────────────────────
 function toggleVisitorPanel() {
