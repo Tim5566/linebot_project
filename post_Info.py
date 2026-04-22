@@ -12,27 +12,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import time as _time
 
-# ── 修正1：完整 User-Agent，避免 Render 出口 IP 被識別為爬蟲 ─────────────────
-headers = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept":          "application/json, text/plain, */*",
-    "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection":      "keep-alive",
-    "Referer":         "https://www.twse.com.tw/",
-}
+headers = {"User-Agent": "Mozilla/5.0"}
 
-# ── 上市 API 專用 headers（帶正確 Referer）────────────────────────────────────
-headers_twse = {**headers, "Referer": "https://www.twse.com.tw/"}
-# ── 上櫃 API 專用 headers ────────────────────────────────────────────────────
-headers_tpex = {**headers, "Referer": "https://www.tpex.org.tw/"}
-
-# ── 盤後資料快取（同一天同一股不重複呼叫 API）─────────────────────────────────
-_stock_cache: dict = {}
+# ── 盤後資料 session 快取（避免同一天同一股重複呼叫 API）────────────────────
+_stock_cache: dict = {}   # {date_keyword: raw_text}
 
 def _cache_key(keyword: str) -> str:
     return f"{get_today()}_{keyword}"
@@ -40,53 +23,39 @@ def _cache_key(keyword: str) -> str:
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
-
-# ── 修正2：fetch_with_retry 放寬日期驗證 + 提高 timeout ──────────────────────
-def fetch_with_retry(url, today, date_key="date", retries=4, delay=2.0,
-                     hdr=None, skip_date_check=False):
+def fetch_with_retry(url, today, date_key="date", retries=3, delay=1.0):
     """
-    雲端環境改良版：
-    - timeout 提高至 15s（Render 網路較慢）
-    - skip_date_check=True 時跳過日期驗證，直接回傳第一個成功結果
-    - 日期驗證放寬：只要年份+月份對就接受（避免因 API 時序問題誤判）
+    發出 GET 請求，若回傳日期不是今天則自動重試最多 retries 次。
+    優化：第一次失敗縮短等待（0.5s），後續才用 delay。
     """
-    if hdr is None:
-        hdr = headers
-    today_ym = re.sub(r"[^\d]", "", today)[:6]  # 只取 YYYYMM
+    today_d = re.sub(r"[^\d]", "", today)
     for attempt in range(retries):
         try:
-            res = requests.get(url, headers=hdr, verify=False, timeout=15)
-            res.raise_for_status()
+            res = requests.get(url, headers=headers, verify=False, timeout=8)
             data = res.json()
-
-            if skip_date_check:
+            api_date = re.sub(r"[^\d]", "", str(data.get(date_key, "")))
+            if today_d in api_date:
                 return data
-
-            raw_date = str(data.get(date_key, ""))
-            api_date = re.sub(r"[^\d]", "", raw_date)
-
-            # 放寬：只要同年同月就接受（解決雲端時序不一致問題）
-            if today_ym in api_date:
-                return data
-
-            print(f"[fetch retry {attempt+1}/{retries}] 日期不符 api={api_date} today_ym={today_ym}")
+            print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_date} today={today_d}")
         except Exception as e:
-            print(f"[fetch retry {attempt+1}/{retries}] 失敗: {e}")
-
-        wait = 1.0 if attempt == 0 else delay
-        _time.sleep(wait)
+            print(f"[retry {attempt+1}/{retries}] 請求失敗: {e}")
+        _time.sleep(0.5 if attempt == 0 else delay)
     return None
 
 
-# ── 上市 / 上櫃公司代碼名稱（啟動時讀取一次）─────────────────────────────────
+# ── 上市 / 上櫃公司代碼名稱存檔（初始讀取一次）────────────────────────────────
+# 改用 dict 做 O(1) 查詢，大幅加速關鍵字比對
+# code→name, name→code 雙向索引
+
 def _load_stock_list():
-    """往前找最多 14 個工作日，兼容連假後長週末。"""
+    """自動往前找近 10 個工作日的資料，避免硬編碼日期失效。"""
     from datetime import date, timedelta
     twse_code2name, twse_name2code = {}, {}
     otc_code2name,  otc_name2code  = {}, {}
 
+    # 往前找最多 10 天
     d = date.today()
-    for _ in range(14):
+    for _ in range(10):
         d -= timedelta(days=1)
         if d.weekday() >= 5:
             continue
@@ -94,7 +63,7 @@ def _load_stock_list():
         try:
             r = requests.get(
                 f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={date_str}",
-                headers=headers_twse, verify=False, timeout=15)
+                headers=headers, verify=False, timeout=8)
             raw = r.json()
             if raw.get("stat") == "OK" and raw.get("data"):
                 for item in raw["data"]:
@@ -105,7 +74,7 @@ def _load_stock_list():
             continue
 
     d = date.today()
-    for _ in range(14):
+    for _ in range(10):
         d -= timedelta(days=1)
         if d.weekday() >= 5:
             continue
@@ -113,7 +82,7 @@ def _load_stock_list():
         try:
             r = requests.get(
                 f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={date_str}",
-                headers=headers_tpex, verify=False, timeout=15)
+                headers=headers, verify=False, timeout=8)
             raw = r.json()
             if raw.get("tables") and raw["tables"][0].get("data"):
                 for item in raw["tables"][0]["data"]:
@@ -127,6 +96,7 @@ def _load_stock_list():
 
 try:
     TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE = _load_stock_list()
+    # 保留舊 list 介面相容性（twse_top50 / otc_top50 用到）
     TWSE_data_code = list(TWSE_CODE2NAME.keys())
     TWSE_data_name = list(TWSE_CODE2NAME.values())
     OTC_data_code  = list(OTC_CODE2NAME.keys())
@@ -138,165 +108,134 @@ except Exception as e:
     print(f"❌ 無法取得代碼清單: {e}")
 
 
-# ── 上市個股查詢函式 ──────────────────────────────────────────────────────────
-
+# ── 上市個股查詢（並行） ──────────────────────────────────────────────────────
 def _twse_disposal(keyword, api_url):
     try:
-        res  = requests.get(api_url, headers=headers_twse, verify=False, timeout=15)
+        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
         data = res.json()
-        rows = data.get("data") or []
-        for row in rows:
+        for row in data["data"]:
             stock_id, stock_name = row[2], row[3]
             disposal_end_date = row[6][10:]
             if keyword in stock_id or keyword in stock_name:
                 return f"處置：⭕ 至 {disposal_end_date}"
         return "處置：❌"
-    except Exception as e:
-        print(f"[disposal] {e}")
+    except Exception:
         return None
 
 def _twse_foreign(keyword, api_url, today):
     try:
-        # 修正3：skip_date_check=True，不因日期誤判而丟棄資料
-        data = fetch_with_retry(api_url, today, hdr=headers_twse, skip_date_check=True)
+        data = fetch_with_retry(api_url, today)
         if data is None:
             return None
-        for row in data.get("data", []):
+        for row in data["data"]:
             stock_id, stock_name = row[1], row[2]
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 return f"外資：{row[5]} 股"
-        return None
-    except Exception as e:
-        print(f"[twse_foreign] {e}")
+    except Exception:
         return None
 
 def _twse_trust(keyword, api_url, today):
     try:
-        data = fetch_with_retry(api_url, today, hdr=headers_twse, skip_date_check=True)
+        data = fetch_with_retry(api_url, today)
         if data is None:
             return None
-        for row in data.get("data", []):
+        for row in data["data"]:
             stock_id, stock_name = row[1], row[2]
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 return f"投信：{row[5]} 股"
-        return None
-    except Exception as e:
-        print(f"[twse_trust] {e}")
+    except Exception:
         return None
 
 def _twse_proprietary(keyword, api_url, today):
     try:
-        data = fetch_with_retry(api_url, today, hdr=headers_twse, skip_date_check=True)
+        data = fetch_with_retry(api_url, today)
         if data is None:
             return None
-        for row in data.get("data", []):
+        for row in data["data"]:
             stock_id, stock_name = row[0], row[1]
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 return f"自營商：{row[10]} 股"
-        return None
-    except Exception as e:
-        print(f"[twse_proprietary] {e}")
+    except Exception:
         return None
 
 def _twse_short_sale(keyword, api_url, today):
     try:
-        data = fetch_with_retry(api_url, today, hdr=headers_twse, skip_date_check=True)
+        data = fetch_with_retry(api_url, today)
         if data is None:
             return None
-        for row in data.get("data", []):
+        for row in data["data"]:
             stock_id, stock_name = row[0], row[1]
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
-        return None
-    except Exception as e:
-        print(f"[twse_short_sale] {e}")
+    except Exception:
         return None
 
 
-# ── 上櫃個股查詢函式 ──────────────────────────────────────────────────────────
-
+# ── 上櫃個股查詢（並行） ──────────────────────────────────────────────────────
 def _otc_disposal(keyword, api_url):
     try:
-        res  = requests.get(api_url, headers=headers_tpex, verify=False, timeout=15)
+        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
         data = res.json()
-        rows = (data.get("tables") or [{}])[0].get("data") or []
-        for row in rows:
+        for row in data["tables"][0]["data"]:
             stock_id, stock_name = row[2], row[3].split("(")[0]
             disposal_end_date = row[5][10:]
             if keyword in stock_id or keyword in stock_name:
                 return f"處置：⭕ 至 {disposal_end_date}"
         return "處置：❌"
-    except Exception as e:
-        print(f"[otc_disposal] {e}")
+    except Exception:
         return None
 
 def _otc_institutional(keyword, api_url, today):
-    """
-    修正4：移除有 bug 的日期驗證（to_minguo 年份算錯），
-    改為直接取得資料，用 skip_date_check 避免誤判。
-    """
     try:
-        inst_data = None
-        for attempt in range(4):
-            try:
-                res = requests.get(api_url, headers=headers_tpex,
-                                   verify=False, timeout=15)
-                inst_data = res.json()
-                if inst_data and len(inst_data) > 0:
-                    break
-            except Exception as e:
-                print(f"[otc_inst retry {attempt+1}/4] {e}")
-            _time.sleep(1.0 if attempt == 0 else 2.0)
+        def otc_date_ok(data):
+            raw = data[0]["Date"] if data else ""
+            return re.sub(r"[^\d]", "", to_minguo(raw)) == re.sub(r"[^\d]", "", today)
 
-        if not inst_data:
+        inst_data = None
+        for attempt in range(3):
+            res = requests.get(api_url, headers=headers, verify=False, timeout=10)
+            inst_data = res.json()
+            if otc_date_ok(inst_data):
+                break
+            print(f"[otc_inst retry {attempt+1}/3] 日期不符，等待重試...")
+            _time.sleep(1.5)
+
+        if not otc_date_ok(inst_data):
             return None, None, None
 
         for row in inst_data:
-            stock_id   = row.get("SecuritiesCompanyCode", "")
-            stock_name = row.get("CompanyName", "")
+            stock_id, stock_name = row["SecuritiesCompanyCode"], row["CompanyName"]
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
-                try:
-                    foreign = int(row.get(
-                        "Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference", 0))
-                    trust   = int(row.get(
-                        "SecuritiesInvestmentTrustCompanies-Difference", 0))
-                    prop    = int(row.get("Dealers-Difference", 0))
-                except (ValueError, TypeError):
-                    return None, None, None
-                return (f"外資：{foreign:,} 股",
-                        f"投信：{trust:,} 股",
-                        f"自營商：{prop:,} 股")
+                foreign     = f"外資：{int(row['Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference']):,} 股"
+                trust       = f"投信：{int(row['SecuritiesInvestmentTrustCompanies-Difference']):,} 股"
+                proprietary = f"自營商：{int(row['Dealers-Difference']):,} 股"
+                return foreign, trust, proprietary
         return None, None, None
-    except Exception as e:
-        print(f"[otc_institutional] {e}")
+    except Exception:
         return None, None, None
 
 def _otc_short_sale(keyword, api_url, today):
     try:
-        data = fetch_with_retry(api_url, today, date_key="date",
-                                hdr=headers_tpex, skip_date_check=True)
+        data = fetch_with_retry(api_url, today, date_key="date", retries=3, delay=1.5)
         if data is None:
             return None
         kw = keyword
         if not kw.isdigit():
-            kw = OTC_NAME2CODE.get(kw, kw)
-        rows = (data.get("tables") or [{}])[0].get("data") or []
-        for row in rows:
+            kw = OTC_NAME2CODE.get(kw, kw)  # dict O(1) 查代碼
+        for row in data["tables"][0]["data"]:
             if kw in row[0]:
                 return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
-        return None
-    except Exception as e:
-        print(f"[otc_short_sale] {e}")
+    except Exception:
         return None
 
 
@@ -305,18 +244,18 @@ def stock_info(keyword):
     today = get_today()
 
     if not is_trading_day():
-        return "📢 今日週末或連假未開盤❗"
+        return f"📢 今日週末或連假未開盤❗"
     elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
-        return "📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
+        return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
-    # 快取命中 → 直接回傳
+    # 快取命中 → 直接回傳，省去重複 API 呼叫
     ck = _cache_key(keyword)
     if ck in _stock_cache:
         return _stock_cache[ck]
 
     reply = f"{keyword} (今盤後買賣超)\n"
 
-    # ── 上市 ─────────────────────────────────────────────────────────────────
+    # ── 上市（dict O(1) 查詢）────────────────────────────────────────────────
     if keyword in TWSE_CODE2NAME or keyword in TWSE_NAME2CODE:
         API_Disposal    = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
         API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
@@ -345,16 +284,16 @@ def stock_info(keyword):
         _stock_cache[ck] = reply.strip()
         return _stock_cache[ck]
 
-    # ── 上櫃 ─────────────────────────────────────────────────────────────────
+    # ── 上櫃（dict O(1) 查詢）────────────────────────────────────────────────
     elif keyword in OTC_CODE2NAME or keyword in OTC_NAME2CODE:
         API_institutional = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
         API_Disposal      = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
         API_Short_Sale    = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            f_disposal   = executor.submit(_otc_disposal,      keyword, API_Disposal)
-            f_inst       = executor.submit(_otc_institutional,  keyword, API_institutional, today)
-            f_short_sale = executor.submit(_otc_short_sale,    keyword, API_Short_Sale,    today)
+            f_disposal   = executor.submit(_otc_disposal,     keyword, API_Disposal)
+            f_inst       = executor.submit(_otc_institutional, keyword, API_institutional, today)
+            f_short_sale = executor.submit(_otc_short_sale,   keyword, API_Short_Sale,    today)
 
             Disposal_text                              = f_disposal.result()
             Foreign_text, Trust_text, Proprietary_text = f_inst.result()
@@ -381,10 +320,11 @@ def market_pnfo():
 
     reply = "📉大盤盤後詳細資訊📈\n"
 
+    # 三大法人買賣金額統計
     try:
-        data = fetch_with_retry(API_Net_Amount, today, hdr=headers_twse, skip_date_check=True)
-        if data is None or not data.get("data"):
-            raise Exception("無資料")
+        data = fetch_with_retry(API_Net_Amount, today)
+        if data is None:
+            raise Exception("日期不符或無資料")
         net_total = 0
         for i in range(3, -1, -1):
             row        = data["data"][i]
@@ -395,30 +335,28 @@ def market_pnfo():
             reply += f"{label} : {net_amount}億\n"
         reply += f"合計金額 : {int(net_total * 100) / 100}億\n"
         reply += "---------------------------------------------\n"
-    except Exception as e:
-        print(f"[market_pnfo net_amount] {e}")
+    except Exception:
         reply += "三大法人 : 🚫 暫未更新\n"
         reply += "---------------------------------------------\n"
 
+    # 大盤融資金額統計
     try:
-        data = fetch_with_retry(API_MarginDelta, today, hdr=headers_twse, skip_date_check=True)
+        data = fetch_with_retry(API_MarginDelta, today)
         if data is None:
-            raise Exception("無資料")
+            raise Exception("日期不符或無資料")
         row          = data["tables"][0]["data"]
         prev_margin  = int(row[2][4].replace(',', '')) / 1e5
         today_margin = int(row[2][5].replace(',', '')) / 1e5
         margin_delta = today_margin - prev_margin
         reply += f"融資金額增減 : {margin_delta:.2f}億\n"
         reply += f"融資額金水位 : {today_margin:.2f}億\n"
-    except Exception as e:
-        print(f"[market_pnfo margin] {e}")
+    except Exception:
         reply += "融資金額增減 : 🚫 暫未更新\n"
         reply += "融資額金水位 : 🚫 暫未更新\n"
 
     return reply.strip()
 
-
-# ── 上市三大法人排行前50 ──────────────────────────────────────────────────────
+# ── 上市三大法人買賣超排行前50 ────────────────────────────────────────────────────
 def twse_top50(today=None):
     if today is None:
         today = get_today()
@@ -429,12 +367,16 @@ def twse_top50(today=None):
 
     def _parse_top50(api_url, id_col, name_col, net_col):
         try:
-            res  = requests.get(api_url, headers=headers_twse, verify=False, timeout=15)
+            # 直接 GET，不用 fetch_with_retry（TWSE 這支 API 的 date 欄位不可靠）
+            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
             data = res.json()
+
             if data.get("stat") != "OK":
+                print(f"[twse_top50] API stat: {data.get('stat')}")
                 return None, None
+
             processed = []
-            for row in data.get("data", []):
+            for row in data["data"]:
                 name = row[name_col].strip()
                 if re.search(r'購|售|認購|認售', name):
                     continue
@@ -444,11 +386,13 @@ def twse_top50(today=None):
                 except (ValueError, IndexError):
                     continue
                 processed.append({"id": stock_id, "name": name, "net": net})
+
             buy  = sorted(processed, key=lambda x: x["net"], reverse=True)[:50]
             sell = sorted(processed, key=lambda x: x["net"])[:50]
             return buy, sell
+
         except Exception as e:
-            print(f"[twse_top50] {e}")
+            print(f"[twse_top50] 查詢失敗: {e}")
             return None, None
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
@@ -461,34 +405,51 @@ def twse_top50(today=None):
         proprietary_buy, proprietary_sell = f_proprietary.result()
 
     return {
-        "foreign":     {"buy": foreign_buy     or [], "sell": foreign_sell     or [], "error": "🚫 暫未更新" if foreign_buy     is None else None},
-        "trust":       {"buy": trust_buy       or [], "sell": trust_sell       or [], "error": "🚫 暫未更新" if trust_buy       is None else None},
-        "proprietary": {"buy": proprietary_buy or [], "sell": proprietary_sell or [], "error": "🚫 暫未更新" if proprietary_buy is None else None},
+        "foreign": {
+            "buy":  foreign_buy  if foreign_buy  is not None else [],
+            "sell": foreign_sell if foreign_sell is not None else [],
+            "error": "🚫 暫未更新" if foreign_buy is None else None,
+        },
+        "trust": {
+            "buy":  trust_buy  if trust_buy  is not None else [],
+            "sell": trust_sell if trust_sell is not None else [],
+            "error": "🚫 暫未更新" if trust_buy is None else None,
+        },
+        "proprietary": {
+            "buy":  proprietary_buy  if proprietary_buy  is not None else [],
+            "sell": proprietary_sell if proprietary_sell is not None else [],
+            "error": "🚫 暫未更新" if proprietary_buy is None else None,
+        },
     }
 
-
-# ── 上櫃三大法人排行前50 ──────────────────────────────────────────────────────
+# ── 上櫃三大法人買賣超排行前50 ────────────────────────────────────────────────
 def otc_top50():
     API_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
 
     def _parse_otc_top50():
         try:
-            res  = requests.get(API_URL, headers=headers_tpex, verify=False, timeout=15)
+            res  = requests.get(API_URL, headers=headers, verify=False, timeout=10)
             data = res.json()
 
-            foreign_list, trust_list, dealer_list = [], [], []
+            foreign_list = []
+            trust_list   = []
+            dealer_list  = []
 
             for row in data:
-                stock_id   = row.get("SecuritiesCompanyCode", "").strip()
-                stock_name = row.get("CompanyName", "").strip()
+                stock_id   = row["SecuritiesCompanyCode"].strip()
+                stock_name = row["CompanyName"].strip()
+
+                # 過濾權證、認購認售
                 if re.search(r'購|售|認購|認售', stock_name):
                     continue
+
                 try:
-                    foreign = int(row.get("Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference", 0)) // 1000
-                    trust   = int(row.get("SecuritiesInvestmentTrustCompanies-Difference", 0)) // 1000
-                    dealer  = int(row.get("Dealers-Difference", 0)) // 1000
+                    foreign = int(row["Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference"]) // 1000
+                    trust   = int(row["SecuritiesInvestmentTrustCompanies-Difference"]) // 1000
+                    dealer  = int(row["Dealers-Difference"]) // 1000
                 except (KeyError, ValueError):
                     continue
+
                 foreign_list.append({"id": stock_id, "name": stock_name, "net": foreign})
                 trust_list.append(  {"id": stock_id, "name": stock_name, "net": trust})
                 dealer_list.append( {"id": stock_id, "name": stock_name, "net": dealer})
@@ -501,13 +462,25 @@ def otc_top50():
             return top50(foreign_list), top50(trust_list), top50(dealer_list)
 
         except Exception as e:
-            print(f"[otc_top50] {e}")
+            print(f"[otc_top50] 查詢失敗: {e}")
             return (None, None), (None, None), (None, None)
 
     (foreign_buy, foreign_sell), (trust_buy, trust_sell), (dealer_buy, dealer_sell) = _parse_otc_top50()
 
     return {
-        "foreign":     {"buy": foreign_buy  or [], "sell": foreign_sell  or [], "error": "🚫 暫未更新" if foreign_buy  is None else None},
-        "trust":       {"buy": trust_buy    or [], "sell": trust_sell    or [], "error": "🚫 暫未更新" if trust_buy    is None else None},
-        "proprietary": {"buy": dealer_buy   or [], "sell": dealer_sell   or [], "error": "🚫 暫未更新" if dealer_buy   is None else None},
+        "foreign": {
+            "buy":   foreign_buy  if foreign_buy  is not None else [],
+            "sell":  foreign_sell if foreign_sell is not None else [],
+            "error": "🚫 暫未更新" if foreign_buy is None else None,
+        },
+        "trust": {
+            "buy":   trust_buy  if trust_buy  is not None else [],
+            "sell":  trust_sell if trust_sell is not None else [],
+            "error": "🚫 暫未更新" if trust_buy is None else None,
+        },
+        "proprietary": {
+            "buy":   dealer_buy  if dealer_buy  is not None else [],
+            "sell":  dealer_sell if dealer_sell is not None else [],
+            "error": "🚫 暫未更新" if dealer_buy is None else None,
+        },
     }
