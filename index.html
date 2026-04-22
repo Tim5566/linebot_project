@@ -375,6 +375,18 @@
       background-clip: text;
       filter: drop-shadow(0 0 18px rgba(0,229,255,.18));
     }
+    /* 共用標題 span（盤後更新時程、數據說明等 inline 標題）*/
+    .section-title-span {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.38rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      background: linear-gradient(90deg, #fff 60%, rgba(0,229,255,.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(0,229,255,.18));
+    }
 
     /* ── ANIMATED GLOWING BORDER UTIL ── */
     @keyframes borderGlow {
@@ -3242,34 +3254,35 @@
     }
     body.theme-day .hint { color: #7a9cb8; }
     body.theme-day .hint kbd { background: rgba(26,123,191,.1); color: #1a7bbf; border-color: rgba(26,123,191,.2); }
-    body.theme-day .section-label { color: #0e5a9a; opacity: 1; font-weight: 600; text-shadow: none; }
-    body.theme-day h2.section-title {
-      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: none;
+    body.theme-day .section-label { color: #1265a8; opacity: 1; font-weight: 700; text-shadow: none; letter-spacing: .28em; }
+    body.theme-day h2.section-title,
+    body.theme-day .section-title-span {
+      background: linear-gradient(90deg, #0a4a8a 0%, #1265a8 55%, #1a88cc 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.5)) !important;
       font-weight: 900;
-      filter: none;
+      font-size: 1.45rem;
     }
     body.theme-day .timeline-title {
-      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: none;
+      background: linear-gradient(90deg, #0a4a8a 0%, #1265a8 55%, #1a88cc 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.5)) !important;
     }
     body.theme-day .timeline-title .info-icon {
-      -webkit-text-fill-color: initial;
+      -webkit-text-fill-color: initial !important;
       background: rgba(230,242,255,.75);
       color: rgba(10,50,110,.85);
     }
     body.theme-day .data-note-title {
-      background: linear-gradient(90deg, #0a2540 30%, #1265a8 70%, #1a90e0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: none;
+      background: linear-gradient(90deg, #0a4a8a 0%, #1265a8 55%, #1a88cc 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.5)) !important;
     }
 
     /* ── STOCK RESULT CARD ── */
@@ -3539,6 +3552,54 @@
     body.theme-day .metric-cell  { animation: none; }
     body.theme-day header::after { animation: headerLineSweep 6s linear infinite; opacity: .6; }
 
+    /* ── C：強制移除白天模式閃爍動畫 ── */
+    body.theme-day .search-area::before,
+    body.theme-day .search-area::after,
+    body.theme-day .market-wrap::before,
+    body.theme-day .market-wrap::after {
+      animation: none !important;
+      background-image: none !important;
+      background-size: 100% !important;
+      opacity: 0 !important;
+    }
+
+    /* ── D：大頭貼 SVG — 暗色主題 ── */
+    .av-bg       { fill: #061428; stroke: rgba(0,229,255,.38); stroke-width: 1.2px; }
+    .av-rim      { stroke: rgba(0,229,255,.1); stroke-width: .8px; }
+    .av-body     { fill: rgba(0,180,220,.18); stroke: #00ccee; stroke-width: 1.6px; stroke-linecap: round; }
+    .av-head     { fill: rgba(0,180,220,.15); stroke: #00ccee; stroke-width: 1.8px; }
+    .av-shine    { fill: rgba(160,240,255,.3); }
+    .av-shoulder { stroke: rgba(0,200,240,.25); stroke-width: 1px; }
+
+    /* ── D：大頭貼 SVG — 白天晴空主題 ── */
+    body.theme-day .av-bg       { fill: #daeeff; stroke: rgba(26,123,191,.55); stroke-width: 1.4px; }
+    body.theme-day .av-rim      { stroke: rgba(26,123,191,.2); stroke-width: .8px; }
+    body.theme-day .av-body     { fill: rgba(26,123,191,.18); stroke: #1265a8; stroke-width: 1.8px; stroke-linecap: round; }
+    body.theme-day .av-head     { fill: rgba(26,123,191,.14); stroke: #1265a8; stroke-width: 2px; }
+    body.theme-day .av-shine    { fill: rgba(255,255,255,.75); }
+    body.theme-day .av-shoulder { stroke: rgba(26,100,170,.28); stroke-width: 1.2px; }
+    body.theme-day .auth-offline-dot {
+      background: #e05050;
+      border-color: rgba(240,248,255,.95);
+      box-shadow: 0 0 5px rgba(220,80,80,.5);
+    }
+    body.theme-day .auth-login-icon-btn {
+      border-color: rgba(26,123,191,.3);
+      background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(235,245,255,.8));
+      box-shadow: 0 2px 12px rgba(26,100,180,.15);
+    }
+    body.theme-day .auth-login-icon-btn:hover {
+      border-color: rgba(26,123,191,.55);
+      box-shadow: 0 4px 18px rgba(26,100,180,.25);
+      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(225,240,255,.9));
+    }
+    body.theme-day .auth-guest-name {
+      color: #0a2540;
+    }
+    body.theme-day .auth-guest-sub {
+      color: #4a7090;
+    }
+
     /* ── 白天模式 mobile watchlist 微調 ── */
     @media (max-width: 600px) {
       body.theme-day .wl-row {
@@ -3585,11 +3646,11 @@
 
     /* ── section-label 強化 ── */
     body.theme-day .section-label {
-      color: #0a4a8a;
+      color: #1265a8;
       opacity: 1;
       font-weight: 700;
       text-shadow: 0 1px 0 rgba(255,255,255,.6);
-      letter-spacing: .32em;
+      letter-spacing: .28em;
     }
 
     /* ── 大盤資訊區市場卡片 icon 描邊顏色加深 ── */
@@ -3872,42 +3933,19 @@
           <!-- 精緻頭像：仿 0.png 圓角方形底 + 青色人形 -->
           <div class="auth-avatar-placeholder-static">
             <div class="auth-offline-dot"></div>
-            <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" class="avatar-svg">
               <defs>
-                <radialGradient id="avatarBg" cx="50%" cy="35%" r="65%">
-                  <stop offset="0%" stop-color="#0a2040"/>
-                  <stop offset="100%" stop-color="#040c1c"/>
-                </radialGradient>
                 <filter id="avatarGlow">
                   <feGaussianBlur stdDeviation="1.5" result="blur"/>
                   <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                 </filter>
               </defs>
-              <!-- 圓角方形底板 -->
-              <rect x="1" y="1" width="50" height="50" rx="14" ry="14"
-                fill="url(#avatarBg)"
-                stroke="rgba(0,229,255,.35)" stroke-width="1.2"/>
-              <!-- 內框光邊 -->
-              <rect x="3" y="3" width="46" height="46" rx="12" ry="12"
-                fill="none"
-                stroke="rgba(0,229,255,.1)" stroke-width=".8"/>
-              <!-- 身體弧形 -->
-              <path d="M10 46 Q10 34 26 34 Q42 34 42 46"
-                fill="rgba(0,180,220,.18)"
-                stroke="#00ccee" stroke-width="1.6"
-                stroke-linecap="round" filter="url(#avatarGlow)"/>
-              <!-- 頭部圓 -->
-              <circle cx="26" cy="22" r="8.5"
-                fill="rgba(0,180,220,.15)"
-                stroke="#00ccee" stroke-width="1.8"
-                filter="url(#avatarGlow)"/>
-              <!-- 頭部高光 -->
-              <circle cx="23" cy="19.5" r="2"
-                fill="rgba(160,240,255,.3)"/>
-              <!-- 肩膀線條 -->
-              <path d="M14 38 Q26 32 38 38"
-                fill="none"
-                stroke="rgba(0,200,240,.25)" stroke-width="1"/>
+              <rect class="av-bg"   x="1" y="1" width="50" height="50" rx="14" ry="14"/>
+              <rect class="av-rim"  x="3" y="3" width="46" height="46" rx="12" ry="12" fill="none"/>
+              <path class="av-body" d="M10 46 Q10 34 26 34 Q42 34 42 46" filter="url(#avatarGlow)"/>
+              <circle class="av-head" cx="26" cy="22" r="8.5" filter="url(#avatarGlow)"/>
+              <circle class="av-shine" cx="23" cy="19.5" r="2"/>
+              <path class="av-shoulder" d="M14 38 Q26 32 38 38" fill="none"/>
             </svg>
           </div>
 
@@ -4373,7 +4411,7 @@
   <div class="search-area">
     <div class="search-top">
       <p class="section-label">· 個股查詢 ·</p>
-            <svg id="mainTitleSvg" xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient><linearGradient id="tg1day" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0a1828"/><stop offset="55%" stop-color="#0d3a6e"/><stop offset="100%" stop-color="#1265a8"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)" id="mainTitleText">盤後買賣超查詢</text></svg>
+            <svg id="mainTitleSvg" xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient><linearGradient id="tg1day" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0a4a8a"/><stop offset="55%" stop-color="#1265a8"/><stop offset="100%" stop-color="#1a88cc"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)" id="mainTitleText">盤後買賣超查詢</text></svg>
     </div>
     <div class="search-row">
       <div class="search-input-wrap">
@@ -4538,7 +4576,7 @@
     <div class="timeline">
       <p class="section-label" style="margin-bottom:6px">· 更新排程 ·</p>
       <div style="margin-bottom:22px;display:flex;align-items:center;gap:8px;">
-        <span style="font-family:'Orbitron',monospace;font-size:1.38rem;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.18));">盤後更新時程</span>
+        <span class="section-title-span">盤後更新時程</span>
         <span class="info-icon" style="margin-left:2px;flex-shrink:0;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
           <span class="tooltip" style="left:0;transform:none;max-width:260px">
@@ -4555,7 +4593,7 @@
     <div class="data-note">
       <p class="section-label" style="margin-bottom:6px">· 說明 ·</p>
       <div style="margin-bottom:16px;">
-        <span style="font-family:'Orbitron',monospace;font-size:1.38rem;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.18));">數據說明</span>
+        <span class="section-title-span">數據說明</span>
       </div>
       <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
@@ -6499,18 +6537,43 @@ setTimeout(() => {
   </div>
 </div>
 
-<!-- MOUNTAIN CANVAS（白天山脈背景）-->
+<!-- MOUNTAIN CANVAS（白天山脈背景 + 動態草地）-->
 <script>
 (function() {
   const mc = document.getElementById('mountainCanvas');
   if (!mc) return;
   const mctx = mc.getContext('2d');
   let MW, MH;
+  let animFrame = null;
+  let t = 0; // 全局時間計數
+
+  // ── 蝴蝶群（動態）────────────────────────────────────────────────────────
+  const butterflies = Array.from({ length: 6 }, (_, i) => ({
+    x: Math.random(),
+    y: 0.55 + Math.random() * 0.2,
+    vx: (0.0006 + Math.random() * 0.0008) * (Math.random() < 0.5 ? 1 : -1),
+    vy: 0,
+    wingPhase: Math.random() * Math.PI * 2,
+    wingSpeed: 0.12 + Math.random() * 0.08,
+    bobPhase: Math.random() * Math.PI * 2,
+    colors: [
+      ['#ff9de2','#ffb347'], ['#a8d8ea','#87ceeb'], ['#b0fbc1','#7edc9c'],
+      ['#ffd6a5','#ffb347'], ['#c9b1ff','#9d72ff'], ['#ff9de2','#f7c5e8']
+    ][i % 6],
+    scale: 0.7 + Math.random() * 0.5,
+  }));
+
+  // ── 羊群（動態行走）──────────────────────────────────────────────────────
+  const sheepData = [
+    { x: 0.12, xv: 0.00025, s: 1.0,  legPhase: 0 },
+    { x: 0.38, xv: -0.0002, s: 0.85, legPhase: 1.2 },
+    { x: 0.62, xv: 0.00018, s: 1.1,  legPhase: 0.6 },
+    { x: 0.80, xv: -0.0003, s: 0.9,  legPhase: 1.8 },
+  ];
 
   function mResize() {
     MW = mc.width  = window.innerWidth;
     MH = mc.height = window.innerHeight;
-    drawMountains();
   }
 
   function drawMountains() {
@@ -6534,7 +6597,7 @@ setTimeout(() => {
       [MW*0.68, baseY - MH*0.30], [MW*0.78, baseY - MH*0.42], [MW*0.88, baseY - MH*0.26],
       [MW*1.0, baseY - MH*0.32], [MW, MH]
     ];
-    peaks1.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    peaks1.forEach(([x, y]) => mctx.lineTo(x, y));
     mctx.closePath();
     mctx.fill();
     mctx.restore();
@@ -6555,12 +6618,12 @@ setTimeout(() => {
       [MW*0.56, baseY - MH*0.22], [MW*0.65, baseY - MH*0.34], [MW*0.74, baseY - MH*0.18],
       [MW*0.84, baseY - MH*0.28], [MW*0.93, baseY - MH*0.16], [MW, baseY - MH*0.22], [MW, MH]
     ];
-    peaks2.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    peaks2.forEach(([x, y]) => mctx.lineTo(x, y));
     mctx.closePath();
     mctx.fill();
     mctx.restore();
 
-    // 近山層（最深綠，帶雪頂感）
+    // 近山層（最深綠）
     mctx.save();
     mctx.globalAlpha = 0.55;
     const g3 = mctx.createLinearGradient(0, baseY - MH*0.20, 0, baseY + 10);
@@ -6577,7 +6640,7 @@ setTimeout(() => {
       [MW*0.74, baseY - MH*0.16], [MW*0.82, baseY - MH*0.06], [MW*0.90, baseY - MH*0.14],
       [MW*0.96, baseY - MH*0.04], [MW, baseY], [MW, MH]
     ];
-    peaks3.forEach(([x, y], i) => i === 0 ? mctx.lineTo(x, y) : mctx.lineTo(x, y));
+    peaks3.forEach(([x, y]) => mctx.lineTo(x, y));
     mctx.closePath();
     mctx.fill();
     mctx.restore();
@@ -6591,15 +6654,267 @@ setTimeout(() => {
     mctx.fillStyle = g4;
     mctx.fillRect(0, baseY + MH*0.02, MW, MH - baseY);
     mctx.restore();
+
+    // ── 三層草葉筆觸（隨時間搖曳）─────────────────────────────────────────
+    const grassConfigs = [
+      { y: baseY + MH*0.025, count: 55, hRange: [10,20], alpha: 0.28, color: 'rgba(40,120,55,1)' },
+      { y: baseY + MH*0.030, count: 45, hRange: [14,26], alpha: 0.38, color: 'rgba(50,140,65,1)' },
+      { y: baseY + MH*0.038, count: 35, hRange: [18,32], alpha: 0.22, color: 'rgba(70,160,80,1)' },
+    ];
+    const rng = (seed, idx) => ((Math.sin(seed * 9301 + idx * 49297 + 233) * 0.5 + 0.5));
+    grassConfigs.forEach(({ y, count, hRange, alpha, color }) => {
+      mctx.save();
+      mctx.globalAlpha = alpha;
+      mctx.strokeStyle = color;
+      mctx.lineWidth = 1.2;
+      mctx.lineCap = 'round';
+      for (let i = 0; i < count; i++) {
+        const x   = rng(7, i + count) * MW;
+        const h   = hRange[0] + rng(13, i) * (hRange[1] - hRange[0]);
+        // 搖曳：每根草有自己的相位偏移
+        const sway = Math.sin(t * 0.025 + rng(31, i) * Math.PI * 2) * 4 * rng(19, i);
+        const dx   = sway;
+        mctx.beginPath();
+        mctx.moveTo(x, y);
+        mctx.quadraticCurveTo(x + dx * 0.5, y - h * 0.5, x + dx, y - h);
+        mctx.stroke();
+      }
+      mctx.restore();
+    });
+
+    // ── 九朵彩色小花（花莖隨風搖）────────────────────────────────────────
+    const flowerColors = ['#ff7eb3', '#ffb347', '#ffe156', '#a8e6cf', '#b0c4ff'];
+    const flowers = [
+      { x: 0.08, y: baseY + MH*0.05 }, { x: 0.18, y: baseY + MH*0.03 },
+      { x: 0.29, y: baseY + MH*0.06 }, { x: 0.40, y: baseY + MH*0.04 },
+      { x: 0.52, y: baseY + MH*0.055 }, { x: 0.63, y: baseY + MH*0.03 },
+      { x: 0.72, y: baseY + MH*0.065 }, { x: 0.83, y: baseY + MH*0.04 },
+      { x: 0.93, y: baseY + MH*0.05 },
+    ];
+    flowers.forEach(({ x, y }, i) => {
+      const fx   = x * MW;
+      const fy   = y;
+      const fc   = flowerColors[i % flowerColors.length];
+      const fr   = 4 + rng(23, i) * 3;
+      // 花頭搖曳偏移
+      const sway = Math.sin(t * 0.022 + i * 0.9) * 3.5;
+      mctx.save();
+      mctx.globalAlpha = 0.80;
+      // 莖（搖曳）
+      mctx.strokeStyle = 'rgba(50,130,60,.75)';
+      mctx.lineWidth = 1.4;
+      mctx.lineCap = 'round';
+      mctx.beginPath();
+      mctx.moveTo(fx, fy + fr * 0.8 + 12);
+      mctx.quadraticCurveTo(fx + sway * 0.4, fy, fx + sway, fy - fr * 1.4);
+      mctx.stroke();
+      // 花瓣（5片）繞搖曳後的花頭位置
+      const hx = fx + sway, hy = fy - fr * 1.4;
+      for (let p = 0; p < 5; p++) {
+        const a  = (p / 5) * Math.PI * 2 + t * 0.008; // 花瓣緩慢自轉
+        const px = hx + Math.cos(a) * fr * 1.4;
+        const py = hy + Math.sin(a) * fr * 1.4;
+        mctx.beginPath();
+        mctx.arc(px, py, fr * 0.9, 0, Math.PI * 2);
+        mctx.fillStyle = fc;
+        mctx.fill();
+      }
+      // 花心（黃色）
+      mctx.beginPath();
+      mctx.arc(hx, hy, fr * 0.75, 0, Math.PI * 2);
+      mctx.fillStyle = '#ffe156';
+      mctx.fill();
+      mctx.restore();
+    });
+
+    // ── 四隻行走的白羊 ──────────────────────────────────────────────────
+    sheepData.forEach(sp => {
+      // 更新位置
+      sp.x += sp.xv;
+      if (sp.x > 1.12) { sp.x = -0.12; sp.xv = Math.abs(sp.xv); }
+      if (sp.x < -0.12) { sp.x = 1.12; sp.xv = -Math.abs(sp.xv); }
+      sp.legPhase += 0.07;
+
+      const sx = sp.x * MW;
+      const sy = baseY + MH * 0.033;
+      const s  = sp.s;
+      const dir = sp.xv > 0 ? 1 : -1; // 朝向
+
+      mctx.save();
+      mctx.globalAlpha = 0.78;
+      mctx.scale(dir, 1); // 翻轉朝向
+      const sxFlipped = dir > 0 ? sx : -sx;
+
+      // 身體陰影（地面投影）
+      mctx.globalAlpha = 0.14;
+      mctx.beginPath();
+      mctx.ellipse(sxFlipped, sy + 13*s, 16*s, 4*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(60,90,60,1)';
+      mctx.fill();
+      mctx.globalAlpha = 0.78;
+
+      // 四條腿（交替擺動）
+      const legOffsets = [[-9,-3], [-3,-1], [3,-1], [9,-3]];
+      legOffsets.forEach(([dx, ldx], li) => {
+        const swing = Math.sin(sp.legPhase + li * Math.PI * 0.5) * 5 * s;
+        mctx.beginPath();
+        mctx.moveTo(sxFlipped + dx*s, sy + 9*s);
+        mctx.lineTo(sxFlipped + (dx + ldx)*s, sy + 21*s + swing);
+        mctx.strokeStyle = 'rgba(200,210,225,.9)';
+        mctx.lineWidth = 2.5*s;
+        mctx.lineCap = 'round';
+        mctx.stroke();
+      });
+
+      // 身體（橢圓）
+      mctx.beginPath();
+      mctx.ellipse(sxFlipped, sy, 18*s, 12*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(245,248,252,.97)';
+      mctx.fill();
+      mctx.strokeStyle = 'rgba(180,195,215,.65)';
+      mctx.lineWidth = .8;
+      mctx.stroke();
+
+      // 毛茸茸（幾個小圓）
+      [[-10,-4], [0,-8], [10,-4], [-6,2], [6,2]].forEach(([ddx,ddy]) => {
+        mctx.beginPath();
+        mctx.arc(sxFlipped + ddx*s, sy + ddy*s, 7*s, 0, Math.PI*2);
+        mctx.fillStyle = 'rgba(252,254,255,.9)';
+        mctx.fill();
+      });
+
+      // 頭部
+      const hx2 = sxFlipped + 19*s, hy2 = sy - 7*s;
+      mctx.beginPath();
+      mctx.arc(hx2, hy2, 7*s, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(238,242,250,.97)';
+      mctx.fill();
+      mctx.strokeStyle = 'rgba(170,185,205,.55)';
+      mctx.lineWidth = .8;
+      mctx.stroke();
+
+      // 耳朵
+      mctx.beginPath();
+      mctx.ellipse(hx2 - 4*s, hy2 - 8*s, 3*s, 5*s, -0.3, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(225,232,242,.95)';
+      mctx.fill();
+      mctx.beginPath();
+      mctx.ellipse(hx2 + 4*s, hy2 - 8*s, 3*s, 5*s, 0.3, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(225,232,242,.95)';
+      mctx.fill();
+
+      // 眼睛 + 眨眼（隨機）
+      mctx.fillStyle = 'rgba(60,80,110,.75)';
+      mctx.beginPath();
+      mctx.arc(hx2 + 2*s, hy2 - 1*s, 1.3*s, 0, Math.PI*2);
+      mctx.fill();
+      // 嘴巴小弧線
+      mctx.strokeStyle = 'rgba(140,120,110,.5)';
+      mctx.lineWidth = .8*s;
+      mctx.beginPath();
+      mctx.arc(hx2 + 4*s, hy2 + 2*s, 2.5*s, 0.2, Math.PI * 0.75);
+      mctx.stroke();
+
+      mctx.restore();
+    });
+
+    // ── 蝴蝶（飛舞動態）────────────────────────────────────────────────────
+    butterflies.forEach(b => {
+      b.wingPhase += b.wingSpeed;
+      b.bobPhase  += 0.025;
+      // 位置更新（正弦曲線飛行）
+      b.x += b.vx;
+      b.y  = (0.56 + butterflies.indexOf(b) * 0.032) + Math.sin(b.bobPhase) * 0.04;
+      if (b.x > 1.1) { b.x = -0.1; }
+      if (b.x < -0.1){ b.x =  1.1; }
+
+      const bx = b.x * MW;
+      const by = b.y * MH;
+      const s  = b.scale;
+      const wy = Math.abs(Math.sin(b.wingPhase)); // 翅膀開合（0~1）
+      const dir = b.vx > 0 ? 1 : -1;
+
+      mctx.save();
+      mctx.globalAlpha = 0.70;
+      mctx.translate(bx, by);
+      mctx.scale(dir, 1);
+
+      // 左翼
+      mctx.beginPath();
+      mctx.ellipse(-9*s*wy, -5*s, 10*s*wy, 7*s, -0.4, 0, Math.PI*2);
+      mctx.fillStyle = b.colors[0];
+      mctx.fill();
+      mctx.globalAlpha = 0.45;
+      mctx.beginPath();
+      mctx.ellipse(-7*s*wy, -2*s, 6*s*wy, 4.5*s, -0.2, 0, Math.PI*2);
+      mctx.fillStyle = b.colors[1];
+      mctx.fill();
+      mctx.globalAlpha = 0.70;
+
+      // 右翼
+      mctx.beginPath();
+      mctx.ellipse(9*s*wy, -5*s, 10*s*wy, 7*s, 0.4, 0, Math.PI*2);
+      mctx.fillStyle = b.colors[0];
+      mctx.fill();
+      mctx.globalAlpha = 0.45;
+      mctx.beginPath();
+      mctx.ellipse(7*s*wy, -2*s, 6*s*wy, 4.5*s, 0.2, 0, Math.PI*2);
+      mctx.fillStyle = b.colors[1];
+      mctx.fill();
+      mctx.globalAlpha = 0.70;
+
+      // 身體（細橢圓）
+      mctx.beginPath();
+      mctx.ellipse(0, 0, 1.5*s, 6*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(50,30,20,.75)';
+      mctx.fill();
+
+      // 觸角
+      mctx.strokeStyle = 'rgba(50,30,20,.7)';
+      mctx.lineWidth = .8*s;
+      mctx.beginPath();
+      mctx.moveTo(0, -5*s);
+      mctx.quadraticCurveTo(-5*s, -12*s, -7*s*dir, -14*s);
+      mctx.moveTo(0, -5*s);
+      mctx.quadraticCurveTo(5*s, -12*s, 7*s*dir, -14*s);
+      mctx.stroke();
+      // 觸角端點圓
+      mctx.fillStyle = 'rgba(50,30,20,.6)';
+      mctx.beginPath(); mctx.arc(-7*s*dir, -14*s, 1.2*s, 0, Math.PI*2); mctx.fill();
+      mctx.beginPath(); mctx.arc( 7*s*dir, -14*s, 1.2*s, 0, Math.PI*2); mctx.fill();
+
+      mctx.restore();
+    });
+  }
+
+  // ── 動態循環 ──────────────────────────────────────────────────────────────
+  function animate() {
+    animFrame = requestAnimationFrame(animate);
+    if (!document.body.classList.contains('theme-day')) return;
+    t++;
+    mResize_noRedraw(); // 僅在 resize 事件才重設尺寸
+    drawMountains();
+  }
+
+  let _needResize = false;
+  function mResize() {
+    MW = mc.width  = window.innerWidth;
+    MH = mc.height = window.innerHeight;
+  }
+  function mResize_noRedraw() {
+    if (_needResize) {
+      MW = mc.width  = window.innerWidth;
+      MH = mc.height = window.innerHeight;
+      _needResize = false;
+    }
   }
 
   mResize();
-  window.addEventListener('resize', mResize);
-  // 監聽主題切換重繪
-  document.addEventListener('_themeChanged', drawMountains);
-  const origAdd = document.body.classList.add.bind(document.body.classList);
-  // MutationObserver 偵測 theme-day 變化
-  new MutationObserver(() => drawMountains()).observe(document.body, {attributes:true, attributeFilter:['class']});
+  animate();
+  window.addEventListener('resize', () => { _needResize = true; });
+  new MutationObserver(() => {
+    if (document.body.classList.contains('theme-day')) { t = 0; }
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 })();
 </script>
 
