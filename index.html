@@ -1855,7 +1855,7 @@
     .drawer-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,61,90,.1); transform: scale(1.1) rotate(90deg); box-shadow: 0 0 10px rgba(255,61,90,.15); }
     .drawer-close svg { width: 13px; height: 13px; }
 
-    .drawer-section { padding: 12px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-section { padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; }
     .drawer-section-label {
       font-family: 'Share Tech Mono', monospace;
       font-size: .62rem;
@@ -1864,6 +1864,26 @@
       text-transform: uppercase;
       padding: 4px 8px 10px;
       display: block;
+    }
+
+    /* ── 群組標籤（新）── */
+    .nav-group-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .57rem;
+      letter-spacing: .28em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      padding: 10px 10px 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: .75;
+    }
+    .nav-group-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0,229,255,.18), transparent);
     }
     /* "關於本站" 區塊標籤 — 特別加強 */
     .about-section-label {
@@ -1952,6 +1972,172 @@
       box-shadow: 0 0 8px rgba(0,229,255,.08);
     }
     .drawer-divider { height: 1px; background: rgba(0,229,255,.07); margin: 4px 12px; }
+
+    /* ── Accordion（可展開子選單）── */
+    .nav-accordion-trigger {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .74rem;
+      letter-spacing: .06em;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all .22s cubic-bezier(.22,1,.36,1);
+      white-space: nowrap;
+      background: none;
+      border: 1px solid transparent;
+      width: 100%;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-accordion-trigger::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 15%; bottom: 15%;
+      width: 2.5px;
+      background: linear-gradient(to bottom, #ffd600, rgba(255,200,0,.5));
+      opacity: 0;
+      border-radius: 2px;
+      transition: opacity .22s;
+    }
+    .nav-accordion-trigger::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,214,0,.05), transparent);
+      transition: left .4s ease;
+      pointer-events: none;
+    }
+    .nav-accordion-trigger:hover::after { left: 160%; }
+    .nav-accordion-trigger svg.trigger-icon {
+      width: 15px; height: 15px; flex-shrink: 0;
+      opacity: .6; transition: all .22s; color: var(--yellow);
+    }
+    .nav-accordion-trigger:hover {
+      color: var(--text);
+      background: rgba(255,214,0,.05);
+      border-color: rgba(255,214,0,.15);
+      transform: translateX(2px);
+    }
+    .nav-accordion-trigger:hover svg.trigger-icon { opacity: 1; transform: scale(1.1); }
+    .nav-accordion-trigger.open {
+      color: var(--yellow);
+      background: linear-gradient(90deg, rgba(255,214,0,.07), rgba(255,214,0,.03));
+      border-color: rgba(255,214,0,.18);
+    }
+    .nav-accordion-trigger.open::before { opacity: 1; }
+    .nav-accordion-trigger.open svg.trigger-icon { opacity: 1; }
+    /* 展開箭頭 */
+    .acc-arrow {
+      margin-left: auto;
+      width: 13px; height: 13px;
+      flex-shrink: 0;
+      color: var(--text-faint);
+      transition: transform .28s cubic-bezier(.22,1,.36,1), color .22s;
+    }
+    .nav-accordion-trigger.open .acc-arrow {
+      transform: rotate(180deg);
+      color: var(--yellow);
+    }
+    /* 標籤文字 */
+    .acc-label { flex: 1; }
+    .acc-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      background: linear-gradient(135deg, rgba(255,214,0,.15), rgba(255,180,0,.1));
+      border: 1px solid rgba(255,214,0,.28);
+      color: var(--yellow);
+      border-radius: 5px;
+      padding: 2px 6px;
+      letter-spacing: .05em;
+      text-shadow: 0 0 6px rgba(255,214,0,.3);
+    }
+
+    /* 子選單容器 */
+    .nav-sub-menu {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .35s cubic-bezier(.22,1,.36,1), opacity .25s;
+      opacity: 0;
+      padding-left: 12px;
+    }
+    .nav-sub-menu.open {
+      max-height: 600px;
+      opacity: 1;
+    }
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px 9px 18px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .05em;
+      color: var(--text-faint);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all .2s;
+      white-space: nowrap;
+      background: none;
+      border: 1px solid transparent;
+      width: 100%;
+      text-align: left;
+      text-decoration: none;
+      position: relative;
+    }
+    /* 左側細點綴線 */
+    .nav-sub-item::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 50%;
+      transform: translateY(-50%);
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(255,214,0,.3);
+      transition: all .2s;
+    }
+    .nav-sub-item:hover {
+      color: var(--text);
+      background: rgba(255,214,0,.05);
+      border-color: rgba(255,214,0,.12);
+      transform: translateX(2px);
+    }
+    .nav-sub-item:hover::before { background: var(--yellow); box-shadow: 0 0 6px rgba(255,214,0,.4); }
+    .nav-sub-item svg { width: 13px; height: 13px; flex-shrink: 0; opacity: .5; transition: opacity .2s; color: var(--yellow); }
+    .nav-sub-item:hover svg { opacity: .85; }
+    .nav-sub-item .sub-badge {
+      margin-left: auto;
+      font-size: .48rem;
+      background: rgba(255,214,0,.08);
+      border: 1px solid rgba(255,214,0,.18);
+      color: rgba(255,214,0,.6);
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: .04em;
+    }
+    /* coming-soon 狀態 */
+    .nav-sub-item.coming-soon {
+      opacity: .4;
+      cursor: default;
+      pointer-events: none;
+    }
+    .nav-sub-item.coming-soon::after {
+      content: 'SOON';
+      margin-left: auto;
+      font-size: .45rem;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      color: var(--text-faint);
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: .08em;
+    }
+
     /* 我的最愛 nav-item 特別樣式 */
     .nav-item.fav-nav-item {
       color: rgba(255,100,100,.7);
@@ -2981,6 +3167,24 @@
     }
     body.theme-day .drawer-divider { background: rgba(26,123,191,.1); }
     body.theme-day .about-section-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .nav-group-label { color: #5a80a8; opacity: .8; }
+    body.theme-day .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.25), transparent); }
+    /* Accordion day theme */
+    body.theme-day .nav-accordion-trigger { color: #3a5570; }
+    body.theme-day .nav-accordion-trigger:hover { color: #1a2d40; background: rgba(184,136,14,.07); border-color: rgba(184,136,14,.2); }
+    body.theme-day .nav-accordion-trigger.open { color: #8b6a00; background: linear-gradient(90deg, rgba(184,136,14,.09), rgba(184,136,14,.04)); border-color: rgba(184,136,14,.22); }
+    body.theme-day .nav-accordion-trigger.open::before { background: linear-gradient(to bottom, #b8880e, rgba(180,140,0,.5)); }
+    body.theme-day .nav-accordion-trigger svg.trigger-icon { color: #b8880e; }
+    body.theme-day .acc-arrow { color: #8a9cb8; }
+    body.theme-day .nav-accordion-trigger.open .acc-arrow { color: #b8880e; }
+    body.theme-day .acc-badge { background: rgba(184,136,14,.12); border-color: rgba(184,136,14,.3); color: #8b6a00; text-shadow: none; }
+    body.theme-day .nav-sub-item { color: #5a7898; }
+    body.theme-day .nav-sub-item::before { background: rgba(180,140,0,.3); }
+    body.theme-day .nav-sub-item:hover { color: #1a2d40; background: rgba(184,136,14,.06); border-color: rgba(184,136,14,.15); }
+    body.theme-day .nav-sub-item:hover::before { background: #b8880e; box-shadow: 0 0 4px rgba(180,140,0,.3); }
+    body.theme-day .nav-sub-item svg { color: #b8880e; }
+    body.theme-day .nav-sub-item .sub-badge { background: rgba(180,140,0,.08); border-color: rgba(180,140,0,.2); color: rgba(140,110,0,.7); }
+    body.theme-day .nav-sub-item.coming-soon::after { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #8a9cb8; }
     body.theme-day .auth-login-btn {
       background: linear-gradient(135deg, #1a7bbf, #1565a0);
       color: #fff;
@@ -3781,13 +3985,17 @@
 
     <div class="drawer-divider"></div>
 
+    <!-- ── 群組 1：查詢工具 ── -->
     <div class="drawer-section">
+      <span class="nav-group-label">查詢工具</span>
+
       <button class="nav-item active" onclick="scrollToMain()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         個股查詢
       </button>
+
       <button class="nav-item fav-nav-item" id="navWatchlist" onclick="openWatchlistModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -3795,6 +4003,14 @@
         我的最愛
         <span class="nav-badge" id="favCountBadge" style="display:none">0</span>
       </button>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <!-- ── 群組 2：法人數據 ── -->
+    <div class="drawer-section">
+      <span class="nav-group-label">法人數據</span>
+
       <button class="nav-item" onclick="openTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -3802,25 +4018,88 @@
         上市買賣超
         <span class="nav-badge">TOP 50</span>
       </button>
+
       <button class="nav-item" onclick="openOtcTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
-        櫃買買賣超
+        上櫃買賣超
         <span class="nav-badge">TOP 50</span>
       </button>
+
       <button class="nav-item" onclick="scrollToMarket()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
         </svg>
         法人大盤資訊
       </button>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <!-- ── 群組 3：學習資源（Accordion）── -->
+    <div class="drawer-section">
+      <span class="nav-group-label">學習資源</span>
+
+      <button class="nav-accordion-trigger" id="accLearn" onclick="toggleAccordion('accLearn','subLearn')">
+        <svg class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <span class="acc-label">技術分析教學</span>
+        <span class="acc-badge">NEW</span>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <div class="nav-sub-menu" id="subLearn">
+        <button class="nav-sub-item coming-soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          K 線型態
+        </button>
+        <button class="nav-sub-item coming-soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          均線理論
+        </button>
+        <button class="nav-sub-item coming-soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+          量能分析
+        </button>
+        <button class="nav-sub-item coming-soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+          </svg>
+          支撐與壓力
+        </button>
+        <button class="nav-sub-item coming-soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          </svg>
+          籌碼與法人
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <!-- ── 群組 4：系統 ── -->
+    <div class="drawer-section">
+      <span class="nav-group-label">系統</span>
+
       <button class="nav-item" onclick="scrollToTimeline()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
         更新時程
       </button>
+
       <button class="nav-item" onclick="openSettingsModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
@@ -3832,8 +4111,9 @@
 
     <div class="drawer-divider"></div>
 
+    <!-- ── 群組 5：關於本站 ── -->
     <div class="drawer-section">
-      <span class="about-section-label">關於本站</span>
+      <span class="nav-group-label">關於本站</span>
       <a class="nav-item" href="stock_site/legal/about.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -5343,6 +5623,27 @@ function renderStock(d) {
 document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') queryStock();
 });
+
+// ── ACCORDION ────────────────────────────────────────────────────────────────
+function toggleAccordion(triggerId, menuId) {
+  const trigger = document.getElementById(triggerId);
+  const menu    = document.getElementById(menuId);
+  if (!trigger || !menu) return;
+
+  const isOpen = trigger.classList.contains('open');
+
+  // 關閉所有其他已開啟的 accordion
+  document.querySelectorAll('.nav-accordion-trigger.open').forEach(t => {
+    if (t.id !== triggerId) {
+      t.classList.remove('open');
+      const m = document.getElementById(t.id.replace('acc', 'sub'));
+      if (m) m.classList.remove('open');
+    }
+  });
+
+  trigger.classList.toggle('open', !isOpen);
+  menu.classList.toggle('open', !isOpen);
+}
 
 // ── DRAWER ────────────────────────────────────────────────────────────────────
 function toggleDrawer() {
