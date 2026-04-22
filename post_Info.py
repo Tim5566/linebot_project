@@ -324,8 +324,7 @@ def stock_info(keyword):
         API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
         API_Short_Sale  = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
 
-        # 修正5：max_workers 降為 3，避免 Render 免費版 CPU 被打爆
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             f_disposal    = executor.submit(_twse_disposal,    keyword, API_Disposal)
             f_foreign     = executor.submit(_twse_foreign,     keyword, API_Foreign,     today)
             f_trust       = executor.submit(_twse_trust,       keyword, API_Trust,       today)
