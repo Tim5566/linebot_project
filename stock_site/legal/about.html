@@ -207,7 +207,7 @@
 <header>
   <div class="header-left">
     <div class="logo">
-      <div class="logo-icon"><img src="../../images/jelly.png" alt="JellyStock Logo" /></div>
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock Logo" /></div>
       <div>
         <div class="logo-text">盤後雷達</div>
         <div class="logo-sub">JELLYSTOCK · SYSTEM</div>
@@ -337,10 +337,10 @@
     <div class="footer-copy">© 2026 JellyStock. All rights reserved.</div>
   </div>
   <nav class="footer-nav">
-    <a href="../../index.html">首頁</a>
-    <a href="../../stock_site/legal/privacy.html">隱私政策</a>
-    <a href="../../stock_site/legal/about.html" class="active">關於本站</a>
-    <a href="../../stock_site/legal/disclaimer.html">免責聲明</a>
+    <a href="/">首頁</a>
+    <a href="/stock_site/legal/privacy.html">隱私政策</a>
+    <a href="/stock_site/legal/about.html" class="active">關於本站</a>
+    <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
   </nav>
 </footer>
 
@@ -361,6 +361,33 @@
     const bc = new BroadcastChannel('jellystock_theme');
     bc.onmessage = function(e){ if(e.data&&e.data.theme) applyPageTheme(e.data.theme); };
   } catch(e){}
+})();
+</script>
+
+<script>
+/* ── JellyStock 全站主題同步（與 index.html 一致）── */
+(function() {
+  // 優先讀 jelly_global_theme（與 index.html 同一個 key）
+  const saved = localStorage.getItem('jelly_global_theme') ||
+                localStorage.getItem('jelly_theme') || 'space';
+  document.body.classList.remove('theme-day', 'theme-forest');
+  if (saved === 'day')    document.body.classList.add('theme-day');
+  if (saved === 'forest') document.body.classList.add('theme-forest');
+
+  // 監聽來自 index.html 的主題廣播
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const bc = new BroadcastChannel('jellystock_theme');
+      bc.onmessage = (e) => {
+        const theme = e.data && e.data.theme;
+        if (!theme) return;
+        document.body.classList.remove('theme-day', 'theme-forest');
+        if (theme === 'day')    document.body.classList.add('theme-day');
+        if (theme === 'forest') document.body.classList.add('theme-forest');
+        localStorage.setItem('jelly_global_theme', theme);
+      };
+    } catch(e) {}
+  }
 })();
 </script>
 </body>
