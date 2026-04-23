@@ -1535,9 +1535,11 @@
       .stock-market-tag { font-size: .6rem; }
       .card-header-right { flex-direction: column; gap: 3px; align-items: flex-end; }
       .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; }
-      .metric-cell { padding: 12px 10px; }
+      .metric-cell { padding: 12px 10px; min-height: 88px; }
       .metric-label { font-size: .64rem; }
       .metric-value { font-size: 1rem; }
+      /* 手機版 metric-icon 尺寸與 market-card-icon 一致 */
+      .metric-icon { width: 44px; height: 44px; bottom: 8px; right: 8px; }
 
       /* ── Market overview ── */
       .market-wrap { padding: 16px 12px 14px; border-radius: 16px; }
@@ -3200,6 +3202,9 @@
     body.theme-day .ticker-item span.down { color: #1a8a3c; }
 
     /* ── DRAWER ── */
+    /* ══════════════════════════════════════════════════════
+       ☀️  白天晴空選單：背景不變，icon 顏色跟太空完全一致，文字改深藍
+       ══════════════════════════════════════════════════════ */
     body.theme-day .drawer {
       background: rgba(240,247,255,.97);
       border-right: 1px solid rgba(26,123,191,.15);
@@ -3212,110 +3217,84 @@
     }
     body.theme-day .drawer-brand { color: #1a5080; }
     body.theme-day .drawer-close { color: #3a5570; border-color: rgba(26,123,191,.2); }
-    body.theme-day .drawer-auth-top {
-      background: rgba(26,123,191,.05);
-      border-bottom-color: rgba(26,123,191,.12);
-    }
     body.theme-day .drawer-section-label { color: #2a5070; font-weight: 600; }
-    body.theme-day .nav-item {
-      color: #3a5570;
-      border-color: transparent;
-    }
-    body.theme-day .nav-item:hover {
-      background: rgba(26,123,191,.08);
-      border-color: rgba(26,123,191,.2);
-      color: #1a2d40;
-    }
-    body.theme-day .nav-item.active {
-      background: rgba(26,123,191,.12);
-      border-color: rgba(26,123,191,.35);
-      color: var(--accent);
-      box-shadow: none;
-    }
-    body.theme-day .nav-badge {
-      background: rgba(26,123,191,.12);
-      border-color: rgba(26,123,191,.25);
-      color: var(--accent);
-    }
     body.theme-day .drawer-divider { background: rgba(26,123,191,.1); }
     body.theme-day .about-section-label { color: #1265a8; font-weight: 600; }
-    body.theme-day .nav-group-label { color: #6a90b8; opacity: .85; }
+
+    /* 群組標籤小字：跟太空同色系但稍淡 */
+    body.theme-day .nav-group-label { opacity: .85; }
     body.theme-day .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.2), transparent); }
-    body.theme-day .nav-group-search > .nav-group-label { color: #0d6a90; opacity: 1; }
-    body.theme-day .nav-group-data > .nav-group-label { color: #4a3a90; opacity: 1; }
-    body.theme-day .nav-group-learn > .nav-group-label { color: #8a6000; opacity: 1; }
-    body.theme-day .nav-group-sys > .nav-group-label { color: #2a5878; opacity: 1; }
-    body.theme-day .nav-group-about > .nav-group-label { color: #5a7090; opacity: 1; }
-    body.theme-day .nav-group-search .nav-group-label { color: #1a7bbf; }
-    body.theme-day .nav-group-search .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.3), transparent); }
-    body.theme-day .nav-group-data .nav-group-label { color: #6a50c0; }
-    body.theme-day .nav-group-data .nav-group-label::after { background: linear-gradient(90deg, rgba(100,80,200,.25), transparent); }
-    body.theme-day .nav-group-sys .nav-group-label { color: #2a7090; }
-    body.theme-day .nav-group-sys .nav-group-label::after { background: linear-gradient(90deg, rgba(0,130,180,.22), transparent); }
-    body.theme-day .nav-group-about .nav-group-label { color: #6a8090; opacity: .7; }
+    body.theme-day .nav-group-search > .nav-group-label { color: rgba(0,160,200,.75); }
+    body.theme-day .nav-group-search > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,180,220,.22), transparent); }
+    body.theme-day .nav-group-data > .nav-group-label { color: rgba(110,90,200,.7); }
+    body.theme-day .nav-group-data > .nav-group-label::after { background: linear-gradient(90deg, rgba(120,100,220,.2), transparent); }
+    body.theme-day .nav-group-learn > .nav-group-label { color: rgba(180,130,0,.75); }
+    body.theme-day .nav-group-learn > .nav-group-label::after { background: linear-gradient(90deg, rgba(180,140,0,.2), transparent); }
+    body.theme-day .nav-group-sys > .nav-group-label { color: rgba(60,130,170,.7); }
+    body.theme-day .nav-group-sys > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,150,200,.2), transparent); }
+    body.theme-day .nav-group-about > .nav-group-label { color: rgba(120,145,175,.7); }
+    body.theme-day .nav-group-about > .nav-group-label::after { background: linear-gradient(90deg, rgba(140,160,200,.15), transparent); }
 
-    /* 白天模式各群組 nav-item 顏色 */
-    body.theme-day .nav-group-search .nav-item { color: #0a5090; }
-    body.theme-day .nav-group-search .nav-item svg { color: #1a7bbf; }
-    body.theme-day .nav-group-search .nav-item:hover { color: #083870; background: rgba(26,123,191,.08); border-color: rgba(26,123,191,.22); }
-    body.theme-day .nav-group-search .nav-item:hover svg { color: #1265a8; filter: none; }
-    body.theme-day .nav-group-data .nav-item { color: #4a3090; }
-    body.theme-day .nav-group-data .nav-item svg { color: #6a50c0; }
-    body.theme-day .nav-group-data .nav-item:hover { color: #321870; background: rgba(100,80,200,.07); border-color: rgba(100,80,200,.2); }
-    body.theme-day .nav-group-data .nav-item:hover svg { color: #5a40b0; filter: none; }
-    body.theme-day .nav-group-sys .nav-item { color: #1a5068; }
-    body.theme-day .nav-group-sys .nav-item svg { color: #2a7090; }
-    body.theme-day .nav-group-sys .nav-item:hover { color: #0a3850; background: rgba(0,130,180,.07); border-color: rgba(0,130,180,.18); }
-    body.theme-day .nav-group-sys .nav-item:hover svg { color: #1a6080; filter: none; }
-    body.theme-day .nav-group-about .nav-item { color: #4a6070; }
-    body.theme-day .nav-group-about .nav-item svg { color: #6a8090; }
-    body.theme-day .nav-group-about .nav-item:hover { color: #2a4050; background: rgba(80,100,120,.06); border-color: rgba(80,100,120,.15); }
-    body.theme-day .nav-group-about .nav-item:hover svg { color: #4a6070; filter: none; }
-    body.theme-day .nav-group-learn .nav-group-label { color: #8a6010; opacity: .8; }
-    body.theme-day .nav-group-learn .nav-group-label::after { background: linear-gradient(90deg, rgba(180,130,0,.2), transparent); }
+    /* ── 所有 nav-item 文字：深藍色 ── */
+    body.theme-day .nav-item { color: #1a4a78; border-color: transparent; }
+    body.theme-day .nav-item:hover { color: #0d3560; background: rgba(26,100,180,.07); border-color: rgba(26,100,180,.18); }
+    body.theme-day .nav-item.active { color: #1265a8; background: rgba(26,101,168,.1); border-color: rgba(26,101,168,.28); box-shadow: none; }
+    body.theme-day .nav-badge { background: rgba(26,100,180,.12); border-color: rgba(26,100,180,.25); color: #1a5090; text-shadow: none; }
 
-    /* ── 白天模式 群組配色（清晰深色，高對比）── */
-    /* 查詢工具：深青藍 */
-    body.theme-day .nav-group-search .nav-item { color: #0d6a90; }
-    body.theme-day .nav-group-search .nav-item svg { color: #0e7aaa; filter: none; }
-    body.theme-day .nav-group-search .nav-item:hover { color: #0a5070; background: rgba(0,130,180,.07); border-color: rgba(0,130,180,.22); }
-    body.theme-day .nav-group-search .nav-item:hover svg { color: #0a5070; filter: none; }
-    /* 法人數據：深紫藍 */
-    body.theme-day .nav-group-data .nav-item { color: #4a3a90; }
-    body.theme-day .nav-group-data .nav-item svg { color: #5a48a8; filter: none; }
-    body.theme-day .nav-group-data .nav-item:hover { color: #3a2870; background: rgba(80,60,180,.07); border-color: rgba(80,60,180,.2); }
-    body.theme-day .nav-group-data .nav-item:hover svg { color: #3a2870; filter: none; }
-    /* 系統：深藍灰 */
-    body.theme-day .nav-group-sys .nav-item { color: #2a5878; }
-    body.theme-day .nav-group-sys .nav-item svg { color: #2a6888; filter: none; }
-    body.theme-day .nav-group-sys .nav-item:hover { color: #1a3a58; background: rgba(0,100,150,.06); border-color: rgba(0,100,150,.18); }
-    body.theme-day .nav-group-sys .nav-item:hover svg { color: #1a3a58; filter: none; }
-    /* 關於本站：中灰藍 */
-    body.theme-day .nav-group-about .nav-item { color: #5a7090; }
-    body.theme-day .nav-group-about .nav-item svg { color: #6a80a0; filter: none; }
-    body.theme-day .nav-group-about .nav-item:hover { color: #3a5070; background: rgba(80,110,160,.06); border-color: rgba(80,110,160,.15); }
-    body.theme-day .nav-group-about .nav-item:hover svg { color: #3a5070; filter: none; }
-    /* 我的最愛：白天玫瑰紅 */
-    body.theme-day .nav-item.fav-nav-item { color: #9a2030; }
-    body.theme-day .nav-item.fav-nav-item svg { color: #c0392b; filter: none; }
-    body.theme-day .nav-item.fav-nav-item:hover { color: #7a1020; background: rgba(192,57,43,.07); border-color: rgba(192,57,43,.22); }
-    body.theme-day .nav-item.fav-nav-item:hover svg { color: #a02018; filter: none; }
-    body.theme-day .nav-item.fav-nav-item .nav-badge { background: rgba(192,57,43,.1); border-color: rgba(192,57,43,.25); color: #c0392b; }
-    /* Accordion day theme — 藍色系（與其他群組一致）*/
-    body.theme-day .nav-accordion-trigger { color: #1a5080; }
-    body.theme-day .nav-accordion-trigger:hover { color: #0a3860; background: rgba(26,100,180,.07); border-color: rgba(26,100,180,.2); }
-    body.theme-day .nav-accordion-trigger.open { color: #1265a8; background: linear-gradient(90deg, rgba(26,100,180,.09), rgba(26,100,180,.04)); border-color: rgba(26,100,180,.28); }
-    body.theme-day .nav-accordion-trigger.open::before { background: linear-gradient(to bottom, #1265a8, rgba(26,100,180,.5)); }
-    body.theme-day .nav-accordion-trigger svg.trigger-icon { color: #1a7bbf; }
-    body.theme-day .acc-arrow { color: #6a90b8; }
-    body.theme-day .nav-accordion-trigger.open .acc-arrow { color: #1265a8; }
-    body.theme-day .acc-badge { background: rgba(26,100,180,.12); border-color: rgba(26,100,180,.3); color: #1265a8; text-shadow: none; }
-    body.theme-day .nav-sub-item { color: #2a5880; }
-    body.theme-day .nav-sub-item::before { background: rgba(26,100,180,.35); }
-    body.theme-day .nav-sub-item:hover { color: #0a3860; background: rgba(26,100,180,.07); border-color: rgba(26,100,180,.18); }
-    body.theme-day .nav-sub-item:hover::before { background: #1265a8; box-shadow: 0 0 4px rgba(26,100,180,.35); }
-    body.theme-day .nav-sub-item svg { color: #1a7bbf; }
-    body.theme-day .nav-sub-item .sub-badge { background: rgba(26,100,180,.08); border-color: rgba(26,100,180,.2); color: rgba(26,100,180,.8); }
+    /* ── icon 顏色：跟太空主題完全一致（只移除 glow，改為 filter:none）── */
+    /* 查詢工具：青色 rgba(0,229,255) */
+    body.theme-day .nav-group-search .nav-item { color: #1a4a78; }
+    body.theme-day .nav-group-search .nav-item svg { color: rgba(0,180,215,.85); filter: none; opacity: 1; }
+    body.theme-day .nav-group-search .nav-item:hover { color: #0d3560; background: rgba(0,160,200,.06); border-color: rgba(0,160,200,.18); }
+    body.theme-day .nav-group-search .nav-item:hover svg { color: rgba(0,200,235,.9); filter: none; opacity: 1; }
+
+    /* 法人數據：紫色 rgba(140,120,255) */
+    body.theme-day .nav-group-data .nav-item { color: #1a4a78; }
+    body.theme-day .nav-group-data .nav-item svg { color: rgba(130,110,235,.85); filter: none; opacity: 1; }
+    body.theme-day .nav-group-data .nav-item:hover { color: #0d3560; background: rgba(120,100,220,.06); border-color: rgba(120,100,220,.18); }
+    body.theme-day .nav-group-data .nav-item:hover svg { color: rgba(150,130,255,.9); filter: none; opacity: 1; }
+
+    /* 系統：藍灰 rgba(100,170,200) */
+    body.theme-day .nav-group-sys .nav-item { color: #1a4a78; }
+    body.theme-day .nav-group-sys .nav-item svg { color: rgba(80,150,185,.85); filter: none; opacity: 1; }
+    body.theme-day .nav-group-sys .nav-item:hover { color: #0d3560; background: rgba(60,140,180,.06); border-color: rgba(60,140,180,.18); }
+    body.theme-day .nav-group-sys .nav-item:hover svg { color: rgba(100,165,200,.9); filter: none; opacity: 1; }
+
+    /* 關於本站：灰藍 rgba(160,175,200) */
+    body.theme-day .nav-group-about .nav-item { color: #1a4a78; }
+    body.theme-day .nav-group-about .nav-item svg { color: rgba(130,148,175,.8); filter: none; opacity: 1; }
+    body.theme-day .nav-group-about .nav-item:hover { color: #0d3560; background: rgba(100,130,170,.05); border-color: rgba(100,130,170,.15); }
+    body.theme-day .nav-group-about .nav-item:hover svg { color: rgba(150,165,195,.9); filter: none; opacity: 1; }
+
+    /* 我的最愛：紅色（跟太空一致）*/
+    body.theme-day .nav-item.fav-nav-item { color: #9a1a28; border-color: rgba(255,61,90,.08); }
+    body.theme-day .nav-item.fav-nav-item svg { color: rgba(255,61,90,.85); filter: none; opacity: 1; }
+    body.theme-day .nav-item.fav-nav-item:hover { color: #7a0e1a; background: rgba(255,61,90,.07); border-color: rgba(255,61,90,.2); }
+    body.theme-day .nav-item.fav-nav-item:hover svg { color: rgba(255,61,90,.95); filter: none; opacity: 1; }
+    body.theme-day .nav-item.fav-nav-item .nav-badge { background: rgba(255,61,90,.12); border-color: rgba(255,61,90,.28); color: #c0302a; text-shadow: none; }
+
+    /* ── Accordion（技術分析教學）── */
+    /* trigger-icon：黃色（跟太空一樣 var(--yellow)）*/
+    body.theme-day .nav-accordion-trigger { color: #1a4a78; }
+    body.theme-day .nav-accordion-trigger svg.trigger-icon { color: rgba(180,136,0,.85); filter: none; opacity: .9; }
+    body.theme-day .nav-accordion-trigger:hover { color: #0d3560; background: rgba(180,136,14,.06); border-color: rgba(180,136,14,.18); }
+    body.theme-day .nav-accordion-trigger:hover svg.trigger-icon { color: rgba(200,155,0,.95); opacity: 1; }
+    body.theme-day .nav-accordion-trigger.open { color: #7a5800; background: rgba(180,136,14,.08); border-color: rgba(180,136,14,.22); }
+    body.theme-day .nav-accordion-trigger.open::before { background: linear-gradient(to bottom, #b8880e, rgba(180,140,0,.4)); }
+    body.theme-day .nav-accordion-trigger.open svg.trigger-icon { color: #b8880e; opacity: 1; }
+    body.theme-day .acc-label { color: inherit; }
+    body.theme-day .acc-arrow { color: rgba(80,110,150,.65); }
+    body.theme-day .nav-accordion-trigger.open .acc-arrow { color: #b8880e; }
+    body.theme-day .acc-badge { background: rgba(180,136,14,.1); border-color: rgba(180,136,14,.25); color: #8b6a00; text-shadow: none; }
+
+    /* sub-items：icon 黃色（跟太空一樣），文字深藍 */
+    body.theme-day .nav-sub-item { color: #1a4a78; }
+    body.theme-day .nav-sub-item svg { color: rgba(180,136,0,.8); filter: none; opacity: 1; }
+    body.theme-day .nav-sub-item::before { background: rgba(180,140,0,.35); }
+    body.theme-day .nav-sub-item:hover { color: #0d3560; background: rgba(180,136,14,.05); border-color: rgba(180,136,14,.15); }
+    body.theme-day .nav-sub-item:hover::before { background: #b8880e; }
+    body.theme-day .nav-sub-item:hover svg { color: rgba(200,155,0,.9); opacity: 1; }
+    body.theme-day .nav-sub-item.coming-soon { opacity: .42; }
     body.theme-day .nav-sub-item.coming-soon::after { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #7a9cb8; }
     body.theme-day .auth-login-btn {
       background: linear-gradient(135deg, #1a7bbf, #1565a0);
@@ -4717,7 +4696,7 @@
       <div style="margin-bottom:16px;">
         <span class="section-title-span">數據說明</span>
       </div>
-      <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：買賣超以「股」為單位，大盤金額以「億元」為單位</span></div>
+      <div class="data-note-item"><div class="data-note-dot"></div><span>數值單位：個股買賣超以「張」為單位（1張＝1000股），大盤金額以「億元」為單位</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span><span style="color:var(--red)">紅色</span> 表示買超（正值），<span style="color:var(--green)">綠色</span> 表示賣超（負值）</span></div>
       <div class="data-note-item"><div class="data-note-dot"></div><span>融資水位為當日融資餘額總額，非增減值，僅供參考</span></div>
     </div>
@@ -5728,7 +5707,7 @@ function renderStock(d) {
 
   // ── SVG icons：與大盤 market-card-icon 相同位置大小，完全一致的風格 ──
   // 外資：地球儀（同大盤）
-  const ICON_FOREIGN = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  const ICON_FOREIGN = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="38" cy="42" r="28"/><ellipse cx="38" cy="42" rx="11" ry="28"/><ellipse cx="38" cy="42" rx="22" ry="28"/>
     <line x1="10" y1="42" x2="66" y2="42"/><line x1="12" y1="28" x2="64" y2="28"/><line x1="12" y1="56" x2="64" y2="56"/>
     <line x1="17" y1="18" x2="59" y2="66" stroke-width="2.8"/>
@@ -5737,14 +5716,14 @@ function renderStock(d) {
   </svg>`;
 
   // 投信：建築物（同大盤）
-  const ICON_TRUST = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  const ICON_TRUST = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="8" y="66" width="64" height="7" rx="2"/><rect x="12" y="58" width="56" height="8" rx="1"/>
     <polygon points="40,10 70,34 10,34"/><rect x="18" y="34" width="10" height="24" rx="1"/><rect x="52" y="34" width="10" height="24" rx="1"/>
     <line x1="40" y1="58" x2="40" y2="44" stroke-width="2.8"/><polyline points="32,52 40,44 48,52" stroke-width="2.5" fill="none"/>
   </svg>`;
 
   // 自營商：辦公大樓（同大盤）
-  const ICON_PROP = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  const ICON_PROP = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <line x1="8" y1="70" x2="72" y2="70"/><rect x="10" y="14" width="32" height="56" rx="1"/>
     <rect x="14" y="10" width="6" height="6" rx="1"/><rect x="22" y="10" width="6" height="6" rx="1"/><rect x="30" y="10" width="6" height="6" rx="1"/>
     <rect x="13" y="20" width="7" height="5" rx="1"/><rect x="22" y="20" width="7" height="5" rx="1"/><rect x="31" y="20" width="7" height="5" rx="1"/>
@@ -5755,11 +5734,11 @@ function renderStock(d) {
     <rect x="47" y="34" width="6" height="4" rx="1"/><rect x="55" y="34" width="6" height="4" rx="1"/><rect x="63" y="34" width="4" height="4" rx="1"/>
     <rect x="47" y="41" width="6" height="4" rx="1"/><rect x="55" y="41" width="6" height="4" rx="1"/><rect x="63" y="41" width="4" height="4" rx="1"/>
     <rect x="47" y="48" width="6" height="4" rx="1"/><rect x="55" y="48" width="6" height="4" rx="1"/><rect x="63" y="48" width="4" height="4" rx="1"/>
-    <circle cx="57" cy="62" r="7"/><text x="54" y="66" font-size="10" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">S</text>
+    <circle cx="57" cy="62" r="7"/><text x="54" y="66" font-size="10" fill="currentColor" stroke="none" font-family="monospace" font-weight="bold">S</text>
   </svg>`;
 
   // 借券賣出：卷軸 + 向下箭頭（依提供圖片風格繪製）
-  const ICON_SHORT = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  const ICON_SHORT = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <!-- 左側捲軸柱 -->
     <rect x="8" y="10" width="10" height="60" rx="5"/>
     <!-- 右側捲軸柱 -->
@@ -5780,7 +5759,7 @@ function renderStock(d) {
   </svg>`;
 
   // 處置狀態：三角形外框 + 驚嘆號（依提供圖片風格繪製）
-  const ICON_DISPOSAL = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  const ICON_DISPOSAL = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <!-- 三角形外框（圓角）-->
     <path d="M40,10 L72,66 Q72,70 68,70 L12,70 Q8,70 8,66 Z" stroke-linejoin="round"/>
     <!-- 內側稍小三角形輪廓（雙框效果，模仿圖片） -->
@@ -5788,13 +5767,23 @@ function renderStock(d) {
     <!-- 驚嘆號直線 -->
     <line x1="40" y1="30" x2="40" y2="52" stroke-width="3.5" stroke-linecap="round"/>
     <!-- 驚嘆號圓點 -->
-    <circle cx="40" cy="60" r="3.2" fill="#00e5ff" stroke="none"/>
+    <circle cx="40" cy="60" r="3.2" fill="currentColor" stroke="none"/>
   </svg>`;
 
-  const metricCell = (label, value, icon, unit='股') => {
-    const cc = colorClass(value);
-    const display = value != null
-      ? `<span>${value}</span><span class="unit">${unit}</span>`
+  // 股→張換算（÷1000，取整數，保留正負號）
+  const toZhang = v => {
+    if (v == null) return null;
+    const n = parseInt(v.toString().replace(/,/g, ''), 10);
+    if (isNaN(n)) return null;
+    return Math.round(n / 1000).toLocaleString();
+  };
+
+  const metricCell = (label, value, icon, unit='張') => {
+    const raw = value != null ? parseInt(value.toString().replace(/,/g, ''), 10) : null;
+    const cc = colorClass(raw != null ? raw.toString() : null);
+    const zhangVal = toZhang(value);
+    const display = zhangVal != null
+      ? `<span>${zhangVal}</span><span class="unit">${unit}</span>`
       : '🚫 暫未更新';
     return `
       <div class="metric-cell">
