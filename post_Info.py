@@ -14,6 +14,20 @@ import time as _time
 
 headers = {"User-Agent": "Mozilla/5.0"}
 
+# ── API レスポンスキャッシュ（同日同 URL は再取得しない）─────────────────────
+# 上市の外資/投信/自營商/借券 API は全銘柄分のデータが1本で返るため、
+# 2銘柄目以降は HTTP リクエスト不要になり大幅に高速化される
+_api_cache: dict = {}   # { "YYYYMMDD_url": data }
+
+def _api_cache_key(url: str) -> str:
+    return f"{get_today()}_{url}"
+
+def _api_cache_get(url: str):
+    return _api_cache.get(_api_cache_key(url))
+
+def _api_cache_set(url: str, data) -> None:
+    _api_cache[_api_cache_key(url)] = data
+
 # ── 盤後資料 session 快取 ─────────────────────────────────────────────────────
 # ⚠️ 修復：只快取「完全成功」的結果，避免把失敗結果永久快取
 _stock_cache: dict = {}
@@ -32,13 +46,13 @@ def get_today():
 def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
     """
     GET 請求，日期不符自動重試。
-
-    修復點：
-    1. retries 4 次（原 3 次），給 Render 冷啟動更多緩衝
-    2. 日期比對接受西元年 & 民國年（雙向）
-    3. 備用欄位 queryDate / reportDate / Date
-    4. 完全無日期欄位時直接信任資料（不誤判為舊資料）
+    ✅ 新增：API 回應快取（同日同 URL 直接回傳，跳過 HTTP 請求）
     """
+    # ── 快取命中 → 直接回傳，零網路延遲 ──
+    cached = _api_cache_get(url)
+    if cached is not None:
+        return cached
+
     today_d = re.sub(r"[^\d]", "", today)
     try:
         y = int(today_d[:4]) - 1911
@@ -62,12 +76,15 @@ def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
 
             # 無日期欄位 → 直接信任
             if not api_d:
+                _api_cache_set(url, data)   # ← 快取
                 return data
 
             # 西元年或民國年任一相符
             if today_d in api_d or api_d in today_d:
+                _api_cache_set(url, data)   # ← 快取
                 return data
             if minguo_d and (minguo_d in api_d or api_d in minguo_d):
+                _api_cache_set(url, data)   # ← 快取
                 return data
 
             print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_d} "
@@ -165,8 +182,11 @@ except Exception as e:
 # ── 上市個股 ──────────────────────────────────────────────────────────────────
 def _twse_disposal(keyword, api_url):
     try:
-        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-        data = res.json()
+        data = _api_cache_get(api_url)
+        if data is None:
+            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
+            data = res.json()
+            _api_cache_set(api_url, data)
         for row in data["data"]:
             stock_id, stock_name = row[2], row[3]
             if keyword in stock_id or keyword in stock_name:
@@ -235,8 +255,11 @@ def _twse_short_sale(keyword, api_url, today):
 # ── 上櫃個股 ──────────────────────────────────────────────────────────────────
 def _otc_disposal(keyword, api_url):
     try:
-        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-        data = res.json()
+        data = _api_cache_get(api_url)
+        if data is None:
+            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
+            data = res.json()
+            _api_cache_set(api_url, data)
         for row in data["tables"][0]["data"]:
             stock_id, stock_name = row[2], row[3].split("(")[0]
             if keyword in stock_id or keyword in stock_name:
@@ -275,9 +298,15 @@ def _otc_institutional(keyword, api_url, today):
         inst_data = None
         for attempt in range(4):
             try:
+                # ── 快取命中 → 直接使用 ──
+                cached = _api_cache_get(api_url)
+                if cached is not None:
+                    inst_data = cached
+                    break
                 res = requests.get(api_url, headers=headers, verify=False, timeout=12)
                 inst_data = res.json()
                 if otc_date_ok(inst_data):
+                    _api_cache_set(api_url, inst_data)   # ← 快取
                     break
                 print(f"[otc_inst retry {attempt+1}/4] 日期不符，等待...")
             except Exception as e:

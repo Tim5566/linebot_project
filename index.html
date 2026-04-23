@@ -940,6 +940,26 @@
     .metric-cell:has(.metric-value.warning):hover::after  { background: var(--accent); }
     .metric-cell:has(.metric-value.neutral):hover::after  { background: var(--accent); }
 
+    /* ── 個股查詢 SVG icon（與大盤 market-card-icon 完全一致）── */
+    .metric-icon {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      width: 70px;
+      height: 70px;
+      pointer-events: none;
+      opacity: .32;
+      transition: opacity .3s, filter .3s;
+      filter: drop-shadow(0 0 6px rgba(0,229,255,.35)) brightness(1.4);
+      color: var(--accent);
+    }
+    .metric-icon svg { stroke: var(--accent); }
+    .metric-cell:hover .metric-icon { opacity: .55; filter: drop-shadow(0 0 10px rgba(0,229,255,.55)) brightness(1.6); }
+    /* 白天模式：深藍色，與 market-card-icon 一致 */
+    body.theme-day .metric-icon { opacity: .55; filter: none; color: #1060a8; }
+    body.theme-day .metric-icon svg { stroke: #1060a8; }
+    body.theme-day .metric-cell:hover .metric-icon { opacity: .8; }
+
     .metric-label {
       font-size: .72rem;
       color: var(--text-dim);
@@ -1095,10 +1115,12 @@
       width: 70px;
       height: 70px;
       pointer-events: none;
-      opacity: .14;
-      transition: opacity .3s;
+      opacity: .30;
+      transition: opacity .3s, filter .3s;
+      filter: drop-shadow(0 0 6px rgba(0,229,255,.35)) brightness(1.4);
+      color: var(--accent);
     }
-    .market-card:hover .market-card-icon { opacity: .28; }
+    .market-card:hover .market-card-icon { opacity: .52; filter: drop-shadow(0 0 10px rgba(0,229,255,.55)) brightness(1.6); }
     .market-card-value {
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.35rem;
@@ -1881,22 +1903,34 @@
     /* ── 群組標籤（新）── */
     .nav-group-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .57rem;
-      letter-spacing: .28em;
+      font-size: .55rem;
+      letter-spacing: .26em;
       color: var(--text-faint);
       text-transform: uppercase;
       padding: 10px 10px 5px;
       display: flex;
       align-items: center;
       gap: 8px;
-      opacity: .75;
+      opacity: .9;
     }
     .nav-group-label::after {
       content: '';
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, rgba(0,229,255,.18), transparent);
+      background: linear-gradient(90deg, rgba(0,229,255,.2), transparent);
     }
+    /* 各群組標籤顏色 */
+    /* 群組標籤跟隨群組顏色 */
+    .nav-group-search > .nav-group-label { color: rgba(0,229,255,.6); }
+    .nav-group-search > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,229,255,.25), transparent); }
+    .nav-group-data > .nav-group-label { color: rgba(140,120,255,.65); }
+    .nav-group-data > .nav-group-label::after { background: linear-gradient(90deg, rgba(140,100,255,.22), transparent); }
+    .nav-group-learn > .nav-group-label { color: rgba(255,200,60,.65); }
+    .nav-group-learn > .nav-group-label::after { background: linear-gradient(90deg, rgba(255,200,0,.2), transparent); }
+    .nav-group-sys > .nav-group-label { color: rgba(100,180,210,.6); }
+    .nav-group-sys > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,180,220,.2), transparent); }
+    .nav-group-about > .nav-group-label { color: rgba(170,185,210,.5); }
+    .nav-group-about > .nav-group-label::after { background: linear-gradient(90deg, rgba(170,185,210,.15), transparent); }
     /* "關於本站" 區塊標籤 — 特別加強 */
     .about-section-label {
       font-family: 'Noto Sans TC', sans-serif;
@@ -1914,13 +1948,14 @@
       display: flex;
       align-items: center;
       gap: 11px;
-      padding: 12px 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .74rem;
-      letter-spacing: .06em;
+      padding: 10px 13px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .76rem;
+      font-weight: 500;
+      letter-spacing: .03em;
       color: var(--text-dim);
       cursor: pointer;
-      border-radius: 12px;
+      border-radius: 10px;
       transition: all .22s cubic-bezier(.22,1,.36,1);
       white-space: nowrap;
       background: none;
@@ -1941,35 +1976,60 @@
       border-radius: 2px;
       transition: opacity .22s;
     }
-    /* shimmer sweep on hover */
     .nav-item::after {
       content: '';
       position: absolute;
       top: 0; left: -100%;
       width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0,229,255,.06), transparent);
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.05), transparent);
       transition: left .4s ease;
       pointer-events: none;
     }
     .nav-item:hover::after { left: 160%; }
-    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .6; transition: all .22s; }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; transition: all .22s; }
     .nav-item:hover {
-      color: var(--text);
       background: rgba(0,229,255,.06);
       border-color: rgba(0,229,255,.14);
       transform: translateX(2px);
-      box-shadow: inset 0 0 20px rgba(0,229,255,.02);
     }
-    .nav-item:hover svg { opacity: 1; transform: scale(1.1); }
+    .nav-item:hover svg { transform: scale(1.12); }
     .nav-item.active {
       color: var(--accent);
-      background: linear-gradient(90deg, rgba(0,229,255,.1), rgba(0,229,255,.06));
+      background: linear-gradient(90deg, rgba(0,229,255,.1), rgba(0,229,255,.04));
       border-color: rgba(0,229,255,.22);
-      text-shadow: 0 0 10px rgba(0,229,255,.25);
-      transform: translateX(2px);
+      font-weight: 600;
     }
     .nav-item.active::before { opacity: 1; }
-    .nav-item.active svg { opacity: 1; color: var(--accent); filter: drop-shadow(0 0 4px rgba(0,229,255,.5)); }
+    .nav-item.active svg { color: var(--accent); filter: drop-shadow(0 0 4px rgba(0,229,255,.5)); }
+
+    /* ── 群組 1：查詢工具 — 青藍色 ── */
+    .nav-group-search .nav-item { color: rgba(255,255,255,.92); }
+    .nav-group-search .nav-item svg { color: rgba(0,229,255,.8); filter: drop-shadow(0 0 3px rgba(0,229,255,.3)); }
+    .nav-group-search .nav-item:hover { color: #ffffff; background: rgba(0,229,255,.09); border-color: rgba(0,229,255,.28); }
+    .nav-group-search .nav-item:hover svg { color: #00e5ff; filter: drop-shadow(0 0 6px rgba(0,229,255,.55)); }
+
+    /* ── 群組 2：法人數據 — 亮紫藍色 ── */
+    .nav-group-data .nav-item { color: rgba(255,255,255,.92); }
+    .nav-group-data .nav-item svg { color: rgba(140,120,255,.85); filter: drop-shadow(0 0 3px rgba(140,100,255,.3)); }
+    .nav-group-data .nav-item:hover { color: #ffffff; background: rgba(140,100,255,.09); border-color: rgba(140,100,255,.28); }
+    .nav-group-data .nav-item:hover svg { color: #b8aaff; filter: drop-shadow(0 0 6px rgba(140,100,255,.5)); }
+
+    /* ── 群組 3：學習資源 — 琥珀黃 ── */
+    /* (保留原有 accordion 黃色樣式，不覆蓋) */
+    .nav-group-learn .nav-group-label { color: rgba(255,200,40,.65); }
+    .nav-group-learn .nav-group-label::after { background: linear-gradient(90deg, rgba(255,214,0,.28), transparent); }
+
+    /* ── 群組 4：系統 — 灰青色 ── */
+    .nav-group-sys .nav-item { color: rgba(255,255,255,.90); }
+    .nav-group-sys .nav-item svg { color: rgba(100,170,200,.8); filter: drop-shadow(0 0 3px rgba(0,180,220,.2)); }
+    .nav-group-sys .nav-item:hover { color: #ffffff; background: rgba(0,180,220,.08); border-color: rgba(0,180,220,.25); }
+    .nav-group-sys .nav-item:hover svg { color: #7dd0e8; filter: drop-shadow(0 0 5px rgba(0,180,220,.4)); }
+
+    /* ── 群組 5：關於本站 — 柔和灰白 ── */
+    .nav-group-about .nav-item { color: rgba(255,255,255,.88); }
+    .nav-group-about .nav-item svg { color: rgba(160,175,200,.65); }
+    .nav-group-about .nav-item:hover { color: #ffffff; background: rgba(180,190,220,.08); border-color: rgba(180,190,220,.22); }
+    .nav-group-about .nav-item:hover svg { color: #c8d4e8; }
     .nav-badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: .52rem;
@@ -1987,6 +2047,7 @@
 
     /* ── Accordion（可展開子選單）── */
     .nav-accordion-trigger {
+      color: rgba(255,255,255,.90);
       display: flex;
       align-items: center;
       gap: 11px;
@@ -2150,24 +2211,23 @@
       letter-spacing: .08em;
     }
 
-    /* 我的最愛 nav-item 特別樣式 */
-    .nav-item.fav-nav-item {
-      color: rgba(255,100,100,.7);
-      border-color: rgba(255,61,90,.08);
-    }
-    .nav-item.fav-nav-item svg { color: rgba(255,61,90,.6); opacity: .8; }
+    /* 我的最愛 nav-item 特別樣式 — 玫瑰紅 */
+    .nav-item.fav-nav-item { color: rgba(255,255,255,.92); }
+    .nav-item.fav-nav-item svg { color: rgba(255,61,90,.8); filter: drop-shadow(0 0 3px rgba(255,61,90,.35)); }
     .nav-item.fav-nav-item:hover {
-      color: #ff3d5a;
+      color: #ffffff;
       background: rgba(255,61,90,.07);
-      border-color: rgba(255,61,90,.2);
-      box-shadow: inset 0 0 20px rgba(255,61,90,.03);
+      border-color: rgba(255,61,90,.22);
     }
-    .nav-item.fav-nav-item:hover svg { color: #ff3d5a; opacity: 1; }
+    .nav-item.fav-nav-item:hover svg { color: #ff3d5a; filter: drop-shadow(0 0 6px rgba(255,61,90,.6)); }
     .nav-item.fav-nav-item .nav-badge {
-      background: rgba(255,61,90,.15);
-      border-color: rgba(255,61,90,.3);
-      color: #ff3d5a;
-      text-shadow: 0 0 6px rgba(255,61,90,.4);
+      background: linear-gradient(135deg, #ff3d5a, #ff6b6b);
+      border-color: rgba(255,61,90,.6);
+      color: #fff;
+      font-weight: 800;
+      font-size: .65rem;
+      box-shadow: 0 0 10px rgba(255,61,90,.4);
+      text-shadow: 0 1px 2px rgba(0,0,0,.3);
     }
     .page-body { position: relative; z-index: 1; }
     .main-content { min-width: 0; overflow-x: hidden; }
@@ -3179,8 +3239,68 @@
     }
     body.theme-day .drawer-divider { background: rgba(26,123,191,.1); }
     body.theme-day .about-section-label { color: #1265a8; font-weight: 600; }
-    body.theme-day .nav-group-label { color: #5a80a8; opacity: .8; }
-    body.theme-day .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.25), transparent); }
+    body.theme-day .nav-group-label { color: #6a90b8; opacity: .85; }
+    body.theme-day .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.2), transparent); }
+    body.theme-day .nav-group-search > .nav-group-label { color: #0d6a90; opacity: 1; }
+    body.theme-day .nav-group-data > .nav-group-label { color: #4a3a90; opacity: 1; }
+    body.theme-day .nav-group-learn > .nav-group-label { color: #8a6000; opacity: 1; }
+    body.theme-day .nav-group-sys > .nav-group-label { color: #2a5878; opacity: 1; }
+    body.theme-day .nav-group-about > .nav-group-label { color: #5a7090; opacity: 1; }
+    body.theme-day .nav-group-search .nav-group-label { color: #1a7bbf; }
+    body.theme-day .nav-group-search .nav-group-label::after { background: linear-gradient(90deg, rgba(26,123,191,.3), transparent); }
+    body.theme-day .nav-group-data .nav-group-label { color: #6a50c0; }
+    body.theme-day .nav-group-data .nav-group-label::after { background: linear-gradient(90deg, rgba(100,80,200,.25), transparent); }
+    body.theme-day .nav-group-sys .nav-group-label { color: #2a7090; }
+    body.theme-day .nav-group-sys .nav-group-label::after { background: linear-gradient(90deg, rgba(0,130,180,.22), transparent); }
+    body.theme-day .nav-group-about .nav-group-label { color: #6a8090; opacity: .7; }
+
+    /* 白天模式各群組 nav-item 顏色 */
+    body.theme-day .nav-group-search .nav-item { color: #0a5090; }
+    body.theme-day .nav-group-search .nav-item svg { color: #1a7bbf; }
+    body.theme-day .nav-group-search .nav-item:hover { color: #083870; background: rgba(26,123,191,.08); border-color: rgba(26,123,191,.22); }
+    body.theme-day .nav-group-search .nav-item:hover svg { color: #1265a8; filter: none; }
+    body.theme-day .nav-group-data .nav-item { color: #4a3090; }
+    body.theme-day .nav-group-data .nav-item svg { color: #6a50c0; }
+    body.theme-day .nav-group-data .nav-item:hover { color: #321870; background: rgba(100,80,200,.07); border-color: rgba(100,80,200,.2); }
+    body.theme-day .nav-group-data .nav-item:hover svg { color: #5a40b0; filter: none; }
+    body.theme-day .nav-group-sys .nav-item { color: #1a5068; }
+    body.theme-day .nav-group-sys .nav-item svg { color: #2a7090; }
+    body.theme-day .nav-group-sys .nav-item:hover { color: #0a3850; background: rgba(0,130,180,.07); border-color: rgba(0,130,180,.18); }
+    body.theme-day .nav-group-sys .nav-item:hover svg { color: #1a6080; filter: none; }
+    body.theme-day .nav-group-about .nav-item { color: #4a6070; }
+    body.theme-day .nav-group-about .nav-item svg { color: #6a8090; }
+    body.theme-day .nav-group-about .nav-item:hover { color: #2a4050; background: rgba(80,100,120,.06); border-color: rgba(80,100,120,.15); }
+    body.theme-day .nav-group-about .nav-item:hover svg { color: #4a6070; filter: none; }
+    body.theme-day .nav-group-learn .nav-group-label { color: #8a6010; opacity: .8; }
+    body.theme-day .nav-group-learn .nav-group-label::after { background: linear-gradient(90deg, rgba(180,130,0,.2), transparent); }
+
+    /* ── 白天模式 群組配色（清晰深色，高對比）── */
+    /* 查詢工具：深青藍 */
+    body.theme-day .nav-group-search .nav-item { color: #0d6a90; }
+    body.theme-day .nav-group-search .nav-item svg { color: #0e7aaa; filter: none; }
+    body.theme-day .nav-group-search .nav-item:hover { color: #0a5070; background: rgba(0,130,180,.07); border-color: rgba(0,130,180,.22); }
+    body.theme-day .nav-group-search .nav-item:hover svg { color: #0a5070; filter: none; }
+    /* 法人數據：深紫藍 */
+    body.theme-day .nav-group-data .nav-item { color: #4a3a90; }
+    body.theme-day .nav-group-data .nav-item svg { color: #5a48a8; filter: none; }
+    body.theme-day .nav-group-data .nav-item:hover { color: #3a2870; background: rgba(80,60,180,.07); border-color: rgba(80,60,180,.2); }
+    body.theme-day .nav-group-data .nav-item:hover svg { color: #3a2870; filter: none; }
+    /* 系統：深藍灰 */
+    body.theme-day .nav-group-sys .nav-item { color: #2a5878; }
+    body.theme-day .nav-group-sys .nav-item svg { color: #2a6888; filter: none; }
+    body.theme-day .nav-group-sys .nav-item:hover { color: #1a3a58; background: rgba(0,100,150,.06); border-color: rgba(0,100,150,.18); }
+    body.theme-day .nav-group-sys .nav-item:hover svg { color: #1a3a58; filter: none; }
+    /* 關於本站：中灰藍 */
+    body.theme-day .nav-group-about .nav-item { color: #5a7090; }
+    body.theme-day .nav-group-about .nav-item svg { color: #6a80a0; filter: none; }
+    body.theme-day .nav-group-about .nav-item:hover { color: #3a5070; background: rgba(80,110,160,.06); border-color: rgba(80,110,160,.15); }
+    body.theme-day .nav-group-about .nav-item:hover svg { color: #3a5070; filter: none; }
+    /* 我的最愛：白天玫瑰紅 */
+    body.theme-day .nav-item.fav-nav-item { color: #9a2030; }
+    body.theme-day .nav-item.fav-nav-item svg { color: #c0392b; filter: none; }
+    body.theme-day .nav-item.fav-nav-item:hover { color: #7a1020; background: rgba(192,57,43,.07); border-color: rgba(192,57,43,.22); }
+    body.theme-day .nav-item.fav-nav-item:hover svg { color: #a02018; filter: none; }
+    body.theme-day .nav-item.fav-nav-item .nav-badge { background: rgba(192,57,43,.1); border-color: rgba(192,57,43,.25); color: #c0392b; }
     /* Accordion day theme */
     body.theme-day .nav-accordion-trigger { color: #3a5570; }
     body.theme-day .nav-accordion-trigger:hover { color: #1a2d40; background: rgba(184,136,14,.07); border-color: rgba(184,136,14,.2); }
@@ -3348,8 +3468,8 @@
     body.theme-day .market-card-value.positive { color: #961c10; text-shadow: none; font-weight: 700; }
     body.theme-day .market-card-value.negative { color: #0e6b28; text-shadow: none; font-weight: 700; }
     body.theme-day .market-card-sub { color: #7a9cb8; }
-    body.theme-day .market-card-icon { opacity: .55; filter: hue-rotate(10deg) saturate(1.4) brightness(.7); }
-    body.theme-day .market-card:hover .market-card-icon { opacity: .75; }
+    body.theme-day .market-card-icon { opacity: .55; filter: none; color: #1060a8; }
+    body.theme-day .market-card:hover .market-card-icon { opacity: .82; }
     body.theme-day .refresh-badge {
       background: rgba(26,101,168,.1);
       border-color: rgba(26,123,191,.2);
@@ -3654,19 +3774,23 @@
     }
 
     /* ── 大盤資訊區市場卡片 icon 描邊顏色加深 ── */
-    body.theme-day .market-card-icon svg {
-      stroke: #1060a8;
-    }
-    /* 大盤區 SVG path/line/circle 等也加深 */
+    body.theme-day .market-card-icon svg { stroke: #1060a8; }
     body.theme-day .market-card-icon svg path,
     body.theme-day .market-card-icon svg line,
     body.theme-day .market-card-icon svg circle,
     body.theme-day .market-card-icon svg ellipse,
     body.theme-day .market-card-icon svg rect,
     body.theme-day .market-card-icon svg polygon,
-    body.theme-day .market-card-icon svg polyline {
-      stroke: #1060a8;
-    }
+    body.theme-day .market-card-icon svg polyline { stroke: #1060a8; }
+    /* metric-icon 白天也套深藍 stroke */
+    body.theme-day .metric-icon svg { stroke: #1060a8; }
+    body.theme-day .metric-icon svg path,
+    body.theme-day .metric-icon svg line,
+    body.theme-day .metric-icon svg circle,
+    body.theme-day .metric-icon svg ellipse,
+    body.theme-day .metric-icon svg rect,
+    body.theme-day .metric-icon svg polygon,
+    body.theme-day .metric-icon svg polyline { stroke: #1060a8; }
 
     /* ── data-note-item hover text ── */
     body.theme-day .data-note-item:hover { color: #0a1828; background: rgba(26,101,168,.06); }
@@ -4024,17 +4148,17 @@
     <div class="drawer-divider"></div>
 
     <!-- ── 群組 1：查詢工具 ── -->
-    <div class="drawer-section">
+    <div class="drawer-section nav-group-search">
       <span class="nav-group-label">查詢工具</span>
 
-      <button class="nav-item active" onclick="scrollToMain()">
+      <button class="nav-item" id="navScrollMain" data-nav-id="main" onclick="scrollToMain()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         個股查詢
       </button>
 
-      <button class="nav-item fav-nav-item" id="navWatchlist" onclick="openWatchlistModal()">
+      <button class="nav-item fav-nav-item" id="navWatchlist" data-nav-id="watchlist" onclick="openWatchlistModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
@@ -4046,26 +4170,24 @@
     <div class="drawer-divider"></div>
 
     <!-- ── 群組 2：法人數據 ── -->
-    <div class="drawer-section">
+    <div class="drawer-section nav-group-data">
       <span class="nav-group-label">法人數據</span>
 
-      <button class="nav-item" onclick="openTop50Modal()">
+      <button class="nav-item" data-nav-id="top50" onclick="openTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
-        上市買賣超
-        <span class="nav-badge">TOP 50</span>
+        上市買賣超前50
       </button>
 
-      <button class="nav-item" onclick="openOtcTop50Modal()">
+      <button class="nav-item" data-nav-id="otctop50" onclick="openOtcTop50Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
-        上櫃買賣超
-        <span class="nav-badge">TOP 50</span>
+        上櫃買賣超前50
       </button>
 
-      <button class="nav-item" onclick="scrollToMarket()">
+      <button class="nav-item" data-nav-id="market" onclick="scrollToMarket()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
         </svg>
@@ -4073,10 +4195,11 @@
       </button>
     </div>
 
+
     <div class="drawer-divider"></div>
 
     <!-- ── 群組 3：學習資源（Accordion）── -->
-    <div class="drawer-section">
+    <div class="drawer-section nav-group-learn">
       <span class="nav-group-label">學習資源</span>
 
       <button class="nav-accordion-trigger" id="accLearn" onclick="toggleAccordion('accLearn','subLearn')">
@@ -4084,8 +4207,7 @@
           <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
           <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
         </svg>
-        <span class="acc-label">技術分析教學</span>
-        <span class="acc-badge">NEW</span>
+        <span class="acc-label" style="color:#fff">技術分析教學</span>
         <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
@@ -4128,17 +4250,17 @@
     <div class="drawer-divider"></div>
 
     <!-- ── 群組 4：系統 ── -->
-    <div class="drawer-section">
+    <div class="drawer-section nav-group-sys">
       <span class="nav-group-label">系統</span>
 
-      <button class="nav-item" onclick="scrollToTimeline()">
+      <button class="nav-item" data-nav-id="timeline" onclick="scrollToTimeline()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
         更新時程
       </button>
 
-      <button class="nav-item" onclick="openSettingsModal()">
+      <button class="nav-item" data-nav-id="settings" onclick="openSettingsModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -4150,7 +4272,7 @@
     <div class="drawer-divider"></div>
 
     <!-- ── 群組 5：關於本站 ── -->
-    <div class="drawer-section">
+    <div class="drawer-section nav-group-about">
       <span class="nav-group-label">關於本站</span>
       <a class="nav-item" href="stock_site/legal/about.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5603,23 +5725,89 @@ function colorClass(val) {
 
 function renderStock(d) {
   const disposal = d.disposal;
-  const metricCell = (label, value, icon='', unit='股') => {
+
+  // ── SVG icons：與大盤 market-card-icon 相同位置大小，完全一致的風格 ──
+  // 外資：地球儀（同大盤）
+  const ICON_FOREIGN = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="38" cy="42" r="28"/><ellipse cx="38" cy="42" rx="11" ry="28"/><ellipse cx="38" cy="42" rx="22" ry="28"/>
+    <line x1="10" y1="42" x2="66" y2="42"/><line x1="12" y1="28" x2="64" y2="28"/><line x1="12" y1="56" x2="64" y2="56"/>
+    <line x1="17" y1="18" x2="59" y2="66" stroke-width="2.8"/>
+    <line x1="55" y1="18" x2="68" y2="12"/><polyline points="56,10 68,10 68,22" stroke-width="2.5" fill="none"/>
+    <path d="M13,64 Q6,52 10,40" stroke-width="2" fill="none"/><polyline points="8,54 13,64 22,62" stroke-width="2" fill="none"/>
+  </svg>`;
+
+  // 投信：建築物（同大盤）
+  const ICON_TRUST = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8" y="66" width="64" height="7" rx="2"/><rect x="12" y="58" width="56" height="8" rx="1"/>
+    <polygon points="40,10 70,34 10,34"/><rect x="18" y="34" width="10" height="24" rx="1"/><rect x="52" y="34" width="10" height="24" rx="1"/>
+    <line x1="40" y1="58" x2="40" y2="44" stroke-width="2.8"/><polyline points="32,52 40,44 48,52" stroke-width="2.5" fill="none"/>
+  </svg>`;
+
+  // 自營商：辦公大樓（同大盤）
+  const ICON_PROP = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="8" y1="70" x2="72" y2="70"/><rect x="10" y="14" width="32" height="56" rx="1"/>
+    <rect x="14" y="10" width="6" height="6" rx="1"/><rect x="22" y="10" width="6" height="6" rx="1"/><rect x="30" y="10" width="6" height="6" rx="1"/>
+    <rect x="13" y="20" width="7" height="5" rx="1"/><rect x="22" y="20" width="7" height="5" rx="1"/><rect x="31" y="20" width="7" height="5" rx="1"/>
+    <rect x="13" y="28" width="7" height="5" rx="1"/><rect x="22" y="28" width="7" height="5" rx="1"/><rect x="31" y="28" width="7" height="5" rx="1"/>
+    <rect x="13" y="36" width="7" height="5" rx="1"/><rect x="22" y="36" width="7" height="5" rx="1"/><rect x="31" y="36" width="7" height="5" rx="1"/>
+    <rect x="13" y="44" width="7" height="5" rx="1"/><rect x="22" y="44" width="7" height="5" rx="1"/><rect x="31" y="44" width="7" height="5" rx="1"/>
+    <rect x="44" y="30" width="26" height="40" rx="1"/>
+    <rect x="47" y="34" width="6" height="4" rx="1"/><rect x="55" y="34" width="6" height="4" rx="1"/><rect x="63" y="34" width="4" height="4" rx="1"/>
+    <rect x="47" y="41" width="6" height="4" rx="1"/><rect x="55" y="41" width="6" height="4" rx="1"/><rect x="63" y="41" width="4" height="4" rx="1"/>
+    <rect x="47" y="48" width="6" height="4" rx="1"/><rect x="55" y="48" width="6" height="4" rx="1"/><rect x="63" y="48" width="4" height="4" rx="1"/>
+    <circle cx="57" cy="62" r="7"/><text x="54" y="66" font-size="10" fill="#00e5ff" stroke="none" font-family="monospace" font-weight="bold">S</text>
+  </svg>`;
+
+  // 借券賣出：卷軸 + 向下箭頭（依提供圖片風格繪製）
+  const ICON_SHORT = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 左側捲軸柱 -->
+    <rect x="8" y="10" width="10" height="60" rx="5"/>
+    <!-- 右側捲軸柱 -->
+    <rect x="62" y="10" width="10" height="60" rx="5"/>
+    <!-- 卷軸頂橫條 -->
+    <line x1="18" y1="16" x2="62" y2="16" stroke-width="2.5"/>
+    <!-- 卷軸底橫條 -->
+    <line x1="18" y1="64" x2="62" y2="64" stroke-width="2.5"/>
+    <!-- 卷軸面板 -->
+    <rect x="18" y="16" width="44" height="48" rx="1"/>
+    <!-- 文字行 -->
+    <line x1="26" y1="28" x2="54" y2="28" stroke-width="2"/>
+    <line x1="26" y1="36" x2="54" y2="36" stroke-width="2"/>
+    <line x1="26" y1="44" x2="48" y2="44" stroke-width="2"/>
+    <!-- 向下箭頭（借出＝流出）-->
+    <line x1="40" y1="46" x2="40" y2="60" stroke-width="2.8"/>
+    <polyline points="32,54 40,62 48,54" stroke-width="2.8" fill="none"/>
+  </svg>`;
+
+  // 處置狀態：三角形外框 + 驚嘆號（依提供圖片風格繪製）
+  const ICON_DISPOSAL = `<svg class="metric-icon" viewBox="0 0 80 80" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 三角形外框（圓角）-->
+    <path d="M40,10 L72,66 Q72,70 68,70 L12,70 Q8,70 8,66 Z" stroke-linejoin="round"/>
+    <!-- 內側稍小三角形輪廓（雙框效果，模仿圖片） -->
+    <path d="M40,20 L64,62 Q64,65 61,65 L19,65 Q16,65 16,62 Z" stroke-width="1.4" opacity=".5"/>
+    <!-- 驚嘆號直線 -->
+    <line x1="40" y1="30" x2="40" y2="52" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- 驚嘆號圓點 -->
+    <circle cx="40" cy="60" r="3.2" fill="#00e5ff" stroke="none"/>
+  </svg>`;
+
+  const metricCell = (label, value, icon, unit='股') => {
     const cc = colorClass(value);
     const display = value != null
       ? `<span>${value}</span><span class="unit">${unit}</span>`
       : '🚫 暫未更新';
     return `
       <div class="metric-cell">
-        <div class="metric-label">${icon ? `<span>${icon}</span>` : ''} ${label}</div>
+        <div class="metric-label">${label}</div>
         <div class="metric-value ${cc}">${display}</div>
+        ${icon}
       </div>`;
   };
+
   const disposalCc = disposal && disposal.includes('⭕') ? 'warning' : 'neutral';
   const disposalDisplay = disposal ? disposal.replace('處置：','') : '🚫 暫未更新';
 
-  const codeDisplay = d.keyword && /^\d/.test(d.keyword) ? d.keyword : (d.name ? d.keyword : d.keyword);
   const nameDisplay = d.name && d.name !== d.keyword ? d.name : '';
-
   const isLoggedIn = !!window._currentUser;
   const isFav = isLoggedIn && _isFavorite(d.keyword);
   const favBtnClass = isLoggedIn ? (isFav ? 'fav-btn active' : 'fav-btn') : 'fav-btn guest';
@@ -5646,13 +5834,14 @@ function renderStock(d) {
         </div>
       </div>
       <div class="metrics-grid">
-        ${metricCell('外資買賣超', d.foreign,      '🌏')}
-        ${metricCell('投信買賣超', d.trust,        '🏦')}
-        ${metricCell('自營商買賣超', d.proprietary,'🏢')}
-        ${metricCell('借券賣出差額', d.short_sale, '📉')}
+        ${metricCell('外資買賣超',   d.foreign,      ICON_FOREIGN)}
+        ${metricCell('投信買賣超',   d.trust,        ICON_TRUST)}
+        ${metricCell('自營商買賣超', d.proprietary,  ICON_PROP)}
+        ${metricCell('借券賣出差額', d.short_sale,   ICON_SHORT)}
         <div class="metric-cell">
-          <div class="metric-label"><span>⚠️</span> 處置狀態</div>
+          <div class="metric-label">處置狀態</div>
           <div class="metric-value ${disposalCc}">${disposalDisplay}</div>
+          ${ICON_DISPOSAL}
         </div>
       </div>
     </div>`;
@@ -5710,31 +5899,37 @@ document.addEventListener('keydown', e => {
   }
 });
 
-function setActiveNav(idx) {
-  document.querySelectorAll('.nav-item').forEach((el, i) => {
-    el.classList.toggle('active', i === idx);
+// ── 選單 active 狀態管理（改用 data-nav-id 精準控制）──
+function setActiveNav(navId) {
+  document.querySelectorAll('.nav-item, .nav-accordion-trigger').forEach(el => {
+    el.classList.remove('active');
   });
+  if (navId) {
+    const target = document.querySelector(`[data-nav-id="${navId}"]`);
+    if (target) target.classList.add('active');
+  }
 }
+
 function scrollToMain() {
   closeDrawer();
   setTimeout(() => {
     document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 120);
-  setActiveNav(0);
+  setActiveNav('main');
 }
 function scrollToMarket() {
   closeDrawer();
   setTimeout(() => {
     document.querySelector('.market-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 120);
-  setActiveNav(2);
+  setActiveNav('market');
 }
 function scrollToTimeline() {
   closeDrawer();
   setTimeout(() => {
     document.querySelector('.timeline').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 120);
-  setActiveNav(3);
+  setActiveNav('timeline');
 }
 
 // ── TOP50 MODAL ───────────────────────────────────────────────────────────────
@@ -5744,7 +5939,7 @@ let _top50Side    = 'buy';
 
 async function openTop50Modal() {
   closeDrawer();
-  setActiveNav(1);
+  setActiveNav('top50');
   document.getElementById('top50Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
   if (!_top50Cache) await loadTop50();
@@ -5869,6 +6064,7 @@ let _otcTop50Side  = 'buy';
 
 async function openOtcTop50Modal() {
   closeDrawer();
+  setActiveNav('otctop50');
   document.getElementById('otcTop50Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
   if (!_otcTop50Cache) await loadOtcTop50();
@@ -6074,6 +6270,7 @@ function toggleFavorite(code, name, btnEl) {
 // ── WATCHLIST MODAL ──
 function openWatchlistModal() {
   closeDrawer();
+  setActiveNav('watchlist');
   document.getElementById('watchlistModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   loadWatchlist();
