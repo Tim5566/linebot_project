@@ -14,22 +14,19 @@ import time as _time
 
 headers = {"User-Agent": "Mozilla/5.0"}
 
-# ── API レスポンスキャッシュ（同日同 URL は再取得しない）─────────────────────
-# 上市の外資/投信/自營商/借券 API は全銘柄分のデータが1本で返るため、
-# 2銘柄目以降は HTTP リクエスト不要になり大幅に高速化される
-_api_cache: dict = {}   # { "YYYYMMDD_url": data }
+# ══════════════════════════════════════════════════════════════════════════════
+# 快取設計原則：
+#   - _stock_cache  : 個股查詢結果，key = "YYYYMMDD_keyword"，跨日自動失效
+#   - _api_cache    : ★完全移除★（是造成隔天異常的根本原因）
+#     原因：OTC disposal / OTC institutional 的 API URL 不含日期，
+#           用 get_today()+url 做 key 看似安全，但 Render 長時間運行後
+#           get_today() 的日期已是今天，卻可能拿到昨天 API 回傳並快取的資料。
+#           移除 _api_cache 後，每次請求都直接打 API，
+#           fetch_with_retry 的日期驗證確保資料是當天的。
+#           速度損失極小（TWSE 全市場 API 本來就很快），正確性 >> 速度。
+# ══════════════════════════════════════════════════════════════════════════════
 
-def _api_cache_key(url: str) -> str:
-    return f"{get_today()}_{url}"
-
-def _api_cache_get(url: str):
-    return _api_cache.get(_api_cache_key(url))
-
-def _api_cache_set(url: str, data) -> None:
-    _api_cache[_api_cache_key(url)] = data
-
-# ── 盤後資料 session 快取 ─────────────────────────────────────────────────────
-# ⚠️ 修復：只快取「完全成功」的結果，避免把失敗結果永久快取
+# ── 個股查詢結果快取（跨日自動失效）─────────────────────────────────────────
 _stock_cache: dict = {}
 
 def _cache_key(keyword: str) -> str:
@@ -42,17 +39,12 @@ def _is_complete_result(reply: str) -> bool:
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
-# ── API 請求，日期不符自動重試（最多 4 次，間隔 1.2 秒）──────────────────────────────
+
 def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
     """
     GET 請求，日期不符自動重試。
-    ✅ 新增：API 回應快取（同日同 URL 直接回傳，跳過 HTTP 請求）
+    日期比對同時支援西元年與民國年。
     """
-    # ── 快取命中 → 直接回傳，零網路延遲 ──
-    cached = _api_cache_get(url)
-    if cached is not None:
-        return cached
-
     today_d = re.sub(r"[^\d]", "", today)
     try:
         y = int(today_d[:4]) - 1911
@@ -76,15 +68,12 @@ def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
 
             # 無日期欄位 → 直接信任
             if not api_d:
-                _api_cache_set(url, data)   # ← 快取
                 return data
 
             # 西元年或民國年任一相符
             if today_d in api_d or api_d in today_d:
-                _api_cache_set(url, data)   # ← 快取
                 return data
             if minguo_d and (minguo_d in api_d or api_d in minguo_d):
-                _api_cache_set(url, data)   # ← 快取
                 return data
 
             print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_d} "
@@ -178,15 +167,47 @@ except Exception as e:
     TWSE_data_code = TWSE_data_name = OTC_data_code = OTC_data_name = []
     print(f"❌ 代碼清單失敗: {e}")
 
+# ── 代碼清單載入日期（用來偵測跨日，自動重載）───────────────────────────────
+_stock_list_loaded_date: str = get_today()
+
+def _ensure_stock_list_fresh():
+    """
+    每次查詢前呼叫。若日期已跨日，重新載入代碼清單。
+    這確保 Render 長時間運行時，隔天代碼清單仍是最新的。
+    同時也會清除前一天的 _stock_cache 避免資料殘留。
+    """
+    global TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE
+    global TWSE_data_code, TWSE_data_name, OTC_data_code, OTC_data_name
+    global _stock_list_loaded_date
+
+    today = get_today()
+    if today == _stock_list_loaded_date:
+        return  # 同一天，不需要重載
+
+    print(f"[auto-reload] 跨日偵測：{_stock_list_loaded_date} → {today}，重載代碼清單並清除快取")
+
+    # 清除前一天的個股快取
+    old_keys = [k for k in _stock_cache if not k.startswith(today)]
+    for k in old_keys:
+        del _stock_cache[k]
+
+    try:
+        TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE = _load_stock_list()
+        TWSE_data_code = list(TWSE_CODE2NAME.keys())
+        TWSE_data_name = list(TWSE_CODE2NAME.values())
+        OTC_data_code  = list(OTC_CODE2NAME.keys())
+        OTC_data_name  = list(OTC_CODE2NAME.values())
+        _stock_list_loaded_date = today
+        print(f"✅ 代碼清單重載完成：上市 {len(TWSE_data_code)} 筆，上櫃 {len(OTC_data_code)} 筆")
+    except Exception as e:
+        print(f"❌ 代碼清單重載失敗: {e}")
+
 
 # ── 上市個股 ──────────────────────────────────────────────────────────────────
 def _twse_disposal(keyword, api_url):
     try:
-        data = _api_cache_get(api_url)
-        if data is None:
-            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-            data = res.json()
-            _api_cache_set(api_url, data)
+        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
+        data = res.json()
         for row in data["data"]:
             stock_id, stock_name = row[2], row[3]
             if keyword in stock_id or keyword in stock_name:
@@ -255,11 +276,8 @@ def _twse_short_sale(keyword, api_url, today):
 # ── 上櫃個股 ──────────────────────────────────────────────────────────────────
 def _otc_disposal(keyword, api_url):
     try:
-        data = _api_cache_get(api_url)
-        if data is None:
-            res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-            data = res.json()
-            _api_cache_set(api_url, data)
+        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
+        data = res.json()
         for row in data["tables"][0]["data"]:
             stock_id, stock_name = row[2], row[3].split("(")[0]
             if keyword in stock_id or keyword in stock_name:
@@ -298,15 +316,9 @@ def _otc_institutional(keyword, api_url, today):
         inst_data = None
         for attempt in range(4):
             try:
-                # ── 快取命中 → 直接使用 ──
-                cached = _api_cache_get(api_url)
-                if cached is not None:
-                    inst_data = cached
-                    break
                 res = requests.get(api_url, headers=headers, verify=False, timeout=12)
                 inst_data = res.json()
                 if otc_date_ok(inst_data):
-                    _api_cache_set(api_url, inst_data)   # ← 快取
                     break
                 print(f"[otc_inst retry {attempt+1}/4] 日期不符，等待...")
             except Exception as e:
@@ -354,6 +366,9 @@ def _otc_short_sale(keyword, api_url, today):
 # ── 主查詢函式 ────────────────────────────────────────────────────────────────
 def stock_info(keyword):
     today = get_today()
+
+    # ── 跨日自動重載代碼清單（Render 長時間運行的保護機制）──
+    _ensure_stock_list_fresh()
 
     if not is_trading_day():
         return f"📢 今日週末或連假未開盤❗"

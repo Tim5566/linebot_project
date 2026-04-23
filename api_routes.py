@@ -27,6 +27,20 @@ def register_api(app):
     def index():
         return send_from_directory('.', 'index.html')
 
+    # ── 靜態資源（images、音樂等）─────────────────────────────────────────────
+    # 讓 Render 能正確提供 logo、背景圖等資源
+    @app.route("/images/<path:filename>")
+    def serve_images(filename):
+        return send_from_directory('images', filename)
+
+    @app.route("/music/<path:filename>")
+    def serve_music(filename):
+        return send_from_directory('music', filename)
+
+    @app.route("/fonts/<path:filename>")
+    def serve_fonts(filename):
+        return send_from_directory('fonts', filename)
+
     # ── Legal 頁面（stock_site/legal/）────────────────────────────────────────
     @app.route("/stock_site/legal/about.html")
     def page_about():
