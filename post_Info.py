@@ -42,7 +42,7 @@ def _is_complete_result(reply: str) -> bool:
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
-
+# ── API 請求，日期不符自動重試（最多 4 次，間隔 1.2 秒）──────────────────────────────
 def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
     """
     GET 請求，日期不符自動重試。
