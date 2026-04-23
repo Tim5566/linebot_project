@@ -2118,7 +2118,7 @@
       color: var(--yellow);
     }
     /* 標籤文字 */
-    .acc-label { flex: 1; }
+    .acc-label { flex: 1; color: rgba(255,255,255,.88); }
     .acc-badge {
       font-family: 'Share Tech Mono', monospace;
       font-size: .5rem;
@@ -3301,22 +3301,22 @@
     body.theme-day .nav-item.fav-nav-item:hover { color: #7a1020; background: rgba(192,57,43,.07); border-color: rgba(192,57,43,.22); }
     body.theme-day .nav-item.fav-nav-item:hover svg { color: #a02018; filter: none; }
     body.theme-day .nav-item.fav-nav-item .nav-badge { background: rgba(192,57,43,.1); border-color: rgba(192,57,43,.25); color: #c0392b; }
-    /* Accordion day theme */
-    body.theme-day .nav-accordion-trigger { color: #3a5570; }
-    body.theme-day .nav-accordion-trigger:hover { color: #1a2d40; background: rgba(184,136,14,.07); border-color: rgba(184,136,14,.2); }
-    body.theme-day .nav-accordion-trigger.open { color: #8b6a00; background: linear-gradient(90deg, rgba(184,136,14,.09), rgba(184,136,14,.04)); border-color: rgba(184,136,14,.22); }
-    body.theme-day .nav-accordion-trigger.open::before { background: linear-gradient(to bottom, #b8880e, rgba(180,140,0,.5)); }
-    body.theme-day .nav-accordion-trigger svg.trigger-icon { color: #b8880e; }
-    body.theme-day .acc-arrow { color: #8a9cb8; }
-    body.theme-day .nav-accordion-trigger.open .acc-arrow { color: #b8880e; }
-    body.theme-day .acc-badge { background: rgba(184,136,14,.12); border-color: rgba(184,136,14,.3); color: #8b6a00; text-shadow: none; }
-    body.theme-day .nav-sub-item { color: #5a7898; }
-    body.theme-day .nav-sub-item::before { background: rgba(180,140,0,.3); }
-    body.theme-day .nav-sub-item:hover { color: #1a2d40; background: rgba(184,136,14,.06); border-color: rgba(184,136,14,.15); }
-    body.theme-day .nav-sub-item:hover::before { background: #b8880e; box-shadow: 0 0 4px rgba(180,140,0,.3); }
-    body.theme-day .nav-sub-item svg { color: #b8880e; }
-    body.theme-day .nav-sub-item .sub-badge { background: rgba(180,140,0,.08); border-color: rgba(180,140,0,.2); color: rgba(140,110,0,.7); }
-    body.theme-day .nav-sub-item.coming-soon::after { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #8a9cb8; }
+    /* Accordion day theme — 藍色系（與其他群組一致）*/
+    body.theme-day .nav-accordion-trigger { color: #1a5080; }
+    body.theme-day .nav-accordion-trigger:hover { color: #0a3860; background: rgba(26,100,180,.07); border-color: rgba(26,100,180,.2); }
+    body.theme-day .nav-accordion-trigger.open { color: #1265a8; background: linear-gradient(90deg, rgba(26,100,180,.09), rgba(26,100,180,.04)); border-color: rgba(26,100,180,.28); }
+    body.theme-day .nav-accordion-trigger.open::before { background: linear-gradient(to bottom, #1265a8, rgba(26,100,180,.5)); }
+    body.theme-day .nav-accordion-trigger svg.trigger-icon { color: #1a7bbf; }
+    body.theme-day .acc-arrow { color: #6a90b8; }
+    body.theme-day .nav-accordion-trigger.open .acc-arrow { color: #1265a8; }
+    body.theme-day .acc-badge { background: rgba(26,100,180,.12); border-color: rgba(26,100,180,.3); color: #1265a8; text-shadow: none; }
+    body.theme-day .nav-sub-item { color: #2a5880; }
+    body.theme-day .nav-sub-item::before { background: rgba(26,100,180,.35); }
+    body.theme-day .nav-sub-item:hover { color: #0a3860; background: rgba(26,100,180,.07); border-color: rgba(26,100,180,.18); }
+    body.theme-day .nav-sub-item:hover::before { background: #1265a8; box-shadow: 0 0 4px rgba(26,100,180,.35); }
+    body.theme-day .nav-sub-item svg { color: #1a7bbf; }
+    body.theme-day .nav-sub-item .sub-badge { background: rgba(26,100,180,.08); border-color: rgba(26,100,180,.2); color: rgba(26,100,180,.8); }
+    body.theme-day .nav-sub-item.coming-soon::after { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #7a9cb8; }
     body.theme-day .auth-login-btn {
       background: linear-gradient(135deg, #1a7bbf, #1565a0);
       color: #fff;
@@ -4207,7 +4207,7 @@
           <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
           <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
         </svg>
-        <span class="acc-label" style="color:#fff">技術分析教學</span>
+        <span class="acc-label">技術分析教學</span>
         <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
