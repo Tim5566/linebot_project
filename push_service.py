@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from linebot.models import TextSendMessage
-from post_Info import market_pnfo
+from post_Info import market_pnfo, build_snapshot
 from get_trading_holidays import is_trading_day
 import pytz
 
@@ -8,13 +8,22 @@ import pytz
 # label 對應說明：
 #   0 → 休市通知（09:00）
 #   1 → 法人總買賣金額 + 大盤資訊（15:10）
-#   2 → 投信買賣超（15:00）
-#   3 → 外資買賣超（16:10）
-#   4 → 自營商買賣超（16:10）
-#   5 → 處置股（17:30）
+#   2 → 投信買賣超（15:00）         ← 同時建立 twse_trust 快照
+#   3 → 外資買賣超（16:10）         ← 同時建立 twse_foreign 快照
+#   4 → 自營商買賣超（16:10）       ← 同時建立 twse_prop 快照
+#   5 → 處置股（17:30）             ← 同時建立 twse_disposal / otc_disposal / otc_inst 快照
 #   6 → 注意股（17:30）
 #   7 → 大盤融資金額 + 大盤資訊（21:10）
-#   8 → 借券賣出（21:30）
+#   8 → 借券賣出（21:30）           ← 同時建立 twse_short / otc_short 快照
+
+# 各 label 對應需要建立的快照清單
+SNAPSHOT_MAP = {
+    2: ["twse_trust"],
+    3: ["twse_foreign"],
+    4: ["twse_prop"],
+    5: ["twse_disposal", "otc_disposal", "otc_inst"],
+    8: ["twse_short", "otc_short"],
+}
 
 SCHEDULE = [
     # (label, hour, minute, 說明)
@@ -56,12 +65,24 @@ def _build_message(label):
 
 # ── 廣播執行 ──────────────────────────────────────────────────────────────────
 def broadcast_post_inf(line_bot_api, label):
-    """執行單次廣播，休市時只發 label=0 的通知。"""
+    """
+    執行單次廣播，休市時只發 label=0 的通知。
+    同時觸發對應的快照建立（先建快照，再推播）。
+    """
     if not is_trading_day():
         if label == 0:
             line_bot_api.broadcast(TextSendMessage(text="📢 今日週末或連假未開盤❗"))
         return
 
+    # ── 先建立當日快照（比推播更優先，讓查詢立刻變快）──
+    targets = SNAPSHOT_MAP.get(label, [])
+    for target in targets:
+        try:
+            build_snapshot(target)
+        except Exception as e:
+            print(f"[push_service] 快照建立失敗 {target}: {e}")
+
+    # ── 再推播通知 ──
     line_bot_api.broadcast(_build_message(label))
 
 

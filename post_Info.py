@@ -15,6 +15,192 @@ import time as _time
 headers = {"User-Agent": "Mozilla/5.0"}
 
 # ══════════════════════════════════════════════════════════════════════════════
+# 當日快照快取系統（Day Snapshot Cache）
+#
+# 設計概念：
+#   盤後各法人 API 回傳的是「當天全市場所有股票」的完整資料，
+#   與查哪支股票無關。因此做法是：
+#   ① 盤後 API 資料確認有當天資料後，一次性把整包 JSON 存進記憶體快照
+#   ② 使用者查詢個股時，直接從快照 dict 裡 O(1) 查找，完全不打 API
+#   ③ 快照帶有日期標記，隔天自動視為無效，回到即時查詢模式等待新快照
+#
+# 快照結構：
+#   _snap["date"]     — 快照的日期（YYYYMMDD），用來確認是否跨日
+#   _snap["ready"]    — dict，各資料來源是否已成功建立快照
+#   _snap["twse_*"]   — 上市各 API 的原始 JSON data（list of rows）
+#   _snap["otc_inst"] — 上櫃三大法人的原始 JSON（list of rows）
+#   _snap["otc_dis"]  — 上櫃處置股的原始 JSON tables[0]["data"]
+#   _snap["otc_sbl"]  — 上櫃借券的原始 JSON tables[0]["data"]
+#
+# 觸發時機（由 push_service.py 的排程呼叫）：
+#   15:00 → build_snapshot("twse_trust")     投信
+#   15:10 → build_snapshot("twse_foreign")   外資
+#   16:10 → build_snapshot("twse_prop")      自營商
+#   17:30 → build_snapshot("twse_disposal")  處置股
+#           build_snapshot("otc_inst")       上櫃三大法人
+#           build_snapshot("otc_disposal")   上櫃處置股
+#   21:30 → build_snapshot("twse_short")     借券賣出
+#           build_snapshot("otc_short")      上櫃借券賣出
+# ══════════════════════════════════════════════════════════════════════════════
+
+_snap: dict = {
+    "date":          None,   # 快照建立日期 YYYYMMDD
+    "ready": {
+        "twse_foreign":  False,
+        "twse_trust":    False,
+        "twse_prop":     False,
+        "twse_short":    False,
+        "twse_disposal": False,
+        "otc_inst":      False,
+        "otc_disposal":  False,
+        "otc_short":     False,
+    },
+    # 上市各 API 的 data rows
+    "twse_foreign":  None,   # TWT38U data rows
+    "twse_trust":    None,   # TWT44U data rows
+    "twse_prop":     None,   # TWT43U data rows
+    "twse_short":    None,   # TWT93U data rows
+    "twse_disposal": None,   # punish data rows
+    # 上櫃各 API 的 data rows
+    "otc_inst":      None,   # tpex_3insti list of rows
+    "otc_disposal":  None,   # disposal tables[0]["data"] rows
+    "otc_short":     None,   # sbl tables[0]["data"] rows
+}
+
+
+def _snap_reset_if_stale():
+    """若快照日期不是今天，清空所有快照（每天只用當天的資料）。"""
+    today = get_today()
+    if _snap["date"] != today:
+        for key in _snap["ready"]:
+            _snap["ready"][key] = False
+        for key in list(_snap.keys()):
+            if key not in ("date", "ready"):
+                _snap[key] = None
+        _snap["date"] = today
+        print(f"[snapshot] 跨日清空，新日期 {today}")
+
+
+def build_snapshot(target: str) -> bool:
+    """
+    主動抓取指定 API 的完整 JSON 存進快照。
+    target 對應 _snap["ready"] 的 key。
+    由 push_service.py 排程呼叫，每次只抓一支 API。
+    回傳 True 表示成功，False 表示失敗（會繼續 fallback 到即時查詢）。
+    """
+    _snap_reset_if_stale()
+    today = get_today()
+
+    print(f"[snapshot] 開始建立 {target} 快照，日期 {today}")
+
+    try:
+        if target == "twse_foreign":
+            url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+            data = fetch_with_retry(url, today)
+            if data and data.get("data"):
+                _snap["twse_foreign"]       = data["data"]
+                _snap["ready"]["twse_foreign"] = True
+                print(f"[snapshot] ✅ twse_foreign {len(_snap['twse_foreign'])} 筆")
+                return True
+
+        elif target == "twse_trust":
+            url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
+            data = fetch_with_retry(url, today)
+            if data and data.get("data"):
+                _snap["twse_trust"]       = data["data"]
+                _snap["ready"]["twse_trust"] = True
+                print(f"[snapshot] ✅ twse_trust {len(_snap['twse_trust'])} 筆")
+                return True
+
+        elif target == "twse_prop":
+            url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
+            data = fetch_with_retry(url, today)
+            if data and data.get("data"):
+                _snap["twse_prop"]       = data["data"]
+                _snap["ready"]["twse_prop"] = True
+                print(f"[snapshot] ✅ twse_prop {len(_snap['twse_prop'])} 筆")
+                return True
+
+        elif target == "twse_short":
+            url  = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
+            data = fetch_with_retry(url, today)
+            if data and data.get("data"):
+                _snap["twse_short"]       = data["data"]
+                _snap["ready"]["twse_short"] = True
+                print(f"[snapshot] ✅ twse_short {len(_snap['twse_short'])} 筆")
+                return True
+
+        elif target == "twse_disposal":
+            url  = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
+            res  = requests.get(url, headers=headers, verify=False, timeout=10)
+            data = res.json()
+            rows = data.get("data") or []
+            _snap["twse_disposal"]       = rows
+            _snap["ready"]["twse_disposal"] = True
+            print(f"[snapshot] ✅ twse_disposal {len(rows)} 筆")
+            return True
+
+        elif target == "otc_inst":
+            url = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
+            # 驗證日期
+            today_d = re.sub(r"[^\d]", "", today)
+            try:
+                y = int(today_d[:4]) - 1911
+                minguo_today = f"{y:03d}{today_d[4:]}"
+            except Exception:
+                minguo_today = ""
+
+            for attempt in range(4):
+                try:
+                    res  = requests.get(url, headers=headers, verify=False, timeout=12)
+                    data = res.json()
+                    if data:
+                        raw  = data[0].get("Date", "")
+                        if not raw:
+                            # 無日期欄位直接信任
+                            _snap["otc_inst"]       = data
+                            _snap["ready"]["otc_inst"] = True
+                            print(f"[snapshot] ✅ otc_inst {len(data)} 筆")
+                            return True
+                        api_d = re.sub(r"[^\d]", "", to_minguo(raw))
+                        if (today_d in api_d or api_d in today_d or
+                                (minguo_today and (minguo_today in api_d or api_d in minguo_today))):
+                            _snap["otc_inst"]       = data
+                            _snap["ready"]["otc_inst"] = True
+                            print(f"[snapshot] ✅ otc_inst {len(data)} 筆")
+                            return True
+                        print(f"[snapshot] otc_inst 日期不符 api={api_d} retry {attempt+1}/4")
+                except Exception as e:
+                    print(f"[snapshot] otc_inst 失敗 {attempt+1}/4: {e}")
+                _time.sleep(1.5)
+
+        elif target == "otc_disposal":
+            url  = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
+            res  = requests.get(url, headers=headers, verify=False, timeout=10)
+            data = res.json()
+            rows = data.get("tables", [{}])[0].get("data") or []
+            _snap["otc_disposal"]       = rows
+            _snap["ready"]["otc_disposal"] = True
+            print(f"[snapshot] ✅ otc_disposal {len(rows)} 筆")
+            return True
+
+        elif target == "otc_short":
+            url  = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
+            data = fetch_with_retry(url, today, date_key="date", retries=4, delay=1.5)
+            if data:
+                rows = data.get("tables", [{}])[0].get("data") or []
+                _snap["otc_short"]       = rows
+                _snap["ready"]["otc_short"] = True
+                print(f"[snapshot] ✅ otc_short {len(rows)} 筆")
+                return True
+
+    except Exception as e:
+        print(f"[snapshot] ❌ {target} 建立失敗: {e}")
+
+    print(f"[snapshot] ❌ {target} 建立失敗，將繼續使用即時查詢")
+    return False
+
+# ══════════════════════════════════════════════════════════════════════════════
 # 快取設計原則：
 #   - _stock_cache  : 個股查詢結果，key = "YYYYMMDD_keyword"，跨日自動失效
 #   - _api_cache    : ★完全移除★（是造成隔天異常的根本原因）
@@ -203,8 +389,18 @@ def _ensure_stock_list_fresh():
         print(f"❌ 代碼清單重載失敗: {e}")
 
 
-# ── 上市個股 ──────────────────────────────────────────────────────────────────
+# ── 上市個股（優先從快照查，快照未建立則即時打 API）─────────────────────────
 def _twse_disposal(keyword, api_url):
+    # 優先從快照查
+    if _snap["ready"]["twse_disposal"] and _snap["twse_disposal"] is not None:
+        try:
+            for row in _snap["twse_disposal"]:
+                if keyword in row[2] or keyword in row[3]:
+                    return f"處置：⭕ 至 {row[6][10:]}"
+            return "處置：❌"
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
         data = res.json()
@@ -217,6 +413,19 @@ def _twse_disposal(keyword, api_url):
         return None
 
 def _twse_foreign(keyword, api_url, today):
+    # 優先從快照查
+    if _snap["ready"]["twse_foreign"] and _snap["twse_foreign"] is not None:
+        try:
+            for row in _snap["twse_foreign"]:
+                stock_id, stock_name = row[1], row[2]
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+                if keyword in stock_id or keyword in stock_name:
+                    return f"外資：{row[5]} 股"
+            return None
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -231,6 +440,19 @@ def _twse_foreign(keyword, api_url, today):
         return None
 
 def _twse_trust(keyword, api_url, today):
+    # 優先從快照查
+    if _snap["ready"]["twse_trust"] and _snap["twse_trust"] is not None:
+        try:
+            for row in _snap["twse_trust"]:
+                stock_id, stock_name = row[1], row[2]
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+                if keyword in stock_id or keyword in stock_name:
+                    return f"投信：{row[5]} 股"
+            return None
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -245,6 +467,19 @@ def _twse_trust(keyword, api_url, today):
         return None
 
 def _twse_proprietary(keyword, api_url, today):
+    # 優先從快照查
+    if _snap["ready"]["twse_prop"] and _snap["twse_prop"] is not None:
+        try:
+            for row in _snap["twse_prop"]:
+                stock_id, stock_name = row[0], row[1]
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+                if keyword in stock_id or keyword in stock_name:
+                    return f"自營商：{row[10]} 股"
+            return None
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -259,6 +494,19 @@ def _twse_proprietary(keyword, api_url, today):
         return None
 
 def _twse_short_sale(keyword, api_url, today):
+    # 優先從快照查
+    if _snap["ready"]["twse_short"] and _snap["twse_short"] is not None:
+        try:
+            for row in _snap["twse_short"]:
+                stock_id, stock_name = row[0], row[1]
+                if re.search(r'購|售|認購|認售', stock_name):
+                    continue
+                if keyword in stock_id or keyword in stock_name:
+                    return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
+            return None
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         data = fetch_with_retry(api_url, today)
         if data is None:
@@ -273,8 +521,20 @@ def _twse_short_sale(keyword, api_url, today):
         return None
 
 
-# ── 上櫃個股 ──────────────────────────────────────────────────────────────────
+# ── 上櫃個股（優先從快照查，快照未建立則即時打 API）─────────────────────────
 def _otc_disposal(keyword, api_url):
+    # 優先從快照查
+    if _snap["ready"]["otc_disposal"] and _snap["otc_disposal"] is not None:
+        try:
+            for row in _snap["otc_disposal"]:
+                stock_id   = row[2]
+                stock_name = row[3].split("(")[0]
+                if keyword in stock_id or keyword in stock_name:
+                    return f"處置：⭕ 至 {row[5][10:]}"
+            return "處置：❌"
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
         data = res.json()
@@ -287,12 +547,24 @@ def _otc_disposal(keyword, api_url):
         return None
 
 def _otc_institutional(keyword, api_url, today):
-    """
-    修復：
-    1. 日期比對同時支援西元年與民國年
-    2. retries 4 次
-    3. 若 API 無 Date 欄位則直接信任資料
-    """
+    # ── 優先從快照查 ──────────────────────────────────────────────────────────
+    if _snap["ready"]["otc_inst"] and _snap["otc_inst"] is not None:
+        try:
+            for row in _snap["otc_inst"]:
+                sid  = row.get("SecuritiesCompanyCode", "")
+                name = row.get("CompanyName", "")
+                if re.search(r'購|售|認購|認售', name):
+                    continue
+                if keyword in sid or keyword in name:
+                    f = f"外資：{int(row['Foreign Investors include Mainland Area Investors (Foreign Dealers excluded)-Difference']):,} 股"
+                    t = f"投信：{int(row['SecuritiesInvestmentTrustCompanies-Difference']):,} 股"
+                    p = f"自營商：{int(row['Dealers-Difference']):,} 股"
+                    return f, t, p
+            return None, None, None
+        except Exception:
+            pass
+
+    # ── Fallback：即時打 API ──────────────────────────────────────────────────
     try:
         today_d = re.sub(r"[^\d]", "", today)
         try:
@@ -306,7 +578,7 @@ def _otc_institutional(keyword, api_url, today):
                 return False
             raw = data[0].get("Date", "")
             if not raw:
-                return True   # 無日期欄位 → 信任
+                return True
             api_d = re.sub(r"[^\d]", "", to_minguo(raw))
             if not api_d:
                 return True
@@ -351,6 +623,17 @@ def _otc_institutional(keyword, api_url, today):
 
 
 def _otc_short_sale(keyword, api_url, today):
+    # 優先從快照查
+    if _snap["ready"]["otc_short"] and _snap["otc_short"] is not None:
+        try:
+            kw = keyword if keyword.isdigit() else OTC_NAME2CODE.get(keyword, keyword)
+            for row in _snap["otc_short"]:
+                if kw in row[0]:
+                    return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
+            return None
+        except Exception:
+            pass
+    # Fallback：即時打 API
     try:
         data = fetch_with_retry(api_url, today, date_key="date", retries=4, delay=1.5)
         if data is None:
