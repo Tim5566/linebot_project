@@ -11,7 +11,7 @@ from api_routes import register_api
 
 app = Flask(__name__)
 
-# 使用 Render 環境變數設定 Token 與 Secret
+# 使用 Render 環境變數設定 Token 與 Secret.
 load_dotenv()  # .env 本地端載入環境變數
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
