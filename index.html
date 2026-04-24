@@ -589,6 +589,23 @@
       background: linear-gradient(90deg, transparent, rgba(0,229,255,.5), transparent);
       animation: borderGlow 3s ease-in-out infinite;
     }
+    /* ── 代碼 + 愛心 + 股票名稱 左側群組 ── */
+    .stock-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .stock-header-left .stock-name-title {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin: 0;
+    }
     .stock-badge {
       background: linear-gradient(135deg, rgba(0,229,255,.14), rgba(0,150,255,.08));
       border: 1px solid rgba(0,229,255,.38);
@@ -640,8 +657,8 @@
     }
 
     .fav-btn {
-      margin-left: auto;
-      width: 34px; height: 34px;
+      flex-shrink: 0;
+      width: 30px; height: 30px;
       border-radius: 50%;
       border: 1px solid rgba(255,61,90,.2);
       background: rgba(255,61,90,.04);
@@ -652,7 +669,7 @@
       transition: all .25s cubic-bezier(.22,1,.36,1);
       position: relative;
     }
-    .fav-btn svg { width: 16px; height: 16px; transition: all .25s; }
+    .fav-btn svg { width: 14px; height: 14px; transition: all .25s; }
     .fav-btn:hover {
       border-color: rgba(255,61,90,.5);
       background: rgba(255,61,90,.12);
@@ -1529,8 +1546,11 @@
       #searchBtn { height: 46px; font-size: .82rem; padding: 0 18px; width: 100%; justify-content: center; }
 
       /* ── Stock result card ── */
-      .card-header { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+      .card-header { padding: 12px 14px; gap: 8px; flex-wrap: nowrap; align-items: center; }
+      .stock-header-left { gap: 6px; }
       .stock-badge { font-size: .82rem; padding: 4px 10px; }
+      .fav-btn { width: 28px; height: 28px; }
+      .fav-btn svg { width: 13px; height: 13px; }
       .stock-name-title { font-size: .95rem; }
       .stock-market-tag { font-size: .6rem; }
       .card-header-right { flex-direction: column; gap: 3px; align-items: flex-end; }
@@ -5805,10 +5825,8 @@ function renderStock(d) {
   resultEl.innerHTML = `
     <div class="stock-card">
       <div class="card-header">
-        <div class="stock-badge">${d.keyword}</div>
-        ${nameDisplay ? `
-        <div class="stock-name-group">
-          <div class="stock-name-title">${nameDisplay}</div>
+        <div class="stock-header-left">
+          <div class="stock-badge">${d.keyword}</div>
           <button class="${favBtnClass}" title="${favTitle}"
             onclick="toggleFavorite('${d.keyword}', '${nameDisplay || d.keyword}', this)"
             id="favBtn_${d.keyword}">
@@ -5816,7 +5834,8 @@ function renderStock(d) {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
           </button>
-        </div>` : ''}
+          ${nameDisplay ? '<div class="stock-name-title">' + nameDisplay + '</div>' : ''}
+        </div>
         <div class="card-header-right">
           <div class="stock-market-tag">${d.market || '上市/上櫃'}</div>
           <div class="card-timestamp">${d.date || ''} 盤後</div>
