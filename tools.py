@@ -1,4 +1,3 @@
-
 import datetime
 
 def to_minguo(date_str):

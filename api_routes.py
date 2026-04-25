@@ -61,7 +61,7 @@ def register_api(app):
         return jsonify(get_trading_status())
 
     # ── 手動觸發 Firebase 同步（測試用）────────────────────────────────────────
-    # 用法：瀏覽器打開 /api/sync_test?date=20250424&token=你設定的SECRET
+    # 用法：瀏覽器打開 /api/sync_test?date=20260424&token=你設定的SECRET
     @app.route("/api/sync_test")
     def api_sync_test():
         token = request.args.get("token", "")

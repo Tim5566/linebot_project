@@ -1,6 +1,8 @@
 """
 firebase_sync.py - 含日期驗證 + 重試等待機制
 """
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
 import re
@@ -206,17 +208,21 @@ def _fetch_otc_institutional(today: str) -> dict:
             if attempt < MAX_DATE_RETRIES: _time.sleep(DATE_RETRY_WAIT)
             continue
 
+        # 上櫃日期格式為民國年 YYYMMDD（民國年 + 1911 = 西元年）
         raw_date = data[0].get("Date", "") if data else ""
         if raw_date:
-            from tools import to_minguo
-            converted = re.sub(r"[^\d]", "", to_minguo(raw_date))
-            today_d   = re.sub(r"[^\d]", "", today)
-            if not (today_d in converted or converted in today_d):
-                print(f"[otc_inst] 第{attempt}次資料日期={raw_date}，今天={today}，尚未更新")
-                if attempt < MAX_DATE_RETRIES:
-                    print(f"[otc_inst] 等待 {DATE_RETRY_WAIT} 秒後重試...")
-                    _time.sleep(DATE_RETRY_WAIT)
-                continue
+            raw_d = re.sub(r"[^\d]", "", raw_date)
+            try:
+                western = str(int(raw_d[:3]) + 1911) + raw_d[3:]
+                today_d = re.sub(r"[^\d]", "", today)
+                if western != today_d:
+                    print(f"[otc_inst] 第{attempt}次資料日期={raw_date}（西元{western}），今天={today}，尚未更新")
+                    if attempt < MAX_DATE_RETRIES:
+                        print(f"[otc_inst] 等待 {DATE_RETRY_WAIT} 秒後重試...")
+                        _time.sleep(DATE_RETRY_WAIT)
+                    continue
+            except Exception:
+                print(f"[otc_inst] 日期解析失敗 raw={raw_date}，直接信任資料")
 
         out = {}
         for row in data:
