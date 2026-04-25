@@ -4,19 +4,7 @@ from post_Info import stock_info, market_pnfo, get_today, twse_top50, otc_top50
 from get_trading_holidays import get_trading_status
 import re
 import os
-import requests as http_requests  # 避免與 flask request 衝突
-
-# ── Supabase 設定 ──────────────────────────────────────────────────────────────
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
-
-def _supabase_headers():
-    return {
-        'apikey':        SUPABASE_KEY,
-        'Authorization': f'Bearer {SUPABASE_KEY}',
-        'Content-Type':  'application/json',
-        'Prefer':        'return=representation',
-    }
+from firebase_admin import db as firebase_db
 
 
 def register_api(app):
@@ -71,6 +59,24 @@ def register_api(app):
     @app.route("/api/trading_status")
     def api_trading_status():
         return jsonify(get_trading_status())
+
+    # ── 手動觸發 Firebase 同步（測試用）────────────────────────────────────────
+    # 用法：瀏覽器打開 /api/sync_test?date=20250424&token=你設定的SECRET
+    @app.route("/api/sync_test")
+    def api_sync_test():
+        token = request.args.get("token", "")
+        secret = os.environ.get("SYNC_SECRET", "")
+        if not secret or token != secret:
+            return jsonify({"error": "未授權"}), 403
+
+        date = request.args.get("date", get_today())
+
+        try:
+            import firebase_sync
+            firebase_sync.sync_all(date)
+            return jsonify({"status": "ok", "date": date, "message": f"{date} 同步完成"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")
@@ -153,64 +159,24 @@ def register_api(app):
     # ── 訪客統計 API ───────────────────────────────────────────────────────────
     @app.route("/api/visitor", methods=["POST"])
     def api_visitor():
-        if not SUPABASE_URL or not SUPABASE_KEY:
-            return jsonify({"error": "Supabase 未設定"}), 500
-
         from datetime import datetime, timezone, timedelta
-        today   = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d')
-        headers = _supabase_headers()
+        today = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d')
 
         try:
             # ── 1. 今日訪客數 +1 ──────────────────────────────────────────
-            check = http_requests.get(
-                f"{SUPABASE_URL}/rest/v1/visitors_daily"
-                f"?visit_date=eq.{today}&select=id,count",
-                headers=headers
-            )
-            rows = check.json()
-
-            if rows:
-                row_id      = rows[0]['id']
-                today_count = rows[0]['count'] + 1
-                http_requests.patch(
-                    f"{SUPABASE_URL}/rest/v1/visitors_daily?id=eq.{row_id}",
-                    headers=headers,
-                    json={"count": today_count}
-                )
-            else:
-                today_count = 1
-                http_requests.post(
-                    f"{SUPABASE_URL}/rest/v1/visitors_daily",
-                    headers=headers,
-                    json={"visit_date": today, "count": 1}
-                )
+            daily_ref   = firebase_db.reference(f"visitors/daily/{today}")
+            today_count = (daily_ref.get() or 0) + 1
+            daily_ref.set(today_count)
 
             # ── 2. 累積總訪客數 +1 ────────────────────────────────────────
-            total_res  = http_requests.get(
-                f"{SUPABASE_URL}/rest/v1/visitors_total?id=eq.1&select=count",
-                headers=headers
-            )
-            total_rows = total_res.json()
-
-            if total_rows:
-                new_total = total_rows[0]['count'] + 1
-                http_requests.patch(
-                    f"{SUPABASE_URL}/rest/v1/visitors_total?id=eq.1",
-                    headers=headers,
-                    json={"count": new_total}
-                )
-            else:
-                new_total = 1
-                http_requests.post(
-                    f"{SUPABASE_URL}/rest/v1/visitors_total",
-                    headers=headers,
-                    json={"id": 1, "count": 1}
-                )
+            total_ref = firebase_db.reference("visitors/total")
+            new_total = (total_ref.get() or 0) + 1
+            total_ref.set(new_total)
 
             return jsonify({"today": today_count, "total": new_total})
 
         except Exception as e:
-            print(f"[Visitor] Supabase 錯誤: {e}")
+            print(f"[Visitor] Firebase 錯誤: {e}")
             return jsonify({"error": str(e)}), 500
 
 
