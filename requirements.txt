@@ -5,3 +5,4 @@ pytz
 pandas
 flask_cors
 python-dotenv
+firebase-admin

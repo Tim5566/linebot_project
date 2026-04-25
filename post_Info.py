@@ -1,3 +1,19 @@
+"""
+post_Info.py（Firebase 快取版）
+────────────────────────────────────────────────────────────────────────────
+股票查詢邏輯：
+  - stock_info()   → 優先從 Firebase 讀取，沒資料才 fallback 打 TWSE API
+  - market_pnfo()  → 從 Firebase 讀取大盤資訊
+  - twse_top50()   → 仍直接打 API（資料量大，全市場排行）
+  - otc_top50()    → 仍直接打 API
+
+個股查詢流程：
+  1. 檢查今日是否交易日、時間是否 ≥ 15:00
+  2. 查 Firebase stock_data/{today}/twse/{stock_id} 或 otc/{stock_id}
+  3. 若 Firebase 無資料 → fallback 打 TWSE API（和舊版一樣）
+────────────────────────────────────────────────────────────────────────────
+"""
+
 import datetime
 import requests
 import re
@@ -5,14 +21,17 @@ import urllib3
 import concurrent.futures
 from zoneinfo import ZoneInfo
 
+import os
+import firebase_admin
+from firebase_admin import credentials, db as firebase_db
+
 from get_trading_holidays import is_trading_day
 from tools import to_minguo
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 import time as _time
 
-#headers = {"User-Agent": "Mozilla/5.0"}
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -21,37 +40,73 @@ headers = {
     "X-Requested-With": "XMLHttpRequest",
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
-# 快取設計原則：
-#   - _stock_cache  : 個股查詢結果，key = "YYYYMMDD_keyword"，跨日自動失效
-#   - _api_cache    : ★完全移除★（是造成隔天異常的根本原因）
-#     原因：OTC disposal / OTC institutional 的 API URL 不含日期，
-#           用 get_today()+url 做 key 看似安全，但 Render 長時間運行後
-#           get_today() 的日期已是今天，卻可能拿到昨天 API 回傳並快取的資料。
-#           移除 _api_cache 後，每次請求都直接打 API，
-#           fetch_with_retry 的日期驗證確保資料是當天的。
-#           速度損失極小（TWSE 全市場 API 本來就很快），正確性 >> 速度。
-# ══════════════════════════════════════════════════════════════════════════════
+# ── Firebase 初始化（單例）────────────────────────────────────────────────────
+_firebase_initialized = False
 
-# ── 個股查詢結果快取（跨日自動失效）─────────────────────────────────────────
+def _init_firebase():
+    global _firebase_initialized
+    if _firebase_initialized:
+        return
+    try:
+        cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred, {
+            "databaseURL": os.environ.get("FIREBASE_DATABASE_URL", "")
+        })
+        _firebase_initialized = True
+        print("✅ Firebase 初始化成功")
+    except Exception as e:
+        print(f"❌ Firebase 初始化失敗: {e}")
+
+_init_firebase()
+
+# ── 個股查詢結果快取（記憶體，跨日自動失效）──────────────────────────────────
 _stock_cache: dict = {}
 
 def _cache_key(keyword: str) -> str:
     return f"{get_today()}_{keyword}"
 
 def _is_complete_result(reply: str) -> bool:
-    """只有不含任何「暫未更新」的回覆才算完整，才存入快取。"""
     return "暫未更新" not in reply
 
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# Firebase 讀取
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _read_firebase_stock(today: str, market: str, stock_id: str) -> dict | None:
+    """
+    從 Firebase 讀取單支個股資料。
+    market: "twse" 或 "otc"
+    回傳 dict 或 None（無資料）。
+    """
+    try:
+        ref  = firebase_db.reference(f"stock_data/{today}/{market}/{stock_id}")
+        data = ref.get()
+        return data  # dict or None
+    except Exception as e:
+        print(f"[firebase_read] 失敗 {market}/{stock_id}: {e}")
+        return None
+
+
+def _read_firebase_market(today: str) -> dict | None:
+    """從 Firebase 讀取大盤資訊。"""
+    try:
+        ref  = firebase_db.reference(f"stock_data/{today}/market")
+        return ref.get()
+    except Exception as e:
+        print(f"[firebase_read_market] 失敗: {e}")
+        return None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 代碼清單（用來判斷個股屬於上市或上櫃，以及名稱 ↔ 代碼互查）
+# ══════════════════════════════════════════════════════════════════════════════
+
 def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
-    """
-    GET 請求，日期不符自動重試。
-    日期比對同時支援西元年與民國年。
-    """
     today_d = re.sub(r"[^\d]", "", today)
     try:
         y = int(today_d[:4]) - 1911
@@ -73,28 +128,23 @@ def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
 
             api_d = re.sub(r"[^\d]", "", raw_date)
 
-            # 無日期欄位 → 直接信任
             if not api_d:
                 return data
-
-            # 西元年或民國年任一相符
             if today_d in api_d or api_d in today_d:
                 return data
             if minguo_d and (minguo_d in api_d or api_d in minguo_d):
                 return data
 
-            print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_d} "
-                  f"today={today_d} url={url[:65]}")
+            print(f"[retry {attempt+1}/{retries}] 日期不符 api={api_d} today={today_d}")
 
         except Exception as e:
-            print(f"[retry {attempt+1}/{retries}] 請求失敗: {e} url={url[:65]}")
+            print(f"[retry {attempt+1}/{retries}] 請求失敗: {e}")
 
         _time.sleep(0.5 if attempt == 0 else delay)
 
     return None
 
 
-# ── 上市 / 上櫃代碼清單（並行載入，帶超時保護）───────────────────────────────
 def _load_stock_list():
     from datetime import date, timedelta
 
@@ -115,7 +165,6 @@ def _load_stock_list():
                     for row in raw["data"]:
                         c2n[row[0].strip()] = row[1].strip()
                         n2c[row[1].strip()] = row[0].strip()
-                    print(f"[stock_list] 上市 {len(c2n)} 筆 date={ds}")
                     return c2n, n2c
             except Exception as e:
                 print(f"[stock_list] 上市 {ds} 失敗: {e}")
@@ -139,7 +188,6 @@ def _load_stock_list():
                     for row in tables[0]["data"]:
                         c2n[row[0].strip()] = row[1].strip()
                         n2c[row[1].strip()] = row[0].strip()
-                    print(f"[stock_list] 上櫃 {len(c2n)} 筆 date={ds}")
                     return c2n, n2c
             except Exception as e:
                 print(f"[stock_list] 上櫃 {ds} 失敗: {e}")
@@ -151,12 +199,10 @@ def _load_stock_list():
         try:
             twse_c2n, twse_n2c = ft.result(timeout=25)
         except concurrent.futures.TimeoutError:
-            print("[stock_list] 上市超時")
             twse_c2n, twse_n2c = {}, {}
         try:
             otc_c2n, otc_n2c = fo.result(timeout=25)
         except concurrent.futures.TimeoutError:
-            print("[stock_list] 上櫃超時")
             otc_c2n, otc_n2c = {}, {}
 
     return twse_c2n, twse_n2c, otc_c2n, otc_n2c
@@ -174,26 +220,19 @@ except Exception as e:
     TWSE_data_code = TWSE_data_name = OTC_data_code = OTC_data_name = []
     print(f"❌ 代碼清單失敗: {e}")
 
-# ── 代碼清單載入日期（用來偵測跨日，自動重載）───────────────────────────────
 _stock_list_loaded_date: str = get_today()
 
 def _ensure_stock_list_fresh():
-    """
-    每次查詢前呼叫。若日期已跨日，重新載入代碼清單。
-    這確保 Render 長時間運行時，隔天代碼清單仍是最新的。
-    同時也會清除前一天的 _stock_cache 避免資料殘留。
-    """
     global TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE
     global TWSE_data_code, TWSE_data_name, OTC_data_code, OTC_data_name
     global _stock_list_loaded_date
 
     today = get_today()
     if today == _stock_list_loaded_date:
-        return  # 同一天，不需要重載
+        return
 
-    print(f"[auto-reload] 跨日偵測：{_stock_list_loaded_date} → {today}，重載代碼清單並清除快取")
+    print(f"[auto-reload] 跨日偵測：{_stock_list_loaded_date} → {today}")
 
-    # 清除前一天的個股快取
     old_keys = [k for k in _stock_cache if not k.startswith(today)]
     for k in old_keys:
         del _stock_cache[k]
@@ -205,12 +244,15 @@ def _ensure_stock_list_fresh():
         OTC_data_code  = list(OTC_CODE2NAME.keys())
         OTC_data_name  = list(OTC_CODE2NAME.values())
         _stock_list_loaded_date = today
-        print(f"✅ 代碼清單重載完成：上市 {len(TWSE_data_code)} 筆，上櫃 {len(OTC_data_code)} 筆")
+        print(f"✅ 代碼清單重載完成")
     except Exception as e:
         print(f"❌ 代碼清單重載失敗: {e}")
 
 
-# ── 上市個股 ──────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# Fallback：Firebase 無資料時，直接打 TWSE API（和舊版一樣）
+# ══════════════════════════════════════════════════════════════════════════════
+
 def _twse_disposal(keyword, api_url):
     try:
         res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
@@ -279,8 +321,6 @@ def _twse_short_sale(keyword, api_url, today):
     except Exception:
         return None
 
-
-# ── 上櫃個股 ──────────────────────────────────────────────────────────────────
 def _otc_disposal(keyword, api_url):
     try:
         res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
@@ -294,12 +334,6 @@ def _otc_disposal(keyword, api_url):
         return None
 
 def _otc_institutional(keyword, api_url, today):
-    """
-    修復：
-    1. 日期比對同時支援西元年與民國年
-    2. retries 4 次
-    3. 若 API 無 Date 欄位則直接信任資料
-    """
     try:
         today_d = re.sub(r"[^\d]", "", today)
         try:
@@ -313,7 +347,7 @@ def _otc_institutional(keyword, api_url, today):
                 return False
             raw = data[0].get("Date", "")
             if not raw:
-                return True   # 無日期欄位 → 信任
+                return True
             api_d = re.sub(r"[^\d]", "", to_minguo(raw))
             if not api_d:
                 return True
@@ -327,13 +361,12 @@ def _otc_institutional(keyword, api_url, today):
                 inst_data = res.json()
                 if otc_date_ok(inst_data):
                     break
-                print(f"[otc_inst retry {attempt+1}/4] 日期不符，等待...")
+                print(f"[otc_inst retry {attempt+1}/4] 日期不符")
             except Exception as e:
                 print(f"[otc_inst retry {attempt+1}/4] 失敗: {e}")
             _time.sleep(0.8 if attempt == 0 else 1.5)
 
         if not inst_data or not otc_date_ok(inst_data):
-            print(f"[otc_inst] 最終失敗 keyword={keyword}")
             return None, None, None
 
         for row in inst_data:
@@ -347,15 +380,13 @@ def _otc_institutional(keyword, api_url, today):
                     t = f"投信：{int(row['SecuritiesInvestmentTrustCompanies-Difference']):,} 股"
                     p = f"自營商：{int(row['Dealers-Difference']):,} 股"
                     return f, t, p
-                except (KeyError, ValueError) as e:
-                    print(f"[otc_inst] 欄位解析失敗 keyword={keyword}: {e}")
+                except (KeyError, ValueError):
                     return None, None, None
         return None, None, None
 
     except Exception as e:
         print(f"[otc_inst] 未預期錯誤 keyword={keyword}: {e}")
         return None, None, None
-
 
 def _otc_short_sale(keyword, api_url, today):
     try:
@@ -370,92 +401,160 @@ def _otc_short_sale(keyword, api_url, today):
         return None
 
 
-# ── 主查詢函式 ────────────────────────────────────────────────────────────────
-def stock_info(keyword):
-    today = get_today()
+# ══════════════════════════════════════════════════════════════════════════════
+# 主查詢：優先 Firebase，無資料才 fallback
+# ══════════════════════════════════════════════════════════════════════════════
 
-    # ── 跨日自動重載代碼清單（Render 長時間運行的保護機制）──
+def _stock_id_from_keyword(keyword: str):
+    """
+    keyword 可能是代碼或名稱，回傳 (stock_id, market)。
+    market: "twse" | "otc" | None
+    """
+    if keyword in TWSE_CODE2NAME:
+        return keyword, "twse"
+    if keyword in TWSE_NAME2CODE:
+        return TWSE_NAME2CODE[keyword], "twse"
+    if keyword in OTC_CODE2NAME:
+        return keyword, "otc"
+    if keyword in OTC_NAME2CODE:
+        return OTC_NAME2CODE[keyword], "otc"
+    return None, None
+
+
+def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: str) -> str | None:
+    """
+    從 Firebase 組出回覆字串。
+    若 Firebase 完全沒有該股資料，回傳 None（交由 fallback 處理）。
+    """
+    data = _read_firebase_stock(today, market, stock_id)
+    if not data:
+        return None  # Firebase 尚未同步，走 fallback
+
+    name     = data.get("name", keyword)
+    foreign  = data.get("foreign")
+    trust    = data.get("trust")
+    prop     = data.get("proprietary")
+    short    = data.get("short_sale")
+    disposal = data.get("disposal")
+
+    # 若三大法人都沒有，也走 fallback（可能 15:10 尚未同步）
+    if foreign is None and trust is None and prop is None:
+        return None
+
+    # 格式化數字（加千分位）
+    def _fmt(val, label, unit="股"):
+        if val is None:
+            return f"{label}：🚫 暫未更新"
+        try:
+            n = int(val)
+            return f"{label}：{n:,} {unit}"
+        except (ValueError, TypeError):
+            return f"{label}：{val} {unit}"
+
+    reply  = f"{name}({stock_id}) (今盤後買賣超)\n"
+    reply += (disposal + "\n") if disposal else "處置：❌\n"
+    reply += _fmt(foreign,  "外資") + "\n"
+    reply += _fmt(trust,    "投信") + "\n"
+    reply += _fmt(prop,     "自營商") + "\n"
+    reply += _fmt(short,    "借卷賣出") + "\n"
+
+    return reply.strip()
+
+
+def _fallback_twse(keyword: str, today: str) -> str:
+    """Firebase 無資料時，直接打上市 API（舊版邏輯）。"""
+    API_Disposal    = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
+    API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
+    API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
+    API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
+    API_Short_Sale  = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
+        fd = ex.submit(_twse_disposal,    keyword, API_Disposal)
+        ff = ex.submit(_twse_foreign,     keyword, API_Foreign,     today)
+        ft = ex.submit(_twse_trust,       keyword, API_Trust,       today)
+        fp = ex.submit(_twse_proprietary, keyword, API_Proprietary, today)
+        fs = ex.submit(_twse_short_sale,  keyword, API_Short_Sale,  today)
+        D, F, T, P, S = fd.result(), ff.result(), ft.result(), fp.result(), fs.result()
+
+    reply  = f"{keyword} (今盤後買賣超)\n"
+    reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
+    reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
+    reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
+    reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
+    reply += (S + "\n") if S else "借卷賣出：🚫 暫未更新\n"
+    return reply.strip()
+
+
+def _fallback_otc(keyword: str, today: str) -> str:
+    """Firebase 無資料時，直接打上櫃 API（舊版邏輯）。"""
+    API_inst       = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
+    API_Disposal   = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
+    API_Short_Sale = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+        fd = ex.submit(_otc_disposal,     keyword, API_Disposal)
+        fi = ex.submit(_otc_institutional, keyword, API_inst,       today)
+        fs = ex.submit(_otc_short_sale,   keyword, API_Short_Sale,  today)
+        D        = fd.result()
+        F, T, P  = fi.result()
+        S        = fs.result()
+
+    reply  = f"{keyword} (今盤後買賣超)\n"
+    reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
+    reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
+    reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
+    reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
+    reply += (S + "\n") if S else "借卷賣出：🚫 暫未更新\n"
+    return reply.strip()
+
+
+def stock_info(keyword: str) -> str:
+    today = get_today()
     _ensure_stock_list_fresh()
 
     if not is_trading_day():
-        return f"📢 今日週末或連假未開盤❗"
-    elif datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
-        return f"📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
+        return "📢 今日週末或連假未開盤❗"
+    if datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour < 15:
+        return "📢 今盤後資料尚未更新❗\n請於今日 15:00 後再試一次。"
 
+    # ── 記憶體快取（當日同一 keyword 不重複查）──
     ck = _cache_key(keyword)
     if ck in _stock_cache:
         return _stock_cache[ck]
 
-    reply = f"{keyword} (今盤後買賣超)\n"
+    # ── 解析 stock_id & market ──
+    stock_id, market = _stock_id_from_keyword(keyword)
 
-    # ── 上市 ──────────────────────────────────────────────────────────────────
-    if keyword in TWSE_CODE2NAME or keyword in TWSE_NAME2CODE:
-        API_Disposal    = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
-        API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
-        API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
-        API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
-        API_Short_Sale  = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
+    if stock_id and market:
+        # 優先從 Firebase 讀
+        reply = _build_reply_from_firebase(keyword, stock_id, market, today)
+        if reply:
+            if _is_complete_result(reply):
+                _stock_cache[ck] = reply
+            return reply
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
-            fd = ex.submit(_twse_disposal,    keyword, API_Disposal)
-            ff = ex.submit(_twse_foreign,     keyword, API_Foreign,     today)
-            ft = ex.submit(_twse_trust,       keyword, API_Trust,       today)
-            fp = ex.submit(_twse_proprietary, keyword, API_Proprietary, today)
-            fs = ex.submit(_twse_short_sale,  keyword, API_Short_Sale,  today)
-            D, F, T, P, S = fd.result(), ff.result(), ft.result(), fp.result(), fs.result()
+        # Firebase 無資料 → fallback 打 API
+        print(f"[stock_info] Firebase miss，fallback to API: keyword={keyword}")
+        if market == "twse":
+            reply = _fallback_twse(keyword, today)
+        else:
+            reply = _fallback_otc(keyword, today)
 
-        reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
-        reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
-        reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
-        reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
-        reply += (S + "\n") if S else "借卷賣出：🚫 暫未更新\n"
-
-        # ⚠️ 只快取完整結果（不含「暫未更新」）
         if _is_complete_result(reply):
-            _stock_cache[ck] = reply.strip()
-        return reply.strip()
+            _stock_cache[ck] = reply
+        return reply
 
-    # ── 上櫃 ──────────────────────────────────────────────────────────────────
-    elif keyword in OTC_CODE2NAME or keyword in OTC_NAME2CODE:
-        API_inst       = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
-        API_Disposal   = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
-        API_Short_Sale = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-            fd = ex.submit(_otc_disposal,     keyword, API_Disposal)
-            fi = ex.submit(_otc_institutional, keyword, API_inst,       today)
-            fs = ex.submit(_otc_short_sale,   keyword, API_Short_Sale,  today)
-            D        = fd.result()
-            F, T, P  = fi.result()
-            S        = fs.result()
-
-        reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
-        reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
-        reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
-        reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
-        reply += (S + "\n") if S else "借卷賣出：🚫 暫未更新\n"
-
-        # ⚠️ 只快取完整結果
-        if _is_complete_result(reply):
-            _stock_cache[ck] = reply.strip()
-        return reply.strip()
-
-    # ── 代碼清單為空時的備用查詢（冷啟動保護）───────────────────────────────
-    else:
-        result = _fallback_search(keyword, today)
-        if result:
-            return result
-        return f"❌找不到「{keyword}」今盤後資料。"
+    # ── 代碼清單查不到 → fallback 同時試上市 + 上櫃 ──
+    result = _fallback_search(keyword, today)
+    if result:
+        return result
+    return f"❌找不到「{keyword}」今盤後資料。"
 
 
 def _fallback_search(keyword: str, today: str):
-    """
-    代碼清單為空（冷啟動失敗）時的備用查詢。
-    直接打 API 比對，不依賴預載入的 dict。
-    """
+    """代碼清單為空（冷啟動失敗）時的備用查詢。"""
     print(f"[fallback] keyword={keyword}")
-
-    # 先試上市
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
             ff = ex.submit(_twse_foreign,     keyword,
@@ -466,7 +565,7 @@ def _fallback_search(keyword: str, today: str):
                            f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}", today)
             F, T, P = ff.result(), ft.result(), fp.result()
         if F or T or P:
-            r = f"{keyword} (今盤後買賣超)\n"
+            r  = f"{keyword} (今盤後買賣超)\n"
             r += (F + "\n") if F else "外資：🚫 暫未更新\n"
             r += (T + "\n") if T else "投信：🚫 暫未更新\n"
             r += (P + "\n") if P else "自營商：🚫 暫未更新\n"
@@ -474,14 +573,13 @@ def _fallback_search(keyword: str, today: str):
     except Exception as e:
         print(f"[fallback] 上市失敗: {e}")
 
-    # 再試上櫃
     try:
         F2, T2, P2 = _otc_institutional(
             keyword,
             "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json",
             today)
         if F2 or T2 or P2:
-            r = f"{keyword} (今盤後買賣超)\n"
+            r  = f"{keyword} (今盤後買賣超)\n"
             r += (F2 + "\n") if F2 else "外資：🚫 暫未更新\n"
             r += (T2 + "\n") if T2 else "投信：🚫 暫未更新\n"
             r += (P2 + "\n") if P2 else "自營商：🚫 暫未更新\n"
@@ -492,24 +590,46 @@ def _fallback_search(keyword: str, today: str):
     return None
 
 
-# ── 大盤總體資訊 ──────────────────────────────────────────────────────────────
-def market_pnfo():
+# ══════════════════════════════════════════════════════════════════════════════
+# 大盤總體資訊（從 Firebase 讀，無資料才打 API）
+# ══════════════════════════════════════════════════════════════════════════════
+
+def market_pnfo() -> str:
     today = get_today()
-    API_Net_Amount  = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
-    API_MarginDelta = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
+
+    # 嘗試從 Firebase 讀
+    mkt = _read_firebase_market(today)
+    if mkt:
+        reply = "📉大盤盤後詳細資訊📈\n"
+        labels = ["自營商", "投信", "外資及陸資", "外資"]
+        for label in labels:
+            if label in mkt:
+                reply += f"{label} : {mkt[label]}億\n"
+        if "合計金額" in mkt:
+            reply += f"合計金額 : {mkt['合計金額']}億\n"
+        reply += "---------------------------------------------\n"
+        if "融資金額增減" in mkt:
+            reply += f"融資金額增減 : {mkt['融資金額增減']}億\n"
+        if "融資額金水位" in mkt:
+            reply += f"融資額金水位 : {mkt['融資額金水位']}億\n"
+        return reply.strip()
+
+    # Fallback：直接打 API
+    print("[market_pnfo] Firebase miss，fallback to API")
     reply = "📉大盤盤後詳細資訊📈\n"
 
     try:
-        data = fetch_with_retry(API_Net_Amount, today)
+        data = fetch_with_retry(
+            f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}", today)
         if data is None:
             raise Exception("無資料")
         net_total = 0
         for i in range(3, -1, -1):
-            row = data["data"][i]
+            row        = data["data"][i]
             net_amount = float(row[3].replace(',', '')) / 1e8
             net_total += net_amount
             net_amount = int(net_amount * 100) / 100
-            label = row[0][:5] if i == 3 else row[0]
+            label      = row[0][:5] if i == 3 else row[0]
             reply += f"{label} : {net_amount}億\n"
         reply += f"合計金額 : {int(net_total * 100) / 100}億\n"
         reply += "---------------------------------------------\n"
@@ -517,10 +637,11 @@ def market_pnfo():
         reply += "三大法人 : 🚫 暫未更新\n---------------------------------------------\n"
 
     try:
-        data = fetch_with_retry(API_MarginDelta, today)
+        data = fetch_with_retry(
+            f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}", today)
         if data is None:
             raise Exception("無資料")
-        row = data["tables"][0]["data"]
+        row          = data["tables"][0]["data"]
         prev_margin  = int(row[2][4].replace(',', '')) / 1e5
         today_margin = int(row[2][5].replace(',', '')) / 1e5
         margin_delta = today_margin - prev_margin
@@ -532,7 +653,10 @@ def market_pnfo():
     return reply.strip()
 
 
-# ── 上市三大法人買賣超排行前50 ───────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# 上市 / 上櫃 Top50（資料量大，仍直接打 API）
+# ══════════════════════════════════════════════════════════════════════════════
+
 def twse_top50(today=None):
     if today is None:
         today = get_today()
@@ -574,10 +698,8 @@ def twse_top50(today=None):
     return {"foreign": _wrap(fb, fs), "trust": _wrap(tb, ts), "proprietary": _wrap(pb, ps)}
 
 
-# ── 上櫃三大法人買賣超排行前50 ──────────────────────────────────────────────
 def otc_top50():
     API_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
-
     try:
         res  = requests.get(API_URL, headers=headers, verify=False, timeout=10)
         data = res.json()
