@@ -76,7 +76,10 @@ def register_api(app):
             firebase_sync.sync_all(date)
             return jsonify({"status": "ok", "date": date, "message": f"{date} 同步完成"})
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+                    import traceback
+                    err_detail = traceback.format_exc()
+                    print(f"[sync_test ERROR]\n{err_detail}")
+                    return jsonify({"error": str(e), "detail": err_detail}), 500
 
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")

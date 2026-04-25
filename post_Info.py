@@ -13,6 +13,7 @@ post_Info.py（Firebase 快取版）
   3. 若 Firebase 無資料 → fallback 打 TWSE API（和舊版一樣）
 ────────────────────────────────────────────────────────────────────────────
 """
+from __future__ import annotations
 
 import datetime
 import requests
