@@ -71,15 +71,19 @@ def register_api(app):
 
         date = request.args.get("date", get_today())
 
-        try:
-            import firebase_sync
-            firebase_sync.sync_all(date)
-            return jsonify({"status": "ok", "date": date, "message": f"{date} 同步完成"})
-        except Exception as e:
-                    import traceback
-                    err_detail = traceback.format_exc()
-                    print(f"[sync_test ERROR]\n{err_detail}")
-                    return jsonify({"error": str(e), "detail": err_detail}), 500
+        import threading
+        import firebase_sync
+
+        def run():
+            try:
+                firebase_sync.sync_all(date)
+                print(f"[sync_test] {date} 同步完成 ✅")
+            except Exception as e:
+                import traceback
+                print(f"[sync_test ERROR]\n{traceback.format_exc()}")
+
+        threading.Thread(target=run, daemon=True).start()
+        return jsonify({"status": "started", "date": date, "message": f"{date} 同步已在背景執行，請看 Render Log"})
 
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")
