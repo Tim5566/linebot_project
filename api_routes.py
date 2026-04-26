@@ -55,6 +55,15 @@ def register_api(app):
     def page_top50_otc():
         return send_from_directory('stock_site/features', 'top50_otc.html')
 
+    # ── 技術分析教學章節 ────────────────────────────────────────────────────────
+    @app.route("/stock_site/features/chapter1.html")
+    def page_chapter1():
+        return send_from_directory('stock_site/features', 'chapter1.html')
+
+    @app.route("/stock_site/features/chapter2.html")
+    def page_chapter2():
+        return send_from_directory('stock_site/features', 'chapter2.html')
+
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
     def api_trading_status():

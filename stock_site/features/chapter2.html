@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第二章：K棒進階解讀（強弱判讀）— 技術分析教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;   /* 下跌 */
+      --red:       #ff3d5a;   /* 上漲 */
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    /* ── BG ── */
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+    }
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+
+    /* ── HEADER ── */
+    header {
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 24px 0 16px;height:58px;
+      border-bottom:1px solid rgba(0,229,255,.09);
+      background:rgba(3,6,14,.97);
+      backdrop-filter:blur(24px);
+      box-shadow:0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);
+      background-size:200% 100%;animation:headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+
+    .header-left{display:flex;align-items:center;gap:0;}
+    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .back-btn {
+      display:flex;align-items:center;gap:7px;
+      padding:6px 14px;border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      background:rgba(0,229,255,.05);
+      color:var(--text-dim);font-family:'Share Tech Mono',monospace;
+      font-size:.68rem;letter-spacing:.08em;cursor:pointer;
+      text-decoration:none;transition:all .2s;
+    }
+    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);box-shadow:0 0 14px rgba(0,229,255,.2)}
+    .back-btn svg{width:12px;height:12px;flex-shrink:0}
+    .chapter-badge {
+      font-family:'Share Tech Mono',monospace;font-size:.62rem;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.2);border-radius:8px;
+      padding:3px 10px;letter-spacing:.12em;
+    }
+
+    /* ── STICKY PROGRESS BAR ── */
+    .sticky-progress {
+      position:sticky;top:58px;z-index:190;
+      background:rgba(3,6,14,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{
+      height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));
+      box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;
+    }
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    /* ── CHAPTER SIDE NAV ── */
+    .chapter-sidenav {
+      position:fixed;left:0;top:50%;transform:translateY(-50%);
+      z-index:150;display:flex;flex-direction:column;gap:0;
+      background:rgba(3,6,14,.88);backdrop-filter:blur(20px);
+      border:1px solid rgba(0,229,255,.1);border-left:none;
+      border-radius:0 12px 12px 0;overflow:hidden;
+    }
+    .ch-nav-item {
+      display:flex;align-items:center;gap:0;
+      padding:10px 14px 10px 12px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.08em;color:var(--text-faint);
+      text-decoration:none;cursor:pointer;
+      border-left:2px solid transparent;
+      transition:all .2s;white-space:nowrap;
+      border-bottom:1px solid rgba(0,229,255,.06);
+      position:relative;overflow:hidden;
+    }
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
+    .ch-nav-item .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
+    .ch-nav-item:hover .ch-label,.ch-nav-item.active .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item:hover,.ch-nav-item:focus{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
+    .ch-nav-item.active{color:var(--accent);background:rgba(0,229,255,.09);border-left-color:var(--accent);}
+    .ch-nav-item.current-ch{color:var(--pink);border-left-color:var(--pink);background:rgba(255,110,180,.07);}
+    .ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MAIN ── */
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:36px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+
+    .hero-icon {
+      flex-shrink:0;width:110px;height:110px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);
+      border-radius:20px;position:relative;overflow:hidden;
+    }
+    .hero-icon::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at center,rgba(0,229,255,.08),transparent 70%);
+    }
+
+    .hero-content{flex:1;min-width:0;}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--accent);text-transform:uppercase;
+      opacity:.8;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(0,229,255,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;
+      border:1px solid;cursor:default;
+    }
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+
+    /* ── TOC ── */
+    .toc-strip {
+      display:flex;align-items:center;gap:0;
+      margin-bottom:44px;padding:18px 24px;
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;overflow-x:auto;
+    }
+    .toc-item {
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      min-width:72px;cursor:pointer;padding:4px 8px;border-radius:10px;
+      transition:background .2s;
+    }
+    .toc-item:hover{background:rgba(0,229,255,.08);}
+    .toc-dot {
+      width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,229,255,.25);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-faint);
+      transition:all .3s;
+    }
+    .toc-dot.active{border-color:var(--accent);background:rgba(0,229,255,.15);color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.3);}
+    .toc-lbl{font-size:.58rem;color:var(--text-faint);text-align:center;line-height:1.3;transition:color .3s;}
+    .toc-item:hover .toc-lbl{color:var(--text-dim);}
+    .toc-connector{flex:1;min-width:12px;height:1px;background:rgba(0,229,255,.12);}
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);
+      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .5s,transform .5s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .section-header {
+      display:flex;align-items:center;gap:16px;
+      padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);
+      position:relative;
+    }
+    .section-header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.35),transparent);
+    }
+    .section-num {
+      font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.2);border-radius:8px;
+      padding:4px 10px;letter-spacing:.1em;white-space:nowrap;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+      color:#fff;letter-spacing:.06em;
+    }
+    .section-icon {
+      margin-left:auto;font-size:1.4rem;opacity:.7;
+    }
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--accent);font-style:normal;font-weight:500;}
+
+    /* ── CORE INSIGHT BOX ── */
+    .insight-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.03));
+      border:1px solid rgba(0,229,255,.2);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+
+    .warn-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warn-box .insight-label{color:var(--red);}
+
+    .gold-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.03));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow);}
+
+    .purple-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));
+      border:1px solid rgba(178,102,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .purple-box .insight-label{color:var(--purple);}
+
+    /* ── CANDLESTICK DEMO SVG ── */
+    .candle-showcase {
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;
+      margin:24px 0;
+    }
+    .candle-card {
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;padding:18px 16px;text-align:center;
+      transition:all .25s;cursor:default;position:relative;overflow:hidden;
+    }
+    .candle-card:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.25);transform:translateY(-2px);}
+    .candle-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      transition:opacity .3s;opacity:0;
+    }
+    .candle-card.red-card::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+    .candle-card.green-card::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+    .candle-card.doji-card::before{background:linear-gradient(90deg,transparent,var(--yellow),transparent);}
+    .candle-card:hover::before{opacity:1;}
+
+    .candle-svg-wrap{display:flex;justify-content:center;align-items:center;height:90px;margin-bottom:12px;}
+    .candle-name{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;}
+    .candle-desc{font-size:.76rem;color:var(--text-dim);line-height:1.5;}
+
+    /* ── FORCE METER ── */
+    .force-meter-wrap{margin:24px 0;}
+    .force-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .force-label{font-size:.82rem;color:var(--text-dim);min-width:110px;}
+    .force-bar-bg{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;position:relative;}
+    .force-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+    .force-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);min-width:36px;text-align:right;}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{
+      background:rgba(0,229,255,.07);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+      padding:12px 16px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;
+    }
+    .cmp-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+      color:var(--text-dim);vertical-align:top;line-height:1.6;
+    }
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .cmp-table .val-red{color:var(--red);font-weight:600;}
+    .cmp-table .val-green{color:var(--green);font-weight:600;}
+    .cmp-table .val-yellow{color:var(--yellow);font-weight:600;}
+    .cmp-table .val-cyan{color:var(--accent);font-weight:600;}
+
+    /* ── INTERACTIVE K-BAR SIMULATOR ── */
+    .sim-wrap{
+      background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.12);
+      border-radius:16px;padding:24px;margin:24px 0;
+    }
+    .sim-title{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--accent);margin-bottom:16px;}
+    .sim-canvas{
+      width:100%;height:220px;background:#050c1a;border-radius:12px;
+      border:1px solid rgba(0,229,255,.08);margin-bottom:16px;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;
+    }
+    .sim-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+    .sim-btn {
+      padding:8px 16px;border-radius:10px;border:1px solid rgba(0,229,255,.2);
+      background:rgba(0,229,255,.06);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.08em;
+      cursor:pointer;transition:all .2s;
+    }
+    .sim-btn:hover{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.4);}
+    .sim-btn.active{background:rgba(0,229,255,.2);border-color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.25);}
+    .sim-btn.red{border-color:rgba(255,61,90,.25);background:rgba(255,61,90,.06);color:var(--red);}
+    .sim-btn.red:hover{background:rgba(255,61,90,.15);border-color:rgba(255,61,90,.5);}
+    .sim-btn.grn{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.06);color:var(--green);}
+    .sim-btn.grn:hover{background:rgba(0,230,118,.15);border-color:rgba(0,230,118,.5);}
+    .sim-result{
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      border-radius:10px;padding:14px 18px;
+      font-size:.84rem;color:var(--text-dim);line-height:1.7;min-height:52px;
+    }
+    .sim-result strong{color:var(--accent);}
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-wrap{margin:24px 0;}
+    .flow-step {
+      display:flex;align-items:flex-start;gap:16px;margin-bottom:4px;
+      padding:16px 18px;border-radius:12px;
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);
+      transition:all .2s;
+    }
+    .flow-step:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.2);}
+    .flow-num {
+      flex-shrink:0;width:28px;height:28px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;
+    }
+    .flow-num.cn{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .flow-num.rn{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .flow-num.gn{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .flow-num.yn{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .flow-arrow{flex-shrink:0;font-size:1rem;color:var(--text-faint);margin-top:0;align-self:center;}
+    .flow-content{flex:1;}
+    .flow-heading{font-size:.88rem;color:var(--text);font-weight:600;margin-bottom:4px;}
+    .flow-sub{font-size:.8rem;color:var(--text-dim);line-height:1.6;}
+
+    /* ── PATTERN GRID ── */
+    .pattern-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
+    .pattern-card{
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;padding:20px;transition:all .25s;
+    }
+    .pattern-card:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.25);transform:translateY(-2px);}
+    .pattern-card-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .pattern-badge{
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+      padding:4px 10px;border-radius:20px;
+    }
+    .pb-bull{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .pb-bear{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .pb-warn{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .pb-neutral{background:rgba(178,102,255,.12);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .pattern-name{font-size:.88rem;color:var(--text);font-weight:600;}
+    .pattern-desc{font-size:.8rem;color:var(--text-dim);line-height:1.6;}
+    .pattern-key{
+      margin-top:10px;padding:8px 12px;border-radius:8px;
+      background:rgba(0,0,0,.2);font-size:.78rem;color:var(--text-dim);
+      border-left:2px solid rgba(0,229,255,.3);
+    }
+
+    /* ── SIGNAL DETECTOR ── */
+    .detector-wrap{
+      background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.12);
+      border-radius:16px;padding:24px;margin:24px 0;
+    }
+    .detector-title{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--accent);margin-bottom:16px;}
+    .detector-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+    .detector-item{
+      display:flex;align-items:center;gap:10px;
+      padding:12px 14px;border-radius:10px;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      cursor:pointer;transition:all .2s;user-select:none;
+    }
+    .detector-item:hover{background:rgba(0,229,255,.09);}
+    .detector-item.selected{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.35);}
+    .di-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .2s;}
+    .di-label{font-size:.82rem;color:var(--text-dim);}
+    .detector-output{
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      border-radius:10px;padding:16px;font-size:.84rem;color:var(--text-dim);line-height:1.75;min-height:70px;
+    }
+    .detector-output strong{color:var(--accent);}
+
+    /* ── QUIZ ── */
+    .quiz-section{
+      background:linear-gradient(135deg,rgba(178,102,255,.05),rgba(0,229,255,.03));
+      border:1px solid rgba(178,102,255,.15);
+      border-radius:20px;padding:28px;margin-bottom:32px;
+    }
+    .quiz-section-title{
+      font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;
+      color:#fff;letter-spacing:.08em;margin-bottom:24px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .quiz-block{margin-bottom:28px;}
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:500;line-height:1.65;margin-bottom:14px;}
+    .quiz-options{display:flex;flex-direction:column;gap:9px;}
+    .quiz-opt {
+      display:flex;align-items:flex-start;gap:12px;
+      padding:13px 16px;border-radius:12px;
+      border:1px solid rgba(0,229,255,.1);background:rgba(0,229,255,.03);
+      cursor:pointer;transition:all .2s;font-size:.86rem;color:var(--text-dim);line-height:1.55;
+    }
+    .quiz-opt:hover:not(.disabled){background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.25);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-opt.correct{background:rgba(0,230,118,.1)!important;border-color:rgba(0,230,118,.4)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{background:rgba(255,61,90,.08)!important;border-color:rgba(255,61,90,.3)!important;color:var(--red)!important;}
+    .quiz-letter{
+      flex-shrink:0;width:22px;height:22px;border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;
+      background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);
+    }
+    .quiz-feedback{
+      margin-top:12px;padding:14px 16px;border-radius:10px;
+      font-size:.84rem;line-height:1.7;display:none;
+    }
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer {
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.12);border-radius:20px;
+      padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+      position:relative;overflow:hidden;margin-top:16px;
+    }
+    .chapter-footer::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+    }
+    .footer-info{font-size:.88rem;color:var(--text-dim);line-height:1.75;}
+    .footer-info strong{color:var(--text);}
+    .next-btn {
+      display:flex;align-items:center;gap:10px;
+      padding:12px 24px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.07);
+      color:var(--accent);font-family:'Share Tech Mono',monospace;
+      font-size:.75rem;letter-spacing:.1em;cursor:pointer;
+      text-decoration:none;transition:all .2s;white-space:nowrap;
+    }
+    .next-btn:hover{background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 20px rgba(0,229,255,.2);}
+    .next-btn svg{width:16px;height:16px;}
+
+    /* ── SHADOW LINES ── */
+    .shadow-line{
+      display:flex;align-items:stretch;gap:0;
+      margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,229,255,.1);
+    }
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.up{background:linear-gradient(180deg,var(--red),rgba(255,61,90,.4));}
+    .sl-side.dn{background:linear-gradient(180deg,var(--green),rgba(0,230,118,.4));}
+    .sl-side.neu{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.4));}
+    .sl-body{padding:16px 20px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;margin-bottom:6px;}
+    .sl-top.up{color:var(--red);}
+    .sl-top.dn{color:var(--green);}
+    .sl-top.neu{color:var(--yellow);}
+    .sl-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── DIVIDER ── */
+    .sec-divider{
+      text-align:center;margin:28px 0 22px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.3em;color:var(--text-faint);
+      display:flex;align-items:center;gap:14px;
+    }
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── HIGHLIGHT CHIP ── */
+    .chip{
+      display:inline-block;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;
+      padding:3px 10px;border-radius:6px;letter-spacing:.05em;
+      vertical-align:middle;margin:0 2px;
+    }
+    .chip-red{background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+
+    /* ── MULTI-CANDLE RHYTHM ── */
+    .rhythm-row{display:flex;gap:12px;align-items:flex-end;justify-content:center;margin:20px 0;padding:20px;background:#040b15;border-radius:12px;border:1px solid rgba(0,229,255,.08);}
+
+    /* ── TRUE VS FALSE BREAKOUT ── */
+    .breakout-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+    .bc-card{border-radius:14px;padding:20px;text-align:center;}
+    .bc-card.true{background:rgba(255,61,90,.05);border:1px solid rgba(255,61,90,.2);}
+    .bc-card.false{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);}
+    .bc-title{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.12em;margin-bottom:12px;}
+    .bc-card.true .bc-title{color:var(--red);}
+    .bc-card.false .bc-title{color:var(--green);}
+    .bc-points{font-size:.8rem;color:var(--text-dim);line-height:1.8;text-align:left;}
+    .bc-points li{padding:2px 0;}
+
+    /* responsive */
+    @media(max-width:600px){
+      .hero{flex-direction:column;gap:20px;padding:24px;}
+      .hero-icon{width:80px;height:80px;}
+      .hero-title{font-size:1.2rem;}
+      main{padding:28px 16px 80px;}
+      .detector-grid{grid-template-columns:1fr;}
+      .breakout-compare{grid-template-columns:1fr;}
+      .candle-showcase{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+
+<!-- Chapter Side Nav -->
+<nav class="chapter-sidenav">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html">
+    <span class="ch-num">01</span><span class="ch-label">市場與股票</span>
+  </a>
+  <a class="ch-nav-item current-ch" href="/stock_site/features/chapter2.html">
+    <span class="ch-num">02</span><span class="ch-label">K棒解讀</span>
+  </a>
+  <span class="ch-nav-item locked">
+    <span class="ch-num">03</span><span class="ch-label">趨勢結構</span>
+  </span>
+  <span class="ch-nav-item locked">
+    <span class="ch-num">04</span><span class="ch-label">支撐壓力</span>
+  </span>
+  <span class="ch-nav-item locked">
+    <span class="ch-num">05</span><span class="ch-label">均線理論</span>
+  </span>
+</nav>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock Logo"/></div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">技術分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a class="back-btn" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+    <span class="chapter-badge">CH.02</span>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky">
+    <div class="progress-fill-sticky" id="progressFill"></div>
+  </div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第二章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-icon">
+      <!-- Animated K-bar icon -->
+      <svg width="70" height="80" viewBox="0 0 70 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Red up candle -->
+        <line x1="16" y1="8" x2="16" y2="16" stroke="#ff3d5a" stroke-width="1.5"/>
+        <rect x="9" y="16" width="14" height="32" rx="2" fill="#ff3d5a" opacity="0.9"/>
+        <line x1="16" y1="48" x2="16" y2="58" stroke="#ff3d5a" stroke-width="1.5"/>
+        <!-- Green down candle -->
+        <line x1="35" y1="14" x2="35" y2="22" stroke="#00e676" stroke-width="1.5"/>
+        <rect x="28" y="22" width="14" height="26" rx="2" fill="none" stroke="#00e676" stroke-width="1.5"/>
+        <line x1="35" y1="48" x2="35" y2="60" stroke="#00e676" stroke-width="1.5"/>
+        <!-- Doji -->
+        <line x1="54" y1="10" x2="54" y2="65" stroke="#ffd600" stroke-width="1.5"/>
+        <rect x="47" y="32" width="14" height="3" rx="1" fill="#ffd600"/>
+        <!-- Glow dots -->
+        <circle cx="16" cy="8" r="2" fill="#ff3d5a" opacity="0.6">
+          <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="54" cy="10" r="2" fill="#ffd600" opacity="0.6">
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">CHAPTER 02 · CANDLESTICK MASTERY</div>
+      <div class="hero-title">K棒進階解讀<br/>強弱判讀實戰</div>
+      <div class="hero-desc">每一根K棒都是多空雙方的戰鬥紀錄。長度、影線、顏色的排列方式，藏著市場參與者的情緒、力道與意圖——學會讀懂，就能在別人恐慌時看清方向。</div>
+      <div class="hero-tags">
+        <span class="tag tag-red">紅=上漲</span>
+        <span class="tag tag-green">綠=下跌</span>
+        <span class="tag tag-cyan">力道判讀</span>
+        <span class="tag tag-yellow">影線分析</span>
+        <span class="tag tag-pink">假突破識別</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOC ── -->
+  <div class="toc-strip">
+    <div class="toc-item" onclick="scrollToSec('sec1')"><div class="toc-dot active" id="d1">01</div><div class="toc-lbl">K棒<br/>基本解剖</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec2')"><div class="toc-dot" id="d2">02</div><div class="toc-lbl">長短<br/>力道</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec3')"><div class="toc-dot" id="d3">03</div><div class="toc-lbl">影線<br/>試探</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec4')"><div class="toc-dot" id="d4">04</div><div class="toc-lbl">連續K棒<br/>節奏</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec5')"><div class="toc-dot" id="d5">05</div><div class="toc-lbl">假突破<br/>真突破</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec6')"><div class="toc-dot" id="d6">06</div><div class="toc-lbl">關鍵型態<br/>大全</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec7')"><div class="toc-dot" id="d7">07</div><div class="toc-lbl">實戰<br/>解題</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec8')"><div class="toc-dot" id="d8">08</div><div class="toc-lbl">互動<br/>測驗</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 1 ── K棒基本解剖
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec1">
+    <div class="section-header">
+      <span class="section-num">SEC 01</span>
+      <span class="section-title">K棒的解剖：四個數字藏著整場戰爭</span>
+      <span class="section-icon">🕯️</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">一根K棒，只記錄四個數字：<strong>開盤價、收盤價、最高價、最低價</strong>。但這四個數字，代表的是一段時間內（可能是5分鐘、1小時、1天、1週）多空雙方所有的廝殺結果。</p>
+
+      <!-- K棒解剖圖 SVG -->
+      <div style="display:flex;justify-content:center;margin:28px 0;">
+        <svg width="420" height="260" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+          <!-- Background grid -->
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,229,255,0.05)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="420" height="260" fill="#040b15" rx="12"/>
+          <rect width="420" height="260" fill="url(#grid)" rx="12"/>
+
+          <!-- RED CANDLE (Left) -->
+          <!-- Wick top -->
+          <line x1="90" y1="32" x2="90" y2="70" stroke="#ff3d5a" stroke-width="2"/>
+          <!-- Body -->
+          <rect x="68" y="70" width="44" height="100" rx="4" fill="#ff3d5a"/>
+          <!-- Wick bottom -->
+          <line x1="90" y1="170" x2="90" y2="210" stroke="#ff3d5a" stroke-width="2"/>
+          <!-- Labels Red -->
+          <line x1="116" y1="32" x2="155" y2="32" stroke="rgba(255,61,90,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="158" y="36" fill="#ff3d5a" font-size="11" font-family="Share Tech Mono, monospace">最高價 HIGH</text>
+          <line x1="116" y1="70" x2="155" y2="70" stroke="rgba(255,61,90,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="158" y="74" fill="#ff3d5a" font-size="11" font-family="Share Tech Mono, monospace">開盤價 OPEN</text>
+          <line x1="116" y1="170" x2="155" y2="170" stroke="rgba(255,61,90,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="158" y="174" fill="#ff6eb4" font-size="11" font-family="Share Tech Mono, monospace">收盤價 CLOSE</text>
+          <line x1="116" y1="210" x2="155" y2="210" stroke="rgba(255,61,90,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="158" y="214" fill="#ff3d5a" font-size="11" font-family="Share Tech Mono, monospace">最低價 LOW</text>
+          <!-- Red label -->
+          <rect x="58" y="228" width="64" height="22" rx="6" fill="rgba(255,61,90,0.12)" stroke="rgba(255,61,90,0.3)" stroke-width="1"/>
+          <text x="90" y="243" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle">紅棒 上漲</text>
+
+          <!-- GREEN CANDLE (Right) - open at top of body, close at bottom -->
+          <!-- Wick top -->
+          <line x1="330" y1="32" x2="330" y2="80" stroke="#00e676" stroke-width="2"/>
+          <!-- Body (hollow / outline style for down) -->
+          <rect x="308" y="80" width="44" height="100" rx="4" fill="none" stroke="#00e676" stroke-width="2"/>
+          <!-- Wick bottom -->
+          <line x1="330" y1="180" x2="330" y2="218" stroke="#00e676" stroke-width="2"/>
+          <!-- Labels Green -->
+          <text x="8" y="36" fill="#00e676" font-size="11" font-family="Share Tech Mono, monospace">最高價 HIGH</text>
+          <line x1="90" y1="32" x2="304" y2="32" stroke="rgba(0,230,118,0.0)" stroke-width="0"/>
+          <line x1="260" y1="32" x2="305" y2="32" stroke="rgba(0,230,118,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="8" y="84" fill="#00e676" font-size="11" font-family="Share Tech Mono, monospace">開盤價 OPEN</text>
+          <line x1="100" y1="80" x2="305" y2="80" stroke="rgba(0,230,118,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="8" y="184" fill="#7affb8" font-size="11" font-family="Share Tech Mono, monospace">收盤價 CLOSE</text>
+          <line x1="115" y1="180" x2="305" y2="180" stroke="rgba(0,230,118,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="8" y="222" fill="#00e676" font-size="11" font-family="Share Tech Mono, monospace">最低價 LOW</text>
+          <line x1="80" y1="218" x2="305" y2="218" stroke="rgba(0,230,118,0.5)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Green label -->
+          <rect x="305" y="228" width="64" height="22" rx="6" fill="rgba(0,230,118,0.10)" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+          <text x="337" y="243" fill="#00e676" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle">綠棒 下跌</text>
+
+          <!-- Center label -->
+          <text x="210" y="245" fill="rgba(0,229,255,0.5)" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle">── 台股：紅=漲 綠=跌 ──</text>
+        </svg>
+      </div>
+
+      <div class="insight-box">
+        <span class="insight-icon">💡</span>
+        <div class="insight-body">
+          <div class="insight-label">── 核心觀念 ──</div>
+          <div class="insight-text"><strong>K棒不是圖表，是戰場。</strong> 收盤價 vs 開盤價 決定誰贏（多還是空）；最高/最低價決定雙方最遠打到哪裡。影線是被擊退的痕跡，實體是最終佔領的領土。</div>
+        </div>
+      </div>
+
+      <p class="prose">台股的顏色規則：<span class="chip chip-red">紅棒</span> 代表收盤價 > 開盤價（上漲），<span class="chip chip-green">綠棒</span> 代表收盤價 < 開盤價（下跌）。這和歐美市場相反（歐美通常紅=跌，綠=漲），學習時要特別注意。</p>
+
+      <!-- 實體 vs 影線 -->
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">▌ 實體（Body）= 多空決戰結果</div>
+          <div class="sl-text">實體是開盤到收盤之間的區域。<strong>實體越長</strong>，代表這段時間內一方主導越徹底、越有力量；<strong>實體越短</strong>，代表雙方相當，市場猶豫。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side neu"></div>
+        <div class="sl-body">
+          <div class="sl-top neu">▌ 上下影線（Wick/Shadow）= 被擊退的試探</div>
+          <div class="sl-text">影線是在實體之外延伸的線段。<strong>上影線</strong>代表多方曾攻到更高位置，但最終被空方打回來；<strong>下影線</strong>則相反，空方攻到更低，被多方撐住。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 2 ── 長短代表力道
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec2">
+    <div class="section-header">
+      <span class="section-num">SEC 02</span>
+      <span class="section-title">實體長短 = 力道強弱：怎麼量化「誰在主導」</span>
+      <span class="section-icon">⚡</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">K棒的實體長度，是判斷<strong>多空力道</strong>最直觀的工具。長實體代表市場明確；短實體代表市場猶豫。但「長」和「短」是相對的——要跟附近的K棒比較，不是絕對數字。</p>
+
+      <div class="candle-showcase">
+        <!-- 大紅棒 -->
+        <div class="candle-card red-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <line x1="16" y1="5" x2="16" y2="14" stroke="#ff3d5a" stroke-width="1.5"/>
+              <rect x="4" y="14" width="24" height="62" rx="3" fill="#ff3d5a"/>
+              <line x1="16" y1="76" x2="16" y2="85" stroke="#ff3d5a" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="candle-name">大紅棒</div>
+          <div class="candle-desc">多方大勝。收盤遠高於開盤，全程主導，幾乎沒有壓力。</div>
+        </div>
+        <!-- 小紅棒 -->
+        <div class="candle-card red-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <line x1="16" y1="22" x2="16" y2="38" stroke="#ff3d5a" stroke-width="1.5"/>
+              <rect x="4" y="38" width="24" height="18" rx="3" fill="#ff3d5a"/>
+              <line x1="16" y1="56" x2="16" y2="70" stroke="#ff3d5a" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="candle-name">小紅棒</div>
+          <div class="candle-desc">多方微勝，雙方拉鋸。趨勢不明確，需看前後K棒確認。</div>
+        </div>
+        <!-- 大綠棒 -->
+        <div class="candle-card green-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <line x1="16" y1="5" x2="16" y2="14" stroke="#00e676" stroke-width="1.5"/>
+              <rect x="4" y="14" width="24" height="62" rx="3" fill="none" stroke="#00e676" stroke-width="1.8"/>
+              <line x1="16" y1="76" x2="16" y2="85" stroke="#00e676" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="candle-name">大綠棒</div>
+          <div class="candle-desc">空方大勝。賣壓沉重，多方幾乎無法抵抗。</div>
+        </div>
+        <!-- 十字星 -->
+        <div class="candle-card doji-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <line x1="16" y1="10" x2="16" y2="45" stroke="#ffd600" stroke-width="1.5"/>
+              <rect x="4" y="43" width="24" height="4" rx="2" fill="#ffd600"/>
+              <line x1="16" y1="47" x2="16" y2="80" stroke="#ffd600" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="candle-name">十字星</div>
+          <div class="candle-desc">勢均力敵。市場在猶豫，轉折機率高。</div>
+        </div>
+        <!-- 墓碑十字 -->
+        <div class="candle-card doji-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <line x1="16" y1="10" x2="16" y2="70" stroke="#ffd600" stroke-width="1.5"/>
+              <rect x="4" y="68" width="24" height="4" rx="2" fill="#ffd600"/>
+            </svg>
+          </div>
+          <div class="candle-name">墓碑十字</div>
+          <div class="candle-desc">上漲後被打回原點。高位出現時是明顯的<span style="color:var(--red)">空方警訊</span>。</div>
+        </div>
+        <!-- 蜻蜓十字 -->
+        <div class="candle-card doji-card">
+          <div class="candle-svg-wrap">
+            <svg width="32" height="90" viewBox="0 0 32 90">
+              <rect x="4" y="18" width="24" height="4" rx="2" fill="#ffd600"/>
+              <line x1="16" y1="22" x2="16" y2="80" stroke="#ffd600" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="candle-name">蜻蜓十字</div>
+          <div class="candle-desc">下殺後被強力撐回。低位出現是<span style="color:var(--green)">多方訊號</span>。</div>
+        </div>
+      </div>
+
+      <!-- Force meter -->
+      <div class="sec-divider">── 力道評估儀 ──</div>
+      <div class="force-meter-wrap" id="forceMeter">
+        <div class="force-row">
+          <span class="force-label">大紅棒 多方力道</span>
+          <div class="force-bar-bg"><div class="force-bar-fill" id="fb1" style="width:0%;background:linear-gradient(90deg,#ff3d5a,#ff6eb4)"></div></div>
+          <span class="force-val">92%</span>
+        </div>
+        <div class="force-row">
+          <span class="force-label">小紅棒 多方力道</span>
+          <div class="force-bar-bg"><div class="force-bar-fill" id="fb2" style="width:0%;background:linear-gradient(90deg,#ff3d5a,#ff6eb4)"></div></div>
+          <span class="force-val">38%</span>
+        </div>
+        <div class="force-row">
+          <span class="force-label">大綠棒 空方力道</span>
+          <div class="force-bar-bg"><div class="force-bar-fill" id="fb3" style="width:0%;background:linear-gradient(90deg,#00e676,#00b8a9)"></div></div>
+          <span class="force-val">88%</span>
+        </div>
+        <div class="force-row">
+          <span class="force-label">十字星 不確定性</span>
+          <div class="force-bar-bg"><div class="force-bar-fill" id="fb4" style="width:0%;background:linear-gradient(90deg,#ffd600,#ff9800)"></div></div>
+          <span class="force-val">95%</span>
+        </div>
+        <div class="force-row">
+          <span class="force-label">墓碑十字 空方壓力</span>
+          <div class="force-bar-bg"><div class="force-bar-fill" id="fb5" style="width:0%;background:linear-gradient(90deg,#ff3d5a,#b266ff)"></div></div>
+          <span class="force-val">80%</span>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <span class="insight-icon">⚠️</span>
+        <div class="insight-body">
+          <div class="insight-label">── 重要提醒 ──</div>
+          <div class="insight-text">「長」和「短」都是<strong>相對概念</strong>。一根在平常日看起來很短的K棒，在極低波動期可能是強力訊號。永遠要拿身邊5～10根K棒做比較，不要孤立解讀。</div>
+        </div>
+      </div>
+
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>K棒特徵</th>
+            <th>暗示訊號</th>
+            <th>應對策略</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>連續大紅棒（無影線）</td>
+            <td class="val-red">多方極強，趨勢明確上攻</td>
+            <td>不追高，等回調再進</td>
+          </tr>
+          <tr>
+            <td>連續大綠棒（無影線）</td>
+            <td class="val-green">空方主導，下跌動能強</td>
+            <td>不接刀，等止跌訊號</td>
+          </tr>
+          <tr>
+            <td>越來越小的紅棒</td>
+            <td class="val-yellow">上漲動能衰竭，警惕轉折</td>
+            <td>設緊一點的停利</td>
+          </tr>
+          <tr>
+            <td>多根十字星出現</td>
+            <td class="val-cyan">市場猶豫期，方向待定</td>
+            <td>等突破再決策，不賭方向</td>
+          </tr>
+          <tr>
+            <td>爆量大棒後縮量小棒</td>
+            <td class="val-yellow">行情可能結束，主力可能出場</td>
+            <td>高度警戒，保護利潤</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 3 ── 影線分析
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec3">
+    <div class="section-header">
+      <span class="section-num">SEC 03</span>
+      <span class="section-title">上下影線：試探、失敗與反轉的密碼</span>
+      <span class="section-icon">🎣</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">影線（Wick）是市場被拒絕的足跡。<strong>上影線越長</strong>，代表多方曾試圖攻高卻被空方大力擊回；<strong>下影線越長</strong>，代表空方曾試圖殺低卻被多方強力承接。</p>
+
+      <div class="insight-box">
+        <span class="insight-icon">🔑</span>
+        <div class="insight-body">
+          <div class="insight-label">── 核心觀念 ──</div>
+          <div class="insight-text">影線 = 失敗的進攻。看到長影線，要問：<strong>「誰的進攻失敗了？」</strong> 上影線 → 多方失敗（空方勝）；下影線 → 空方失敗（多方勝）。失敗方越慘，反轉力道越強。</div>
+        </div>
+      </div>
+
+      <!-- 影線互動解析器 -->
+      <div class="detector-wrap">
+        <div class="detector-title">▶ 影線情境解析器（點選組合）</div>
+        <div class="detector-grid" id="shadowGrid">
+          <div class="detector-item" data-type="long-upper" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--red)"></div>
+            <span class="di-label">長上影線 / 短下影線</span>
+          </div>
+          <div class="detector-item" data-type="long-lower" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--green)"></div>
+            <span class="di-label">短上影線 / 長下影線</span>
+          </div>
+          <div class="detector-item" data-type="both-long" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--yellow)"></div>
+            <span class="di-label">上下影線都長</span>
+          </div>
+          <div class="detector-item" data-type="no-shadow" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--accent)"></div>
+            <span class="di-label">幾乎沒有影線</span>
+          </div>
+          <div class="detector-item" data-type="gravestone" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--purple)"></div>
+            <span class="di-label">墓碑十字（全上影線）</span>
+          </div>
+          <div class="detector-item" data-type="dragonfly" onclick="selectShadow(this)">
+            <div class="di-dot" style="background:var(--pink)"></div>
+            <span class="di-label">蜻蜓十字（全下影線）</span>
+          </div>
+        </div>
+        <div class="detector-output" id="shadowOutput">點選上方任一組合，即可查看影線解讀與實戰含義...</div>
+      </div>
+
+      <div class="sec-divider">── 影線位置很重要 ──</div>
+
+      <p class="prose">同樣的影線，<strong>出現在不同位置</strong>代表完全不同的意義：</p>
+
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <div class="flow-num rn">⬆</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">高位出現長上影線 → <span style="color:var(--red)">危險！空方反撲強烈</span></div>
+            <div class="flow-sub">在漲勢末端（高點區）出現長上影線，代表多方再次試圖突破高點，但被空方強力阻擊。這是<strong>趨勢即將轉向</strong>的早期訊號之一。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num gn">⬇</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">低位出現長下影線 → <span style="color:var(--green)">多方有力承接！可能止跌</span></div>
+            <div class="flow-sub">在跌勢末端（低點區）出現長下影線，代表空方試圖繼續殺低，但有大量多方資金在低點進場承接，將價格撐回。是可能的<strong>底部訊號</strong>。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num yn">↔</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">盤整中出現長影線 → <span style="color:var(--yellow)">測試支撐壓力，等待突破</span></div>
+            <div class="flow-sub">在橫盤震盪中出現長影線，通常是市場在測試某個關鍵價位。如果每次都被擋回，說明那個價位的力量很強，突破後力道會很大。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <span class="insight-icon">🚨</span>
+        <div class="insight-body">
+          <div class="insight-label">── 常見錯誤 ──</div>
+          <div class="insight-text">很多新手看到長下影線就以為是「底部到了，趕快買」。但<strong>下跌趨勢中的長下影線不代表止跌</strong>，可能只是暫時的反彈。必須配合趨勢位置、成交量和後續幾根K棒一起判斷。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 4 ── 連續K棒節奏
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec4">
+    <div class="section-header">
+      <span class="section-num">SEC 04</span>
+      <span class="section-title">連續K棒的節奏：趨勢 vs 震盪怎麼分</span>
+      <span class="section-icon">🎵</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">一根K棒告訴你一個瞬間，<strong>多根K棒的組合</strong>才告訴你市場的「節奏」。趨勢行情和盤整行情在K棒上有完全不同的外觀，學會識別可以讓你早人一步知道「現在該等待還是出手」。</p>
+
+      <!-- 趨勢 vs 震盪對比 -->
+      <div class="breakout-compare" style="grid-template-columns:1fr 1fr">
+        <div class="bc-card true" style="border-color:rgba(255,61,90,.25)">
+          <div class="bc-title">📈 趨勢行情的K棒特徵</div>
+          <div class="bc-points">
+            <li>紅棒實體明顯比綠棒大</li>
+            <li>每次回調綠棒不超過前一紅棒的一半</li>
+            <li>高點持續創新高（或低點持續新低）</li>
+            <li>整體K棒呈現斜坡形排列</li>
+            <li>回調後往往出現大紅棒反攻</li>
+          </div>
+        </div>
+        <div class="bc-card false" style="border-color:rgba(0,230,118,.25)">
+          <div class="bc-title">↔ 震盪行情的K棒特徵</div>
+          <div class="bc-points">
+            <li>紅棒和綠棒大小相近</li>
+            <li>收盤價反覆在同一區間內</li>
+            <li>高點和低點沒有持續突破</li>
+            <li>常見大量上下影線（試探被拒）</li>
+            <li>方向感薄弱，無法持續</li>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-divider">── 多根K棒組合解讀 ──</div>
+
+      <!-- K棒節奏視覺化 -->
+      <div class="sim-wrap">
+        <div class="sim-title">▶ 多根K棒節奏模擬（點選查看）</div>
+        <div class="sim-controls">
+          <button class="sim-btn active" onclick="showRhythm('uptrend',this)">上升趨勢</button>
+          <button class="sim-btn" onclick="showRhythm('downtrend',this)">下降趨勢</button>
+          <button class="sim-btn" onclick="showRhythm('consolidation',this)">盤整震盪</button>
+          <button class="sim-btn" onclick="showRhythm('exhaustion',this)">動能衰竭</button>
+          <button class="sim-btn" onclick="showRhythm('reversal',this)">趨勢反轉</button>
+        </div>
+        <div class="sim-canvas" id="rhythmCanvas">
+          <svg id="rhythmSvg" width="100%" height="100%" viewBox="0 0 540 200" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="sim-result" id="rhythmResult"><strong>上升趨勢：</strong> 紅棒主導，每次回調（綠棒）幅度小且快速，隨後更大紅棒繼續推升。高點不斷創新高，這是趨勢最健康的型態。操作思路：回調時尋找進場機會，不追高。</div>
+      </div>
+
+      <p class="prose">判斷趨勢強弱，可以看這個關鍵比例：<strong>回調的幅度</strong>。健康的上漲趨勢中，每次回調應該只回吐上漲幅度的 <em>1/3 到 1/2</em>。如果回調超過 <em>2/3</em>，上漲動能已明顯衰弱；如果跌破前波低點，趨勢結構可能已破壞。</p>
+
+      <div class="purple-box">
+        <span class="insight-icon">🎯</span>
+        <div class="insight-body">
+          <div class="insight-label">── 實戰口訣 ──</div>
+          <div class="insight-text">
+            <strong>趨勢行情：</strong> 「紅棒長、綠棒短，順勢做，不要猜頂」<br/>
+            <strong>震盪行情：</strong> 「紅綠一樣大，不操作，等突破確認」<br/>
+            <strong>反轉訊號：</strong> 「紅棒越來越短，或出現爆量大綠棒，警戒」
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 5 ── 假突破 vs 真突破
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec5">
+    <div class="section-header">
+      <span class="section-num">SEC 05</span>
+      <span class="section-title">假突破 vs 真突破：K棒騙局大解密</span>
+      <span class="section-icon">🎭</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">市場最常見的陷阱之一：<strong>假突破</strong>（Bull/Bear Trap）。價格突破了關鍵壓力或支撐，誘引大量買單/賣單進場後，卻又快速反轉回原區間。這個手法是主力和市場結構本身造成的，新手最容易踩坑。</p>
+
+      <div class="warn-box">
+        <span class="insight-icon">💀</span>
+        <div class="insight-body">
+          <div class="insight-label">── 假突破的本質 ──</div>
+          <div class="insight-text">假突破 = <strong>「誘多」或「誘空」</strong>。價格突破後，追進去的人成了主力的流動性來源。主力出貨（或補空）完畢後，價格立刻反轉，讓追進去的散戶深套。</div>
+        </div>
+      </div>
+
+      <div class="breakout-compare">
+        <div class="bc-card true">
+          <div class="bc-title">✅ 真突破的特徵</div>
+          <ul class="bc-points" style="list-style:none">
+            <li>✦ 突破K棒實體巨大、影線極短</li>
+            <li>✦ 突破當下成交量明顯放大（爆量）</li>
+            <li>✦ 收盤價明確站上/跌破關鍵價位</li>
+            <li>✦ 突破後不再回到關鍵價位以下</li>
+            <li>✦ 次日開盤繼續延伸，不回頭</li>
+            <li>✦ 相關個股/板塊同步突破</li>
+          </ul>
+        </div>
+        <div class="bc-card false">
+          <div class="bc-title">❌ 假突破的特徵</div>
+          <ul class="bc-points" style="list-style:none">
+            <li>✦ 突破K棒出現長上/下影線</li>
+            <li>✦ 成交量小（縮量突破幾乎都是假的）</li>
+            <li>✦ 收盤時又被拉回關鍵價位以內</li>
+            <li>✦ 突破後第二天跳空回原區間</li>
+            <li>✦ 市場沒有同步配合（獨立跑）</li>
+            <li>✦ 突破點正好是整數關卡（特別警惕）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 假突破流程圖 -->
+      <div class="sec-divider">── 如何避開假突破陷阱 ──</div>
+
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <div class="flow-num cn">1</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">等待收盤確認，不在突破瞬間追進</div>
+            <div class="flow-sub">很多假突破在盤中突破、收盤前打回。等K棒收盤後再確認，可以過濾掉80%的假突破。代價是：真突破你會晚進，但這是值得付出的代價。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num cn">2</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">看量！縮量突破幾乎都是假的</div>
+            <div class="flow-sub">真正的突破需要大量資金推動，成交量必須明顯高於最近平均水準。縮量突破代表沒有人願意在高價追，這種突破很脆弱。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num cn">3</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">等待回測（Retest）再進場</div>
+            <div class="flow-sub">真突破後，價格往往會回頭「測試」剛突破的關鍵位（原本的壓力變成支撐）。在這個回測點進場，比追突破點進場風險低很多，勝率也更高。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num cn">4</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">設定假突破停損：突破就是訊號</div>
+            <div class="flow-sub">如果你判斷是真突破並進場，但隨後價格重新跌回關鍵位以下，<strong>立刻停損</strong>。不要「等等看」——假突破一旦確認，往往會走得很遠。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <span class="insight-icon">💡</span>
+        <div class="insight-body">
+          <div class="insight-label">── 核心觀念 ──</div>
+          <div class="insight-text">「<strong>突破要靠三個條件確認：實體、量、收盤。</strong>」實體大 + 放量 + 收盤站穩 = 三個都有才是真突破。缺一個，降低信心；缺兩個，高度警惕假突破。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 6 ── 關鍵型態大全
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec6">
+    <div class="section-header">
+      <span class="section-num">SEC 06</span>
+      <span class="section-title">關鍵K棒型態大全：不背名字，學會看本質</span>
+      <span class="section-icon">📖</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">K棒型態有幾十種，但市場上真正有用的只有那幾個。重點不是背名字，而是理解<strong>每個型態背後的多空邏輯</strong>：誰在贏、為什麼形成、何時會失效。</p>
+
+      <div class="sec-divider">── 多方訊號型態 ──</div>
+
+      <div class="pattern-grid">
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bull">多方</span>
+            <span class="pattern-name">錘子線（Hammer）</span>
+          </div>
+          <div class="pattern-desc">下跌後出現，有長下影線、幾乎沒有上影線的小實體。空方試圖繼續打低，但被多方大力承接。</div>
+          <div class="pattern-key">🔑 本質：空方進攻失敗，多方在低點控場。低位出現更有效，需次日確認。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bull">多方</span>
+            <span class="pattern-name">看漲吞噬（Bullish Engulfing）</span>
+          </div>
+          <div class="pattern-desc">前一根是綠棒，後一根是更大的紅棒，完全包住前一根。多方一口氣吞掉昨日空方的全部成果。</div>
+          <div class="pattern-key">🔑 本質：多方力量突然爆發，逆轉局勢。吞噬越大，訊號越強。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bull">多方</span>
+            <span class="pattern-name">晨星（Morning Star）</span>
+          </div>
+          <div class="pattern-desc">三根K棒：大綠棒 → 小十字星 → 大紅棒。先跌、再猶豫、再強力反彈。</div>
+          <div class="pattern-key">🔑 本質：下跌動能耗盡 → 市場迷茫 → 多方接手。三步驟完整的底部反轉。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bull">多方</span>
+            <span class="pattern-name">三個白兵（Three White Soldiers）</span>
+          </div>
+          <div class="pattern-desc">連續三根大紅棒，每根收盤價都高於前一根，且開盤在前一根實體中段附近。</div>
+          <div class="pattern-key">🔑 本質：多方持續有序推進，但若出現在高點，小心過度延伸後的急跌。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">── 空方訊號型態 ──</div>
+
+      <div class="pattern-grid">
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bear">空方</span>
+            <span class="pattern-name">射擊之星（Shooting Star）</span>
+          </div>
+          <div class="pattern-desc">上漲後出現，有長上影線、幾乎沒有下影線的小實體。多方衝高後被空方強力打壓。</div>
+          <div class="pattern-key">🔑 本質：多方進攻失敗，空方在高點取得主導。高位出現才有意義。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bear">空方</span>
+            <span class="pattern-name">看跌吞噬（Bearish Engulfing）</span>
+          </div>
+          <div class="pattern-desc">前一根是紅棒，後一根是更大的綠棒，完全包住前一根。空方力量突然爆發。</div>
+          <div class="pattern-key">🔑 本質：高位出現更危險。吞噬的實體越大、量越大，下跌力道越強。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bear">空方</span>
+            <span class="pattern-name">黃昏之星（Evening Star）</span>
+          </div>
+          <div class="pattern-desc">三根K棒：大紅棒 → 小十字星 → 大綠棒。先漲、再猶豫、再強力下殺。</div>
+          <div class="pattern-key">🔑 本質：上漲動能耗盡 → 市場迷茫 → 空方接手。高點出現的三根反轉。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-bear">空方</span>
+            <span class="pattern-name">三隻烏鴉（Three Black Crows）</span>
+          </div>
+          <div class="pattern-desc">連續三根大綠棒，每根收盤都低於前一根。空方持續有序推進。</div>
+          <div class="pattern-key">🔑 本質：下跌趨勢啟動的強烈訊號。若出現在長期低點，注意可能過度延伸。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">── 中性/轉折型態 ──</div>
+
+      <div class="pattern-grid">
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-neutral">轉折</span>
+            <span class="pattern-name">十字星（Doji）</span>
+          </div>
+          <div class="pattern-desc">開盤與收盤幾乎相同，有上下影線。多空完全均衡，誰都沒有主導。</div>
+          <div class="pattern-key">🔑 本質：市場在等待決策。通常需要下一根K棒確認方向，不能單獨判斷。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-warn">警示</span>
+            <span class="pattern-name">紡錘線（Spinning Top）</span>
+          </div>
+          <div class="pattern-desc">小實體加上相對稱的上下影線。雙方都有試探，但誰也沒有主導。</div>
+          <div class="pattern-key">🔑 本質：猶豫不決。在趨勢中出現通常是趨勢暫停而非反轉，繼續觀察。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-neutral">轉折</span>
+            <span class="pattern-name">孕線（Harami）</span>
+          </div>
+          <div class="pattern-desc">大K棒後跟著一根完全被包在大棒實體內的小K棒。市場動能急速收縮。</div>
+          <div class="pattern-key">🔑 本質：強勢方突然失去力道。後續方向需要看下一根K棒的突破方向。</div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-card-top">
+            <span class="pattern-badge pb-warn">警示</span>
+            <span class="pattern-name">長腿十字（Long Legged Doji）</span>
+          </div>
+          <div class="pattern-desc">上下影線都很長的十字星。雙方激烈交戰但最終回到原點，市場極度不確定。</div>
+          <div class="pattern-key">🔑 本質：高度不確定性。常出現在重要轉折點前，是大行情啟動的前兆。</div>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <span class="insight-icon">⚠️</span>
+        <div class="insight-body">
+          <div class="insight-label">── 型態的三個限制 ──</div>
+          <div class="insight-text">
+            <strong>① 位置比型態重要：</strong> 同樣的錘子線，在下降趨勢末端有效，在上漲中段出現只是回調。<br/>
+            <strong>② 型態需要確認：</strong> 幾乎所有型態都需要下一根K棒來「確認」，不要搶在確認前行動。<br/>
+            <strong>③ 量能是靈魂：</strong> 無量的型態可信度大幅降低，特別是反轉型態必須放量才有說服力。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 7 ── 實戰解題
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec7">
+    <div class="section-header">
+      <span class="section-num">SEC 07</span>
+      <span class="section-title">實戰解題：真實情境的K棒判讀演練</span>
+      <span class="section-icon">🔬</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">理論學完，現在進入最重要的部分：<strong>實戰情境分析</strong>。以下每個案例都模擬真實市場中的K棒序列，按照系統性步驟解讀。</p>
+
+      <!-- 案例1 -->
+      <div class="shadow-line" style="margin-bottom:20px">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">▌ 案例一：高位出現射擊之星後的操作</div>
+          <div class="sl-text">
+            <strong>情境：</strong> 某股連漲三週後，突然出現一根長上影線、小實體的紅棒（射擊之星），成交量比前幾天縮小。<br/><br/>
+            <strong>判讀步驟：</strong><br/>
+            ① 位置：高位（連漲後）→ 反轉型態有效性高<br/>
+            ② 型態：射擊之星 → 多方衝高失敗，空方反撲<br/>
+            ③ 量能：縮量 → 多方力道不足，突破無法持續<br/>
+            ④ 結論：<span style="color:var(--red)">警戒！這是空方反撲的早期訊號</span><br/><br/>
+            <strong>操作策略：</strong> 已持有多單者考慮減倉保護利潤；等下一根K棒確認（若出現大綠棒或跌破前支撐則進一步減倉）；不在此時新增多倉。
+          </div>
+        </div>
+      </div>
+
+      <!-- 案例2 -->
+      <div class="shadow-line" style="margin-bottom:20px">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">▌ 案例二：下跌趨勢中的錘子線</div>
+          <div class="sl-text">
+            <strong>情境：</strong> 某股下跌了一個月，某日出現長下影線（影線為實體3倍以上）的小紅棒（錘子線），成交量明顯放大。<br/><br/>
+            <strong>判讀步驟：</strong><br/>
+            ① 位置：低位（持續下跌後）→ 底部反轉型態有效性高<br/>
+            ② 型態：錘子線 → 空方殺低失敗，多方大力承接<br/>
+            ③ 量能：放量 → 大量資金在此進場，有意義<br/>
+            ④ 結論：<span style="color:var(--green)">多方承接訊號！但需等確認</span><br/><br/>
+            <strong>操作策略：</strong> 等待下一根K棒確認（若為紅棒且收盤高於錘子線實體上方）再進場；進場點設在確認K棒收盤附近；停損設在錘子線最低點以下。
+          </div>
+        </div>
+      </div>
+
+      <!-- 案例3 -->
+      <div class="shadow-line" style="margin-bottom:20px">
+        <div class="sl-side neu"></div>
+        <div class="sl-body">
+          <div class="sl-top neu">▌ 案例三：假突破識別與因應</div>
+          <div class="sl-text">
+            <strong>情境：</strong> 股價在60元附近盤整2週，某日突然跳高至63元（突破盤整區），但到收盤時拉回至59元，形成長上影線、實體偏小的K棒，成交量普通。<br/><br/>
+            <strong>判讀步驟：</strong><br/>
+            ① 突破後收盤回到壓力位以下 → 假突破特徵<br/>
+            ② 成交量普通，沒有爆量支持 → 缺乏推進動能<br/>
+            ③ 長上影線明確 → 高位被強力拒絕<br/>
+            ④ 結論：<span style="color:var(--yellow)">高機率假突破！誘多陷阱</span><br/><br/>
+            <strong>操作策略：</strong> 不要追60元上方的突破；若已進場應立即設好停損在60元以下；觀察接下來是否重回60元壓力區測試；假突破確認後，可能反向走低至支撐區。
+          </div>
+        </div>
+      </div>
+
+      <!-- 判斷流程圖 -->
+      <div class="sec-divider">── K棒判讀系統流程 ──</div>
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <div class="flow-num yn">①</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">先看位置（Position First）</div>
+            <div class="flow-sub">這根K棒出現在哪裡？高位？低位？趨勢中段？支撐？壓力？位置決定型態的有效性，同樣的錘子線在不同位置意義天差地別。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num yn">②</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">看K棒形態（Pattern）</div>
+            <div class="flow-sub">實體大小、影線長短、顏色。是誰在主導？多方？空方？還是誰都沒有主導（十字星）？</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num yn">③</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">確認量能（Volume）</div>
+            <div class="flow-sub">這根K棒的成交量是否支持它的外觀？大紅棒+小量=懷疑；大紅棒+大量=可信。量能是K棒訊號的放大器或消音器。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num yn">④</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">等待確認（Confirmation）</div>
+            <div class="flow-sub">幾乎所有單根K棒訊號都需要後續K棒確認。等待確認雖然犧牲了一點利潤，但能過濾大量假訊號，長期下來勝率更高。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num yn">⑤</div>
+          <div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">設定停損，執行計劃（Execute with SL）</div>
+            <div class="flow-sub">每次進場前，先確定停損位置。K棒判讀幫你找進場點，但停損保護你的資金。沒有停損的交易計劃是不完整的計劃。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 8 ── 互動測驗
+  ═══════════════════════════════════════════ -->
+  <div class="quiz-section reveal" id="sec8">
+    <div class="quiz-section-title">
+      <span style="font-size:1.3rem">🧠</span> 第二章 實力測驗
+    </div>
+
+    <!-- Q1 -->
+    <div class="quiz-block" id="q1">
+      <div class="quiz-label">基礎題 1 / 7</div>
+      <div class="quiz-q">台股中，一根「大紅棒」代表什麼？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q1','A','A')"><span class="quiz-letter">A</span>收盤大於開盤，且差距很大，代表多方強力主導</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','A','B')"><span class="quiz-letter">B</span>收盤小於開盤，空方主導，跌幅很大</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','A','C')"><span class="quiz-letter">C</span>成交量很大，但方向不確定</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','A','D')"><span class="quiz-letter">D</span>當天沒有波動，市場靜止</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-block" id="q2" style="margin-top:24px">
+      <div class="quiz-label">基礎題 2 / 7</div>
+      <div class="quiz-q">一根K棒出現了很長的「上影線」，這代表什麼？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q2','B','A')"><span class="quiz-letter">A</span>多方力量非常強，持續推高價格</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','B','B')"><span class="quiz-letter">B</span>多方試圖攻高，但被空方強力擊回，多方進攻失敗</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','B','C')"><span class="quiz-letter">C</span>代表成交量創新高</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','B','D')"><span class="quiz-letter">D</span>下影線等於零，市場單邊下跌</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-block" id="q3" style="margin-top:24px">
+      <div class="quiz-label">進階題 3 / 7</div>
+      <div class="quiz-q">以下哪種組合，最可能是「真突破」而非假突破？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q3','C','A')"><span class="quiz-letter">A</span>盤中突破、收盤前拉回、成交量普通</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','C','B')"><span class="quiz-letter">B</span>長上影線突破、實體極小、縮量</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','C','C')"><span class="quiz-letter">C</span>大紅棒收盤明確站上壓力位、成交量爆增、次日開盤延伸</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','C','D')"><span class="quiz-letter">D</span>只突破整數關卡一點點，但成交量普通</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-block" id="q4" style="margin-top:24px">
+      <div class="quiz-label">進階題 4 / 7</div>
+      <div class="quiz-q">在下跌趨勢末端出現「錘子線」（長下影線+小實體），你應該怎麼做？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q4','C','A')"><span class="quiz-letter">A</span>看到錘子線馬上買進，因為底部已到</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','B')"><span class="quiz-letter">B</span>忽略它，繼續等待，K棒型態沒有意義</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','C')"><span class="quiz-letter">C</span>等待下一根K棒確認（出現紅棒），再配合量能決定是否進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','D')"><span class="quiz-letter">D</span>立刻放空，因為下跌趨勢沒有結束</div>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-block" id="q5" style="margin-top:24px">
+      <div class="quiz-label">進階題 5 / 7</div>
+      <div class="quiz-q">連續三根紅棒後，出現一根「十字星」（開收盤幾乎相同），你的判斷是？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q5','B','A')"><span class="quiz-letter">A</span>十字星等於上漲確認，應該追高</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','B')"><span class="quiz-letter">B</span>上漲動能可能在減弱，市場猶豫。需要觀察下一根K棒，警戒可能的回調</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','C')"><span class="quiz-letter">C</span>十字星沒有任何意義，可以忽略</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','D')"><span class="quiz-letter">D</span>確定是底部，趕快補倉</div>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-block" id="q6" style="margin-top:24px">
+      <div class="quiz-label">實戰題 6 / 7</div>
+      <div class="quiz-q">你持有一支股票，進場後上漲了12%。昨天出現一根「看跌吞噬」（大綠棒吞噬前一根紅棒），成交量比平均大50%，現在仍在上漲趨勢中，你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q6','A','A')"><span class="quiz-letter">A</span>減倉保護部分利潤，並把停利點上移；等待確認再決定是否全部離場</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','A','B')"><span class="quiz-letter">B</span>繼續持有，一根K棒不代表什麼，長線不要動搖</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','A','C')"><span class="quiz-letter">C</span>立刻全部賣出，因為趨勢已經結束</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','A','D')"><span class="quiz-letter">D</span>加碼買進，趁回調便宜補</div>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-block" id="q7" style="margin-top:24px">
+      <div class="quiz-q">以下哪個說法是錯的？</div>
+      <div class="quiz-label">觀念題 7 / 7</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q7','D','A')"><span class="quiz-letter">A</span>台股紅棒代表上漲，綠棒代表下跌</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','B')"><span class="quiz-letter">B</span>下影線越長，代表多方承接力道越強</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','C')"><span class="quiz-letter">C</span>真突破通常伴隨放量，假突破通常成交量普通或縮量</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','D')"><span class="quiz-letter">D</span>只要出現錘子線，就可以立刻進場買進，不需要等確認</div>
+      </div>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- Final Score -->
+    <div id="finalScore" style="display:none;margin-top:32px;padding:28px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(178,102,255,.05));border:1px solid rgba(0,229,255,.2);text-align:center">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--accent);margin-bottom:10px">── 第二章 最終成績 ──</div>
+      <div id="scoreNum" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--accent);text-shadow:0 0 30px rgba(0,229,255,.4)"></div>
+      <div id="scoreMsg" style="font-size:.88rem;color:var(--text-dim);margin-top:12px;line-height:1.75"></div>
+    </div>
+  </div>
+
+  <!-- ── CHAPTER FOOTER ── -->
+  <div class="chapter-footer">
+    <div class="footer-info">
+      <strong>第二章完成 ✅</strong><br>
+      你已掌握K棒解剖、力道判讀、影線含義、節奏識別、假突破識別與關鍵型態。<br>
+      下一章：趨勢與結構——高低點的秘密語言
+    </div>
+    <a class="next-btn" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      第三章 即將推出
+    </a>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+// SHADOW DETECTOR
+// ═══════════════════════════════════════════════
+const shadowMap = {
+  'long-upper': '<strong>長上影線 / 短下影線：</strong> 多方試圖攻高，但最終被空方打回。這是多方進攻失敗的痕跡。<br/>📍 高位出現 → 警惕頂部反轉；📍 低位出現 → 通常只是短暫上試，不一定反轉；📍 盤整中出現 → 壓力位確認，突破難度高',
+  'long-lower': '<strong>短上影線 / 長下影線：</strong> 空方試圖殺低，但被多方強力承接回來。這是空方進攻失敗的痕跡。<br/>📍 低位出現 → 錘子線型態，多方承接訊號；📍 高位出現 → 注意假反彈，需確認；📍 盤整中出現 → 支撐位確認，下破難度高',
+  'both-long':  '<strong>上下影線都長：</strong> 多空雙方激烈交戰，你來我往，最終回到接近中間位置。市場極度猶豫和不確定。<br/>📍 通常出現在重要支撐/壓力交叉點；📍 常見在重大消息發布前後；📍 需等待後續方向確認，不要在此位置貿然操作',
+  'no-shadow':  '<strong>幾乎沒有影線：</strong> 一方從頭到尾主導整根K棒，幾乎沒有被打到影線的程度。這是最「乾淨」的力量展現。<br/>📍 大紅棒無上影線 → 多方壓倒性勝利，上升趨勢極強；📍 大綠棒無下影線 → 空方壓倒性勝利，下跌趨勢極強；📍 代表市場共識高，方向明確',
+  'gravestone': '<strong>墓碑十字（全上影線）：</strong> 開盤=收盤=最低，但盤中曾大幅拉高。多方最後一搏失敗，全部退回原點。<br/>📍 高位出現 → 強烈看跌訊號，頂部反轉警報；📍 是典型的「多方彈盡糧絕」型態；📍 需配合量能：若放量更危險，代表主力在高點出貨',
+  'dragonfly':  '<strong>蜻蜓十字（全下影線）：</strong> 開盤=收盤=最高，但盤中曾大幅殺低。空方全面進攻最終被多方完全消化。<br/>📍 低位出現 → 強烈看漲訊號，底部反轉警報；📍 是典型的「空方彈盡糧絕」型態；📍 出現時若爆量，說明有大量多方資金在低點進場承接，反彈力道可能強烈'
+};
+
+function selectShadow(el) {
+  document.querySelectorAll('.detector-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  const type = el.dataset.type;
+  document.getElementById('shadowOutput').innerHTML = shadowMap[type] || '...';
+}
+
+// ═══════════════════════════════════════════════
+// RHYTHM SIMULATOR
+// ═══════════════════════════════════════════════
+const rhythmData = {
+  uptrend: {
+    candles: [
+      {o:155,c:148,h:156,l:145,color:'#00e676'},
+      {o:148,c:162,h:164,l:147,color:'#ff3d5a'},
+      {o:162,c:158,h:164,l:155,color:'#00e676'},
+      {o:158,c:175,h:177,l:157,color:'#ff3d5a'},
+      {o:175,c:170,h:176,l:167,color:'#00e676'},
+      {o:170,c:188,h:191,l:169,color:'#ff3d5a'},
+      {o:188,c:185,h:190,l:182,color:'#00e676'},
+      {o:185,c:198,h:201,l:184,color:'#ff3d5a'},
+      {o:198,c:195,h:200,l:192,color:'#00e676'},
+      {o:195,c:210,h:213,l:194,color:'#ff3d5a'},
+    ],
+    desc: '<strong>上升趨勢：</strong> 紅棒主導，每次回調（綠棒）幅度小且快速，隨後更大紅棒繼續推升。高點持續創新高。操作思路：等回調的小綠棒結束後進場，不追高。'
+  },
+  downtrend: {
+    candles: [
+      {o:200,c:188,h:202,l:186,color:'#00e676'},
+      {o:188,c:193,h:195,l:187,color:'#ff3d5a'},
+      {o:193,c:178,h:194,l:176,color:'#00e676'},
+      {o:178,c:182,h:183,l:177,color:'#ff3d5a'},
+      {o:182,c:165,h:183,l:163,color:'#00e676'},
+      {o:165,c:169,h:170,l:164,color:'#ff3d5a'},
+      {o:169,c:154,h:170,l:152,color:'#00e676'},
+      {o:154,c:157,h:158,l:153,color:'#ff3d5a'},
+      {o:157,c:143,h:158,l:141,color:'#00e676'},
+      {o:143,c:147,h:148,l:142,color:'#ff3d5a'},
+    ],
+    desc: '<strong>下降趨勢：</strong> 綠棒主導，每次反彈（紅棒）幅度小且短暫，隨後更大綠棒繼續下殺。低點持續創新低。操作思路：不接刀，等到止跌訊號出現後再觀察。'
+  },
+  consolidation: {
+    candles: [
+      {o:170,c:175,h:180,l:168,color:'#ff3d5a'},
+      {o:175,c:168,h:178,l:165,color:'#00e676'},
+      {o:168,c:174,h:181,l:166,color:'#ff3d5a'},
+      {o:174,c:169,h:176,l:164,color:'#00e676'},
+      {o:169,c:173,h:182,l:167,color:'#ff3d5a'},
+      {o:173,c:167,h:175,l:163,color:'#00e676'},
+      {o:167,c:172,h:180,l:165,color:'#ff3d5a'},
+      {o:172,c:168,h:174,l:162,color:'#00e676'},
+      {o:168,c:174,h:183,l:166,color:'#ff3d5a'},
+      {o:174,c:170,h:176,l:164,color:'#00e676'},
+    ],
+    desc: '<strong>盤整震盪：</strong> 紅棒和綠棒大小相近，價格在固定區間反覆。高點和低點沒有突破。操作思路：不賭方向，等待明確突破信號後再進場。'
+  },
+  exhaustion: {
+    candles: [
+      {o:155,c:170,h:172,l:154,color:'#ff3d5a'},
+      {o:170,c:183,h:185,l:169,color:'#ff3d5a'},
+      {o:183,c:193,h:195,l:182,color:'#ff3d5a'},
+      {o:193,c:199,h:202,l:192,color:'#ff3d5a'},
+      {o:199,c:203,h:210,l:198,color:'#ff3d5a'},
+      {o:203,c:205,h:215,l:201,color:'#ff3d5a'},
+      {o:205,c:206,h:218,l:203,color:'#ff3d5a'},
+      {o:206,c:205,h:212,l:203,color:'#00e676'},
+      {o:205,c:202,h:208,l:199,color:'#00e676'},
+      {o:202,c:194,h:204,l:192,color:'#00e676'},
+    ],
+    desc: '<strong>動能衰竭：</strong> 注意紅棒越來越短！雖然方向仍向上，但每根紅棒的實體在縮小，上影線在增長。最後幾根開始出現綠棒。這是上漲動能衰竭、可能轉向的早期訊號。'
+  },
+  reversal: {
+    candles: [
+      {o:200,c:195,h:201,l:193,color:'#00e676'},
+      {o:195,c:188,h:196,l:186,color:'#00e676'},
+      {o:188,c:183,h:190,l:181,color:'#00e676'},
+      {o:183,c:178,h:185,l:176,color:'#00e676'},
+      {o:178,c:172,h:180,l:169,color:'#00e676'},
+      {o:172,c:168,h:174,l:160,color:'#00e676'},  // 長下影線
+      {o:168,c:173,h:175,l:167,color:'#ff3d5a'},  // 錘子確認
+      {o:173,c:182,h:184,l:172,color:'#ff3d5a'},
+      {o:182,c:191,h:193,l:181,color:'#ff3d5a'},
+      {o:191,c:199,h:201,l:190,color:'#ff3d5a'},
+    ],
+    desc: '<strong>底部反轉：</strong> 連續下跌後出現長下影線（多方承接），隨後確認紅棒，接著趨勢開始反轉向上。這是標準的底部反轉K棒序列。注意第6根的長下影線是關鍵轉折訊號。'
+  }
+};
+
+function showRhythm(key, btn) {
+  document.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const data = rhythmData[key];
+  document.getElementById('rhythmResult').innerHTML = data.desc;
+  drawRhythm(data.candles);
+}
+
+function drawRhythm(candles) {
+  const svg = document.getElementById('rhythmSvg');
+  const W = 540, H = 200, PAD = 20;
+  const prices = candles.flatMap(c => [c.h, c.l]);
+  const minP = Math.min(...prices) - 5;
+  const maxP = Math.max(...prices) + 5;
+  const scaleY = v => PAD + (1 - (v - minP) / (maxP - minP)) * (H - PAD * 2);
+  const cw = (W - PAD * 2) / candles.length;
+
+  let html = '';
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD + (H - PAD * 2) * i / 4;
+    html += `<line x1="${PAD}" y1="${y}" x2="${W - PAD}" y2="${y}" stroke="rgba(0,229,255,0.06)" stroke-width="1"/>`;
+  }
+
+  candles.forEach((c, i) => {
+    const x = PAD + i * cw + cw / 2;
+    const bodyW = cw * 0.55;
+    const oY = scaleY(c.o), cY = scaleY(c.c), hY = scaleY(c.h), lY = scaleY(c.l);
+    const top = Math.min(oY, cY), bot = Math.max(oY, cY);
+    const bodyH = Math.max(bot - top, 2);
+    const col = c.color;
+    const isFilled = c.color === '#ff3d5a';
+    html += `<line x1="${x}" y1="${hY}" x2="${x}" y2="${lY}" stroke="${col}" stroke-width="1.5"/>`;
+    if (isFilled) {
+      html += `<rect x="${x - bodyW/2}" y="${top}" width="${bodyW}" height="${bodyH}" rx="2" fill="${col}" opacity="0.9"/>`;
+    } else {
+      html += `<rect x="${x - bodyW/2}" y="${top}" width="${bodyW}" height="${bodyH}" rx="2" fill="none" stroke="${col}" stroke-width="1.8"/>`;
+    }
+  });
+  svg.innerHTML = html;
+}
+
+// Init rhythm
+drawRhythm(rhythmData.uptrend.candles);
+
+// ═══════════════════════════════════════════════
+// FORCE METER ANIMATION
+// ═══════════════════════════════════════════════
+const targets = [92, 38, 88, 95, 80];
+function animateForce() {
+  targets.forEach((t, i) => {
+    setTimeout(() => {
+      const el = document.getElementById('fb' + (i+1));
+      if (el) el.style.width = t + '%';
+    }, i * 150);
+  });
+}
+const fmObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { animateForce(); fmObserver.unobserve(e.target); }});
+}, { threshold: 0.3 });
+const fm = document.getElementById('forceMeter');
+if (fm) fmObserver.observe(fm);
+
+// ═══════════════════════════════════════════════
+// QUIZ LOGIC
+// ═══════════════════════════════════════════════
+const feedbackMap = {
+  q1: {
+    correct: '🎉 正確！台股規則：紅棒 = 收盤高於開盤（上漲），大紅棒代表多方本場大勝，上漲力道強。這和歐美市場相反，一定要記住。',
+    wrong:   '❌ 台股中，紅棒代表上漲（收盤 > 開盤），綠棒代表下跌（收盤 < 開盤）。大紅棒的實體越長，代表多方主導越徹底，上漲力道越強。'
+  },
+  q2: {
+    correct: '🎉 完全正確！長上影線 = 多方試圖攻高，被空方強力擊回。影線是被擊退的痕跡，上影線越長，代表高位空方力量越強。',
+    wrong:   '❌ 長上影線代表多方進攻高位失敗！價格曾拉高到影線頂端，但最後被打回來，說明那個高位有強大的空方力量在等待。'
+  },
+  q3: {
+    correct: '🎉 答對了！真突破三要素：大實體（強力）+ 放量（有資金支持）+ 收盤站穩 + 次日延伸。三個全中，突破可信度極高。',
+    wrong:   '❌ 真突破需要：大實體K棒（不是長影線）+ 成交量明顯放大 + 收盤確實站上壓力位 + 次日不回頭。縮量突破、長影線突破、收盤回落都是假突破的特徵。'
+  },
+  q4: {
+    correct: '🎉 完全正確！「等確認」是K棒操作最重要的原則。錘子線只是一個訊號，不是保證。等下一根紅棒確認+量能支持，勝率才會提高。',
+    wrong:   '❌ 看到錘子線就立刻買是很危險的！下跌趨勢中，一根K棒改變不了趨勢，需要等待確認：下一根出現紅棒、量能放大，才能提高進場的勝率。停損永遠設在錘子線最低點以下。'
+  },
+  q5: {
+    correct: '🎉 正確！十字星 = 多空勢均力敵，市場在猶豫。連漲後出現十字星是動能可能減弱的訊號，需要警戒後續走向，不是追高的時機。',
+    wrong:   '❌ 十字星代表多空均衡，市場在猶豫。在連漲後出現，通常代表上漲動能在消耗。不是買入訊號，也不是確定的賣出訊號，需要等待下一根K棒的方向來確認。'
+  },
+  q6: {
+    correct: '🎉 非常正確！看跌吞噬+放量是警訊，但不是必然反轉。最佳策略是：減倉保護利潤（不是全出）+ 上移停利點。讓獲利繼續跑，同時保護已有的成果。',
+    wrong:   '❌ 看跌吞噬+放量是重要警示訊號，但不一定代表趨勢立刻結束。最平衡的策略是：先減倉保護部分利潤（而不是全部賣出或繼續加碼），同時緊縮停利空間，等待下一步確認。'
+  },
+  q7: {
+    correct: '🎉 抓到了！「出現錘子線就立刻進場」是錯誤的！所有K棒型態都需要後續確認，錘子線也不例外。需等確認K棒（隔日紅棒站上錘子線實體上方）再進場，才是正確做法。',
+    wrong:   '❌ 注意！選項D才是錯的：出現錘子線不能立刻進場，必須等待確認K棒。A、B、C都是正確的觀念：台股紅=漲，長下影線=多方承接，真突破要放量。'
+  }
+};
+
+const quizScore = { q1:false, q2:false, q3:false, q4:false, q5:false, q6:false, q7:false };
+let answeredCount = 0;
+const totalQuiz = Object.keys(quizScore).length;
+
+function answer(el, quizId, correctLetter, chosenLetter) {
+  const block = document.getElementById(quizId);
+  if (block.dataset.answered) return;
+  block.dataset.answered = 'true';
+  answeredCount++;
+
+  const opts = block.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  const isCorrect = chosenLetter === correctLetter;
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    const letters = ['A','B','C','D'];
+    const ci = letters.indexOf(correctLetter);
+    if (opts[ci]) opts[ci].classList.add('correct');
+  }
+
+  const fb = document.getElementById(quizId + '-fb');
+  fb.textContent = isCorrect ? feedbackMap[quizId].correct : feedbackMap[quizId].wrong;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'fail');
+
+  quizScore[quizId] = isCorrect;
+  updateProgress();
+
+  if (answeredCount === totalQuiz) {
+    setTimeout(showFinalScore, 600);
+  }
+}
+
+function showFinalScore() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const pct = Math.round(correct / totalQuiz * 100);
+  const el = document.getElementById('finalScore');
+  const numEl = document.getElementById('scoreNum');
+  const msgEl = document.getElementById('scoreMsg');
+
+  let msg = '';
+  if (pct === 100) msg = '🏆 滿分！你對K棒的理解已超越大多數散戶。繼續前進，第三章的趨勢與結構等著你。';
+  else if (pct >= 70) msg = '🎯 優秀！你掌握了K棒分析的核心觀念。建議複習答錯的題目，確保每個判斷邏輯都清楚後再前進。';
+  else msg = '📖 繼續加油！K棒是技術分析最重要的基礎工具，建議重讀本章，特別是「假突破識別」和「型態確認」的部分。';
+
+  numEl.textContent = correct + ' / ' + totalQuiz;
+  msgEl.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS BAR
+// ═══════════════════════════════════════════════
+function updateProgress() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const scrollPct = Math.min(1, window.scrollY / (document.body.scrollHeight - window.innerHeight));
+  const quizPct = correct / totalQuiz;
+  const combined = Math.round((scrollPct * 0.5 + quizPct * 0.5) * 100);
+  document.getElementById('progressFill').style.width = combined + '%';
+  document.getElementById('progressPct').textContent = combined + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive:true });
+
+// ═══════════════════════════════════════════════
+// TOC SCROLL
+// ═══════════════════════════════════════════════
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ═══════════════════════════════════════════════
+// INTERSECTION OBSERVERS
+// ═══════════════════════════════════════════════
+const secIds = ['sec1','sec2','sec3','sec4','sec5','sec6','sec7','sec8'];
+const dotIds = ['d1','d2','d3','d4','d5','d6','d7','d8'];
+
+const tocObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      dotIds.forEach((did, i) => {
+        const dot = document.getElementById(did);
+        if (dot) dot.classList.toggle('active', secIds[i] === id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.06 });
+
+secIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    tocObserver.observe(el);
+    if (el.classList.contains('reveal')) revealObserver.observe(el);
+  }
+});
+</script>
+</body>
+</html>
