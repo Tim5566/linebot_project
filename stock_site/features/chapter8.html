@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第八章：量能與籌碼（王牌章節） — JellyStock 技術分析教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+
+    :root {
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;   /* 下跌 */
+      --red:       #ff3d5a;   /* 上漲 */
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    /* ── BG ── */
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+    }
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+
+    /* ── HEADER ── */
+    header {
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 24px 0 16px;height:58px;
+      border-bottom:1px solid rgba(0,229,255,.09);
+      background:rgba(3,6,14,.97);
+      backdrop-filter:blur(24px);
+      box-shadow:0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);
+      background-size:200% 100%;animation:headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+
+    .header-left{display:flex;align-items:center;gap:0;}
+    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .back-btn {
+      display:flex;align-items:center;gap:7px;
+      padding:6px 14px;border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      background:rgba(0,229,255,.05);
+      color:var(--text-dim);font-family:'Share Tech Mono',monospace;
+      font-size:.68rem;letter-spacing:.08em;cursor:pointer;
+      text-decoration:none;transition:all .2s;
+    }
+    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);box-shadow:0 0 14px rgba(0,229,255,.2)}
+    .back-btn svg{width:12px;height:12px;flex-shrink:0}
+    .chapter-badge {
+      font-family:'Share Tech Mono',monospace;font-size:.62rem;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.2);border-radius:8px;
+      padding:3px 10px;letter-spacing:.12em;
+    }
+
+    /* ── STICKY PROGRESS BAR ── */
+    .sticky-progress {
+      position:sticky;top:58px;z-index:190;
+      background:rgba(3,6,14,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{
+      height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));
+      box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;
+    }
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    /* ── CHAPTER SIDE NAV ── */
+    .chapter-sidenav {
+      position:fixed;left:0;top:50%;transform:translateY(-50%);
+      z-index:150;display:flex;flex-direction:column;gap:0;
+      background:rgba(3,6,14,.88);backdrop-filter:blur(20px);
+      border:1px solid rgba(0,229,255,.1);border-left:none;
+      border-radius:0 12px 12px 0;overflow:hidden;
+    }
+    .ch-nav-item {
+      display:flex;align-items:center;gap:0;
+      padding:10px 14px 10px 12px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.08em;color:var(--text-faint);
+      text-decoration:none;cursor:pointer;
+      border-left:2px solid transparent;
+      transition:all .2s;white-space:nowrap;
+      border-bottom:1px solid rgba(0,229,255,.06);
+      position:relative;overflow:hidden;
+    }
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
+    .ch-nav-item .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
+    .ch-nav-item:hover .ch-label,.ch-nav-item.active .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item:hover,.ch-nav-item:focus{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
+    .ch-nav-item.active{color:var(--accent);background:rgba(0,229,255,.09);border-left-color:var(--accent);}
+    .ch-nav-item.current-ch{color:var(--pink);border-left-color:var(--pink);background:rgba(255,110,180,.07);}
+    .ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MAIN ── */
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:36px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+
+    .hero-icon {
+      flex-shrink:0;width:110px;height:110px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);
+      border-radius:20px;position:relative;overflow:hidden;
+    }
+    .hero-icon::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at center,rgba(0,229,255,.08),transparent 70%);
+    }
+
+    .hero-content{flex:1;min-width:0;}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--accent);text-transform:uppercase;
+      opacity:.8;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(0,229,255,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;
+      border:1px solid;cursor:default;
+    }
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+
+    /* ── TOC ── */
+    .toc-strip {
+      display:flex;align-items:center;gap:0;
+      margin-bottom:44px;padding:18px 24px;
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;overflow-x:auto;
+    }
+    .toc-item {
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      min-width:72px;cursor:pointer;padding:4px 8px;border-radius:10px;
+      transition:background .2s;
+    }
+    .toc-item:hover{background:rgba(0,229,255,.08);}
+    .toc-dot {
+      width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,229,255,.25);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-faint);
+      transition:all .3s;
+    }
+    .toc-dot.active{border-color:var(--accent);background:rgba(0,229,255,.15);color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.3);}
+    .toc-lbl{font-size:.58rem;color:var(--text-faint);text-align:center;line-height:1.3;transition:color .3s;}
+    .toc-item:hover .toc-lbl{color:var(--text-dim);}
+    .toc-connector{flex:1;min-width:12px;height:1px;background:rgba(0,229,255,.12);}
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);
+      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .5s,transform .5s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .section-header {
+      display:flex;align-items:center;gap:16px;
+      padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);
+      position:relative;
+    }
+    .section-header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.35),transparent);
+    }
+    .section-num {
+      font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.2);border-radius:8px;
+      padding:4px 10px;letter-spacing:.1em;white-space:nowrap;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+      color:#fff;letter-spacing:.06em;
+    }
+    .section-icon {
+      margin-left:auto;font-size:1.4rem;opacity:.7;
+    }
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--accent);font-style:normal;font-weight:500;}
+
+    /* ── CORE INSIGHT BOX ── */
+    .insight-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.03));
+      border:1px solid rgba(0,229,255,.2);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+
+    .warn-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warn-box .insight-label{color:var(--red);}
+
+    .gold-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.03));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow);}
+
+    .purple-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));
+      border:1px solid rgba(178,102,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .purple-box .insight-label{color:var(--purple);}
+
+    /* ── CANDLESTICK DEMO SVG ── */
+    .candle-showcase {
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;
+      margin:24px 0;
+    }
+    .candle-card {
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;padding:18px 16px;text-align:center;
+      transition:all .25s;cursor:default;position:relative;overflow:hidden;
+    }
+    .candle-card:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.25);transform:translateY(-2px);}
+    .candle-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      transition:opacity .3s;opacity:0;
+    }
+    .candle-card.red-card::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+    .candle-card.green-card::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+    .candle-card.doji-card::before{background:linear-gradient(90deg,transparent,var(--yellow),transparent);}
+    .candle-card:hover::before{opacity:1;}
+
+    .candle-svg-wrap{display:flex;justify-content:center;align-items:center;height:90px;margin-bottom:12px;}
+    .candle-name{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;}
+    .candle-desc{font-size:.76rem;color:var(--text-dim);line-height:1.5;}
+
+    /* ── FORCE METER ── */
+    .force-meter-wrap{margin:24px 0;}
+    .force-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .force-label{font-size:.82rem;color:var(--text-dim);min-width:110px;}
+    .force-bar-bg{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;position:relative;}
+    .force-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+    .force-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);min-width:36px;text-align:right;}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{
+      background:rgba(0,229,255,.07);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+      padding:12px 16px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;
+    }
+    .cmp-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+      color:var(--text-dim);vertical-align:top;line-height:1.6;
+    }
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .cmp-table .val-red{color:var(--red);font-weight:600;}
+    .cmp-table .val-green{color:var(--green);font-weight:600;}
+    .cmp-table .val-yellow{color:var(--yellow);font-weight:600;}
+    .cmp-table .val-cyan{color:var(--accent);font-weight:600;}
+
+    /* ── INTERACTIVE K-BAR SIMULATOR ── */
+    .sim-wrap{
+      background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.12);
+      border-radius:16px;padding:24px;margin:24px 0;
+    }
+    .sim-title{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--accent);margin-bottom:16px;}
+    .sim-canvas{
+      width:100%;height:220px;background:#050c1a;border-radius:12px;
+      border:1px solid rgba(0,229,255,.08);margin-bottom:16px;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;
+    }
+    .sim-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+    .sim-btn {
+      padding:8px 16px;border-radius:10px;border:1px solid rgba(0,229,255,.2);
+      background:rgba(0,229,255,.06);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.08em;
+      cursor:pointer;transition:all .2s;
+    }
+    .sim-btn:hover{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.4);}
+    .sim-btn.active{background:rgba(0,229,255,.2);border-color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.25);}
+    .sim-btn.red{border-color:rgba(255,61,90,.25);background:rgba(255,61,90,.06);color:var(--red);}
+    .sim-btn.red:hover{background:rgba(255,61,90,.15);border-color:rgba(255,61,90,.5);}
+    .sim-btn.grn{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.06);color:var(--green);}
+    .sim-btn.grn:hover{background:rgba(0,230,118,.15);border-color:rgba(0,230,118,.5);}
+    .sim-result{
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      border-radius:10px;padding:14px 18px;
+      font-size:.84rem;color:var(--text-dim);line-height:1.7;min-height:52px;
+    }
+    .sim-result strong{color:var(--accent);}
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-wrap{margin:24px 0;}
+    .flow-step {
+      display:flex;align-items:flex-start;gap:16px;margin-bottom:4px;
+      padding:16px 18px;border-radius:12px;
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);
+      transition:all .2s;
+    }
+    .flow-step:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.2);}
+    .flow-num {
+      flex-shrink:0;width:28px;height:28px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;
+    }
+    .flow-num.cn{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .flow-num.rn{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .flow-num.gn{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .flow-num.yn{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .flow-arrow{flex-shrink:0;font-size:1rem;color:var(--text-faint);margin-top:0;align-self:center;}
+    .flow-content{flex:1;}
+    .flow-heading{font-size:.88rem;color:var(--text);font-weight:600;margin-bottom:4px;}
+    .flow-sub{font-size:.8rem;color:var(--text-dim);line-height:1.6;}
+
+    /* ── PATTERN GRID ── */
+    .pattern-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:24px 0;}
+    .pattern-card{
+      background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);
+      border-radius:14px;padding:20px;transition:all .25s;
+    }
+    .pattern-card:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.25);transform:translateY(-2px);}
+    .pattern-card-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .pattern-badge{
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+      padding:4px 10px;border-radius:20px;
+    }
+    .pb-bull{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .pb-bear{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .pb-warn{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .pb-neutral{background:rgba(178,102,255,.12);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .pattern-name{font-size:.88rem;color:var(--text);font-weight:600;}
+    .pattern-desc{font-size:.8rem;color:var(--text-dim);line-height:1.6;}
+    .pattern-key{
+      margin-top:10px;padding:8px 12px;border-radius:8px;
+      background:rgba(0,0,0,.2);font-size:.78rem;color:var(--text-dim);
+      border-left:2px solid rgba(0,229,255,.3);
+    }
+
+    /* ── SIGNAL DETECTOR ── */
+    .detector-wrap{
+      background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.12);
+      border-radius:16px;padding:24px;margin:24px 0;
+    }
+    .detector-title{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--accent);margin-bottom:16px;}
+    .detector-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+    .detector-item{
+      display:flex;align-items:center;gap:10px;
+      padding:12px 14px;border-radius:10px;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      cursor:pointer;transition:all .2s;user-select:none;
+    }
+    .detector-item:hover{background:rgba(0,229,255,.09);}
+    .detector-item.selected{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.35);}
+    .di-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .2s;}
+    .di-label{font-size:.82rem;color:var(--text-dim);}
+    .detector-output{
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+      border-radius:10px;padding:16px;font-size:.84rem;color:var(--text-dim);line-height:1.75;min-height:70px;
+    }
+    .detector-output strong{color:var(--accent);}
+
+    /* ── QUIZ ── */
+    .quiz-section{
+      background:linear-gradient(135deg,rgba(178,102,255,.05),rgba(0,229,255,.03));
+      border:1px solid rgba(178,102,255,.15);
+      border-radius:20px;padding:28px;margin-bottom:32px;
+    }
+    .quiz-section-title{
+      font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;
+      color:#fff;letter-spacing:.08em;margin-bottom:24px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .quiz-block{margin-bottom:28px;}
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:500;line-height:1.65;margin-bottom:14px;}
+    .quiz-options{display:flex;flex-direction:column;gap:9px;}
+    .quiz-opt {
+      display:flex;align-items:flex-start;gap:12px;
+      padding:13px 16px;border-radius:12px;
+      border:1px solid rgba(0,229,255,.1);background:rgba(0,229,255,.03);
+      cursor:pointer;transition:all .2s;font-size:.86rem;color:var(--text-dim);line-height:1.55;
+    }
+    .quiz-opt:hover:not(.disabled){background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.25);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-opt.correct{background:rgba(0,230,118,.1)!important;border-color:rgba(0,230,118,.4)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{background:rgba(255,61,90,.08)!important;border-color:rgba(255,61,90,.3)!important;color:var(--red)!important;}
+    .quiz-letter{
+      flex-shrink:0;width:22px;height:22px;border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;
+      background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);
+    }
+    .quiz-feedback{
+      margin-top:12px;padding:14px 16px;border-radius:10px;
+      font-size:.84rem;line-height:1.7;display:none;
+    }
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer {
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.12);border-radius:20px;
+      padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+      position:relative;overflow:hidden;margin-top:16px;
+    }
+    .chapter-footer::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+    }
+    .footer-info{font-size:.88rem;color:var(--text-dim);line-height:1.75;}
+    .footer-info strong{color:var(--text);}
+    .next-btn {
+      display:flex;align-items:center;gap:10px;
+      padding:12px 24px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.07);
+      color:var(--accent);font-family:'Share Tech Mono',monospace;
+      font-size:.75rem;letter-spacing:.1em;cursor:pointer;
+      text-decoration:none;transition:all .2s;white-space:nowrap;
+    }
+    .next-btn:hover{background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 20px rgba(0,229,255,.2);}
+    .next-btn svg{width:16px;height:16px;}
+
+    /* ── SHADOW LINES ── */
+    .shadow-line{
+      display:flex;align-items:stretch;gap:0;
+      margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,229,255,.1);
+    }
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.up{background:linear-gradient(180deg,var(--red),rgba(255,61,90,.4));}
+    .sl-side.dn{background:linear-gradient(180deg,var(--green),rgba(0,230,118,.4));}
+    .sl-side.neu{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.4));}
+    .sl-body{padding:16px 20px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;margin-bottom:6px;}
+    .sl-top.up{color:var(--red);}
+    .sl-top.dn{color:var(--green);}
+    .sl-top.neu{color:var(--yellow);}
+    .sl-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── DIVIDER ── */
+    .sec-divider{
+      text-align:center;margin:28px 0 22px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.3em;color:var(--text-faint);
+      display:flex;align-items:center;gap:14px;
+    }
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── HIGHLIGHT CHIP ── */
+    .chip{
+      display:inline-block;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;
+      padding:3px 10px;border-radius:6px;letter-spacing:.05em;
+      vertical-align:middle;margin:0 2px;
+    }
+    .chip-red{background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+
+    /* ── MULTI-CANDLE RHYTHM ── */
+    .rhythm-row{display:flex;gap:12px;align-items:flex-end;justify-content:center;margin:20px 0;padding:20px;background:#040b15;border-radius:12px;border:1px solid rgba(0,229,255,.08);}
+
+    /* ── TRUE VS FALSE BREAKOUT ── */
+    .breakout-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
+    .bc-card{border-radius:14px;padding:20px;text-align:center;}
+    .bc-card.true{background:rgba(255,61,90,.05);border:1px solid rgba(255,61,90,.2);}
+    .bc-card.false{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);}
+    .bc-title{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.12em;margin-bottom:12px;}
+    .bc-card.true .bc-title{color:var(--red);}
+    .bc-card.false .bc-title{color:var(--green);}
+    .bc-points{font-size:.8rem;color:var(--text-dim);line-height:1.8;text-align:left;}
+    .bc-points li{padding:2px 0;}
+
+    /* responsive */
+    @media(max-width:600px){
+      .hero{flex-direction:column;gap:20px;padding:24px;}
+      .hero-icon{width:80px;height:80px;}
+      .hero-title{font-size:1.2rem;}
+      main{padding:28px 16px 80px;}
+      .detector-grid{grid-template-columns:1fr;}
+      .breakout-compare{grid-template-columns:1fr;}
+      .candle-showcase{grid-template-columns:repeat(2,1fr);}
+    }
+  
+
+    /* ── UNIFIED EXTRAS ── */
+    /* Card header alias for ch8/older chapters */
+    .card-header{display:flex;align-items:center;gap:14px;padding:20px 26px;border-bottom:1px solid rgba(0,229,255,.08);position:relative;}
+    .card-header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+    .card-num{font-family:'Orbitron',monospace;font-size:.6rem;font-weight:700;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:7px;padding:3px 9px;letter-spacing:.1em;white-space:nowrap;}
+    .card-title{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:#fff;letter-spacing:.05em;flex:1;}
+    .card-icon{margin-left:auto;font-size:1.3rem;opacity:.7;flex-shrink:0;}
+    .card-body{padding:26px;}
+    /* prose alias */
+    .content-para{font-size:.88rem;color:var(--text-dim);line-height:1.85;margin-bottom:14px;}
+    .content-para strong{color:var(--text);font-weight:600;}
+    em.hl{font-style:normal;color:var(--accent);font-weight:600;}
+    em.hl-orange{font-style:normal;color:var(--orange);font-weight:600;}
+    em.hl-yellow{font-style:normal;color:var(--yellow);font-weight:600;}
+    em.hl-green{font-style:normal;color:var(--green);font-weight:600;}
+    em.hl-red{font-style:normal;color:var(--red);font-weight:600;}
+    em.hl-pink{font-style:normal;color:var(--pink);font-weight:600;}
+    em.hl-purple{font-style:normal;color:var(--purple);font-weight:600;}
+    /* mistake/success/case boxes */
+    .mistake-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,61,90,.07),rgba(200,20,50,.02));border:1px solid rgba(255,61,90,.22);border-radius:13px;padding:16px 20px;margin:18px 0;}
+    .mistake-box .insight-label{color:var(--red);}
+    .success-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,230,118,.07),rgba(0,150,80,.02));border:1px solid rgba(0,230,118,.22);border-radius:13px;padding:16px 20px;margin:18px 0;}
+    .success-box .insight-label{color:var(--green);}
+    .insight-quote{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--accent);display:block;margin-top:8px;letter-spacing:.04em;}
+    /* vocab */
+    .vocab-list{display:flex;flex-direction:column;gap:9px;margin:16px 0;}
+    .vocab-item{display:flex;gap:14px;align-items:flex-start;padding:13px 16px;border-radius:11px;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.09);transition:border-color .2s;}
+    .vocab-item:hover{border-color:rgba(0,229,255,.22);}
+    .vocab-term{font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px;}
+    .vocab-def{font-size:.84rem;color:var(--text-dim);line-height:1.65;}
+    .vocab-def strong{color:var(--text);}
+    /* stat cards */
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:18px 0;}
+    .stat-card{padding:16px;border-radius:13px;text-align:center;background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.1);transition:all .2s;}
+    .stat-card:hover{border-color:rgba(0,229,255,.22);transform:translateY(-2px);}
+    .stat-num{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;margin-bottom:5px;display:block;color:var(--accent);}
+    .stat-label{font-size:.72rem;color:var(--text-dim);line-height:1.5;}
+    /* flow chart */
+    .flow-chart{display:flex;flex-wrap:wrap;gap:0;align-items:center;padding:18px;background:rgba(0,0,0,.2);border-radius:13px;border:1px solid rgba(0,229,255,.09);margin:18px 0;}
+    .flow-node{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,100,200,.04));border:1px solid rgba(0,229,255,.22);border-radius:9px;padding:9px 14px;font-size:.78rem;color:var(--text);text-align:center;min-width:80px;}
+    .flow-arrow{color:var(--accent);font-size:1rem;padding:0 5px;flex-shrink:0;}
+    .flow-yes{background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(0,150,80,.05));border:1px solid rgba(0,230,118,.28);border-radius:9px;padding:8px 12px;font-size:.76rem;color:var(--green);}
+    .flow-no{background:linear-gradient(135deg,rgba(255,61,90,.1),rgba(200,20,50,.04));border:1px solid rgba(255,61,90,.25);border-radius:9px;padding:8px 12px;font-size:.76rem;color:var(--red);}
+    .flow-question{background:linear-gradient(135deg,rgba(255,214,0,.08),rgba(200,160,0,.04));border:1px solid rgba(255,214,0,.25);border-radius:9px;padding:9px 14px;font-size:.78rem;color:var(--yellow);text-align:center;}
+    .flow-break{flex-basis:100%;height:8px;}
+    /* before/after */
+    .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0;}
+    @media(max-width:520px){.ba-grid{grid-template-columns:1fr;}}
+    .ba-card{border-radius:11px;padding:16px;border:1px solid;}
+    .ba-card.before{border-color:rgba(255,61,90,.2);background:rgba(255,61,90,.04);}
+    .ba-card.after{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04);}
+    .ba-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.14em;margin-bottom:9px;font-weight:700;}
+    .before .ba-label{color:var(--red);}.after .ba-label{color:var(--green);}
+    .ba-text{font-size:.81rem;color:var(--text-dim);line-height:1.65;}
+    /* signal grid */
+    .signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0;}
+    @media(max-width:560px){.signal-grid{grid-template-columns:1fr;}}
+    /* case study */
+    .case-study{background:linear-gradient(135deg,rgba(255,214,0,.05),rgba(200,160,0,.02));border:1px solid rgba(255,214,0,.18);border-radius:14px;overflow:hidden;margin:18px 0;}
+    .case-header{background:rgba(255,214,0,.07);padding:13px 18px;border-bottom:1px solid rgba(255,214,0,.12);display:flex;align-items:center;gap:9px;}
+    .case-badge{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.14em;color:var(--yellow);background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.25);border-radius:5px;padding:2px 8px;}
+    .case-title{font-weight:700;font-size:.88rem;color:#fff;}
+    .case-body{padding:16px 18px;}
+    .case-body p{font-size:.84rem;color:var(--text-dim);line-height:1.8;margin-bottom:9px;}
+    .case-lesson{margin-top:12px;padding:11px 14px;border-radius:9px;background:rgba(178,102,255,.07);border:1px solid rgba(178,102,255,.2);font-size:.82rem;color:var(--purple);line-height:1.65;}
+    .example-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,214,0,.14);border-radius:11px;padding:14px 18px;margin:16px 0;}
+    .example-label{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:.18em;color:var(--yellow);opacity:.8;margin-bottom:7px;text-transform:uppercase;}
+    .example-box p{font-size:.85rem;line-height:1.8;color:var(--text-dim);}
+    /* vol chart */
+    .vol-chart-wrap{background:#040b15;border-radius:12px;border:1px solid rgba(0,229,255,.08);overflow:hidden;margin:18px 0;}
+    .vol-chart-title{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--text-faint);padding:10px 16px 0;}
+    /* teal color vars for ch8 */
+    :root{--teal:#00bfa5;}
+    .tag-teal{color:var(--teal);border-color:rgba(0,191,165,.3);background:rgba(0,191,165,.07);}
+    /* chapter-sidenav fix: border same as ch2 */
+    .chapter-sidenav{border:1px solid rgba(0,229,255,.12)!important;}
+    /* fnum aliases */
+    .fn-t{background:rgba(0,191,165,.12);border:1px solid rgba(0,191,165,.3);color:var(--teal);}
+    /* THEME DAY */
+    body.theme-day{
+      --bg:#ddeaf6;--surface:#f0f7ff;--surface2:#e4f0fa;
+      --accent:#1a7bbf;--green:#1a8a3c;--red:#c0392b;--yellow:#c07800;
+      --purple:#6a32b8;--pink:#b8006a;--orange:#b84c00;--teal:#00796b;
+      --muted:#7a9cb8;--text:#0a2540;--text-dim:#1e4060;--text-faint:#4a7090;
+    }
+    body.theme-day .bg-nebula{background:linear-gradient(180deg,rgba(168,212,240,.5),rgba(200,228,248,.4),transparent)!important;}
+    body.theme-day .bg-scanlines{opacity:.25!important;}
+    body.theme-day header{background:rgba(255,255,255,.94)!important;border-bottom-color:rgba(26,123,191,.16)!important;box-shadow:0 2px 18px rgba(26,100,180,.1)!important;}
+    body.theme-day header::after{background:linear-gradient(90deg,transparent,rgba(26,123,191,.6),rgba(33,150,211,.8),rgba(26,123,191,.6),transparent)!important;}
+    body.theme-day .logo-text{color:#0a2540!important;text-shadow:none!important;}
+    body.theme-day .logo-sub{color:#1a7bbf!important;}
+    body.theme-day .back-btn{color:#1e4060!important;background:rgba(26,123,191,.06)!important;border-color:rgba(26,123,191,.18)!important;}
+    body.theme-day .back-btn:hover{color:#1a7bbf!important;border-color:rgba(26,123,191,.4)!important;}
+    body.theme-day .chapter-badge{color:#1a7bbf!important;background:rgba(26,123,191,.07)!important;border-color:rgba(26,123,191,.2)!important;}
+    body.theme-day .sticky-progress{background:rgba(255,255,255,.94)!important;}
+    body.theme-day .chapter-sidenav{background:rgba(255,255,255,.92)!important;border-color:rgba(26,123,191,.2)!important;}
+    body.theme-day .ch-nav-item{color:#4a7090!important;border-bottom-color:rgba(26,123,191,.1)!important;}
+    body.theme-day .ch-nav-item:hover{color:#1a7bbf!important;background:rgba(26,123,191,.07)!important;border-left-color:rgba(26,123,191,.5)!important;}
+    body.theme-day .ch-nav-item.current-ch{color:#1a7bbf!important;border-left-color:#1a7bbf!important;background:rgba(26,123,191,.1)!important;}
+    body.theme-day .section-card{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(240,247,255,.98))!important;border-color:rgba(26,123,191,.13)!important;box-shadow:0 4px 24px rgba(26,100,180,.08)!important;}
+    body.theme-day .section-header,body.theme-day .card-header{border-bottom-color:rgba(26,123,191,.1)!important;}
+    body.theme-day .section-num,body.theme-day .card-num{color:#1a7bbf!important;background:rgba(26,123,191,.07)!important;border-color:rgba(26,123,191,.18)!important;}
+    body.theme-day .section-title,body.theme-day .card-title{color:#0a2540!important;}
+    body.theme-day .prose,body.theme-day .content-para{color:#1e4060!important;}
+    body.theme-day .prose strong,body.theme-day .content-para strong{color:#0a2540!important;}
+    body.theme-day .hero{background:rgba(255,255,255,.95)!important;border-color:rgba(26,123,191,.16)!important;}
+    body.theme-day .hero-title{background:linear-gradient(90deg,#0a2540 50%,#1a7bbf)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;}
+    body.theme-day .hero-desc{color:#1e4060!important;}
+    body.theme-day .toc-strip{background:rgba(26,123,191,.04)!important;border-color:rgba(26,123,191,.13)!important;}
+    body.theme-day .toc-dot{border-color:rgba(26,123,191,.25)!important;}
+    body.theme-day .toc-lbl{color:#4a7090!important;}
+    body.theme-day .insight-box{background:rgba(26,123,191,.06)!important;border-color:rgba(26,123,191,.2)!important;}
+    body.theme-day .insight-text{color:#0a2540!important;}
+    body.theme-day .quiz-section{background:linear-gradient(135deg,rgba(26,123,191,.05),rgba(0,229,255,.02))!important;border-color:rgba(26,123,191,.14)!important;}
+    body.theme-day .quiz-opt{background:rgba(26,123,191,.03)!important;border-color:rgba(26,123,191,.11)!important;color:#1e4060!important;}
+    body.theme-day .quiz-opt:hover:not(.disabled){background:rgba(26,123,191,.08)!important;}
+    body.theme-day .chapter-footer{background:rgba(255,255,255,.95)!important;border-color:rgba(26,123,191,.13)!important;}
+    body.theme-day .footer-info{color:#1e4060!important;}
+    body.theme-day .cmp-table th,body.theme-day .compare-table th{background:rgba(26,123,191,.07)!important;color:#1a7bbf!important;border-bottom-color:rgba(26,123,191,.15)!important;}
+    body.theme-day .cmp-table td,body.theme-day .compare-table td{color:#1e4060!important;border-bottom-color:rgba(26,123,191,.07)!important;}
+    body.theme-day .sl-body{background:rgba(26,123,191,.02)!important;}
+    body.theme-day .sl-text{color:#1e4060!important;}
+    body.theme-day .vocab-item{background:rgba(26,123,191,.03)!important;border-color:rgba(26,123,191,.1)!important;}
+    body.theme-day .vocab-def{color:#1e4060!important;}
+    body.theme-day .flow-step{background:rgba(26,123,191,.03)!important;border-color:rgba(26,123,191,.1)!important;}
+    body.theme-day .flow-sub{color:#1e4060!important;}
+    body.theme-day .sec-divider{color:#4a7090!important;}
+    body.theme-day .gold-box{background:rgba(192,120,0,.05)!important;border-color:rgba(192,120,0,.2)!important;}
+    body.theme-day .warn-box{background:rgba(192,57,43,.05)!important;border-color:rgba(192,57,43,.2)!important;}
+    body.theme-day .success-box{background:rgba(26,138,60,.05)!important;border-color:rgba(26,138,60,.2)!important;}
+    body.theme-day .purple-box{background:rgba(106,50,184,.05)!important;border-color:rgba(106,50,184,.2)!important;}
+    body.theme-day .purple-box .insight-label{color:#6a32b8!important;}
+    body.theme-day .gold-box .insight-label{color:#c07800!important;}
+    body.theme-day .warn-box .insight-label{color:#c0392b!important;}
+
+
+    
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    
+    
+    
+
+    /* ── BG ── */
+    
+    
+
+    /* ── HEADER ── */
+    
+    
+    to{background-position:200% 0}}
+    
+    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
+    
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    
+    
+    
+    
+    
+    .back-btn svg{width:12px;height:12px;flex-shrink:0}
+    
+
+    /* ── STICKY PROGRESS ── */
+    
+    
+    
+    
+    
+    
+
+    /* ── SIDE NAV ── */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    /* ── MAIN ── */
+    
+
+    /* ── HERO ── */
+    .hero{display:flex;align-items:center;gap:36px;margin-bottom:56px;background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));border:1px solid rgba(178,102,255,.18);border-radius:24px;padding:36px 40px;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),rgba(255,152,0,.9),var(--purple),transparent);background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;}
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero::after{content:'CH.08';position:absolute;right:24px;bottom:-16px;font-family:'Orbitron',monospace;font-size:6rem;font-weight:900;color:rgba(178,102,255,.04);pointer-events:none;line-height:1;}
+    .hero-jelly{flex-shrink:0;width:130px;height:130px;position:relative;}
+    .jelly-svg{width:100%;height:100%;}
+    .hero-content{flex:1;min-width:0;}
+    .hero-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.35em;color:var(--purple);text-transform:uppercase;opacity:.85;margin-bottom:8px;}
+    .hero-title{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;line-height:1.25;letter-spacing:.04em;margin-bottom:12px;background:linear-gradient(90deg,#fff 40%,rgba(178,102,255,.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(178,102,255,.2));}
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:4px 12px;border-radius:20px;letter-spacing:.08em;border:1px solid;cursor:default;}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+
+    /* ── KEY CONCEPT ── */
+    .key-concept{text-align:center;padding:24px 28px;margin:28px 0;background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(178,102,255,.02));border:1px solid rgba(178,102,255,.22);border-radius:16px;position:relative;overflow:hidden;}
+    .key-concept::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),var(--orange),var(--purple),transparent);animation:borderGlow 3s ease-in-out infinite;}
+    @keyframes borderGlow{0%,100%{opacity:.25}50%{opacity:1}}
+    .key-concept-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.25em;color:var(--purple);opacity:.7;text-transform:uppercase;margin-bottom:10px;}
+    .key-concept-text{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:var(--purple);letter-spacing:.04em;line-height:1.5;text-shadow:0 0 30px rgba(178,102,255,.3);}
+
+    /* ── SECTION CARD ── */
+    .section-card{background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));border:1px solid rgba(178,102,255,.1);border-radius:20px;margin-bottom:32px;overflow:hidden;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(178,102,255,.02);}
+    .section-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(178,102,255,.5),rgba(255,152,0,.4),transparent);animation:borderGlow 4s ease-in-out infinite;}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    .card-
+    .card-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;background:linear-gradient(135deg,rgba(178,102,255,.15),rgba(80,30,0,.07));border:1px solid rgba(178,102,255,.28);font-size:1.4rem;}
+    .card-title-wrap{flex:1;}
+    .card-num{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--purple);opacity:.75;margin-bottom:3px;}
+    .card-title{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:.04em;}
+    .card-
+
+    /* ── TEXT ── */
+    .content-para{font-size:.9rem;line-height:1.85;color:var(--text);margin-bottom:18px;}
+    .content-para:last-child{margin-bottom:0;}
+    em.hl{font-style:normal;color:var(--purple);font-weight:600;}
+    em.hl-orange{font-style:normal;color:var(--orange);font-weight:600;}
+    em.hl-yellow{font-style:normal;color:var(--yellow);font-weight:600;}
+    em.hl-green{font-style:normal;color:var(--green);font-weight:600;}
+    em.hl-red{font-style:normal;color:var(--red);font-weight:600;}
+    em.hl-pink{font-style:normal;color:var(--pink);font-weight:600;}
+
+    /* ── INSIGHT / MISTAKE / GOLD / CASE ── */
+    .insight-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(100,40,200,.04));border:1px solid rgba(178,102,255,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .insight-icon{font-size:1.4rem;flex-shrink:0;padding-top:2px;}
+    .insight-text{font-size:.88rem;line-height:1.8;color:var(--text);}
+    .insight-quote{font-family:'Orbitron',monospace;font-size:.78rem;color:var(--purple);display:block;margin-top:8px;letter-spacing:.04em;}
+    .mistake-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,61,90,.07),rgba(200,20,50,.03));border:1px solid rgba(255,61,90,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .mistake-box .insight-text{color:var(--text-dim);}
+    .gold-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(200,120,0,.03));border:1px solid rgba(255,214,0,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .gold-box .insight-text{color:var(--text);}
+    .success-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,230,118,.07),rgba(0,150,80,.03));border:1px solid rgba(0,230,118,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .success-box .insight-text{color:var(--text);}
+    .example-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,214,0,.15);border-radius:12px;padding:16px 20px;margin:18px 0;position:relative;}
+    .example-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--yellow);opacity:.8;margin-bottom:8px;text-transform:uppercase;}
+    .example-box p{font-size:.87rem;line-height:1.8;color:var(--text-dim);}
+    .example-box p strong{color:var(--text);}
+    .case-study{background:linear-gradient(135deg,rgba(255,214,0,.05),rgba(200,160,0,.02));border:1px solid rgba(255,214,0,.18);border-radius:16px;overflow:hidden;margin:20px 0;}
+    .case-
+    .case-badge{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--yellow);background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.25);border-radius:6px;padding:2px 8px;}
+    .case-title{font-weight:700;font-size:.9rem;color:#fff;}
+    .case-
+    .case-body p{font-size:.86rem;color:var(--text-dim);line-height:1.8;margin-bottom:10px;}
+    .case-body p:last-child{margin-bottom:0;}
+    .case-lesson{margin-top:14px;padding:12px 16px;border-radius:10px;background:rgba(178,102,255,.07);border:1px solid rgba(178,102,255,.2);font-size:.84rem;color:var(--purple);line-height:1.65;}
+
+    /* ── VOCAB LIST ── */
+    .vocab-list{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+    .vocab-item{display:flex;gap:16px;align-items:flex-start;padding:14px 18px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid rgba(178,102,255,.1);transition:border-color .2s;}
+    .vocab-item:hover{border-color:rgba(178,102,255,.28);}
+    .vocab-term{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--purple);font-weight:700;flex-shrink:0;min-width:90px;}
+    .vocab-def{font-size:.86rem;color:var(--text-dim);line-height:1.65;}
+    .vocab-def strong{color:var(--text);}
+
+    /* ── COMPARE TABLE ── */
+    .compare-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.83rem;}
+    .compare-table th{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.1em;color:var(--purple);text-transform:uppercase;padding:10px 16px;border-bottom:1px solid rgba(178,102,255,.22);text-align:left;background:rgba(178,102,255,.05);}
+    .compare-table td{padding:11px 16px;border-bottom:1px solid rgba(178,102,255,.06);color:var(--text-dim);line-height:1.65;}
+    .compare-table tr:hover td{background:rgba(178,102,255,.025);}
+    .val-up{color:var(--red);font-weight:600;}
+    .val-dn{color:var(--green);font-weight:600;}
+    .val-purple{color:var(--purple);font-weight:600;}
+    .val-yellow{color:var(--yellow);font-weight:600;}
+    .val-orange{color:var(--orange);font-weight:600;}
+
+    /* ── FLOW CHART ── */
+    .flow-chart{display:flex;flex-wrap:wrap;gap:0;align-items:center;padding:20px;background:rgba(0,0,0,.2);border-radius:14px;border:1px solid rgba(178,102,255,.1);margin:20px 0;}
+    .flow-node{background:linear-gradient(135deg,rgba(178,102,255,.1),rgba(80,30,120,.07));border:1px solid rgba(178,102,255,.28);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--text);text-align:center;min-width:90px;}
+    .flow-arrow{color:var(--purple);font-size:1.1rem;padding:0 6px;flex-shrink:0;}
+    .flow-yes{background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(0,150,80,.06));border:1px solid rgba(0,230,118,.3);border-radius:10px;padding:9px 14px;font-size:.78rem;color:var(--green);}
+    .flow-no{background:linear-gradient(135deg,rgba(255,61,90,.1),rgba(200,20,50,.05));border:1px solid rgba(255,61,90,.28);border-radius:10px;padding:9px 14px;font-size:.78rem;color:var(--red);}
+    .flow-question{background:linear-gradient(135deg,rgba(255,214,0,.1),rgba(200,160,0,.05));border:1px solid rgba(255,214,0,.3);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--yellow);text-align:center;}
+    .flow-break{flex-basis:100%;height:8px;}
+
+    /* ── STAT CARDS ── */
+    .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+    @media(max-width:480px){.stat-row{grid-template-columns:1fr 1fr;}}
+    .stat-card{padding:18px 16px;border-radius:14px;text-align:center;background:rgba(0,0,0,.25);border:1px solid rgba(178,102,255,.12);transition:border-color .2s,transform .2s;}
+    .stat-card:hover{border-color:rgba(178,102,255,.28);transform:translateY(-2px);}
+    .stat-num{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;margin-bottom:4px;display:block;}
+    .stat-label{font-size:.72rem;color:var(--text-dim);line-height:1.5;}
+
+    /* ── BEFORE / AFTER ── */
+    .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+    @media(max-width:520px){.ba-grid{grid-template-columns:1fr;}}
+    .ba-card{border-radius:12px;padding:18px;border:1px solid;}
+    .ba-card.before{border-color:rgba(255,61,90,.2);background:rgba(255,61,90,.04);}
+    .ba-card.after{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04);}
+    .ba-label{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;margin-bottom:10px;font-weight:700;}
+    .before .ba-label{color:var(--red);}.after .ba-label{color:var(--green);}
+    .ba-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+    .ba-text strong{color:var(--text);}
+
+    /* ── SIGNAL GRID (3 levels) ── */
+    .signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+    @media(max-width:560px){.signal-grid{grid-template-columns:1fr;}}
+    .signal-card{border-radius:14px;padding:20px;border:1px solid;text-align:center;transition:transform .2s,border-color .25s;cursor:default;}
+    .signal-card:hover{transform:translateY(-3px);}
+    .signal-card.lv1{border-color:rgba(255,214,0,.22);background:rgba(255,214,0,.04);}
+    .signal-card.lv2{border-color:rgba(255,152,0,.22);background:rgba(255,152,0,.04);}
+    .signal-card.lv3{border-color:rgba(255,61,90,.22);background:rgba(255,61,90,.04);}
+    .signal-icon{font-size:2rem;margin-bottom:10px;}
+    .signal-title{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.1em;font-weight:700;margin-bottom:8px;}
+    .signal-card.lv1 .signal-title{color:var(--yellow);}
+    .signal-card.lv2 .signal-title{color:var(--orange);}
+    .signal-card.lv3 .signal-title{color:var(--red);}
+    .signal-desc{font-size:.8rem;color:var(--text-dim);line-height:1.65;}
+    .signal-badge{display:inline-block;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 10px;border-radius:20px;}
+    .signal-card.lv1 .signal-badge{color:var(--yellow);background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.25);}
+    .signal-card.lv2 .signal-badge{color:var(--orange);background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.25);}
+    .signal-card.lv3 .signal-badge{color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.25);}
+
+    /* ── VOLUME CHART SVG AREA ── */
+    .vol-chart-wrap{background:rgba(0,0,0,.25);border:1px solid rgba(178,102,255,.12);border-radius:14px;padding:20px;margin:20px 0;}
+    .vol-chart-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--purple);margin-bottom:14px;opacity:.8;}
+
+    /* ── INTERACTIVE: QUIZ ── */
+    .quiz-block{background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(120,60,200,.04));border:1px solid rgba(178,102,255,.22);border-radius:16px;padding:24px;margin-top:28px;}
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.22em;color:var(--purple);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .quiz-label::before{content:'⚡';}
+    .quiz-q{font-size:.92rem;font-weight:600;color:#fff;margin-bottom:16px;line-height:1.6;}
+    .quiz-options{display:flex;flex-direction:column;gap:8px;}
+    .quiz-opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;border:1px solid rgba(178,102,255,.15);background:rgba(178,102,255,.04);font-size:.87rem;color:var(--text-dim);transition:all .2s;user-select:none;}
+    .quiz-opt:hover:not(.disabled){background:rgba(178,102,255,.1);border-color:rgba(178,102,255,.35);color:var(--text);}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.5)!important;background:rgba(0,230,118,.1)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{border-color:rgba(255,61,90,.5)!important;background:rgba(255,61,90,.1)!important;color:var(--red)!important;}
+    .quiz-opt.disabled{cursor:default;pointer-events:none;}
+    .quiz-letter{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;border:1px solid rgba(178,102,255,.35);color:var(--purple);background:rgba(178,102,255,.08);}
+    .quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.85rem;line-height:1.7;display:none;}
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.25);color:#ff8fa0;}
+
+    /* ── INTERACTIVE: 量能情境模擬 ── */
+    .scenario-block{background:rgba(0,0,0,.25);border:1px solid rgba(178,102,255,.15);border-radius:16px;padding:24px;margin:24px 0;}
+    .scenario-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--purple);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+    .scenario-title::before{content:'🔬';}
+    .sc-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+    .sc-btn{font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:9px 18px;border-radius:10px;cursor:pointer;border:1px solid rgba(178,102,255,.28);background:rgba(178,102,255,.05);color:var(--text-dim);transition:all .2s;letter-spacing:.06em;}
+    .sc-btn:hover{border-color:rgba(178,102,255,.5);color:var(--purple);background:rgba(178,102,255,.1);}
+    .sc-btn.active-sc{border-color:var(--purple);color:var(--purple);background:rgba(178,102,255,.15);box-shadow:0 0 12px rgba(178,102,255,.2);}
+    .sc-result{background:rgba(0,0,0,.3);border:1px solid rgba(178,102,255,.12);border-radius:12px;padding:18px;min-height:90px;font-size:.87rem;line-height:1.8;color:var(--text-dim);transition:all .3s;}
+    .sc-result strong{color:var(--text);}
+
+    /* ── CHECKLIST ── */
+    .checklist{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+    .check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:10px;background:rgba(178,102,255,.03);border:1px solid rgba(178,102,255,.1);}
+    .check-icon{font-size:1rem;flex-shrink:0;padding-top:1px;}
+    .check-text{font-size:.86rem;color:var(--text);line-height:1.65;}
+    .check-text strong{color:var(--purple);}
+
+    /* ── JELLY TIP ── */
+    .jelly-tip{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;margin:22px 0;background:linear-gradient(135deg,rgba(178,102,255,.05),rgba(255,152,0,.03));border:1px solid rgba(178,102,255,.18);border-radius:14px;}
+    .jelly-tip-mascot{flex-shrink:0;}
+    .jelly-mini-svg{width:52px;height:52px;}
+    .jelly-tip-bubble{background:rgba(0,0,0,.25);border:1px solid rgba(178,102,255,.2);border-radius:12px;padding:12px 16px;font-size:.86rem;line-height:1.75;color:var(--text);position:relative;flex:1;}
+    .jelly-tip-bubble::before{content:'';position:absolute;left:-10px;top:16px;border:5px solid transparent;border-right-color:rgba(178,102,255,.2);}
+    .jelly-tip-name{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--purple);letter-spacing:.12em;margin-bottom:6px;}
+
+    /* ── TOC STRIP ── */
+    .toc-strip{display:flex;align-items:center;gap:0;margin-bottom:44px;padding:18px 24px;background:rgba(178,102,255,.03);border:1px solid rgba(178,102,255,.1);border-radius:14px;overflow-x:auto;}
+    .toc-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;}
+    .toc-dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:.65rem;font-weight:700;border:1px solid rgba(178,102,255,.22);color:var(--text-faint);background:rgba(178,102,255,.04);transition:all .25s;}
+    .toc-dot.active{border-color:var(--purple);color:var(--purple);background:rgba(178,102,255,.12);box-shadow:0 0 12px rgba(178,102,255,.3);}
+    .toc-lbl{font-family:'Share Tech Mono',monospace;font-size:.57rem;color:var(--text-faint);text-align:center;line-height:1.4;letter-spacing:.04em;}
+    .toc-connector{flex:1;height:1px;background:linear-gradient(90deg,rgba(178,102,255,.1),rgba(178,102,255,.22),rgba(178,102,255,.1));min-width:14px;margin:0 6px;margin-bottom:18px;}
+
+    /* ── FOOTER ── */
+    .chapter-footer{margin-top:60px;padding:28px 36px;background:rgba(178,102,255,.03);border:1px solid rgba(178,102,255,.1);border-radius:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+    .footer-info{font-size:.82rem;color:var(--text-faint);line-height:1.7;}
+    .footer-info strong{color:var(--text-dim);}
+    .next-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.35);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.06em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .next-btn:hover{background:rgba(178,102,255,.18);border-color:rgba(178,102,255,.6);box-shadow:0 0 14px rgba(178,102,255,.2);}
+    .next-btn svg{width:15px;height:15px;}
+    .prev-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;border:1px solid rgba(178,102,255,.22);background:rgba(178,102,255,.06);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.06em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .prev-btn:hover{color:var(--purple);border-color:rgba(178,102,255,.4);background:rgba(178,102,255,.1);}
+    .prev-btn svg{width:15px;height:15px;}
+
+    /* ── SCORE BOX ── */
+    #finalScore{display:none;margin-top:28px;padding:24px;border-radius:16px;background:linear-gradient(135deg,rgba(178,102,255,.08),rgba(255,152,0,.05));border:1px solid rgba(178,102,255,.22);text-align:center;}
+
+    /* ── MOBILE ── */
+    @media(max-width:640px){
+      
+      .hero{flex-direction:column;text-align:center;padding:22px 18px;gap:20px;}
+      .hero-jelly{width:90px;height:90px;}
+      .hero-title{font-size:1.2rem;}
+      .card-
+      .card-
+      .signal-grid{grid-template-columns:1fr;}
+      .chapter-footer{flex-direction:column;padding:20px 18px;}
+      .next-btn,.prev-btn{width:100%;justify-content:center;}
+      .toc-strip{padding:12px 14px;}
+      .toc-lbl{font-size:.5rem;}
+    }
+  
+  </style>
+  <script>
+(function(){
+  function applyTheme(t){if(t==='day')document.body.classList.add('theme-day');else document.body.classList.remove('theme-day');}
+  var t=localStorage.getItem('jelly_global_theme')||'space';
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){applyTheme(t);});}
+  else{applyTheme(t);}
+  try{var bc=new BroadcastChannel('jellystock_theme');bc.onmessage=function(e){if(e.data&&e.data.theme){localStorage.setItem('jelly_global_theme',e.data.theme);applyTheme(e.data.theme);}};}catch(e){}
+  window.addEventListener('storage',function(e){if(e.key==='jelly_global_theme'&&e.newValue)applyTheme(e.newValue);});
+})();
+</script>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+
+<nav class="chapter-sidenav">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場與K線</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒進階解讀</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter3.html"><span class="ch-num">03</span><span class="ch-label">趨勢與結構</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter4.html"><span class="ch-num">04</span><span class="ch-label">支撐與壓力</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter5.html"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter6.html"><span class="ch-num">06</span><span class="ch-label">均線重定位</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter7.html"><span class="ch-num">07</span><span class="ch-label">指標輔助</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/features/chapter8.html"><span class="ch-num">08</span><span class="ch-label">量能與籌碼</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter9.html"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
+</nav>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock Logo"/></div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">技術分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a class="back-btn" href="/stock_site/features/chapter7.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      第七章
+    </a>
+    <span class="chapter-badge">CH.08</span>
+  </div>
+</header>
+
+<div class="sticky-progress">
+  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第八章 閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-jelly">
+      <svg class="jelly-svg" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="jellyBodyGrad8" cx="42%" cy="38%" r="58%">
+            <stop offset="0%" stop-color="rgba(178,102,255,0.22)"/>
+            <stop offset="100%" stop-color="rgba(60,0,100,0.08)"/>
+          </radialGradient>
+          <filter id="jellyGlow8"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="jellyGlowOrg"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <ellipse cx="65" cy="115" rx="42" ry="7" fill="rgba(178,102,255,0.1)"/>
+        <path d="M65 18 C35 18 22 38 20 58 C18 78 22 98 30 108 C38 118 92 118 100 108 C108 98 112 78 110 58 C108 38 95 18 65 18 Z"
+              fill="url(#jellyBodyGrad8)" stroke="#b266ff" stroke-width="2.2" filter="url(#jellyGlow8)" opacity="0.92"/>
+        <ellipse cx="50" cy="52" rx="10" ry="16" fill="rgba(178,102,255,0.14)" transform="rotate(-15,50,52)"/>
+        <ellipse cx="80" cy="60" rx="8" ry="13" fill="rgba(255,152,0,0.1)" transform="rotate(12,80,60)"/>
+        <path d="M80 22 C95 30 110 48 110 68 C110 88 100 108 88 114"
+              fill="none" stroke="#ff9800" stroke-width="2" filter="url(#jellyGlowOrg)" opacity="0.65"/>
+        <!-- Volume bars on body -->
+        <rect x="36" y="90" width="6" height="12" rx="1.5" fill="rgba(0,230,118,0.6)"/>
+        <rect x="46" y="82" width="6" height="20" rx="1.5" fill="rgba(0,230,118,0.6)"/>
+        <rect x="56" y="74" width="6" height="28" rx="1.5" fill="rgba(0,230,118,0.6)"/>
+        <rect x="66" y="65" width="6" height="37" rx="1.5" fill="rgba(255,61,90,0.7)"/>
+        <rect x="76" y="70" width="6" height="32" rx="1.5" fill="rgba(255,61,90,0.5)"/>
+        <rect x="86" y="78" width="6" height="24" rx="1.5" fill="rgba(178,102,255,0.6)"/>
+        <!-- Eyes -->
+        <ellipse cx="52" cy="78" rx="5.5" ry="6.5" fill="#fff" opacity="0.95"/>
+        <ellipse cx="78" cy="78" rx="5.5" ry="6.5" fill="#fff" opacity="0.95"/>
+        <circle cx="53.5" cy="79" r="3.2" fill="#6b00aa"/>
+        <circle cx="79.5" cy="79" r="3.2" fill="#6b00aa"/>
+        <circle cx="54.5" cy="77.5" r="1.1" fill="#fff"/>
+        <circle cx="80.5" cy="77.5" r="1.1" fill="#fff"/>
+        <path d="M56 92 Q65 99 74 92" fill="none" stroke="rgba(178,102,255,0.8)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="34" cy="50" r="2" fill="#b266ff" opacity="0.7"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.1s" repeatCount="indefinite"/></circle>
+        <circle cx="96" cy="60" r="1.8" fill="#ff9800" opacity="0.6"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="1.7s" repeatCount="indefinite"/></circle>
+        <circle cx="42" cy="90" r="1.5" fill="#ffd600" opacity="0.5"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.5s" repeatCount="indefinite"/></circle>
+        <line x1="65" y1="18" x2="65" y2="8" stroke="#b266ff" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+        <circle cx="65" cy="6" r="3" fill="#b266ff" opacity="0.9"><animate attributeName="r" values="2.5;4;2.5" dur="1.5s" repeatCount="indefinite"/></circle>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">CHAPTER 08 · 量能與籌碼</div>
+      <h1 class="hero-title">量能與籌碼<br/>王牌章節 🔥</h1>
+      <p class="hero-desc">成交量是市場最誠實的訊號——它騙不了人。這章教你讀懂<em class="hl">爆量背後的真相</em>、識破主力的吸籌手法、以及散戶最常跌入的心理陷阱。</p>
+      <div class="hero-tags">
+        <span class="tag tag-purple">🔥 王牌章節</span>
+        <span class="tag tag-cyan">⏱ 70 分鐘</span>
+        <span class="tag tag-green">🎮 互動分析</span>
+        <span class="tag tag-orange">📊 量價背離3等級</span>
+        <span class="tag tag-pink">🍮 果凍老師帶路</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE CONCEPT -->
+  <div class="key-concept">
+    <div class="key-concept-label">── 本章核心觀念 ──</div>
+    <div class="key-concept-text">「沒有量的突破，大多是假的。<br/>量，是主力藏不住的秘密。」</div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc-strip">
+    <div class="toc-item" onclick="scrollToSec('sec1')"><div class="toc-dot active" id="d1">01</div><div class="toc-lbl">量的<br/>本質</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec2')"><div class="toc-dot" id="d2">02</div><div class="toc-lbl">爆量<br/>解讀</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec3')"><div class="toc-dot" id="d3">03</div><div class="toc-lbl">無量<br/>危機</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec4')"><div class="toc-dot" id="d4">04</div><div class="toc-lbl">主力<br/>吸籌</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec5')"><div class="toc-dot" id="d5">05</div><div class="toc-lbl">量價<br/>背離</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec6')"><div class="toc-dot" id="d6">06</div><div class="toc-lbl">散戶<br/>心理</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec7')"><div class="toc-dot" id="d7">07</div><div class="toc-lbl">互動<br/>練習</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 1：成交量的本質
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec1">
+    <div class="card-header">
+      <div class="card-icon">💧</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.1</div>
+        <div class="card-title">成交量的本質：市場最誠實的語言</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        技術指標可以被設計出漂亮的訊號，K棒型態可以被主力刻意製造，但<em class="hl">成交量是最難造假的訊號</em>——因為量代表真實的資金進出，每一筆交易都需要買方和賣方同時存在。
+      </p>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(178,102,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(178,102,255,0.1)" stroke="#b266ff" stroke-width="1.8" opacity="0.88"/>
+            <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff9800" stroke-width="1.5" opacity="0.6"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(178,102,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          把量想成「人氣」，價格是「票價」。一場演唱會座位（股票）有限，搶票的人越多（量越大）票價就越高。但如果票賣光了、沒人搶了（量縮），票價就算再高也撐不住了。<strong>量是行情引擎，沒有量，行情只是空殼。</strong>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-num" style="color:var(--purple)">量先行</span>
+          <span class="stat-label">量的變化通常<br/>早於價格變化</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" style="color:var(--orange)">4種</span>
+          <span class="stat-label">量價組合<br/>代表4種市場狀態</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" style="color:var(--yellow)">3級</span>
+          <span class="stat-label">量價背離的<br/>嚴重程度分級</span>
+        </div>
+      </div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term">成交量</span>
+          <span class="vocab-def"><strong>Volume</strong>：一段時間內買賣雙方實際成交的股數（台股以張計）。台股通常看「每日成交張數」，大盤則看「成交金額（億元）」。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term">均量</span>
+          <span class="vocab-def"><strong>MA Volume</strong>：過去N日成交量的平均值。常用20日均量（MA20V）。當日量與均量的比較，是判斷量是否「異常」的基準。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term">爆量</span>
+          <span class="vocab-def">當日成交量為均量的<strong>1.5倍以上</strong>稱為放量，<strong>2倍以上</strong>稱為爆量。爆量不一定是好事——要看爆量後的收盤位置才能判斷。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term">地量</span>
+          <span class="vocab-def">成交量萎縮到近期極低水平，通常是均量的<strong>30%以下</strong>。地量代表市場參與者極少，往往出現在趨勢末端，是底部反轉的潛在訊號之一。</span>
+        </div>
+      </div>
+
+      <!-- 四種量價組合表格 -->
+      <table class="compare-table">
+        <thead><tr><th>量</th><th>價</th><th>市場含義</th><th>操作方向</th></tr></thead>
+        <tbody>
+          <tr><td class="val-up">↑ 放量</td><td class="val-up">↑ 上漲</td><td>多方主動積極買入，趨勢最健康</td><td class="val-purple">✅ 可做多</td></tr>
+          <tr><td class="val-dn">↓ 縮量</td><td class="val-up">↑ 上漲</td><td>多方信心不足，漲勢後繼乏力</td><td class="val-yellow">⚠️ 謹慎，不追高</td></tr>
+          <tr><td class="val-up">↑ 放量</td><td class="val-dn">↓ 下跌</td><td>空方積極出貨，跌勢加速中</td><td style="color:var(--red);font-weight:600">❌ 逃命，快跑</td></tr>
+          <tr><td class="val-dn">↓ 縮量</td><td class="val-dn">↓ 下跌</td><td>跌勢衰竭，賣壓漸減，可能接近底部</td><td class="val-purple">🔍 等待止跌</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 2：爆量 = 換手 or 出貨？
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec2">
+    <div class="card-header">
+      <div class="card-icon">💥</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.2</div>
+        <div class="card-title">爆量 = 換手 or 出貨？關鍵在「收盤位置」</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        爆量是最被誤解的訊號之一。很多人看到大量就覺得「主力進場了！」就衝進去買——但爆量也可能是<em class="hl-red">主力趁機出貨</em>。分辨的關鍵，就是那根K棒的<em class="hl">收盤位置</em>。
+      </p>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(178,102,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(178,102,255,0.1)" stroke="#b266ff" stroke-width="1.8" opacity="0.88"/>
+            <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff9800" stroke-width="1.5" opacity="0.6"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(178,102,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          想像一家人氣餐廳突然大排長龍（爆量）。但如果仔細看，隊伍裡大部分人買了就馬上轉賣給後面的人（高位出貨），收攤的時候餐廳（股價）反而更少人了。<strong>量大不代表行情好，要看量大之後股價站在哪裡。</strong>
+        </div>
+      </div>
+
+      <!-- Breakout volume SVG -->
+      <div class="vol-chart-wrap">
+        <div class="vol-chart-title">── 爆量K棒的三種情境 ──</div>
+        <svg width="100%" height="220" viewBox="0 0 680 220" preserveAspectRatio="xMidYMid meet">
+          <!-- ── 情境A：爆量突破（好） ── -->
+          <text x="20" y="18" fill="rgba(0,230,118,.7)" font-size="10" font-family="Share Tech Mono,monospace">情境A：爆量突破（好）</text>
+          <!-- Resistance -->
+          <line x1="20" y1="50" x2="190" y2="50" stroke="rgba(255,61,90,.3)" stroke-width="1" stroke-dasharray="5,3"/>
+          <!-- Price bars -->
+          <rect x="25" y="62" width="14" height="28" fill="rgba(255,61,90,.6)" rx="2"/>
+          <rect x="48" y="68" width="14" height="22" fill="rgba(0,230,118,.5)" rx="2"/>
+          <rect x="71" y="64" width="14" height="26" fill="rgba(255,61,90,.5)" rx="2"/>
+          <!-- BIG breakout candle -->
+          <line x1="101" y1="32" x2="101" y2="40" stroke="#ff3d5a" stroke-width="2"/>
+          <rect x="94" y="40" width="14" height="48" fill="#ff3d5a" rx="2"/>
+          <line x1="101" y1="88" x2="101" y2="92" stroke="#ff3d5a" stroke-width="2"/>
+          <!-- Post bars up -->
+          <rect x="117" y="36" width="14" height="32" fill="rgba(255,61,90,.8)" rx="2"/>
+          <rect x="140" y="28" width="14" height="38" fill="rgba(255,61,90,.9)" rx="2"/>
+          <rect x="163" y="22" width="14" height="44" fill="#ff3d5a" rx="2"/>
+          <!-- Volume bars A -->
+          <rect x="25" y="155" width="14" height="12" fill="rgba(255,61,90,.4)" rx="1"/>
+          <rect x="48" y="153" width="14" height="14" fill="rgba(0,230,118,.4)" rx="1"/>
+          <rect x="71" y="154" width="14" height="13" fill="rgba(255,61,90,.4)" rx="1"/>
+          <rect x="94" y="130" width="14" height="37" fill="#ff3d5a" rx="1"/>
+          <text x="101" y="126" fill="rgba(255,61,90,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">爆量!</text>
+          <rect x="117" y="148" width="14" height="19" fill="rgba(255,61,90,.6)" rx="1"/>
+          <rect x="140" y="150" width="14" height="17" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="163" y="151" width="14" height="16" fill="rgba(255,61,90,.5)" rx="1"/>
+          <text x="105" y="200" fill="rgba(0,230,118,.7)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">收盤站上壓力→換手成功✅</text>
+
+          <!-- ── 情境B：爆量出貨（危險） ── -->
+          <text x="240" y="18" fill="rgba(255,61,90,.7)" font-size="10" font-family="Share Tech Mono,monospace">情境B：爆量出貨（危險）</text>
+          <rect x="245" y="42" width="14" height="36" fill="rgba(255,61,90,.7)" rx="2"/>
+          <rect x="268" y="36" width="14" height="42" fill="#ff3d5a" rx="2"/>
+          <rect x="291" y="30" width="14" height="46" fill="#ff3d5a" rx="2"/>
+          <!-- BIG candle with long upper shadow = topping -->
+          <line x1="321" y1="22" x2="321" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+          <rect x="314" y="36" width="14" height="8" fill="rgba(255,61,90,.4)" rx="2"/>
+          <line x1="321" y1="44" x2="321" y2="54" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+          <!-- Post bars declining -->
+          <rect x="337" y="44" width="14" height="38" fill="rgba(0,230,118,.7)" rx="2"/>
+          <rect x="360" y="52" width="14" height="44" fill="rgba(0,230,118,.8)" rx="2"/>
+          <rect x="383" y="62" width="14" height="50" fill="#00e676" rx="2"/>
+          <!-- Volume B -->
+          <rect x="245" y="155" width="14" height="12" fill="rgba(255,61,90,.4)" rx="1"/>
+          <rect x="268" y="152" width="14" height="15" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="291" y="150" width="14" height="17" fill="rgba(255,61,90,.6)" rx="1"/>
+          <rect x="314" y="127" width="14" height="40" fill="rgba(255,61,90,.6)" rx="1"/>
+          <text x="321" y="123" fill="rgba(255,61,90,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">爆量!</text>
+          <rect x="337" y="156" width="14" height="11" fill="rgba(0,230,118,.3)" rx="1"/>
+          <rect x="360" y="158" width="14" height="9" fill="rgba(0,230,118,.2)" rx="1"/>
+          <rect x="383" y="160" width="14" height="7" fill="rgba(0,230,118,.2)" rx="1"/>
+          <text x="318" y="200" fill="rgba(255,61,90,.7)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">爆量長上影→主力出貨❌</text>
+
+          <!-- ── 情境C：爆量止跌（底部） ── -->
+          <text x="460" y="18" fill="rgba(178,102,255,.7)" font-size="10" font-family="Share Tech Mono,monospace">情境C：爆量止跌（底部）</text>
+          <rect x="465" y="52" width="14" height="44" fill="rgba(0,230,118,.7)" rx="2"/>
+          <rect x="488" y="60" width="14" height="52" fill="#00e676" rx="2"/>
+          <rect x="511" y="68" width="14" height="58" fill="rgba(0,230,118,.8)" rx="2"/>
+          <!-- Big hammer candle -->
+          <line x1="541" y1="78" x2="541" y2="84" stroke="rgba(178,102,255,.8)" stroke-width="2"/>
+          <rect x="534" y="84" width="14" height="8" fill="rgba(178,102,255,.6)" rx="2"/>
+          <line x1="541" y1="92" x2="541" y2="112" stroke="rgba(178,102,255,.8)" stroke-width="2"/>
+          <!-- Recovery -->
+          <rect x="557" y="70" width="14" height="44" fill="rgba(255,61,90,.7)" rx="2"/>
+          <rect x="580" y="58" width="14" height="54" fill="rgba(255,61,90,.8)" rx="2"/>
+          <rect x="603" y="48" width="14" height="62" fill="#ff3d5a" rx="2"/>
+          <!-- Volume C -->
+          <rect x="465" y="153" width="14" height="14" fill="rgba(0,230,118,.4)" rx="1"/>
+          <rect x="488" y="151" width="14" height="16" fill="rgba(0,230,118,.5)" rx="1"/>
+          <rect x="511" y="149" width="14" height="18" fill="rgba(0,230,118,.5)" rx="1"/>
+          <rect x="534" y="128" width="14" height="39" fill="rgba(178,102,255,.6)" rx="1"/>
+          <text x="541" y="124" fill="rgba(178,102,255,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">爆量!</text>
+          <rect x="557" y="152" width="14" height="15" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="580" y="154" width="14" height="13" fill="rgba(255,61,90,.4)" rx="1"/>
+          <rect x="603" y="155" width="14" height="12" fill="rgba(255,61,90,.4)" rx="1"/>
+          <text x="540" y="200" fill="rgba(178,102,255,.7)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">低位爆量錘子→底部止跌🟣</text>
+        </svg>
+      </div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green)">✅ 換手爆量</span>
+          <span class="vocab-def">出現在突破壓力位時。K棒<strong>實體大、收盤接近最高點、上影線短</strong>。代表多方積極主導，散戶從空方手上接籌，準備新的上漲段。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--red)">❌ 出貨爆量</span>
+          <span class="vocab-def">出現在股價高位。K棒<strong>上影線長、收盤遠低於最高點（縮量收盤）</strong>。代表主力借高位人氣出貨，把持股賣給追高散戶。隔天通常縮量下跌。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">🟣 止跌爆量</span>
+          <span class="vocab-def">出現在低位持續下跌後。K棒為長下影線（錘子線）。代表恐慌性賣壓在此被大買盤吸收，是底部訊號之一，但仍需後續K棒確認。</span>
+        </div>
+      </div>
+
+      <div class="quiz-block" id="quiz1">
+        <div class="quiz-label">互動測驗 1 / 4</div>
+        <div class="quiz-q">某股在連漲15天後，某日出現爆量（均量的3倍），但K棒上影線極長，收盤幾乎回到開盤附近。隔天縮量下跌5%。這個爆量代表什麼？</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(this,'quiz1','C','A')"><span class="quiz-letter">A</span>量這麼大，主力一定在積極買進</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz1','C','B')"><span class="quiz-letter">B</span>換手成功，接下來會繼續漲</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz1','C','C')"><span class="quiz-letter">C</span>高位爆量長上影＋隔天縮量跌，這是典型的主力出貨訊號，應該警惕並考慮出場</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz1','C','D')"><span class="quiz-letter">D</span>正常回調，繼續持有即可</div>
+        </div>
+        <div class="quiz-feedback" id="quiz1-fb"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 3：無量上漲的危險
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec3">
+    <div class="card-header">
+      <div class="card-icon">🕯️</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.3</div>
+        <div class="card-title">無量上漲的危險：虛火旺盛，後繼無力</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        股價每天漲一點，看起來好像穩定上漲，但成交量卻越來越少——這叫<em class="hl">無量上漲</em>，是技術分析中一個非常危險的訊號。
+      </p>
+
+      <div class="insight-box">
+        <div class="insight-icon">💡</div>
+        <div class="insight-text">
+          <strong>無量上漲的本質：</strong>沒有新資金進場，靠的是原有的惜售者不願賣，讓股價緩慢爬升。這種漲法看似穩健，但一旦有人開始出售，根本沒有足夠的買盤來承接，股價可能迅速崩落。
+          <span class="insight-quote">「上漲需要買盤支持，縮量代表買盤在萎縮。」</span>
+        </div>
+      </div>
+
+      <!-- No volume chart -->
+      <div class="vol-chart-wrap">
+        <div class="vol-chart-title">── 無量上漲示意圖：價漲量縮，危險的組合 ──</div>
+        <svg width="100%" height="195" viewBox="0 0 680 195" preserveAspectRatio="xMidYMid meet">
+          <!-- Price line slowly rising -->
+          <polyline points="20,150 75,140 130,128 185,118 240,106 295,96 350,84 405,74 460,62 515,52 570,44 625,36 670,48"
+            fill="none" stroke="#ff3d5a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Volume bars shrinking -->
+          <rect x="18" y="145" width="16" height="35" fill="rgba(255,61,90,.7)" rx="2"/>
+          <rect x="73" y="150" width="16" height="30" fill="rgba(255,61,90,.6)" rx="2"/>
+          <rect x="128" y="154" width="16" height="26" fill="rgba(255,61,90,.55)" rx="2"/>
+          <rect x="183" y="157" width="16" height="23" fill="rgba(255,61,90,.5)" rx="2"/>
+          <rect x="238" y="160" width="16" height="20" fill="rgba(255,61,90,.45)" rx="2"/>
+          <rect x="293" y="163" width="16" height="17" fill="rgba(255,61,90,.4)" rx="2"/>
+          <rect x="348" y="165" width="16" height="15" fill="rgba(255,61,90,.35)" rx="2"/>
+          <rect x="403" y="167" width="16" height="13" fill="rgba(255,61,90,.3)" rx="2"/>
+          <rect x="458" y="169" width="16" height="11" fill="rgba(178,102,255,.3)" rx="2"/>
+          <rect x="513" y="170" width="16" height="10" fill="rgba(178,102,255,.25)" rx="2"/>
+          <rect x="568" y="171" width="16" height="9" fill="rgba(178,102,255,.2)" rx="2"/>
+          <rect x="623" y="172" width="16" height="8" fill="rgba(178,102,255,.15)" rx="2"/>
+          <!-- Collapse at end -->
+          <polyline points="670,48 680,75" fill="none" stroke="rgba(0,230,118,.8)" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <text x="642" y="68" fill="rgba(255,61,90,.7)" font-size="10" font-family="Share Tech Mono,monospace">崩?</text>
+          <!-- Annotations -->
+          <text x="100" y="140" fill="rgba(255,214,0,.6)" font-size="9" font-family="Share Tech Mono,monospace">量縮→</text>
+          <text x="500" y="80" fill="rgba(178,102,255,.6)" font-size="9" font-family="Share Tech Mono,monospace">←幾乎無量</text>
+          <text x="340" y="185" fill="rgba(255,61,90,.4)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">價格看似持續上漲，但量越來越少——這是虛火</text>
+        </svg>
+      </div>
+
+      <div class="ba-grid">
+        <div class="ba-card before">
+          <div class="ba-label">⚠️ 無量上漲</div>
+          <div class="ba-text">量越來越少，價緩慢爬升。像一個氣球被慢慢吹大，但沒有新空氣（資金）進入，靠的只是封口——一旦出現大單賣壓，立刻癟掉。</div>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-label">✅ 量增上漲</div>
+          <div class="ba-text">每波上漲都有量配合，代表<strong>不斷有新資金進場接手</strong>。這種漲法有承接力，回調時也有買盤接住，趨勢最健康。</div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-label">果凍老師說：無量上漲的「危機指標」</div>
+        <p>當你發現一支股票已經連漲5天以上，但成交量每天都比前一天少，這時候要問自己：<strong style="color:#fff">「還有誰在買？」</strong><br/><br/>
+        如果找不到新的買盤邏輯（外資買進、法人增持、業績超預期），這個上漲很可能是空殼，一有風吹草動就會崩潰。果凍老師的建議：看到無量上漲，把停損設緊一點，不要加碼。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 4：主力吸籌的跡象
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec4">
+    <div class="card-header">
+      <div class="card-icon">🕵️</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.4</div>
+        <div class="card-title">主力吸籌的跡象：在別人恐慌時，他們在偷買</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        主力（大戶、法人、機構）要買進大量股票，不可能在短時間內一次買入——那樣會推高自己的成本。所以他們採用<em class="hl">緩慢吸籌</em>的策略，在不引人注意的情況下慢慢建倉。
+      </p>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(178,102,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(178,102,255,0.1)" stroke="#b266ff" stroke-width="1.8" opacity="0.88"/>
+            <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff9800" stroke-width="1.5" opacity="0.6"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <!-- Sneaky expression -->
+            <path d="M22 38 Q26 42 30 38" fill="none" stroke="rgba(178,102,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          主力就像一個想大量買菜的大廚，如果他一次衝進菜市場大喊「我要買500公斤雞肉！」，價格馬上翻倍。所以他每天叫人偷偷分批買，外表看起來市場很平靜，但他的庫存（籌碼）在悄悄增加。<strong>等他買夠了，才會拉抬。</strong>
+        </div>
+      </div>
+
+      <p class="content-para">以下是識別主力正在吸籌的幾個技術線索：</p>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">長期橫盤</span>
+          <span class="vocab-def">股價在一個區間盤整<strong>數週甚至數月</strong>，一般散戶耐不住寂寞而出場，籌碼逐漸集中到有耐心的主力手中。是吸籌最常見的外觀。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">小量堆積</span>
+          <span class="vocab-def">整體量不大，但<strong>每天幾乎都有固定的量</strong>出現（不大也不小），代表有機構在定時定量地買進，不讓股價大幅波動以免引起注意。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">洗盤打壓</span>
+          <span class="vocab-def">偶爾放出一根大陰線，嚇走浮動籌碼（短線散戶）。但股價隔天馬上回升，而且量並未真正放大。這是主力<strong>故意製造恐慌讓散戶賣出</strong>，自己再低接。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">底部縮量</span>
+          <span class="vocab-def">股價在低位，成交量越來越少（地量）。代表散戶已基本出清，浮籌清洗完畢，主力控盤程度提高。<strong>地量之後往往是啟動的前兆。</strong></span>
+        </div>
+      </div>
+
+      <div class="vol-chart-wrap">
+        <div class="vol-chart-title">── 吸籌期的典型量價型態 ──</div>
+        <svg width="100%" height="195" viewBox="0 0 680 195" preserveAspectRatio="xMidYMid meet">
+          <!-- Phase labels -->
+          <rect x="20" y="5" width="120" height="18" rx="4" fill="rgba(178,102,255,.1)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+          <text x="80" y="18" fill="rgba(178,102,255,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">① 下跌後盤整</text>
+          <rect x="200" y="5" width="120" height="18" rx="4" fill="rgba(178,102,255,.1)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+          <text x="260" y="18" fill="rgba(178,102,255,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">② 吸籌期橫盤</text>
+          <rect x="380" y="5" width="120" height="18" rx="4" fill="rgba(255,214,0,.1)" stroke="rgba(255,214,0,.2)" stroke-width="1"/>
+          <text x="440" y="18" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">③ 洗盤</text>
+          <rect x="540" y="5" width="120" height="18" rx="4" fill="rgba(0,230,118,.1)" stroke="rgba(0,230,118,.2)" stroke-width="1"/>
+          <text x="600" y="18" fill="rgba(0,230,118,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">④ 拉升啟動</text>
+
+          <!-- Price path: down → consolidate → washout → up -->
+          <polyline points="20,40 60,75 100,95 140,105 180,100 220,108 260,102 300,106 340,100 360,100 380,130 400,105 430,100 460,102 490,95 520,85 560,60 610,35 660,20"
+            fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- Support line -->
+          <line x1="120" y1="110" x2="540" y2="110" stroke="rgba(0,230,118,.3)" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="280" y="122" fill="rgba(0,230,118,.4)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">支撐位（主力成本區）</text>
+
+          <!-- Washout marker -->
+          <circle cx="380" cy="130" r="5" fill="rgba(255,214,0,.3)" stroke="rgba(255,214,0,.6)" stroke-width="1.5"/>
+          <text x="380" y="145" fill="rgba(255,214,0,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">洗盤</text>
+
+          <!-- Breakout marker -->
+          <circle cx="560" cy="60" r="5" fill="rgba(255,61,90,.3)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <text x="570" y="55" fill="rgba(255,61,90,.7)" font-size="8" font-family="Share Tech Mono,monospace">爆量!</text>
+
+          <!-- Volume bars -->
+          <rect x="20" y="155" width="12" height="20" fill="rgba(0,230,118,.4)" rx="1"/>
+          <rect x="40" y="158" width="12" height="17" fill="rgba(0,230,118,.35)" rx="1"/>
+          <rect x="60" y="162" width="12" height="13" fill="rgba(178,102,255,.3)" rx="1"/>
+          <rect x="80" y="163" width="12" height="12" fill="rgba(178,102,255,.28)" rx="1"/>
+          <rect x="100" y="164" width="12" height="11" fill="rgba(178,102,255,.25)" rx="1"/>
+          <rect x="120" y="164" width="12" height="11" fill="rgba(178,102,255,.25)" rx="1"/>
+          <rect x="140" y="163" width="12" height="12" fill="rgba(178,102,255,.25)" rx="1"/>
+          <rect x="160" y="164" width="12" height="11" fill="rgba(178,102,255,.22)" rx="1"/>
+          <rect x="180" y="163" width="12" height="12" fill="rgba(178,102,255,.25)" rx="1"/>
+          <rect x="200" y="164" width="12" height="11" fill="rgba(178,102,255,.22)" rx="1"/>
+          <rect x="220" y="163" width="12" height="12" fill="rgba(178,102,255,.25)" rx="1"/>
+          <rect x="240" y="164" width="12" height="11" fill="rgba(178,102,255,.22)" rx="1"/>
+          <rect x="260" y="164" width="12" height="11" fill="rgba(178,102,255,.2)" rx="1"/>
+          <rect x="280" y="163" width="12" height="12" fill="rgba(178,102,255,.22)" rx="1"/>
+          <!-- Washout volume spike -->
+          <rect x="373" y="148" width="14" height="27" fill="rgba(255,214,0,.5)" rx="1"/>
+          <rect x="393" y="158" width="12" height="17" fill="rgba(178,102,255,.22)" rx="1"/>
+          <rect x="413" y="162" width="12" height="13" fill="rgba(178,102,255,.18)" rx="1"/>
+          <rect x="433" y="163" width="12" height="12" fill="rgba(178,102,255,.15)" rx="1"/>
+          <rect x="453" y="164" width="12" height="11" fill="rgba(178,102,255,.12)" rx="1"/>
+          <!-- Breakout volume -->
+          <rect x="553" y="138" width="14" height="37" fill="rgba(255,61,90,.8)" rx="1"/>
+          <rect x="573" y="148" width="14" height="27" fill="rgba(255,61,90,.7)" rx="1"/>
+          <rect x="593" y="153" width="14" height="22" fill="rgba(255,61,90,.6)" rx="1"/>
+          <rect x="613" y="155" width="14" height="20" fill="rgba(255,61,90,.55)" rx="1"/>
+          <rect x="633" y="157" width="14" height="18" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="653" y="158" width="14" height="17" fill="rgba(255,61,90,.45)" rx="1"/>
+        </svg>
+      </div>
+
+      <div class="case-study">
+        <div class="case-header">
+          <span class="case-badge">吸籌案例</span>
+          <span class="case-title">🍮 果凍老師解讀：如何識別吸籌</span>
+        </div>
+        <div class="case-body">
+          <p>某股在業績公告前，股價在 <strong style="color:#fff">80～86元</strong> 之間震盪了 <strong style="color:var(--purple)">三個月</strong>。這段期間日均量只有近期均量的40%，散戶覺得「這檔很無聊」大量出走。</p>
+          <p>某週二法人突然買超 <strong style="color:var(--red)">5000張</strong>，週三隔日爆量 <strong style="color:var(--red)">2.5倍</strong> 突破86元壓力，接下來10個交易日連漲到 <strong style="color:var(--green)">112元</strong>，漲幅 <strong style="color:var(--green)">+31%</strong>。</p>
+          <p>懂得看吸籌跡象的人，早在第10週就注意到「量比前期小、但持續有固定小量」的異常，提前佈局——等到爆量突破才追的人，成本已貴了8%。</p>
+          <div class="case-lesson">📌 果凍老師的重點：「盤整是悶的，但悶是為了之後的爽。吸籌期就是主力在等耐心耗盡的散戶離場。」</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 5：量價背離的3種等級
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec5">
+    <div class="card-header">
+      <div class="card-icon">⚠️</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.5</div>
+        <div class="card-title">量價背離的3種等級（王牌知識）</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        量價背離（Volume-Price Divergence）是指<em class="hl">成交量的變化方向與價格趨勢相反</em>——例如股價創新高，但成交量反而越來越少。這種背離往往是趨勢反轉的前兆，分三個等級判斷嚴重程度。
+      </p>
+
+      <div class="signal-grid">
+        <div class="signal-card lv1">
+          <div class="signal-icon">🟡</div>
+          <div class="signal-title">一級背離（輕度）</div>
+          <div class="signal-desc">股價創新高，但當天量比前次創高時少20～40%。短期行情可能放緩，但趨勢未必改變，可輕微減倉觀察。</div>
+          <span class="signal-badge">注意觀察</span>
+        </div>
+        <div class="signal-card lv2">
+          <div class="signal-icon">🟠</div>
+          <div class="signal-title">二級背離（中度）</div>
+          <div class="signal-desc">連續2～3個新高，成交量持續萎縮超過40%，或連漲5天以上量縮幅度加速。主力可能已在分批出貨，應開始減倉。</div>
+          <span class="signal-badge">開始減倉</span>
+        </div>
+        <div class="signal-card lv3">
+          <div class="signal-icon">🔴</div>
+          <div class="signal-title">三級背離（重度）</div>
+          <div class="signal-desc">股價持續創高但量已縮到均量50%以下，或出現一根爆量長上影後開始縮量，且結構顯示LH。趨勢反轉警示，應大幅減倉甚至清倉。</div>
+          <span class="signal-badge">高度警戒</span>
+        </div>
+      </div>
+
+      <!-- Bottom divergence -->
+      <div class="insight-box">
+        <div class="insight-icon">🔄</div>
+        <div class="insight-text">
+          <strong>底部背離（反向訊號，看漲）：</strong><br/>
+          股價持續下跌創新低，但成交量卻越來越少（賣壓減弱），最終出現「地量見地價」——這是空方力量枯竭的訊號，可能是底部反轉的前兆。<br/><br/>
+          <strong>底部背離 + 止跌K棒（錘子線）+ 後續放量上漲 = 底部確立</strong>，這三個條件同時出現，是最可靠的底部訊號之一。
+        </div>
+      </div>
+
+      <!-- Interactive: 量價背離判斷 -->
+      <div class="scenario-block">
+        <div class="scenario-title">量價背離情境分析（點擊選擇情境）</div>
+        <div class="sc-btns">
+          <div class="sc-btn active-sc" onclick="showScenario(this,'s1')">情境1<br/>輕度背離</div>
+          <div class="sc-btn" onclick="showScenario(this,'s2')">情境2<br/>中度背離</div>
+          <div class="sc-btn" onclick="showScenario(this,'s3')">情境3<br/>重度背離</div>
+          <div class="sc-btn" onclick="showScenario(this,'s4')">情境4<br/>底部背離</div>
+          <div class="sc-btn" onclick="showScenario(this,'s5')">情境5<br/>無背離</div>
+        </div>
+        <div class="sc-result" id="scResult">
+          📊 <strong>情境1：股價今天創一週新高，但成交量比上次創高少了25%。</strong><br/><br/>
+          ➤ 背離等級：<strong style="color:var(--yellow)">一級（輕度）</strong><br/>
+          ➤ 含義：短期動能輕微減弱，但不足以確認趨勢轉折<br/>
+          ➤ 建議操作：<strong>正常持倉，把停損往上移一格，不要加碼追高</strong><br/>
+          ➤ 後續觀察：下一根K棒量是否繼續萎縮？
+        </div>
+      </div>
+
+      <div class="quiz-block" id="quiz2">
+        <div class="quiz-label">互動測驗 2 / 4</div>
+        <div class="quiz-q">某股連續5天創新高，但每天的成交量都比前一天少，到第5天時成交量已縮到均量的35%。這是什麼訊號？</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(this,'quiz2','C','A')"><span class="quiz-letter">A</span>量縮代表大家惜售，會繼續漲</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz2','C','B')"><span class="quiz-letter">B</span>正常現象，不需要在意量的變化</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz2','C','C')"><span class="quiz-letter">C</span>這是二～三級背離，趨勢可能即將反轉，應開始分批減倉，不再加碼</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz2','C','D')"><span class="quiz-letter">D</span>等RSI超過80再說</div>
+        </div>
+        <div class="quiz-feedback" id="quiz2-fb"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 6：散戶常見行為——追高殺低
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec6">
+    <div class="card-header">
+      <div class="card-icon">🧠</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.6</div>
+        <div class="card-title">散戶常見行為模式：為什麼我們老是追高殺低？</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <p class="content-para">
+        技術分析學了半天，但一旦真的下單，很多人會發現自己<em class="hl-red">完全不按計劃行事</em>。原因是：市場交易是<strong>人性的戰場</strong>，而人性的本能往往與正確的操作相反。
+      </p>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(178,102,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(178,102,255,0.1)" stroke="#b266ff" stroke-width="1.8" opacity="0.88"/>
+            <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff9800" stroke-width="1.5" opacity="0.6"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <!-- Worried expression -->
+            <path d="M22 40 Q26 37 30 40" fill="none" stroke="rgba(255,61,90,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          我保證——你在學技術分析之前，一定犯過這些錯誤：看到大漲就追進去、看到大跌就砍掉、賺了一點就急著賣、虧了很多還在等回本。<strong>這不是你笨，這是人類的本能。但你可以透過學習去對抗這些本能。</strong>
+        </div>
+      </div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--red)">追高心理</span>
+          <span class="vocab-def"><strong>FOMO（錯失恐懼）：</strong>看到股票一直漲，害怕再不買就買不到了，在高位衝進去。往往成為最後一個買家，幫主力接走高位籌碼。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green)">殺低恐慌</span>
+          <span class="vocab-def"><strong>PANIC SELL：</strong>股價快速下跌，恐懼蓋過理性，在最低點恐慌賣出。通常在底部賣出後股價馬上反彈，造成「賣在最低點」的悔恨。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--yellow)">錨定偏誤</span>
+          <span class="vocab-def"><strong>Anchoring Bias：</strong>死守著「買入價」這個錨點，跌了50%還在說「等它漲回來再賣」。事實是買入價對未來走勢沒有任何意義。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--purple)">處置效應</span>
+          <span class="vocab-def"><strong>Disposition Effect：</strong>獲利的倉位太早賣掉（怕它跌回來），虧損的倉位死撐不放（不肯承認錯誤）——剛好與正確操作相反！</span>
+        </div>
+      </div>
+
+      <!-- Emotion → Action flow -->
+      <div class="flow-chart">
+        <div class="flow-node">股價大漲</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">FOMO 恐懼<br/>錯失</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">高位追買</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">被套牢</div>
+        <div class="flow-break"></div>
+        <div class="flow-node">股價大跌</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">恐慌害怕<br/>再跌</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">低位殺出</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">後悔反彈</div>
+      </div>
+
+      <div class="gold-box">
+        <div class="insight-icon">🔑</div>
+        <div class="insight-text">
+          <strong>對抗散戶心理的方法：</strong><br/>
+          ① <strong>事前設好計劃</strong>——進場前就決定好停損、目標、部位，不讓情緒在市場開盤時做決定<br/>
+          ② <strong>用「量」驗證「感覺」</strong>——當你有衝動追高時，先看量是否支持；當你想殺低時，先確認是否是止跌訊號<br/>
+          ③ <strong>寫交易日記</strong>——記錄每筆交易的進出場理由，讓情緒有據可循，也方便事後覆盤
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 7：互動量能分析練習
+  ═══════════════════════════════════════════ -->
+  <div class="section-card reveal" id="sec7">
+    <div class="card-header">
+      <div class="card-icon">🎮</div>
+      <div class="card-title-wrap">
+        <div class="card-num">SECTION 8.7</div>
+        <div class="card-title">互動練習：量能綜合判斷</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(178,102,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(178,102,255,0.1)" stroke="#b266ff" stroke-width="1.8" opacity="0.88"/>
+            <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff9800" stroke-width="1.5" opacity="0.6"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#6b00aa"/>
+            <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(178,102,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          現在來考考你！下面四道題涵蓋本章核心知識。<strong>先看題目，自己分析，再選答案。</strong>不要偷看！量能判讀需要訓練，每次練習都是進步。
+        </div>
+      </div>
+
+      <div class="quiz-block" id="quiz3">
+        <div class="quiz-label">互動測驗 3 / 4</div>
+        <div class="quiz-q">某股連跌3週，成交量每週遞減，第3週出現「地量」（均量30%），且出現一根帶長下影線的K棒，收盤比開盤高。根據量能分析，這最可能是？</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(this,'quiz3','B','A')"><span class="quiz-letter">A</span>下跌趨勢持續，繼續等待</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz3','B','B')"><span class="quiz-letter">B</span>底部止跌訊號（地量+止跌K棒），可評估小量試探，等後續放量確認</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz3','B','C')"><span class="quiz-letter">C</span>一定反轉，全倉買進</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz3','B','D')"><span class="quiz-letter">D</span>成交量太少，這筆訊號不可信</div>
+        </div>
+        <div class="quiz-feedback" id="quiz3-fb"></div>
+      </div>
+
+      <div class="quiz-block" id="quiz4" style="margin-top:16px;">
+        <div class="quiz-label">互動測驗 4 / 4（壓軸題）</div>
+        <div class="quiz-q">以下哪個組合，是「最可靠的買進進場訊號」？</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="answer(this,'quiz4','D','A')"><span class="quiz-letter">A</span>股價創新高 + 成交量縮小 + RSI超過70</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz4','D','B')"><span class="quiz-letter">B</span>連漲10天 + 每天量都放大 + 沒有回調</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz4','D','C')"><span class="quiz-letter">C</span>突破壓力位 + 爆量 + 但K棒上影線極長</div>
+          <div class="quiz-opt" onclick="answer(this,'quiz4','D','D')"><span class="quiz-letter">D</span>回調到支撐位縮量止跌 + 出現錘子線 + 後一天放量收紅K確認</div>
+        </div>
+        <div class="quiz-feedback" id="quiz4-fb"></div>
+      </div>
+
+      <!-- Final score -->
+      <div id="finalScore">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px;">── 第八章 最終成績 ──</div>
+        <div id="scoreNum" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--purple);text-shadow:0 0 30px rgba(178,102,255,.4);"></div>
+        <div id="scoreMsg" style="font-size:.88rem;color:var(--text-dim);margin-top:10px;line-height:1.7;"></div>
+      </div>
+
+      <!-- Summary -->
+      <div class="checklist" style="margin-top:32px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px;">── 第八章重點整理 ──</div>
+        <div class="check-item"><span class="check-icon">💧</span><span class="check-text"><strong>量的本質：</strong>成交量是最難造假的訊號，量先行於價，四種量價組合代表四種市場狀態</span></div>
+        <div class="check-item"><span class="check-icon">💥</span><span class="check-text"><strong>爆量判斷：</strong>收盤在高位→換手（好）；長上影收低→出貨（危險）；低位長下影→止跌（觀察）</span></div>
+        <div class="check-item"><span class="check-icon">🕯️</span><span class="check-text"><strong>無量上漲：</strong>缺乏新資金支撐的上漲是虛火，一旦出現賣壓，沒有買盤承接，股價容易急跌</span></div>
+        <div class="check-item"><span class="check-icon">🕵️</span><span class="check-text"><strong>主力吸籌：</strong>長期橫盤+小量堆積+偶爾洗盤，地量後往往是啟動前兆</span></div>
+        <div class="check-item"><span class="check-icon">⚠️</span><span class="check-text"><strong>量價背離三級：</strong>輕度（注意）→中度（減倉）→重度（高度警戒），底部背離是看漲訊號</span></div>
+        <div class="check-item"><span class="check-icon">🧠</span><span class="check-text"><strong>對抗人性：</strong>FOMO追高、恐慌殺低、錨定偏誤、處置效應——用計劃和量的驗證對抗情緒</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHAPTER FOOTER -->
+  <div class="chapter-footer">
+    <div class="footer-info">
+      <strong>第八章完成 ✅</strong><br>
+      你已掌握量的本質、爆量解讀、主力吸籌跡象、量價背離三等級，以及散戶心理陷阱。<br>
+      下一章：交易策略——把所學整合成可執行的完整SOP
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a class="prev-btn" href="/stock_site/features/chapter7.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        第七章
+      </a>
+      <a class="next-btn" href="/stock_site/features/chapter9.html">
+        第九章：交易策略
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+
+</main>
+
+<script>
+// ── QUIZ ──────────────────────────────────────────────────────────
+const feedbackMap = {
+  quiz1:{
+    correct:'✅ 正確！高位爆量 + 長上影線（多方上攻被壓回）+ 隔天縮量跌是教科書等級的出貨訊號。量雖大，但買盤守不住高點，表示賣方力量更強。這時應考慮減倉或出場。',
+    wrong:'❌ 看量要看「收盤位置」！量大不代表主力在買——量大而收盤低，代表主力在賣。高位長上影線是賣壓壓回的痕跡，隔天縮量跌更確認了出貨的跡象。'
+  },
+  quiz2:{
+    correct:'✅ 正確！連5天創高但量縮到均量35%，已達到二～三級背離的程度。成交量越來越少代表沒有新資金進場，靠慣性撐著的漲勢隨時可能反轉，應開始分批出場。',
+    wrong:'❌ 「量縮惜售」在短期成立，但連續5天縮量到均量35%就是嚴重的量價背離——行情後繼無力。要判斷的不是「有沒有人賣」，而是「有沒有新的買盤進來」。'
+  },
+  quiz3:{
+    correct:'✅ 正確！地量（均量30%）+ 長下影線止跌K棒 = 底部止跌的標準組合。賣壓在此枯竭，有買盤開始介入。但「可評估小量試探」是關鍵字——還需要後續放量上漲才能確認底部，不能全倉進去。',
+    wrong:'❌ 地量和止跌K棒的組合是重要訊號！地量代表賣壓枯竭，長下影線代表有買盤介入。正確動作是小量試探，等後續放量確認，而不是繼續等或直接全倉。'
+  },
+  quiz4:{
+    correct:'✅ 完美！這是最完整的進場組合：縮量回調（正常健康的回調）→ 在支撐位止跌（位置對了）→ 出現錘子線（K棒型態確認）→ 次日放量紅K確認（量的驗證）。四個條件同時滿足，進場訊號最可靠。',
+    wrong:'❌ 正確答案是D。A是量價背離（危險）；B是連漲無回調，追進去風險最大；C的爆量長上影線是可能的假突破出貨訊號。D的回調縮量止跌+位置+K棒+量的確認，是四重驗證，最為可靠。'
+  }
+};
+
+const quizScore = {quiz1:false,quiz2:false,quiz3:false,quiz4:false};
+const totalQuiz = 4;
+let answeredCount = 0;
+
+function answer(el, quizId, correctLetter, chosenLetter) {
+  const block = document.getElementById(quizId);
+  if (block.dataset.answered) return;
+  block.dataset.answered = 'true';
+  answeredCount++;
+  const opts = block.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  const isCorrect = chosenLetter === correctLetter;
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    const li = ['A','B','C','D'].indexOf(correctLetter);
+    if (opts[li]) opts[li].classList.add('correct');
+  }
+  const fb = document.getElementById(quizId + '-fb');
+  fb.textContent = isCorrect ? feedbackMap[quizId].correct : feedbackMap[quizId].wrong;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'fail');
+  quizScore[quizId] = isCorrect;
+  updateProgress();
+  if (answeredCount === totalQuiz) setTimeout(showFinalScore, 600);
+}
+
+function showFinalScore() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const pct = Math.round(correct / totalQuiz * 100);
+  const el = document.getElementById('finalScore');
+  document.getElementById('scoreNum').textContent = correct + ' / ' + totalQuiz;
+  let msg = '';
+  if (pct === 100) msg = '🏆 完美！你對量能分析的理解已超越大多數散戶。繼續前進，第九章的交易策略整合等著你！';
+  else if (pct >= 50) msg = '🎯 不錯！你已掌握量能分析的核心觀念。建議回顧答錯的題目，特別注意爆量的收盤位置判斷和量價背離的等級。';
+  else msg = '📖 繼續加油！量能分析需要多看真實圖表練習。建議從「四種量價組合」開始重讀，結合實際K線圖反覆驗證。';
+  document.getElementById('scoreMsg').textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── SCENARIO ──────────────────────────────────────────────────────
+const scenarios = {
+  s1:'📊 <strong>情境1：輕度背離</strong><br/><br/>股價今天創一週新高，成交量比上次創高少25%<br/><br/>➤ 等級：<strong style="color:var(--yellow)">一級（輕度）</strong><br/>➤ 含義：短期動能輕微放緩，趨勢未必改變<br/>➤ 建議：<strong>正常持倉，停損往上移，不追高加碼</strong>',
+  s2:'📊 <strong>情境2：中度背離</strong><br/><br/>股價連3天創新高，但量每天縮，今天已是均量45%<br/><br/>➤ 等級：<strong style="color:var(--orange)">二級（中度）</strong><br/>➤ 含義：主力可能開始分批出貨<br/>➤ 建議：<strong>分批減倉1/3，把停損設緊</strong>',
+  s3:'📊 <strong>情境3：重度背離</strong><br/><br/>連漲10天，量縮到均量35%，今天出現爆量長上影線<br/><br/>➤ 等級：<strong style="color:var(--red)">三級（重度）</strong><br/>➤ 含義：高位爆量出貨特徵明顯，趨勢反轉警示<br/>➤ 建議：<strong>大幅減倉或清倉，不要心存僥倖</strong>',
+  s4:'📊 <strong>情境4：底部背離（看漲）</strong><br/><br/>連跌3週，量每週遞減，上週出現地量（均量30%），本週出現錘子線<br/><br/>➤ 性質：<strong style="color:var(--green)">底部看漲背離</strong><br/>➤ 含義：賣壓枯竭，買盤開始介入<br/>➤ 建議：<strong>小量試探，等後續放量紅K確認後加碼</strong>',
+  s5:'📊 <strong>情境5：無背離（健康）</strong><br/><br/>股價突破壓力位，當天量是均量2.3倍，收盤在高位，無長上影線<br/><br/>➤ 性質：<strong style="color:var(--purple)">量增價漲，無背離</strong><br/>➤ 含義：買盤積極，突破有效，後續行情健康<br/>➤ 建議：<strong>符合進場條件，可按計劃進場</strong>'
+};
+
+function showScenario(btn, key) {
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active-sc'));
+  btn.classList.add('active-sc');
+  document.getElementById('scResult').innerHTML = scenarios[key];
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────
+function updateProgress() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const scrollPct = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
+  const quizPct = correct / totalQuiz;
+  const combined = Math.round((scrollPct * 0.5 + quizPct * 0.5) * 100);
+  document.getElementById('progressFill').style.width = combined + '%';
+  document.getElementById('progressPct').textContent = combined + '%';
+}
+window.addEventListener('scroll', updateProgress, {passive:true});
+
+// ── TOC ──────────────────────────────────────────────────────────
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+const secIds = ['sec1','sec2','sec3','sec4','sec5','sec6','sec7'];
+const dotIds = ['d1','d2','d3','d4','d5','d6','d7'];
+const tocObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      dotIds.forEach((did, i) => {
+        const d = document.getElementById(did);
+        if (d) d.classList.toggle('active', secIds[i] === id);
+      });
+    }
+  });
+}, {threshold:0.25});
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+}, {threshold:0.06});
+secIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { tocObs.observe(el); if (el.classList.contains('reveal')) revealObs.observe(el); }
+});
+</script>
+</body>
+</html>

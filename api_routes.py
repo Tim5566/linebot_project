@@ -42,19 +42,6 @@ def register_api(app):
     def page_disclaimer():
         return send_from_directory('stock_site/legal', 'disclaimer.html')
 
-    # ── Features 頁面（stock_site/features/）──────────────────────────────────
-    @app.route("/stock_site/features/watchlist.html")
-    def page_watchlist():
-        return send_from_directory('stock_site/features', 'watchlist.html')
-
-    @app.route("/stock_site/features/top50_twse.html")
-    def page_top50_twse():
-        return send_from_directory('stock_site/features', 'top50_twse.html')
-
-    @app.route("/stock_site/features/top50_otc.html")
-    def page_top50_otc():
-        return send_from_directory('stock_site/features', 'top50_otc.html')
-
     # ── 技術分析教學章節 ────────────────────────────────────────────────────────
     @app.route("/stock_site/features/chapter1.html")
     def page_chapter1():
@@ -63,6 +50,38 @@ def register_api(app):
     @app.route("/stock_site/features/chapter2.html")
     def page_chapter2():
         return send_from_directory('stock_site/features', 'chapter2.html')
+    
+    @app.route("/stock_site/features/chapter3.html")
+    def page_chapter3():
+        return send_from_directory('stock_site/features', 'chapter3.html')
+    
+    @app.route("/stock_site/features/chapter4.html")
+    def page_chapter4():
+        return send_from_directory('stock_site/features', 'chapter4.html')
+    
+    @app.route("/stock_site/features/chapter5.html")
+    def page_chapter5():
+        return send_from_directory('stock_site/features', 'chapter5.html')
+    
+    @app.route("/stock_site/features/chapter6.html")
+    def page_chapter6():
+        return send_from_directory('stock_site/features', 'chapter6.html')
+    
+    @app.route("/stock_site/features/chapter7.html")
+    def page_chapter7():
+        return send_from_directory('stock_site/features', 'chapter7.html')
+    
+    @app.route("/stock_site/features/chapter8.html")
+    def page_chapter8():
+        return send_from_directory('stock_site/features', 'chapter8.html')
+    
+    @app.route("/stock_site/features/chapter9.html")
+    def page_chapter9():
+        return send_from_directory('stock_site/features', 'chapter9.html')
+    
+    @app.route("/stock_site/features/chapter10.html")
+    def page_chapter10():
+        return send_from_directory('stock_site/features', 'chapter10.html')
 
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")

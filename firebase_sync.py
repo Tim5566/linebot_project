@@ -300,7 +300,11 @@ def _fetch_market(today: str) -> dict:
                 row = data["data"][i]
                 net_amount = float(row[3].replace(',', '')) / 1e8
                 net_total += net_amount
-                result[row[0][:5] if i == 3 else row[0]] = round(net_amount, 2)
+                label = row[0][:5] if i == 3 else row[0]
+                if "自營商" in label:
+                    result["自營商"] = round((result.get("自營商") or 0) + net_amount, 2)
+                else:
+                    result[label] = round(net_amount, 2)
             result["合計金額"] = round(net_total, 2)
         except Exception as e:
             print(f"[market_net] 解析失敗: {e}")

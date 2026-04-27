@@ -277,7 +277,134 @@
     .back-to-top{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--accent);font-family:"Share Tech Mono",monospace;font-size:.75rem;letter-spacing:.06em;cursor:pointer;text-decoration:none;transition:all .2s;}
     .back-to-top:hover{background:rgba(0,229,255,.13);box-shadow:0 0 14px rgba(0,229,255,.25);}
     .sdiv{font-family:"Share Tech Mono",monospace;font-size:.58rem;letter-spacing:.2em;color:var(--text-faint);text-align:center;margin:24px 0 16px;opacity:.5;}
-  </style>
+  
+    /* ── CHAPTER SIDE NAV (improved) ── */
+    .chapter-sidenav {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      background: rgba(2,5,12,.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(0,229,255,.13);
+      border-left: none;
+      border-radius: 0 14px 14px 0;
+      overflow: hidden;
+      box-shadow: 4px 0 32px rgba(0,0,0,.5), 0 0 20px rgba(0,229,255,.04);
+      transition: box-shadow .3s;
+    }
+    .chapter-sidenav:hover {
+      box-shadow: 4px 0 40px rgba(0,0,0,.6), 0 0 30px rgba(0,229,255,.08);
+    }
+    /* top accent bar */
+    .chapter-sidenav::before {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: .5;
+      flex-shrink: 0;
+    }
+    /* bottom accent bar */
+    .chapter-sidenav::after {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: .3;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    .ch-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 9px 16px 9px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: .08em;
+      color: var(--text-faint);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all .2s ease;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+      position: relative;
+      overflow: hidden;
+      min-width: 42px;
+    }
+    .ch-nav-item:last-child { border-bottom: none; }
+    /* hover glow sweep */
+    .ch-nav-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.06));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .ch-nav-item:hover::before { opacity: 1; }
+    .ch-nav-item .ch-num {
+      font-size: .54rem;
+      opacity: .45;
+      margin-right: 0;
+      flex-shrink: 0;
+      min-width: 16px;
+      transition: opacity .2s;
+    }
+    .ch-nav-item:hover .ch-num,
+    .ch-nav-item.current-ch .ch-num { opacity: .9; }
+    .ch-nav-item .ch-label {
+      opacity: 0;
+      max-width: 0;
+      overflow: hidden;
+      transition: opacity .25s, max-width .25s, padding-left .25s;
+      font-size: .62rem;
+      letter-spacing: .05em;
+    }
+    .ch-nav-item:hover .ch-label,
+    .ch-nav-item.current-ch .ch-label {
+      opacity: 1;
+      max-width: 130px;
+      padding-left: 8px;
+    }
+    .ch-nav-item:hover {
+      color: var(--accent);
+      border-left-color: rgba(0,229,255,.5);
+      background: rgba(0,229,255,.05);
+    }
+    .ch-nav-item.current-ch {
+      color: var(--pink);
+      border-left-color: var(--pink);
+      background: rgba(255,110,180,.07);
+    }
+    .ch-nav-item.current-ch .ch-num { color: var(--pink); }
+    .ch-nav-item.locked {
+      opacity: .28;
+      cursor: default;
+      pointer-events: none;
+    }
+    /* chapter number dot for current */
+    .ch-nav-item.current-ch::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 6px var(--pink);
+    }
+    @media (max-width: 768px) { .chapter-sidenav { display: none; } }
+
+    </style>
 </head>
 <body>
 <div class="bg-nebula"></div>
@@ -304,17 +431,17 @@
   </div>
 </div>
 
-<nav class="chapter-sidenav">
-  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場真義</span></a>
-  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒判讀</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">03</span><span class="ch-label">趨勢結構</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">04</span><span class="ch-label">支撐壓力</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">06</span><span class="ch-label">均線系統</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">07</span><span class="ch-label">技術指標</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">08</span><span class="ch-label">量能籌碼</span></a>
-  <a class="ch-nav-item locked"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
-  <a class="ch-nav-item current-ch"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
+<nav class="chapter-sidenav" aria-label="章節導覽">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場與股票</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒解讀</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter3.html"><span class="ch-num">03</span><span class="ch-label">趨勢結構</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter4.html"><span class="ch-num">04</span><span class="ch-label">支撐壓力</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter5.html"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter6.html"><span class="ch-num">06</span><span class="ch-label">均線系統</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter7.html"><span class="ch-num">07</span><span class="ch-label">技術指標</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter8.html"><span class="ch-num">08</span><span class="ch-label">量能籌碼</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter9.html"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/features/chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
 </nav>
 
 <main>
