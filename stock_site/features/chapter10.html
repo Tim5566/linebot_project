@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>第十章：實戰案例解析 — 技術分析教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#03060d;--surface:#070d1a;--accent:#00e5ff;
+      --green:#00e676;--red:#ff3d5a;--yellow:#ffd600;
+      --purple:#b266ff;--pink:#ff6eb4;--orange:#ff9800;
+      --text:#d4e4f7;--text-dim:#7a9ab8;--text-faint:#4a6888;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:"Noto Sans TC",sans-serif;min-height:100vh;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.2) transparent;}
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+    .bg-nebula{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%,rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%,rgba(0,60,80,.18) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%,rgba(60,0,120,.1) 0%,transparent 40%);}
+    .bg-scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);}
+
+    /* HEADER */
+    header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 16px;height:58px;border-bottom:1px solid rgba(0,229,255,.09);background:rgba(3,6,14,.97);backdrop-filter:blur(24px);box-shadow:0 2px 24px rgba(0,0,0,.5);}
+    header::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(178,102,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);background-size:200% 100%;animation:hSweep 4s linear infinite;}
+    @keyframes hSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:"Orbitron",monospace;font-size:.95rem;font-weight:700;letter-spacing:.1em;color:#fff;}
+    .logo-sub{font-family:"Share Tech Mono",monospace;font-size:.52rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .back-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.05);color:var(--text-dim);font-family:"Share Tech Mono",monospace;font-size:.68rem;letter-spacing:.08em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);}
+    .back-btn svg{width:12px;height:12px}
+    .chapter-badge{font-family:"Share Tech Mono",monospace;font-size:.62rem;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);border-radius:8px;padding:3px 10px;letter-spacing:.12em;}
+
+    /* PROGRESS */
+    .sticky-progress{position:sticky;top:58px;z-index:190;background:rgba(3,6,14,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,229,255,.07);}
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;}
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:"Share Tech Mono",monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    /* SIDENAV */
+    .chapter-sidenav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;background:rgba(3,6,14,.88);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,.1);border-left:none;border-radius:0 12px 12px 0;overflow:hidden;}
+    .ch-nav-item{display:flex;align-items:center;padding:10px 14px 10px 12px;font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:var(--text-faint);text-decoration:none;cursor:pointer;border-left:2px solid transparent;transition:all .2s;white-space:nowrap;border-bottom:1px solid rgba(0,229,255,.06);}
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
+    .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
+    .ch-nav-item:hover .ch-label,.ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item:hover{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
+    .ch-nav-item.current-ch{color:var(--accent);border-left-color:var(--accent);background:rgba(0,229,255,.09);}
+    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* MAIN */
+    main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:36px 28px 120px;}
+
+    /* HERO */
+    .hero{display:flex;align-items:center;gap:36px;margin-bottom:52px;background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));border:1px solid rgba(0,229,255,.18);border-radius:24px;padding:36px 40px;position:relative;overflow:hidden;}
+    .hero::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),rgba(178,102,255,.9),var(--accent),transparent);background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;}
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.5}50%{background-position:200% 0;opacity:1}}
+    .hero-icon{flex-shrink:0;width:110px;height:110px;display:flex;align-items:center;justify-content:center;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:20px;position:relative;}
+    .hero-icon::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(0,229,255,.08),transparent 70%);}
+    .hero-content{flex:1;min-width:0;}
+    .hero-label{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.35em;color:var(--accent);text-transform:uppercase;opacity:.8;margin-bottom:8px;}
+    .hero-title{font-family:"Orbitron",monospace;font-size:1.6rem;font-weight:900;line-height:1.25;letter-spacing:.04em;margin-bottom:12px;background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(0,229,255,.2));}
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag{font-family:"Share Tech Mono",monospace;font-size:.65rem;padding:4px 12px;border-radius:20px;letter-spacing:.08em;border:1px solid;cursor:default;}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    @media(max-width:600px){.hero{flex-direction:column;gap:20px;padding:28px 22px;}.hero-icon{width:80px;height:80px;}.hero-title{font-size:1.2rem;}}
+
+    /* TOC */
+    .toc-strip{display:flex;align-items:center;gap:0;margin-bottom:44px;padding:18px 24px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:14px;overflow-x:auto;}
+    .toc-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:70px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:background .2s;}
+    .toc-item:hover{background:rgba(0,229,255,.08);}
+    .toc-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;font-family:"Share Tech Mono",monospace;font-size:.6rem;color:var(--text-faint);transition:all .3s;}
+    .toc-dot.active{border-color:var(--accent);background:rgba(0,229,255,.15);color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.3);}
+    .toc-lbl{font-size:.57rem;color:var(--text-faint);text-align:center;line-height:1.3;}
+    .toc-connector{flex:1;min-width:10px;height:1px;background:rgba(0,229,255,.12);}
+
+    /* SECTION CARDS */
+    .section-card{background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));border:1px solid rgba(0,229,255,.12);border-radius:20px;margin-bottom:32px;overflow:hidden;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.4);}
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .55s,transform .55s cubic-bezier(.22,1,.36,1);}
+    .section-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.4),transparent);animation:borderGlow 4s ease-in-out infinite;}
+    @keyframes borderGlow{0%,100%{opacity:.2}50%{opacity:.9}}
+    .section-header{display:flex;align-items:center;gap:16px;padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);}
+    .section-header::after{content:"";display:block;position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+    .section-num{font-family:"Orbitron",monospace;font-size:.62rem;font-weight:700;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:4px 10px;letter-spacing:.1em;white-space:nowrap;}
+    .section-title{font-family:"Orbitron",monospace;font-size:.95rem;font-weight:700;color:#fff;letter-spacing:.05em;}
+    .section-icon{margin-left:auto;font-size:1.4rem;opacity:.7;}
+    .section-body{padding:28px;}
+
+    /* PROSE */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    em.hl{font-style:normal;color:var(--accent);font-weight:600;}
+    em.hlg{font-style:normal;color:var(--green);font-weight:600;}
+    em.hlr{font-style:normal;color:var(--red);font-weight:600;}
+    em.hly{font-style:normal;color:var(--yellow);font-weight:600;}
+    em.hlp{font-style:normal;color:var(--purple);font-weight:600;}
+    em.hlo{font-style:normal;color:var(--orange);font-weight:600;}
+
+    /* BOXES */
+    .insight-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.03));border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .warn-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .gold-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.02));border:1px solid rgba(255,214,0,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .green-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,150,70,.02));border:1px solid rgba(0,230,118,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.2em;margin-bottom:6px;}
+    .lb-c{color:var(--accent);}
+    .lb-r{color:var(--red);}
+    .lb-g{color:var(--green);}
+    .lb-y{color:var(--yellow);}
+    .lb-p{color:var(--purple);}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+
+    /* KEY CONCEPT */
+    .key-concept{text-align:center;padding:24px 28px;margin:28px 0;background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.2);border-radius:16px;position:relative;overflow:hidden;}
+    .key-concept::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:borderGlow 3s ease-in-out infinite;}
+    .kc-label{font-family:"Share Tech Mono",monospace;font-size:.58rem;letter-spacing:.25em;color:var(--accent);opacity:.7;text-transform:uppercase;margin-bottom:10px;}
+    .kc-text{font-family:"Orbitron",monospace;font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:.04em;line-height:1.55;text-shadow:0 0 30px rgba(0,229,255,.25);}
+
+    /* CASE CARD */
+    .case-card{border-radius:18px;overflow:hidden;margin-bottom:28px;border:1px solid;transition:box-shadow .3s;}
+    .case-card.win{border-color:rgba(0,230,118,.22);}.case-card.win:hover{box-shadow:0 0 30px rgba(0,230,118,.1);}
+    .case-card.lose{border-color:rgba(255,61,90,.22);}.case-card.lose:hover{box-shadow:0 0 30px rgba(255,61,90,.1);}
+    .case-card.mixed{border-color:rgba(255,214,0,.22);}.case-card.mixed:hover{box-shadow:0 0 30px rgba(255,214,0,.08);}
+    .case-header{padding:16px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+    .case-card.win .case-header{background:rgba(0,230,118,.06);}
+    .case-card.lose .case-header{background:rgba(255,61,90,.06);}
+    .case-card.mixed .case-header{background:rgba(255,214,0,.05);}
+    .case-type{font-family:"Share Tech Mono",monospace;font-size:.58rem;padding:3px 10px;border-radius:20px;border:1px solid;white-space:nowrap;}
+    .ct-win{color:var(--green);border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.08);}
+    .ct-lose{color:var(--red);border-color:rgba(255,61,90,.35);background:rgba(255,61,90,.08);}
+    .ct-mixed{color:var(--yellow);border-color:rgba(255,214,0,.35);background:rgba(255,214,0,.08);}
+    .case-title-main{font-family:"Orbitron",monospace;font-size:.88rem;font-weight:700;color:#fff;}
+    .case-subtitle{font-size:.8rem;color:var(--text-dim);flex-basis:100%;margin-top:2px;}
+    .case-body{padding:20px 22px;}
+    .case-chart{width:100%;height:220px;background:#050c1a;border-radius:12px;border:1px solid rgba(0,229,255,.08);margin-bottom:18px;overflow:hidden;position:relative;}
+    .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+    @media(max-width:520px){.case-grid{grid-template-columns:1fr;}}
+    .case-panel{padding:14px 16px;border-radius:12px;font-size:.84rem;line-height:1.7;}
+    .cp-green{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.15);color:var(--text-dim);}
+    .cp-red{background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.15);color:var(--text-dim);}
+    .cp-cyan{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);color:var(--text-dim);}
+    .cp-yellow{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.15);color:var(--text-dim);}
+    .cp-title{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.14em;margin-bottom:7px;}
+    .cp-cyan .cp-title{color:var(--accent);}
+    .cp-green .cp-title{color:var(--green);}
+    .cp-red .cp-title{color:var(--red);}
+    .cp-yellow .cp-title{color:var(--yellow);}
+    .case-steps{display:flex;flex-direction:column;gap:0;margin:16px 0;}
+    .case-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+    .case-step:last-child{border-bottom:none;}
+    .cs-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Orbitron",monospace;font-size:.68rem;font-weight:900;}
+    .cn-c{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .cn-g{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .cn-r{background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .cn-y{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .cs-content{flex:1;}
+    .cs-title{font-size:.87rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+    .cs-desc{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+    .case-verdict{margin-top:16px;padding:14px 18px;border-radius:12px;font-size:.86rem;line---height:1.75;display:flex;gap:12px;align-items:flex-start;}
+    .verdict-win{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);}
+    .verdict-lose{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);}
+    .verdict-mixed{background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.18);}
+    .verdict-icon{font-size:1.4rem;flex-shrink:0;}
+    .verdict-body{flex:1;color:var(--text-dim);line-height:1.75;}
+
+    /* INTERACTIVE CASE SELECTOR */
+    .case-selector{background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:22px;margin:24px 0;}
+    .cs-title-bar{font-family:"Share Tech Mono",monospace;font-size:.65rem;letter-spacing:.2em;color:var(--accent);margin-bottom:16px;}
+    .cs-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+    .cs-tab{padding:8px 14px;border-radius:10px;border:1px solid rgba(0,229,255,.18);background:transparent;color:var(--text-dim);font-family:"Share Tech Mono",monospace;font-size:.66rem;letter-spacing:.07em;cursor:pointer;transition:all .2s;}
+    .cs-tab:hover{background:rgba(0,229,255,.09);border-color:rgba(0,229,255,.35);color:var(--accent);}
+    .cs-tab.active{background:rgba(0,229,255,.14);border-color:var(--accent);color:var(--accent);}
+    .cs-display{width:100%;min-height:200px;background:#050c1a;border-radius:12px;border:1px solid rgba(0,229,255,.07);overflow:hidden;margin-bottom:14px;}
+    .cs-analysis{padding:16px 18px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:12px;font-size:.85rem;color:var(--text-dim);line-height:1.8;min-height:60px;}
+    .cs-analysis strong{color:var(--accent);}
+
+    /* MISTAKE AUTOPSY */
+    .autopsy-card{border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18);margin-bottom:18px;}
+    .autopsy-head{padding:14px 20px;background:rgba(255,61,90,.06);border-bottom:1px solid rgba(255,61,90,.1);display:flex;align-items:center;gap:12px;}
+    .autopsy-num{font-family:"Orbitron",monospace;font-size:.8rem;font-weight:900;color:var(--red);width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,61,90,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .autopsy-title{font-size:.9rem;font-weight:700;color:var(--red);}
+    .autopsy-body{padding:18px 20px;}
+    .autopsy-scene{font-size:.87rem;color:var(--text-dim);line-height:1.75;margin-bottom:12px;padding:12px 14px;background:rgba(0,0,0,.2);border-radius:10px;border-left:2px solid rgba(255,61,90,.3);}
+    .autopsy-why{font-size:.86rem;color:var(--text-dim);line-height:1.75;margin-bottom:10px;}
+    .autopsy-fix{padding:10px 14px;border-radius:9px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.14);font-size:.85rem;color:var(--green);line-height:1.65;}
+
+    /* SOP TIMELINE */
+    .sop-timeline{display:flex;flex-direction:column;gap:0;margin:20px 0;}
+    .sop-step{display:flex;gap:0;align-items:stretch;}
+    .sop-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:52px;}
+    .sop-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Orbitron",monospace;font-size:.75rem;font-weight:900;flex-shrink:0;}
+    .sc-c{background:rgba(0,229,255,.12);border:1.5px solid rgba(0,229,255,.4);color:var(--accent);}
+    .sc-g{background:rgba(0,230,118,.1);border:1.5px solid rgba(0,230,118,.35);color:var(--green);}
+    .sc-y{background:rgba(255,214,0,.1);border:1.5px solid rgba(255,214,0,.35);color:var(--yellow);}
+    .sc-r{background:rgba(255,61,90,.1);border:1.5px solid rgba(255,61,90,.35);color:var(--red);}
+    .sc-p{background:rgba(178,102,255,.1);border:1.5px solid rgba(178,102,255,.35);color:var(--purple);}
+    .sc-o{background:rgba(255,152,0,.1);border:1.5px solid rgba(255,152,0,.35);color:var(--orange);}
+    .sop-line{flex:1;width:2px;background:rgba(0,229,255,.08);margin:4px auto;}
+    .sop-step:last-child .sop-line{display:none;}
+    .sop-right{flex:1;padding:4px 0 20px 16px;}
+    .sop-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:5px;}
+    .sop-desc{font-size:.83rem;color:var(--text-dim);line-height:1.7;}
+
+    /* FINAL SCORE / QUIZ */
+    .quiz-section{background:linear-gradient(135deg,rgba(0,229,255,.04),rgba(178,102,255,.03));border:1px solid rgba(0,229,255,.14);border-radius:20px;padding:28px;margin-bottom:32px;}
+    .quiz-section-title{font-family:"Orbitron",monospace;font-size:.88rem;font-weight:700;color:#fff;letter-spacing:.08em;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+    .quiz-block{margin-bottom:24px;}
+    .quiz-label{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:10px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:500;line-height:1.65;margin-bottom:14px;}
+    .quiz-options{display:flex;flex-direction:column;gap:9px;}
+    .quiz-opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:12px;border:1px solid rgba(0,229,255,.1);background:rgba(0,229,255,.03);cursor:pointer;transition:all .2s;font-size:.86rem;color:var(--text-dim);line-height:1.55;}
+    .quiz-opt:hover:not(.disabled){background:rgba(0,229,255,.09);border-color:rgba(0,229,255,.28);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-opt.correct{background:rgba(0,230,118,.1)!important;border-color:rgba(0,230,118,.4)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{background:rgba(255,61,90,.08)!important;border-color:rgba(255,61,90,.3)!important;color:var(--red)!important;}
+    .quiz-letter{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:"Share Tech Mono",monospace;font-size:.7rem;font-weight:700;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);color:var(--accent);}
+    .quiz-feedback{margin-top:12px;padding:14px 16px;border-radius:10px;font-size:.84rem;line-height:1.7;display:none;}
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.25);color:#ff8fa0;}
+
+    /* JELLY */
+    .jelly-tip{display:flex;gap:16px;align-items:flex-start;margin:22px 0;padding:18px 20px;background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(178,102,255,.03));border:1px solid rgba(0,229,255,.14);border-radius:16px;}
+    .jelly-mini-svg{width:52px;height:52px;flex-shrink:0;}
+    .jelly-bubble{background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:12px 16px;font-size:.85rem;line-height:1.75;color:var(--text);position:relative;flex:1;}
+    .jelly-bubble::before{content:"";position:absolute;left:-10px;top:16px;border:5px solid transparent;border-right-color:rgba(0,229,255,.2);}
+    .jelly-name{font-family:"Share Tech Mono",monospace;font-size:.58rem;color:var(--accent);letter-spacing:.12em;margin-bottom:6px;}
+
+    /* TABLE */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.83rem;}
+    .cmp-table th{font-family:"Share Tech Mono",monospace;font-size:.66rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;padding:11px 16px;border-bottom:1px solid rgba(0,229,255,.2);text-align:left;background:rgba(0,229,255,.04);}
+    .cmp-table td{padding:11px 16px;border-bottom:1px solid rgba(0,229,255,.05);color:var(--text-dim);line-height:1.6;vertical-align:top;}
+    .cmp-table tr:hover td{background:rgba(0,229,255,.025);}
+    .val-r{color:var(--red);font-weight:600;}
+    .val-g{color:var(--green);font-weight:600;}
+    .val-y{color:var(--yellow);font-weight:600;}
+    .val-c{color:var(--accent);font-weight:600;}
+    .val-p{color:var(--purple);font-weight:600;}
+    .val-o{color:var(--orange);font-weight:600;}
+
+    /* CHECKLIST */
+    .check-list{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+    .check-item{display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:10px;background:rgba(0,0,0,.15);border:1px solid rgba(0,229,255,.07);font-size:.86rem;color:var(--text-dim);line-height:1.65;}
+    .check-icon{flex-shrink:0;}
+
+    /* FINAL BADGE */
+    .graduation{text-align:center;padding:40px 28px;background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(178,102,255,.04));border:1px solid rgba(0,229,255,.18);border-radius:24px;margin-top:32px;position:relative;overflow:hidden;}
+    .graduation::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--purple),var(--accent),transparent);animation:borderGlow 2s ease-in-out infinite;}
+    .grad-emoji{font-size:3.5rem;margin-bottom:16px;display:block;}
+    .grad-title{font-family:"Orbitron",monospace;font-size:1.4rem;font-weight:900;color:#fff;letter-spacing:.06em;margin-bottom:12px;text-shadow:0 0 30px rgba(0,229,255,.3);}
+    .grad-desc{font-size:.9rem;color:var(--text-dim);line-height:1.8;max-width:600px;margin:0 auto;}
+
+    /* CHAPTER FOOTER */
+    .chapter-footer{margin-top:60px;padding:28px 36px;background:rgba(0,229,255,.02);border:1px solid rgba(0,229,255,.1);border-radius:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+    .footer-info{font-size:.82rem;color:var(--text-faint);line-height:1.7;}
+    .footer-info strong{color:var(--text-dim);}
+    .back-to-top{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--accent);font-family:"Share Tech Mono",monospace;font-size:.75rem;letter-spacing:.06em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .back-to-top:hover{background:rgba(0,229,255,.13);box-shadow:0 0 14px rgba(0,229,255,.25);}
+    .sdiv{font-family:"Share Tech Mono",monospace;font-size:.58rem;letter-spacing:.2em;color:var(--text-faint);text-align:center;margin:24px 0 16px;opacity:.5;}
+  </style>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><img src="/images/logo.png" alt="logo" onerror="this.style.display='none'"/></div>
+    <div><div class="logo-text">STOCKWISE</div><div class="logo-sub">TECHNICAL ANALYSIS</div></div>
+  </div>
+  <div class="header-right">
+    <span class="chapter-badge">CH.10</span>
+    <a href="javascript:history.back()" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>返回
+    </a>
+  </div>
+</header>
+
+<div class="sticky-progress">
+  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第十章進度 ── CH.10 PROGRESS</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<nav class="chapter-sidenav">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場真義</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒判讀</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">03</span><span class="ch-label">趨勢結構</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">04</span><span class="ch-label">支撐壓力</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">06</span><span class="ch-label">均線系統</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">07</span><span class="ch-label">技術指標</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">08</span><span class="ch-label">量能籌碼</span></a>
+  <a class="ch-nav-item locked"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
+  <a class="ch-nav-item current-ch"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-icon">
+      <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
+        <rect x="10" y="48" width="8" height="16" rx="2" fill="rgba(255,61,90,.7)"/>
+        <rect x="22" y="36" width="8" height="28" rx="2" fill="rgba(0,229,255,.7)"/>
+        <rect x="34" y="28" width="8" height="36" rx="2" fill="rgba(0,230,118,.8)"/>
+        <rect x="46" y="18" width="8" height="46" rx="2" fill="rgba(0,230,118,.9)"/>
+        <polyline points="14,52 26,40 38,32 50,22" stroke="rgba(0,229,255,.6)" stroke-width="1.5" stroke-dasharray="3,2" fill="none"/>
+        <circle cx="14" cy="52" r="2.5" fill="#ff3d5a"/>
+        <circle cx="26" cy="40" r="2.5" fill="#00e5ff"/>
+        <circle cx="38" cy="32" r="2.5" fill="#00e676"/>
+        <circle cx="50" cy="22" r="3.5" fill="#00e676" opacity=".9"/>
+        <circle cx="50" cy="22" r="7" fill="rgba(0,230,118,.15)"/>
+        <text x="35" y="66" fill="rgba(0,229,255,.4)" font-size="6.5" font-family="Share Tech Mono,monospace" text-anchor="middle">REAL CASES</text>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">CHAPTER 10 ── FINAL CHAPTER</div>
+      <div class="hero-title">實戰案例解析<br>真實市場的課堂</div>
+      <div class="hero-desc">學到這裡，你掌握了趨勢、K棒、支撐壓力、型態、均線、指標、量能……現在是<strong>把所有工具整合起來</strong>的時候了。本章用真實的市場邏輯，帶你像解題一樣拆解行情——包括<em class="hlr">虧錢的那種</em>。</div>
+      <div class="hero-tags">
+        <span class="tag tag-green">📈 成功案例拆解</span>
+        <span class="tag tag-red">📉 失敗案例解剖</span>
+        <span class="tag tag-cyan">🔍 互動盤勢判讀</span>
+        <span class="tag tag-yellow">⚠️ 市場陷阱辨識</span>
+        <span class="tag tag-purple">📋 完整交易SOP</span>
+        <span class="tag tag-orange">🏆 畢業測驗</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc-strip">
+    <div class="toc-item" onclick="scrollToSec('sec1')"><div class="toc-dot" id="d1">01</div><div class="toc-lbl">整合思維<br>框架</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec2')"><div class="toc-dot" id="d2">02</div><div class="toc-lbl">成功案例<br>三則</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec3')"><div class="toc-dot" id="d3">03</div><div class="toc-lbl">失敗案例<br>解剖</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec4')"><div class="toc-dot" id="d4">04</div><div class="toc-lbl">互動<br>盤勢判讀</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec5')"><div class="toc-dot" id="d5">05</div><div class="toc-lbl">完整<br>交易SOP</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec6')"><div class="toc-dot" id="d6">06</div><div class="toc-lbl">畢業<br>測驗</div></div>
+  </div>
+
+  <!-- SEC 1 整合思維框架 -->
+  <div class="section-card reveal" id="sec1">
+    <div class="section-header">
+      <span class="section-num">SEC 01</span>
+      <span class="section-title">整合思維：把九章工具組成一套武器</span>
+      <span class="section-icon">🔧</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">前九章你學到的每樣工具，都像一件武器——但沒有一件武器能獨自贏得戰役。<em class="hl">實戰的本質</em>，是在對的時機、對的位置，把對的工具組合起來用。</p>
+      <p class="prose">很多人學完技術分析後，仍然虧錢，原因不是工具學錯了，而是<em class="hlr">用工具的順序和邏輯搞錯了</em>——他們用指標決定方向，用K棒的形狀去猜未來，卻忘了先看清楚自己在哪個戰場上。</p>
+
+      <div class="key-concept">
+        <div class="kc-label">── 第十章核心觀念 ──</div>
+        <div class="kc-text">「先看地圖（趨勢），<br>再找門縫（支撐壓力），<br>等待敵人露出破綻（K棒確認），<br>才舉槍射擊（進場）。」</div>
+      </div>
+
+      <!-- Integration Framework Visual -->
+      <div class="sdiv">── 九章工具整合框架 ──</div>
+      <div style="background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.1);border-radius:16px;padding:20px;margin:16px 0;">
+        <svg viewBox="0 0 560 280" width="100%" style="display:block;max-width:560px;margin:0 auto;">
+          <!-- Layer labels -->
+          <text x="10" y="36" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono,monospace">第一層</text>
+          <text x="10" y="100" fill="rgba(0,230,118,.5)" font-size="8" font-family="Share Tech Mono,monospace">第二層</text>
+          <text x="10" y="164" fill="rgba(255,214,0,.5)" font-size="8" font-family="Share Tech Mono,monospace">第三層</text>
+          <text x="10" y="228" fill="rgba(178,102,255,.5)" font-size="8" font-family="Share Tech Mono,monospace">第四層</text>
+          <!-- Layer 1: Trend -->
+          <rect x="60" y="18" width="450" height="36" rx="10" fill="rgba(0,229,255,.06)" stroke="rgba(0,229,255,.25)" stroke-width="1"/>
+          <text x="285" y="40" fill="var(--accent)" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">趨勢方向（CH3）｜大方向先決定</text>
+          <!-- Layer 2: SR + Pattern + MA -->
+          <rect x="60" y="82" width="140" height="36" rx="9" fill="rgba(0,230,118,.05)" stroke="rgba(0,230,118,.22)" stroke-width="1"/>
+          <text x="130" y="104" fill="var(--green)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">支撐壓力（CH4）</text>
+          <rect x="210" y="82" width="140" height="36" rx="9" fill="rgba(0,230,118,.05)" stroke="rgba(0,230,118,.22)" stroke-width="1"/>
+          <text x="280" y="104" fill="var(--green)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">型態識別（CH5）</text>
+          <rect x="360" y="82" width="150" height="36" rx="9" fill="rgba(0,230,118,.05)" stroke="rgba(0,230,118,.22)" stroke-width="1"/>
+          <text x="435" y="104" fill="var(--green)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">均線系統（CH6）</text>
+          <!-- Layer 3: K-bar + Volume -->
+          <rect x="60" y="146" width="220" height="36" rx="9" fill="rgba(255,214,0,.05)" stroke="rgba(255,214,0,.22)" stroke-width="1"/>
+          <text x="170" y="168" fill="var(--yellow)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">K棒信號（CH2）</text>
+          <rect x="290" y="146" width="220" height="36" rx="9" fill="rgba(255,214,0,.05)" stroke="rgba(255,214,0,.22)" stroke-width="1"/>
+          <text x="400" y="168" fill="var(--yellow)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">量能籌碼（CH8）</text>
+          <!-- Layer 4: Indicators -->
+          <rect x="60" y="210" width="450" height="36" rx="10" fill="rgba(178,102,255,.04)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+          <text x="285" y="232" fill="var(--purple)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle">技術指標輔助（CH7）RSI ｜ MACD ｜ KD</text>
+          <!-- Arrows -->
+          <line x1="285" y1="54" x2="285" y2="82" stroke="rgba(0,229,255,.25)" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="285" y1="118" x2="285" y2="146" stroke="rgba(0,230,118,.2)" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="285" y1="182" x2="285" y2="210" stroke="rgba(255,214,0,.2)" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <!-- Entry label -->
+          <text x="285" y="268" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">▼ 多層確認 → 進場（CH9交易策略）｜執行結果（CH10實戰）▼</text>
+        </svg>
+      </div>
+
+      <table class="cmp-table">
+        <thead><tr><th>狀況</th><th>正確順序</th><th>新手常犯的錯</th></tr></thead>
+        <tbody>
+          <tr><td>看到 KD 金叉</td><td class="val-g">先確認趨勢向上，再看是否在支撐位，K棒有確認，才考慮進場</td><td class="val-r">直接買進，不看大方向</td></tr>
+          <tr><td>RSI 超賣</td><td class="val-g">先確認趨勢是否仍向下，再決定是否在超賣區進場還是繼續等</td><td class="val-r">看到 RSI 20 就抄底</td></tr>
+          <tr><td>出現頭肩頂型態</td><td class="val-g">確認整體趨勢、頸線位置，量能配合，等突破頸線再做空</td><td class="val-r">看到型態就立刻做空，不等確認</td></tr>
+          <tr><td>大漲後回調</td><td class="val-g">判斷是趨勢回調（繼續多）還是趨勢轉向（轉空），看支撐和量能</td><td class="val-r">單憑漲多就賣，或單憑跌多就買</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SEC 2 成功案例 -->
+  <div class="section-card reveal" id="sec2">
+    <div class="section-header">
+      <span class="section-num">SEC 02</span>
+      <span class="section-title">成功案例解析 — 像這樣做，才對</span>
+      <span class="section-icon">📈</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">以下三個案例，都是真實市場中反覆出現的結構性機會。我們不說股票名字——<em class="hl">因為學的是邏輯，不是跟單</em>。每個案例你都可以在任何一支股票上找到類似的樣貌。</p>
+
+      <!-- Case A -->
+      <div class="case-card win">
+        <div class="case-header">
+          <span class="case-type ct-win">✅ 成功案例 A</span>
+          <span class="case-title-main">角色轉換回測進場</span>
+          <span class="case-subtitle">「突破壓力 → 等回測 → 確認支撐 → 進場」教科書案例</span>
+        </div>
+        <div class="case-body">
+          <!-- Chart -->
+          <div class="case-chart">
+            <svg id="chartA" viewBox="0 0 600 220" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="case-grid">
+            <div class="case-panel cp-cyan">
+              <div class="cp-title">── 市場背景 ──</div>
+              週K趨勢向上，股價在 150 元附近壓力位反覆受阻三次。某天出現<strong>放量大紅棒突破</strong>，收盤站穩 155，次日繼續延伸至 162。
+            </div>
+            <div class="case-panel cp-green">
+              <div class="cp-title">── 回測確認 ──</div>
+              突破後第五天，股價從 168 高點開始回調，<strong>回測到 150～153 附近出現長下影線</strong>，成交量明顯萎縮（代表賣壓沒有增加），次日出現大紅棒站穩。
+            </div>
+          </div>
+          <div class="case-steps">
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-c">①</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">確認趨勢（週K向上）</div><div class="sop-desc">先從大框架確認大方向是多方市場，這決定了我們只尋找做多機會，不在此趨勢中做空。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-c">②</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">識別關鍵壓力（150 元區域）</div><div class="sop-desc">前高被測試三次，市場記憶深刻，這是一條強壓力線。等待突破，而不是在壓力下買進。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-g">③</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">放量突破 + 次日確認</div><div class="sop-desc">有效突破的三要素全到：大實體紅棒、成交量放大、收盤站穩、次日繼續延伸。角色轉換啟動。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-g">④</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">等待回測 150～155 區域</div><div class="sop-desc">不追高！耐心等待股價回測前壓力（現在是支撐），這是最好的進場位置——風險最小、空間最大。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-y">⑤</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">K棒止跌確認 → 進場</div><div class="sop-desc">看到長下影線 + 縮量 + 次日紅棒，回測成功確認。進場，停損設在 148（支撐帶下方 2%）。</div></div>
+            </div>
+          </div>
+          <div class="case-verdict verdict-win">
+            <div class="verdict-icon">🏆</div>
+            <div class="verdict-body"><strong style="color:var(--green)">為什麼成功？</strong><br>這個操作的每一步都有充分的確認：趨勢支持（不是逆勢操作）、關鍵位置進場（角色轉換點）、風險控制明確（停損在支撐下方），還有耐心等待（沒有追高）。這五個要素缺一不可。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case B -->
+      <div class="case-card win">
+        <div class="case-header">
+          <span class="case-type ct-win">✅ 成功案例 B</span>
+          <span class="case-title-main">趨勢回調買進法</span>
+          <span class="case-subtitle">「主升趨勢中的 HH/HL 結構確認 + 均線支撐進場」</span>
+        </div>
+        <div class="case-body">
+          <div class="case-chart">
+            <svg id="chartB" viewBox="0 0 600 220" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="case-grid">
+            <div class="case-panel cp-cyan">
+              <div class="cp-title">── 市場背景 ──</div>
+              股票處於明確的上升趨勢（每次高點比前一個高點高，每次低點比前一個低點高）。日K出現三天連跌回調，回調到<strong>20日均線附近</strong>。
+            </div>
+            <div class="case-panel cp-green">
+              <div class="cp-title">── 量能特徵 ──</div>
+              回調過程中成交量持續萎縮（賣壓不重），在均線附近<strong>出現錘子線+縮量</strong>，次日出現跳空紅棒跳過前幾天的跌幅，顯示買方積極回補。
+            </div>
+          </div>
+          <div class="case-steps">
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-c">①</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">確認主趨勢：每波高點和低點都在墊高</div><div class="sop-desc">HH（Higher High）→ HL（Higher Low）→ HH → HL 結構清晰，這是教科書式的上升趨勢。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-c">②</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">等候回調 + 均線靠近</div><div class="sop-desc">不要在高點追，而是等回調到均線（支撐）附近。20日均線是市場平均持有成本，往往是強支撐。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-g">③</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">觀察量能：回調時量縮</div><div class="sop-desc">健康的趨勢回調特徵——成交量在下跌時縮小，說明是持有者沒有出貨，只是短暫獲利了結，主力並未撤離。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-y">④</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">進場：錘子線 + 次日確認</div><div class="sop-desc">均線附近出現錘子線（多方承接），次日出現量增紅棒確認，進場。停損設在本波 HL 低點下方 2%。</div></div>
+            </div>
+          </div>
+          <div class="case-verdict verdict-win">
+            <div class="verdict-icon">💡</div>
+            <div class="verdict-body"><strong style="color:var(--green)">核心原則：順勢而為</strong><br>這個案例的關鍵是「在趨勢的方向上等待低風險進場點」。很多人知道股票在上升趨勢，卻在高點追進——正確的做法是保持耐心，讓股票回來找你，而不是你去追它。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case C -->
+      <div class="case-card win">
+        <div class="case-header">
+          <span class="case-type ct-win">✅ 成功案例 C</span>
+          <span class="case-title-main">量價背離轉折判讀</span>
+          <span class="case-subtitle">「股價創新高但量能萎縮 → 頂背離信號 → 提前減倉」</span>
+        </div>
+        <div class="case-body">
+          <div class="case-grid">
+            <div class="case-panel cp-yellow">
+              <div class="cp-title">── 信號組合 ──</div>
+              股價連創新高，但每一波新高的<strong>成交量都在縮小</strong>。同時 RSI 出現頂背離（股價新高，RSI 低於前高）。K棒實體越來越短，上影線越來越長。
+            </div>
+            <div class="case-panel cp-red">
+              <div class="cp-title">── 行動決策 ──</div>
+              這是量價背離 + RSI 頂背離 + K棒轉弱的三重警訊。不必等到趨勢明確轉向才動作，而是<strong>分批減倉</strong>——先出 1/3，保護利潤，剩餘部分設緊停利。
+            </div>
+          </div>
+          <div class="case-steps">
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-y">①</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">識別量能萎縮：新高無量</div><div class="sop-desc">每次新高的成交量都比上一次少——這叫「無量創高」。主力不跟進拉抬，說明上漲力道靠的是慣性，而非新增買盤支撐。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-y">②</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">確認 RSI 頂背離</div><div class="sop-desc">股價在第三次新高時，RSI 的高點只有前一次新高的 60%——這是動能衰退的明確佐證。兩個工具說同一件事，可信度加倍。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-r">③</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">K棒轉弱：長上影線出現</div><div class="sop-desc">第三次新高後，出現兩根長上影線——說明每次衝高都遭到賣壓壓回。賣方在高位積極出貨。</div></div>
+            </div>
+            <div class="case-step">
+              <div class="sop-left"><div class="sop-circle sc-r">④</div><div class="sop-line"></div></div>
+              <div class="sop-right"><div class="sop-title">分批減倉，不是一次全出</div><div class="sop-desc">看到警訊不必立刻全部賣出——頂部可以磨。策略：先出 1/3 落袋，其餘設緊停利（例如跌破最近支撐就全出）。讓市場決定最後一段。</div></div>
+            </div>
+          </div>
+          <div class="case-verdict verdict-win">
+            <div class="verdict-icon">🎯</div>
+            <div class="verdict-body"><strong style="color:var(--green)">為什麼重要？</strong><br>很多人在頂部虧錢，不是因為不知道要賣，而是<strong>等到明確轉跌才動作</strong>——那時已少賺了 10%～20%。提前識別警訊，分批減倉，是保護利潤最有效的做法。你不需要在最高點賣出，只需要「不要賣在很差的位置」。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 3 失敗案例解剖 -->
+  <div class="section-card reveal" id="sec3">
+    <div class="section-header">
+      <span class="section-num">SEC 03</span>
+      <span class="section-title">失敗案例解剖 — 虧錢是怎麼發生的</span>
+      <span class="section-icon">🔬</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">這一節是全系列最有價值的部分之一。<em class="hlr">失敗案例</em>不是用來讓你沮喪的，而是市場給你的<strong>免費課程</strong>——只要你願意冷靜拆解，每次虧錢背後都有一個可以學到的邏輯錯誤。</p>
+
+      <div class="autopsy-card">
+        <div class="autopsy-head">
+          <div class="autopsy-num">❌</div>
+          <div class="autopsy-title">失敗案例一：逆勢抄底，一路補倉</div>
+        </div>
+        <div class="autopsy-body">
+          <div class="autopsy-scene">情境：股票從 200 跌到 160，你覺得「跌這麼多了，一定快反彈了」，在 160 買進。沒想到繼續跌到 130，你又加碼，跌到 110 再加碼……最後停損出在 90，虧損超過 50%。</div>
+          <div class="autopsy-why"><strong style="color:var(--red)">錯在哪裡？</strong><br>
+          ① <strong>用直覺判斷「跌夠了」</strong>，而不是用趨勢和支撐判斷。200 跌到 160 跌了 20%，但趨勢判斷工具顯示的是高低點結構持續下移，沒有止跌訊號。<br>
+          ② <strong>把「便宜」當成「支撐」</strong>——股票沒有所謂的「跌夠了」，只有「跌到沒有賣方」才是真底。<br>
+          ③ <strong>補倉讓虧損複利放大</strong>——下跌趨勢中的每次補倉，都是在擴大錯誤押注，不是降低成本的英明決策。</div>
+          <div class="autopsy-fix">✅ 應該怎麼做：只在趨勢向上的環境中尋找進場機會。下跌趨勢中的「便宜股票」可能變得更便宜。「等趨勢轉向確認再買」，即使進場點比最低點高 10%，也遠比在下跌中反覆被套強。停損一定要在進場前就設好，不是設在「我虧不了」的水位。</div>
+        </div>
+      </div>
+
+      <div class="autopsy-card">
+        <div class="autopsy-head">
+          <div class="autopsy-num">❌</div>
+          <div class="autopsy-title">失敗案例二：追漲假突破，被主力洗出</div>
+        </div>
+        <div class="autopsy-body">
+          <div class="autopsy-scene">情境：股票在 100 元壓力位附近整理了兩週，突然某天漲停，你興奮地隔天追進，買在 108。結果接下來三天連跌，跌回 97——你停損，損失 10%。</div>
+          <div class="autopsy-why"><strong style="color:var(--red)">錯在哪裡？</strong><br>
+          ① <strong>沒有等待突破確認</strong>——漲停板是很強的K棒，但只是「一天」的訊號。真突破需要：次日繼續站穩、後續延伸、沒有快速打回。<br>
+          ② <strong>買在情緒高點</strong>——漲停後的隔天，是消息已充分消化後散戶追進的時機，也是主力出貨的好時機。<br>
+          ③ <strong>沒有確認成交量的質量</strong>——漲停板可以是主力拉抬（真突破），也可以是遊資一日遊（假突破）。需要確認後續是否有量能延續。</div>
+          <div class="autopsy-fix">✅ 正確做法：突破當天觀望，等第二天開盤確認是否繼續站穩。如果次日跳空高開高走+放量，才是追進的時機（雖然比漲停多付一點，但勝率大幅提升）。寧可少賺突破當天的漲幅，也要確認突破是真的。</div>
+        </div>
+      </div>
+
+      <div class="autopsy-card">
+        <div class="autopsy-head">
+          <div class="autopsy-num">❌</div>
+          <div class="autopsy-title">失敗案例三：停損設太緊，正常波動就出場</div>
+        </div>
+        <div class="autopsy-body">
+          <div class="autopsy-scene">情境：你在支撐位 80 元買進，停損設在 79.5（支撐下方 0.6%）。隔天股票正常波動到 79.3，你被停損洗出，支付手續費。結果同一天下午股票漲到 86，你沒搭上。</div>
+          <div class="autopsy-why"><strong style="color:var(--red)">錯在哪裡？</strong><br>
+          ① <strong>停損設在「精確的點」而不是「有意義的位置」</strong>——支撐是區域，不是精確數字。79.5 在支撐帶內，不代表支撐失效。<br>
+          ② <strong>停損沒有給市場「呼吸空間」</strong>——股票每天都有正常的波動範圍（ATR），停損必須放在超出正常波動的位置，才能分辨「正常波動」和「真的跌破支撐」。<br>
+          ③ <strong>停損太緊 = 被雜訊洗出</strong>——市場的短期波動是隨機的，停損太緊只會讓你頻繁出場，累積手續費和心理損耗。</div>
+          <div class="autopsy-fix">✅ 正確做法：停損設在支撐帶下方 2%～3%（而不是 0.5%）。以 80 元支撐為例，停損應設在 77.5～78 附近——這樣才是「跌破了支撐帶」的真實信號，而不是正常的日內波動。停損越精確不代表越好，越有意義才代表越好。</div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <span class="insight-icon">🔥</span>
+        <div class="insight-body">
+          <div class="insight-label lb-r">── 失敗的共同根源 ──</div>
+          <div class="insight-text">所有失敗案例追根溯源，幾乎都指向同一個問題：<strong>在不對的時機、不對的位置、帶著不正確的邏輯進場</strong>。技術分析給你的不是「必定獲利的公式」，而是「評估機率的工具」。提高勝率的方法只有一個——在確認多個條件都同向的情況下才動作，並且嚴格執行停損。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 4 互動盤勢判讀 -->
+  <div class="section-card reveal" id="sec4">
+    <div class="section-header">
+      <span class="section-num">SEC 04</span>
+      <span class="section-title">互動盤勢判讀 — 你來判斷，然後對答案</span>
+      <span class="section-icon">🔍</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">以下四個場景，每個都是市場中真實出現的結構。先看圖形，<em class="hl">自己做出判斷</em>，再點「顯示分析」驗證你的思路是否正確。</p>
+
+      <div class="case-selector">
+        <div class="cs-title-bar">▶ 選擇場景分析（四種常見市場結構）</div>
+        <div class="cs-tabs">
+          <button class="cs-tab active" onclick="showScene('breakout',this)">場景A：突破後回測</button>
+          <button class="cs-tab" onclick="showScene('diverge',this)">場景B：底背離反轉</button>
+          <button class="cs-tab" onclick="showScene('fake',this)">場景C：假突破陷阱</button>
+          <button class="cs-tab" onclick="showScene('trend',this)">場景D：趨勢回調買點</button>
+        </div>
+        <div class="cs-display"><svg id="sceneChart" viewBox="0 0 580 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg></div>
+        <div class="cs-analysis" id="sceneAnalysis">選擇上方場景，查看詳細的多層次分析——趨勢、支撐壓力、K棒、量能、指標，一次整合解析。</div>
+      </div>
+
+      <div class="jelly-tip">
+        <svg class="jelly-mini-svg" viewBox="0 0 52 52" fill="none">
+          <ellipse cx="26" cy="32" rx="17" ry="14" fill="#00e5ff" opacity=".13"/>
+          <ellipse cx="26" cy="25" rx="14" ry="13" fill="#00e5ff" opacity=".22"/>
+          <circle cx="21" cy="23" r="2.2" fill="#fff" opacity=".85"/>
+          <circle cx="31" cy="23" r="2.2" fill="#fff" opacity=".85"/>
+          <path d="M22 29 Q26 32 30 29" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="jelly-bubble">
+          <div class="jelly-name">── JELLY 提示 ──</div>
+          在分析任何盤勢之前，問自己這三個問題：<strong>① 趨勢向哪走？② 現在在哪個位置（支撐/壓力/中間）？③ K棒和量能說了什麼？</strong>三個問題都有答案了，再去看指標輔助確認。這個順序不能反過來。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 5 完整交易SOP -->
+  <div class="section-card reveal" id="sec5">
+    <div class="section-header">
+      <span class="section-num">SEC 05</span>
+      <span class="section-title">完整交易 SOP — 從看盤到執行的完整流程</span>
+      <span class="section-icon">📋</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">把前九章的所有知識，<em class="hl">整合成一套可以重複執行的流程</em>。這不是魔法公式，而是一個讓你在每次交易前都做到「思考完整」的結構。</p>
+
+      <div class="sop-timeline">
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-c">一</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">🌍 掃描大盤環境（每週一次）</div>
+            <div class="sop-desc">大盤趨勢如何？外資、投信、自營商三大法人方向是什麼？整體市場是做多有利還是做空有利？這決定了你是以多為主、以空為主，還是觀望。不要在空頭市場中拚命找多頭機會。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-c">二</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">📊 個股篩選（每週週末）</div>
+            <div class="sop-desc">在大盤方向確認後，找出符合以下條件的個股：① 趨勢與大盤方向一致 ② 接近重要支撐壓力位 ③ 量能有異動跡象 ④ 法人有持續買超（若做多）。建立一個 5～10 支的觀察清單。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-g">三</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">🔎 個股深度分析（進場前）</div>
+            <div class="sop-desc">對清單中的股票做完整分析：趨勢結構（高低點）→ 支撐壓力帶（多個時間框架）→ 近期K棒行為（止跌/止漲信號）→ 量能確認 → 指標輔助（RSI/MACD/KD 是否同向）。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-g">四</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">✅ 進場條件確認清單（下單前）</div>
+            <div class="sop-desc">必須全部確認才下單：□ 趨勢支持這個方向 □ 在合理位置進場（不是追高/殺低）□ 有K棒確認信號 □ 量能配合 □ 風報比至少 1:2（潛在獲利至少是潛在虧損的兩倍）。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-y">五</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">🛡 進場同時設定停損</div>
+            <div class="sop-desc">停損必須在按下買入的同時設定好——不是「等等看再說」。停損位置設在：有意義的技術位（支撐帶下方 2%）+ 給市場呼吸空間（避免正常波動觸發）。控制單筆虧損在總資金的 1%～2%。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-o">六</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">📈 持倉管理：移動停利</div>
+            <div class="sop-desc">進場後不要放著不管。隨著股價上漲，逐步上移停利位（例如：跌破最近支撐就出場）。在出現「量能警訊+K棒轉弱+背離」三重信號時，開始分批減倉，保護利潤。</div>
+          </div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-left"><div class="sop-circle sc-r">七</div><div class="sop-line"></div></div>
+          <div class="sop-right">
+            <div class="sop-title">📒 交易記錄與覆盤（每筆交易結束後）</div>
+            <div class="sop-desc">記錄：進場原因、停損位置、實際結果、哪裡判斷對了、哪裡判斷錯了。覆盤是提升最快的方式——不覆盤的交易者只是在不斷重複同樣的錯誤，只是次次用不同的股票代號。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="key-concept">
+        <div class="kc-label">── 交易系統最終原則 ──</div>
+        <div class="kc-text">「市場不給你每次都賺錢，<br>但你可以控制每次的虧損。<br>勝率 × 報酬率 × 次數 = 最終成果。<br>三者缺一不可。」</div>
+      </div>
+
+      <div class="check-list">
+        <div class="check-item"><span class="check-icon">📌</span><span><strong>停損是義務，停利是藝術。</strong>停損必須紀律執行，不能因為「感覺一定會回來」就跳過。停利可以讓趨勢跑，不必在頂部精準出。</span></div>
+        <div class="check-item"><span class="check-icon">📌</span><span><strong>倉位管理優先於選股。</strong>再好的股票，全倉進去後遇到黑天鵝就可能滿盤皆輸。每筆交易的風險控制在總資金 1%～2%，才能在市場中長久生存。</span></div>
+        <div class="check-item"><span class="check-icon">📌</span><span><strong>不確定的時候，最好的倉位是空倉。</strong>等待也是一種操作。市場天天都在，好機會幾週才出現一次，不是每天都要進場。</span></div>
+        <div class="check-item"><span class="check-icon">📌</span><span><strong>技術分析是工具，心理是武器。</strong>你可以把九章的工具全部學會，但如果遇到虧損就恐慌、遇到獲利就貪婪，所有工具都會失效。市場最終考驗的是你的紀律，不只是你的技術。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC 6 畢業測驗 -->
+  <div class="quiz-section" id="sec6">
+    <div class="quiz-section-title"><span>🎓</span> 畢業綜合測驗 — 整合應用</div>
+
+    <div class="quiz-block" id="q1">
+      <div class="quiz-label">測驗 1 / 8</div>
+      <div class="quiz-q">一支股票日K趨勢向上（每波高低點都墊高），目前回調到20日均線附近，出現一根長下影線的錘子線，成交量比昨天縮小30%。你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q1','B','A')"><span class="quiz-letter">A</span>立刻買進，錘子線是買入訊號不能錯過</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','B','B')"><span class="quiz-letter">B</span>等明天確認——若明天出現量增紅棒，確認止跌後進場，停損設在錘子線最低點下方2%</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','B','C')"><span class="quiz-letter">C</span>不買，縮量代表市場沒有興趣，這個股票沒機會</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','B','D')"><span class="quiz-letter">D</span>先做空，下跌趨勢一定會繼續</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="quiz-block" id="q2">
+      <div class="quiz-label">測驗 2 / 8</div>
+      <div class="quiz-q">你持有一支獲利20%的股票，突然出現放量大陰棒，跌破了近期的短期支撐。你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q2','C','A')"><span class="quiz-letter">A</span>繼續持有，一根K棒改變不了趨勢</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','B')"><span class="quiz-letter">B</span>立刻全部賣出，放量破支撐就一定跌</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','C')"><span class="quiz-letter">C</span>先減倉一部分保護利潤，把停利緊縮到短期支撐下方，等待觀察後續K棒的反應再決定是否全出</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','D')"><span class="quiz-letter">D</span>加倉，跌下來是更好的買進機會</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="quiz-block" id="q3">
+      <div class="quiz-label">測驗 3 / 8</div>
+      <div class="quiz-q">你設計了一個交易機會：進場價100元，停損95元（風險5%），目標價115元（獲利15%）。這個交易的風報比是多少？是否值得進場？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q3','B','A')"><span class="quiz-letter">A</span>風報比1:1，不值得進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','B')"><span class="quiz-letter">B</span>風報比1:3，是良好的交易設置，值得考慮（每虧1元可能賺3元）</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','C')"><span class="quiz-letter">C</span>風報比5:15，太複雜不用計算</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','D')"><span class="quiz-letter">D</span>風報比不重要，只要勝率高就夠了</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="quiz-block" id="q4">
+      <div class="quiz-label">測驗 4 / 8</div>
+      <div class="quiz-q">股票在盤整三個月後，某天放量突破上方壓力，但你沒在突破當天進場。隔天開盤，股票繼續上漲。你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q4','C','A')"><span class="quiz-letter">A</span>立刻追進，再不買就來不及了</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','B')"><span class="quiz-letter">B</span>放棄這次機會，錯過了就算了</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','C')"><span class="quiz-letter">C</span>把這支股票加入觀察清單，等待回測前壓力（角色轉換）時，以更好的風報比進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','C','D')"><span class="quiz-letter">D</span>做空，突破後一定會回來</div>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- ── 延伸閱讀：心態與資金管理 ── -->
+    <div style="margin:40px 0 8px;border-top:1px solid rgba(0,229,255,.08);padding-top:36px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.28em;color:var(--accent);opacity:.7;text-align:center;margin-bottom:24px">── 延伸閱讀：技術之外，決定你勝負的那件事 ──</div>
+    </div>
+
+    <div class="section-card reveal" id="sec6b" style="border-color:rgba(178,102,255,.18);">
+      <div class="section-header" style="background:linear-gradient(90deg,rgba(178,102,255,.06),transparent);">
+        <span class="section-num" style="color:var(--purple)">延伸</span>
+        <span class="section-title">心態管理——技術學完了，為什麼還是虧？</span>
+        <span class="section-icon">🧠</span>
+      </div>
+      <div class="section-body">
+        <p class="prose">研究顯示，散戶失敗的原因有 80% 不是「不懂技術分析」，而是<em class="hlr">「懂了卻做不到」</em>——看到虧損就移動停損、看到獲利就急著跑、看到別人賺錢就追高。技術是你的武器，心態是你能不能把武器拿穩的手。</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;">
+          <div style="background:rgba(255,61,90,.04);border:1px solid rgba(255,61,90,.18);border-radius:14px;padding:18px;">
+            <div style="font-size:1.3rem;margin-bottom:8px">😰</div>
+            <div style="font-weight:700;color:var(--red);font-size:.9rem;margin-bottom:6px">損失厭惡陷阱</div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.65">人對虧損的痛苦感是獲利快樂感的兩倍。這讓我們傾向「不賣就不算虧」，結果停損變成套牢。<br><br><strong style="color:var(--text)">解法：</strong>把停損當作「買保險的費用」，而不是「失敗的象徵」。接受小虧是交易的必然成本。</div>
+          </div>
+          <div style="background:rgba(255,214,0,.04);border:1px solid rgba(255,214,0,.18);border-radius:14px;padding:18px;">
+            <div style="font-size:1.3rem;margin-bottom:8px">🔥</div>
+            <div style="font-weight:700;color:var(--yellow);font-size:.9rem;margin-bottom:6px">過度交易陷阱</div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.65">「沒有部位就代表在浪費時間」的錯誤想法。強迫進場找訊號，在訊號不清楚的情況下硬進，是虧損最常見的起點。<br><br><strong style="color:var(--text)">解法：</strong>把「不做」當作一種積極的選擇，而不是消極的等待。</div>
+          </div>
+          <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:14px;padding:18px;">
+            <div style="font-size:1.3rem;margin-bottom:8px">🪞</div>
+            <div style="font-weight:700;color:var(--accent);font-size:.9rem;margin-bottom:6px">倖存者偏差陷阱</div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.65">你看到的成功案例都是「最終賺到錢的人」。那些因為同樣的操作而虧損出場的人，你沒機會看到。社群媒體放大了贏家的聲音。<br><br><strong style="color:var(--text)">解法：</strong>用自己的交易記錄評估方法，不要靠別人的獲利截圖。</div>
+          </div>
+          <div style="background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.18);border-radius:14px;padding:18px;">
+            <div style="font-size:1.3rem;margin-bottom:8px">🎯</div>
+            <div style="font-weight:700;color:var(--green);font-size:.9rem;margin-bottom:6px">正確心態建立</div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.65">把每筆交易看作一個機率事件，而不是一個必須贏的賭局。長期期望值為正，才是真正的目標。短期的輸贏不能代表方法的好壞。<br><br><strong style="color:var(--text)">解法：</strong>以 20 筆交易為一個評估週期，而不是以單筆結果論成敗。</div>
+          </div>
+        </div>
+
+        <div class="key-concept" style="border-color:rgba(178,102,255,.2);background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));">
+          <div class="kc-label" style="color:var(--purple)">── 心態核心原則 ──</div>
+          <div class="kc-text" style="color:var(--purple)">「你無法控制市場的走向，<br>但你可以控制你的部位大小、停損紀律，<br>以及你的進場條件。<br>把能控制的事做到極致。」</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card reveal" id="sec6c" style="border-color:rgba(0,230,118,.15);">
+      <div class="section-header" style="background:linear-gradient(90deg,rgba(0,230,118,.05),transparent);">
+        <span class="section-num" style="color:var(--green)">延伸</span>
+        <span class="section-title">資金管理公式——活下去，才能繼續賺</span>
+        <span class="section-icon">💰</span>
+      </div>
+      <div class="section-body">
+        <p class="prose">技術分析告訴你<em class="hl">「在哪裡進場」</em>，資金管理告訴你<em class="hl-green">「進多少」</em>。後者同樣重要，但大多數人只學前者。</p>
+
+        <div style="background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.1);border-radius:14px;padding:22px;margin:20px 0;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.8;margin-bottom:16px;text-transform:uppercase">▶ 1% 風險法則（最常用的資金管理方法）</div>
+          <div style="font-size:.88rem;color:var(--text);line-height:1.85;">
+            <strong style="color:var(--accent)">原則：</strong>每一筆交易，最大虧損不超過總資金的 <strong style="color:var(--red)">1%～2%</strong>。<br><br>
+            <strong style="color:#fff">範例：</strong>總資金 100 萬元，每筆最大虧損 1 萬元（1%）<br>
+            → 進場價 80 元，停損 78 元（風險 2 元/股）<br>
+            → 可買股數 = 10,000 ÷ 2 = <strong style="color:var(--green)">5,000 股（50 張）</strong><br><br>
+            <strong style="color:var(--yellow)">為什麼重要？</strong>即使連續虧損 10 筆，你只損失了 10% 的資金，仍然有足夠的子彈等待反轉。但如果每筆都重倉，3 筆連虧就可能損失 30%～50%，心理崩潰遠比技術崩潰更可怕。
+          </div>
+        </div>
+
+        <table class="cmp-table">
+          <thead><tr><th>資金規模</th><th>每筆最大虧損(1%)</th><th>連虧10筆後剩餘</th><th>心理壓力</th></tr></thead>
+          <tbody>
+            <tr><td>100萬</td><td class="val-r">-1萬/筆</td><td class="val-g">約90萬（仍可操作）</td><td style="color:var(--green)">可承受</td></tr>
+            <tr><td>100萬（每筆10%）</td><td class="val-r">-10萬/筆</td><td class="val-r">約35萬（接近崩潰）</td><td style="color:var(--red)">極大，影響判斷</td></tr>
+            <tr><td>100萬（全倉）</td><td class="val-r">視情況-5~50萬</td><td class="val-r">可能歸零</td><td style="color:var(--red)">恐慌，失去紀律</td></tr>
+          </tbody>
+        </table>
+
+        <div class="warn-box">
+          <span class="insight-icon">⚠️</span>
+          <div class="insight-body">
+            <div class="insight-label lb-r">── 槓桿的兩面刃 ──</div>
+            <div class="insight-text">槓桿可以放大獲利，也同樣放大虧損。使用融資或期貨時，同樣的 1% 風險法則必須以<strong>實際風險金額</strong>計算，而不是以帳面資產計算。很多人在槓桿下操作，以為自己在控制風險，實際上是用 10 倍的速度燒掉資金。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q5">
+      <div class="quiz-label">測驗 5 / 8</div>
+      <div class="quiz-q">大盤處於下跌趨勢，大部分個股都在跌。你找到一支個股形態很漂亮，想做多。你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q5','B','A')"><span class="quiz-letter">A</span>只要個股形態好，就不用管大盤，立刻進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','B')"><span class="quiz-letter">B</span>大盤下跌時，個股做多勝率大幅下降（大盤下跌，大多數股票被拖累下跌），應降低倉位或暫時觀望，等大盤轉向再積極做多</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','C')"><span class="quiz-letter">C</span>大盤和個股無關，只看個股就夠了</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','B','D')"><span class="quiz-letter">D</span>找逆勢強的個股，表示這支有主力在撐，一定會漲</div>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="quiz-block" id="q6">
+      <div class="quiz-label">測驗 6 / 8</div>
+      <div class="quiz-q">你在支撐位100元買進，設停損在98元。進場後股票跌到98.2，你很不安，決定把停損改到95元，給它多一點空間。這樣做對嗎？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q6','B','A')"><span class="quiz-letter">A</span>對的，停損給更多空間可以讓股票有機會回來</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','B')"><span class="quiz-letter">B</span>錯的，這是最危險的交易習慣之一——移動停損讓你暴露在更大的虧損中。停損設定了就要執行，不能因為心裡不舒服就修改</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','C')"><span class="quiz-letter">C</span>看情況，如果你對這支股票有信心可以改</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','D')"><span class="quiz-letter">D</span>停損只是參考，不一定要執行</div>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- ── 延伸閱讀：覆盤方法論 ── -->
+    <div style="margin:40px 0 8px;border-top:1px solid rgba(0,229,255,.08);padding-top:36px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.28em;color:var(--accent);opacity:.7;text-align:center;margin-bottom:24px">── 延伸閱讀：讓你進步最快的那件事 ──</div>
+    </div>
+
+    <div class="section-card reveal" id="sec6d" style="border-color:rgba(255,214,0,.15);">
+      <div class="section-header" style="background:linear-gradient(90deg,rgba(255,214,0,.05),transparent);">
+        <span class="section-num" style="color:var(--yellow)">延伸</span>
+        <span class="section-title">覆盤方法論——從每筆交易中提取價值</span>
+        <span class="section-icon">📒</span>
+      </div>
+      <div class="section-body">
+        <p class="prose">很多人覺得「覆盤」就是回去看K線然後說「啊早知道這裡賣就好了」。這不是覆盤，這是事後諸葛。<em class="hl-yellow">真正的覆盤</em>，是在當時的資訊條件下，重新審視你的決策邏輯是否正確。</p>
+
+        <div style="background:rgba(0,0,0,.2);border:1px solid rgba(255,214,0,.12);border-radius:14px;padding:22px;margin:20px 0;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--yellow);opacity:.8;margin-bottom:16px">▶ 每筆交易的覆盤問卷（建議記在交易日誌）</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,214,0,.08);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--yellow);font-size:.75rem;flex-shrink:0;width:24px">Q1</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">進場理由是什麼？</strong>把當時看到的訊號、分析邏輯完整寫下來——不是結果，是「當時為什麼這樣判斷」。</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,214,0,.08);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--yellow);font-size:.75rem;flex-shrink:0;width:24px">Q2</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">停損位在哪裡？為什麼設在那裡？</strong>「感覺」不是理由，「技術位」才是。</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,214,0,.08);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--yellow);font-size:.75rem;flex-shrink:0;width:24px">Q3</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">結果如何？</strong>盈利 or 虧損，金額多少，和預期相比如何。</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,214,0,.08);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--yellow);font-size:.75rem;flex-shrink:0;width:24px">Q4</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">這次判斷哪裡正確？</strong>哪個分析步驟是有效的，值得保留。</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(255,61,90,.04);border-radius:8px;border:1px solid rgba(255,61,90,.12);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--red);font-size:.75rem;flex-shrink:0;width:24px">Q5</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">這次判斷哪裡錯誤？</strong>是邏輯錯誤、情緒影響、還是資訊不足？下次如何避免？</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:rgba(0,229,255,.04);border-radius:8px;border:1px solid rgba(0,229,255,.1);">
+              <span style="font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:.75rem;flex-shrink:0;width:24px">Q6</span>
+              <div style="font-size:.85rem;color:var(--text-dim);line-height:1.65"><strong style="color:var(--text)">如果重來一次，你會做什麼不一樣的決定？</strong>這是整個覆盤最重要的一題。</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="prose">每做 20 筆交易，回頭看整批記錄：你的<em class="hl">進場訊號</em>哪些勝率高？哪些穩定失敗？<em class="hl-yellow">最大的虧損</em>來自哪種情境（追高？不設停損？逆勢？）——找出你個人最常犯的錯誤模式，專門針對它改進。這比學任何新技術都更能提升你的整體績效。</p>
+
+        <div style="padding:18px 22px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:12px;margin-top:16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--accent);margin-bottom:8px">── 推薦工具 ──</div>
+          <div style="font-size:.84rem;color:var(--text-dim);line-height:1.8;">
+            最簡單的交易日誌：用 <strong style="color:var(--text)">Google 試算表</strong> 記錄每筆交易（日期、股票、進場/出場價、原因、結果、心得）。<br>
+            每個月做一次統計：勝率、平均盈虧比、最大虧損筆數連續幾筆、哪類交易穩定盈利。<br>
+            <strong style="color:var(--accent)">6 個月後，你對自己的交易模式會有比任何課程都更深刻的理解。</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q7">
+      <div class="quiz-label">測驗 7 / 8</div>
+      <div class="quiz-q">下列哪一個組合是最強的做多信號？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q7','D','A')"><span class="quiz-letter">A</span>KD 黃金交叉（只有這一個訊號）</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','B')"><span class="quiz-letter">B</span>股票跌了很多，「感覺」應該要反彈了</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','C')"><span class="quiz-letter">C</span>RSI 超賣 + 出現長下影線錘子線（兩個訊號）</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','D','D')"><span class="quiz-letter">D</span>趨勢向上 + 回測週K支撐 + 出現錘子線 + 縮量回調後量增確認 + RSI底背離（五層確認）</div>
+      </div>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- ── 給完成全系列的你的一段話 ── -->
+    <div style="margin:40px 0 8px;border-top:1px solid rgba(0,229,255,.08);padding-top:36px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.28em;color:var(--accent);opacity:.7;text-align:center;margin-bottom:24px">── 在最後一題之前 ──</div>
+    </div>
+
+    <div class="section-card reveal" id="sec6e" style="border-color:rgba(0,229,255,.2);">
+      <div class="section-header" style="background:linear-gradient(90deg,rgba(0,229,255,.05),transparent);">
+        <span class="section-num" style="color:var(--accent)">結語</span>
+        <span class="section-title">給完成這套課程的你</span>
+        <span class="section-icon">🎓</span>
+      </div>
+      <div class="section-body">
+        <p class="prose">你做到了一件很多人做不到的事：<em class="hl">從頭讀到這裡</em>。大多數人看到「技術分析」就想找快速致富公式，學了幾個指標就去操作，然後虧錢，然後說「技術分析沒用」。</p>
+        <p class="prose">你選擇的是不同的路——從股票本質、市場機制，一路到K棒、趨勢、支撐壓力、型態、均線、指標、量能，最後到實戰案例和整合框架。這不是週末速成班，這是一套需要時間消化的系統。</p>
+
+        <div class="key-concept" style="margin:28px 0;">
+          <div class="kc-label">── 給你的三句話 ──</div>
+          <div class="kc-text" style="font-size:.95rem;line-height:1.9;">
+            「知識要在市場中驗證，<br>不是在課程中驗證。」<br><br>
+            「虧損是學費，但不是必修課——<br>覆盤可以讓你少交很多學費。」<br><br>
+            「市場會一直在，<br>好機會每隔幾週就出現，<br>你不需要每天都進場，<br>你只需要在對的時候，做對的事。」
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0;">
+          <div style="text-align:center;padding:18px 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.14);border-radius:12px;">
+            <div style="font-size:1.8rem;margin-bottom:6px">📚</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;margin-bottom:4px">下一步</div>
+            <div style="font-size:.78rem;color:var(--text-dim);line-height:1.5">實際在真實市場中觀察，把學到的分析框架套用在每天的盤勢上，不帶部位地練習判斷</div>
+          </div>
+          <div style="text-align:center;padding:18px 12px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.14);border-radius:12px;">
+            <div style="font-size:1.8rem;margin-bottom:6px">✍️</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--green);letter-spacing:.08em;margin-bottom:4px">建立習慣</div>
+            <div style="font-size:.78rem;color:var(--text-dim);line-height:1.5">開始記交易日誌。哪怕是模擬單，記錄你的判斷邏輯，然後驗證結果</div>
+          </div>
+          <div style="text-align:center;padding:18px 12px;background:rgba(178,102,255,.04);border:1px solid rgba(178,102,255,.14);border-radius:12px;">
+            <div style="font-size:1.8rem;margin-bottom:6px">🔁</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--purple);letter-spacing:.08em;margin-bottom:4px">回頭複習</div>
+            <div style="font-size:.78rem;color:var(--text-dim);line-height:1.5">三個月後回來重讀這套課程，你會發現自己理解了以前沒看懂的細節</div>
+          </div>
+        </div>
+
+        <div class="jelly-tip">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52" fill="none">
+            <ellipse cx="26" cy="32" rx="17" ry="14" fill="#00e5ff" opacity=".13"/>
+            <ellipse cx="26" cy="25" rx="14" ry="13" fill="#00e5ff" opacity=".22"/>
+            <circle cx="21" cy="23" r="2.2" fill="#fff" opacity=".85"/>
+            <circle cx="31" cy="23" r="2.2" fill="#fff" opacity=".85"/>
+            <path d="M22 29 Q26 32 30 29" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+          </svg>
+          <div class="jelly-bubble">
+            <div class="jelly-name">── JELLY 最後一句話 ──</div>
+            果凍不怕被壓扁，因為它知道自己的形狀會彈回來。市場也會壓著你，會讓你虧損、懷疑、想放棄。但每一次你在壓力下仍然執行停損、仍然等待訊號、仍然不追高，你就比昨天的自己更像一個真正的交易者。<strong style="color:var(--accent)">繼續前進。</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q8">
+      <div class="quiz-label">測驗 8 / 8 ── 最終題</div>
+      <div class="quiz-q">學完整個技術分析課程後，你應該期待的是什麼？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q8','C','A')"><span class="quiz-letter">A</span>每次交易都賺錢，技術分析保證勝率100%</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','B')"><span class="quiz-letter">B</span>找到一個「萬用公式」，只要執行這個公式就能穩定獲利</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','C')"><span class="quiz-letter">C</span>擁有一套評估機率的工具——在高機率情境下積極出手，在低機率情境下耐心等待，嚴格控制每筆風險，讓整體期望值為正</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','D')"><span class="quiz-letter">D</span>可以完全預測市場未來的走向</div>
+      </div>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <div id="finalScore" style="display:none;margin-top:32px;padding:32px;border-radius:18px;background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(178,102,255,.04));border:1px solid rgba(0,229,255,.2);text-align:center">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--accent);margin-bottom:12px">── 畢業測驗成績 ──</div>
+      <div id="scoreNum" style="font-family:'Orbitron',monospace;font-size:2.6rem;font-weight:900;color:var(--accent);text-shadow:0 0 30px rgba(0,229,255,.4)"></div>
+      <div id="scoreMsg" style="font-size:.9rem;color:var(--text-dim);margin-top:14px;line-height:1.8;max-width:520px;margin-left:auto;margin-right:auto"></div>
+    </div>
+  </div>
+
+  <!-- GRADUATION -->
+  <div class="graduation">
+    <span class="grad-emoji">🎓</span>
+    <div class="grad-title">恭喜完成 STOCKWISE 技術分析全系列</div>
+    <div class="grad-desc">從第一章的「資金流與市場本質」，到第十章的「實戰整合」——你已經走完一條大多數散戶從未完整走過的路。<br><br>
+    技術分析不是終點，而是起點。接下來，每一次看盤，每一次進出場，每一次覆盤，才是讓這些知識變成你的直覺、變成你的武器的過程。<br><br>
+    <strong style="color:var(--accent)">市場天天都在，好機會等你。祝你操作順利。</strong></div>
+  </div>
+
+  <div class="chapter-footer">
+    <div class="footer-info">
+      <strong>🎉 全系列完成！</strong><br>
+      CH.01～CH.10 技術分析教學課程已全部完成。<br>
+      繼續回顧任何章節，或到主頁查看即時盤勢分析。
+    </div>
+    <a class="back-to-top" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      回到主頁
+    </a>
+  </div>
+</main>
+
+<script>
+// ── Quiz ──
+const feedbackMap = {
+  q1:{c:"🎉 完全正確！等待確認是技術分析最重要的紀律之一。錘子線+趨勢+均線支撐是非常好的設置，但錘子線出現的當天不是最佳進場點——等下一根紅棒確認止跌，勝率更高。縮量回調是健康的，說明賣壓不重。",w:"❌ 正確答案是B。看到錘子線立刻買進的錯誤在於：一根K棒只是訊號，不是保證。需要等待確認K棒（次日量增紅棒），才算趨勢的延續得到確認，進場的勝率才會真正提升。"},
+  q2:{c:"🎉 正確！放量破支撐是重要的警訊，但不一定代表趨勢立刻結束。最平衡的應對是分批減倉保護已有利潤，同時緊縮停利空間觀察。這樣既不因過度謹慎放棄後續漲幅，也不因貪婪把獲利全吐回去。",w:"❌ 正確答案是C。放量破支撐是警訊，但不是「一定要全出」的信號。正確策略：先保護一部分利潤（減倉），緊縮停利位，給市場機會確認是真的轉向還是假跌破。全倉一次性清出反而容易在震盪中錯失後段。"},
+  q3:{c:"🎉 答對！風報比 = 潛在獲利 / 潛在虧損 = 15元 / 5元 = 1:3。這是良好的交易設置——即使你的勝率只有40%，只要風報比維持在1:3，長期期望值仍然為正。風報比至少要有1:2才值得進場。",w:"❌ 正確答案是B。風報比 = 潛在獲利（115-100=15元）÷ 潛在虧損（100-95=5元）= 3倍。這意味著每虧1元，潛在可以賺3元——這是良好的交易設置。風報比是衡量交易值不值得進行的最基本工具。"},
+  q4:{c:"🎉 非常正確！錯過突破不是壞事，等待回測才是最好的策略。突破後的角色轉換（壓力變支撐）提供了一個比突破當天更好的進場機會——風險更小（停損更近），潛在空間更大。好的交易者不追，他們等。",w:"❌ 正確答案是C。突破後追高是最容易被假突破洗出的行為。正確做法是把它加入觀察清單，等待回測，在角色轉換確認（前壓力變新支撐）時以更好的風報比進場。市場永遠還有下一次機會。"},
+  q5:{c:"🎉 完全正確！大盤方向是最重要的背景因素。即使個股形態完美，在空頭市場中做多的勝率大幅下降——因為大盤的下跌力量會拖累大部分個股。順勢而為的第一步，是確認大盤方向支持你的操作方向。",w:"❌ 正確答案是B。大盤環境是所有操作的背景。空頭市場中，就算個股形態漂亮，它仍然面對「整個市場的拋售壓力」。統計上，大盤下跌期間，超過70%的個股跟著跌。大盤支持你的方向，才積極出手。"},
+  q6:{c:"🎉 非常正確！隨意移動停損（尤其是向不利方向移動）是最危險的交易習慣，也是很多人小虧變大虧的根源。停損設定時就應該是你能承受的最大虧損，一旦設定，非必要不修改。執行停損是紀律，不是失敗。",w:"❌ 正確答案是B！移動停損（向不利方向擴大）是最危險的交易習慣之一。這樣做的後果：小虧變中虧，中虧變大虧。停損的意義在於『在損失還小的時候離場』，一旦設定就要執行，不能因心理不適而修改。"},
+  q7:{c:"🎉 完美！五層確認是最強的進場信號——趨勢（方向確認）+ 週K支撐（位置確認）+ 錘子線（形態確認）+ 量能配合（資金確認）+ RSI底背離（動能確認）。五個工具都說「做多」，這是市場達到高度共識的時刻，勝率最高。",w:"❌ 正確答案是D！單一訊號（只有KD金叉）的可靠性遠低於多重確認。感覺不是工具。兩層確認已比一層好，但五層確認才是最強的信號組合。越多獨立工具指向同一個方向，市場的共識越高，交易的可信度就越高。"},
+  q8:{c:"🎉 這才是技術分析的真實本質！技術分析不給你100%的勝率，也沒有萬用公式。它給你的是一套評估機率的工具——讓你在高機率的情境下積極出手，在低機率的情境下保持耐心，同時透過風險控制讓長期期望值為正。這是最成熟的交易思維。",w:"❌ 正確答案是C。技術分析的本質是機率工具，不是水晶球。它沒有辦法讓你每次都賺錢，也沒有萬用公式，更不能預測未來。它能給你的是：在對的情境下提高勝率，透過嚴格的風險管理讓整體期望值為正——這已經足夠建立長期優勢了。"}
+};
+const quizScore = {};
+const totalQ = 8;
+let answeredCount = 0;
+['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(q => quizScore[q] = false);
+
+function answer(el, qid, correct, chosen) {
+  const block = document.getElementById(qid);
+  if (block.dataset.answered) return;
+  block.dataset.answered = 'true';
+  answeredCount++;
+  const opts = block.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  const isOk = chosen === correct;
+  el.classList.add(isOk ? 'correct' : 'wrong');
+  if (!isOk) {
+    const ci = ['A','B','C','D'].indexOf(correct);
+    if (opts[ci]) opts[ci].classList.add('correct');
+  }
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = isOk ? feedbackMap[qid].c : feedbackMap[qid].w;
+  fb.className = 'quiz-feedback show ' + (isOk ? 'ok' : 'fail');
+  quizScore[qid] = isOk;
+  updateProgress();
+  if (answeredCount === totalQ) setTimeout(showFinalScore, 600);
+}
+
+function showFinalScore() {
+  const c = Object.values(quizScore).filter(Boolean).length;
+  const pct = Math.round(c / totalQ * 100);
+  const el = document.getElementById('finalScore');
+  const ne = document.getElementById('scoreNum');
+  const me = document.getElementById('scoreMsg');
+  let msg = pct === totalQ
+    ? '🏆 滿分畢業！你完全掌握了技術分析的核心思維與實戰邏輯。市場是你的練習場，繼續走下去。'
+    : pct >= 75
+    ? '🎯 優秀！你已具備完整的技術分析思維框架。建議回頭複習答錯的題目，那些正是你在實戰中最可能犯錯的地方。'
+    : '📖 繼續加油！你已經完成了全系列課程，這是很了不起的事。建議回頭重讀讓你答錯的章節——真正的學習發生在「知道自己哪裡不懂」的那一刻。';
+  ne.textContent = c + ' / ' + totalQ;
+  me.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function updateProgress() {
+  const c = Object.values(quizScore).filter(Boolean).length;
+  const sp = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
+  // 捲動佔 80%，答題正確佔 20%（bonus）
+  const combined = Math.min(100, Math.round(sp * 80 + (c / totalQ) * 20));
+  document.getElementById('progressFill').style.width = combined + '%';
+  document.getElementById('progressPct').textContent = combined + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// ── TOC / Reveal ──
+const secIds = ['sec1','sec2','sec3','sec4','sec5','sec6'];
+const dotIds = ['d1','d2','d3','d4','d5','d6'];
+const tocObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      dotIds.forEach((d, i) => {
+        const el = document.getElementById(d);
+        if (el) el.classList.toggle('active', secIds[i] === id);
+      });
+    }
+  });
+}, { threshold: 0.2 });
+secIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) tocObs.observe(el);
+});
+
+// ── Reveal：掃所有 .reveal，不限 id ──
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.section-card.reveal').forEach(el => revObs.observe(el));
+function scrollToSec(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+// ── Draw Charts ──
+function drawCandles(svgId, candles, lines) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const W = 600, H = 220, PAD = 30;
+  const prices = candles.flatMap(c => [c.h, c.l]);
+  const minP = Math.min(...prices) - 8;
+  const maxP = Math.max(...prices) + 8;
+  const scaleY = v => PAD + (1 - (v - minP) / (maxP - minP)) * (H - PAD * 2);
+  const cw = (W - PAD * 2) / candles.length;
+  let html = '';
+  // Grid
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD + (H - PAD * 2) * i / 4;
+    html += `<line x1="${PAD}" y1="${y}" x2="${W - PAD}" y2="${y}" stroke="rgba(0,229,255,0.05)" stroke-width="1"/>`;
+  }
+  // Horizontal lines (S/R)
+  if (lines) {
+    lines.forEach(ln => {
+      const y = scaleY(ln.val);
+      html += `<line x1="${PAD}" y1="${y}" x2="${W - PAD}" y2="${y}" stroke="${ln.color}" stroke-width="1.2" stroke-dasharray="5,3" opacity=".6"/>`;
+      html += `<text x="${W - PAD + 4}" y="${y + 4}" fill="${ln.color}" font-size="8.5" font-family="Share Tech Mono,monospace" opacity=".7">${ln.label}</text>`;
+    });
+  }
+  // Candles
+  candles.forEach((c, i) => {
+    const x = PAD + i * cw + cw / 2;
+    const bw = cw * 0.5;
+    const oY = scaleY(c.o), cY = scaleY(c.c), hY = scaleY(c.h), lY = scaleY(c.l);
+    const top = Math.min(oY, cY), bot = Math.max(oY, cY);
+    const bh = Math.max(bot - top, 1.5);
+    const col = c.c >= c.o ? '#ff3d5a' : '#00e676';
+    const filled = c.c >= c.o;
+    html += `<line x1="${x}" y1="${hY}" x2="${x}" y2="${lY}" stroke="${col}" stroke-width="1.4"/>`;
+    html += filled
+      ? `<rect x="${x - bw/2}" y="${top}" width="${bw}" height="${bh}" rx="1.5" fill="${col}" opacity=".88"/>`
+      : `<rect x="${x - bw/2}" y="${top}" width="${bw}" height="${bh}" rx="1.5" fill="none" stroke="${col}" stroke-width="1.6"/>`;
+    if (c.vol) {
+      const maxVol = Math.max(...candles.map(cc => cc.vol || 0));
+      const vH = (c.vol / maxVol) * 28;
+      html += `<rect x="${x - bw/2}" y="${H - 6 - vH}" width="${bw}" height="${vH}" rx="1" fill="${col}" opacity=".3"/>`;
+    }
+    if (c.label) {
+      html += `<text x="${x}" y="${hY - 5}" fill="rgba(255,214,0,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">${c.label}</text>`;
+    }
+  });
+  svg.innerHTML = html;
+}
+
+// Case A: Breakout + Pullback
+const caseACandles = [
+  {o:108,c:105,h:112,l:103,vol:60},{o:105,c:107,h:110,l:104,vol:55},
+  {o:107,c:103,h:109,l:101,vol:62},{o:103,c:106,h:108,l:102,vol:58},
+  {o:106,c:109,h:111,l:105,vol:65},{o:109,c:106,h:112,l:104,vol:70},
+  {o:106,c:108,h:110,l:105,vol:60},{o:108,c:112,h:114,l:107,vol:90},
+  {o:112,c:118,h:120,l:111,vol:130,label:"突破"},{o:118,c:122,h:124,l:117,vol:110},
+  {o:122,c:128,h:130,l:121,vol:95},{o:128,c:125,h:130,l:123,vol:80},
+  {o:125,c:119,h:127,l:118,vol:65},{o:119,c:114,h:121,l:112,vol:55},
+  {o:114,c:110,h:116,l:108,vol:48},{o:110,c:108,h:113,l:106,vol:42},
+  {o:108,c:112,h:113,l:107,vol:38,label:"縮量"},{o:112,c:120,h:122,l:111,vol:88,label:"確認"},
+  {o:120,c:126,h:128,l:119,vol:95},{o:126,c:132,h:134,l:125,vol:100}
+];
+const caseALines = [{val:110,color:'rgba(255,61,90,.7)',label:'壓力→支撐'}];
+drawCandles('chartA', caseACandles, caseALines);
+
+// Case B: Trend Pullback
+const caseBCandles = [
+  {o:80,c:85,h:86,l:79,vol:70},{o:85,c:90,h:92,l:84,vol:80},
+  {o:90,c:87,h:93,l:86,vol:55},{o:87,c:89,h:91,l:86,vol:48},
+  {o:89,c:94,h:96,l:88,vol:90},{o:94,c:100,h:102,l:93,vol:95},
+  {o:100,c:96,h:102,l:95,vol:60},{o:96,c:93,h:98,l:92,vol:52},
+  {o:93,c:91,h:95,l:90,vol:44,label:"均線"},{o:91,c:94,h:95,l:88,vol:40},
+  {o:94,c:101,h:103,l:93,vol:88,label:"確認"},{o:101,c:106,h:108,l:100,vol:92},
+  {o:106,c:112,h:114,l:105,vol:100},{o:112,c:108,h:114,l:107,vol:65},
+  {o:108,c:105,h:110,l:104,vol:52},{o:105,c:103,h:107,l:102,vol:44},
+  {o:103,c:106,h:107,l:102,vol:38,label:"均線"},{o:106,c:113,h:115,l:105,vol:90,label:"確認"},
+  {o:113,c:118,h:120,l:112,vol:95},{o:118,c:124,h:126,l:117,vol:100}
+];
+const caseBLines = [{val:91,color:'rgba(0,229,255,.6)',label:'20MA'}];
+drawCandles('chartB', caseBCandles, caseBLines);
+
+// Scene Charts
+const sceneData = {
+  breakout: {
+    candles: [
+      {o:90,c:87,h:93,l:86,vol:60},{o:87,c:89,h:91,l:86,vol:55},
+      {o:89,c:86,h:92,l:85,vol:58},{o:86,c:90,h:91,l:85,vol:62},
+      {o:90,c:87,h:92,l:86,vol:57},{o:87,c:89,h:91,l:86,vol:54},
+      {o:89,c:92,h:93,l:88,vol:65},{o:92,c:88,h:94,l:87,vol:60},
+      {o:88,c:91,h:92,l:87,vol:58},{o:91,c:95,h:97,l:90,vol:130,label:"放量突破"},
+      {o:95,c:100,h:102,l:94,vol:115},{o:100,c:105,h:107,l:99,vol:100},
+      {o:105,c:101,h:107,l:99,vol:72},{o:101,c:96,h:103,l:95,vol:55},
+      {o:96,c:93,h:98,l:92,vol:44,label:"回測"},{o:93,c:96,h:97,l:92,vol:40},
+      {o:96,c:103,h:105,l:95,vol:85,label:"確認"},{o:103,c:109,h:111,l:102,vol:95},
+      {o:109,c:114,h:116,l:108,vol:98},{o:114,c:120,h:122,l:113,vol:100}
+    ],
+    lines:[{val:93,color:'rgba(255,152,0,.7)',label:'壓→支'}],
+    analysis:'<strong>場景A：突破後回測確認 ✅</strong><br><br>🔍 <strong>趨勢：</strong>股票在壓力（93元）下方盤整很久，趨勢中性偏多。<br>📊 <strong>突破：</strong>第10天出現放量（成交量是平時2倍+）突破，收盤站穩93上方——有效突破三要素全到。<br>🔄 <strong>角色轉換：</strong>突破後股票上漲到105，然後開始回調。第15天縮量回測到93附近——前壓力在測試「是否轉為支撐」。<br>✅ <strong>進場機會：</strong>第16～17天縮量+出現止跌K棒，是角色轉換確認的進場點。停損設在92以下（支撐帶下方2%）。<br><br>💡 <strong>關鍵學習：</strong>不要在突破當天追進，等回測確認是勝率更高、風報比更好的做法。'
+  },
+  diverge: {
+    candles: [
+      {o:110,c:105,h:112,l:103,vol:80},{o:105,c:100,h:107,l:98,vol:85},
+      {o:100,c:95,h:102,l:93,vol:90},{o:95,c:90,h:97,l:88,vol:95},
+      {o:90,c:85,h:92,l:83,vol:100},{o:85,c:82,h:87,l:80,vol:92},
+      {o:82,c:79,h:84,l:77,vol:85},{o:79,c:75,h:81,l:73,vol:88},
+      {o:75,c:72,h:77,l:70,vol:95},{o:72,c:70,h:74,l:67,vol:102},
+      {o:70,c:68,h:72,l:64,vol:88,label:"新低但RSI不新低"},{o:68,c:72,h:73,l:66,vol:75},
+      {o:72,c:78,h:80,l:71,vol:90,label:"底背離確認"},{o:78,c:84,h:86,l:77,vol:100},
+      {o:84,c:90,h:92,l:83,vol:108},{o:90,c:88,h:93,l:87,vol:75},
+      {o:88,c:93,h:95,l:87,vol:80},{o:93,c:98,h:100,l:92,vol:90},
+      {o:98,c:103,h:105,l:97,vol:95},{o:103,c:108,h:110,l:102,vol:98}
+    ],
+    lines:[{val:68,color:'rgba(0,230,118,.6)',label:'底背離低點'}],
+    analysis:'<strong>場景B：底背離反轉 ✅</strong><br><br>🔍 <strong>背景：</strong>股票經歷長期下跌，從110跌到68附近。下跌趨勢主導。<br>🔀 <strong>底背離信號：</strong>股價在第10天創新低（68），但RSI在這次新低時比上一次低點的RSI值還高——股價新低，指標不新低，這是底背離。<br>📊 <strong>量能確認：</strong>創新低時成交量放大（恐慌拋售），但之後反彈伴隨量能回升，顯示買盤進場。<br>✅ <strong>進場機會：</strong>第13天出現確認K棒（放量突破短期壓力），是底背離反轉的進場點。停損設在68最低點下方2%（67）。<br><br>💡 <strong>關鍵學習：</strong>底背離不是進場指令，而是開始警覺的信號。等K棒確認反轉才行動。'
+  },
+  fake: {
+    candles: [
+      {o:88,c:85,h:90,l:83,vol:70},{o:85,c:88,h:90,l:84,vol:65},
+      {o:88,c:86,h:92,l:85,vol:68},{o:86,c:89,h:91,l:85,vol:72},
+      {o:89,c:87,h:93,l:86,vol:66},{o:87,c:90,h:91,l:86,vol:69},
+      {o:90,c:88,h:94,l:87,vol:70},{o:88,c:91,h:92,l:87,vol:67},
+      {o:91,c:97,h:99,l:90,vol:65,label:"假突破！縮量"},{o:97,c:90,h:99,l:88,vol:58},
+      {o:90,c:86,h:92,l:85,vol:68},{o:86,c:83,h:88,l:82,vol:72},
+      {o:83,c:80,h:85,l:78,vol:75},{o:80,c:77,h:82,l:76,vol:80},
+      {o:77,c:74,h:79,l:73,vol:85},{o:74,c:71,h:76,l:70,vol:90},
+      {o:71,c:68,h:73,l:67,vol:88},{o:68,c:65,h:70,l:64,vol:82},
+      {o:65,c:62,h:67,l:61,vol:78},{o:62,c:59,h:64,l:58,vol:75}
+    ],
+    lines:[{val:91,color:'rgba(255,61,90,.6)',label:'壓力'}],
+    analysis:'<strong>場景C：假突破陷阱 ❌</strong><br><br>🔍 <strong>市場背景：</strong>股票在壓力（91元）下方盤整，整體方向偏空（前期已有下跌趨勢）。<br>⚠️ <strong>假突破特徵：</strong>第9天K棒影線突破91，但收盤沒站穩，成交量沒有明顯放大（縮量突破）——假突破三大特徵全出現：縮量+只有影線+收盤未站穩。<br>❌ <strong>陷阱：</strong>在這天買進的人，隔天就被打回壓力下方，之後股票繼續下跌。停損出場損失慘重。<br>💡 <strong>防範方法：</strong>突破的有效性必須同時滿足：① 放量 ② 大實體收盤站穩 ③ 次日繼續站穩。三者缺一就要懷疑是假突破，等確認再進場。<br><br>🔑 <strong>關鍵學習：</strong>在空頭趨勢中的假突破是最常見的誘多陷阱，追進去就是被主力送走的散戶。'
+  },
+  trend: {
+    candles: [
+      {o:70,c:75,h:76,l:69,vol:80},{o:75,c:80,h:82,l:74,vol:90},
+      {o:80,c:85,h:87,l:79,vol:95},{o:85,c:82,h:87,l:81,vol:65},
+      {o:82,c:79,h:84,l:78,vol:55},{o:79,c:78,h:81,l:77,vol:48,label:"回調均線"},
+      {o:78,c:82,h:83,l:77,vol:42},{o:82,c:88,h:90,l:81,vol:88,label:"確認"},
+      {o:88,c:93,h:95,l:87,vol:95},{o:93,c:90,h:95,l:89,vol:68},
+      {o:90,c:87,h:92,l:86,vol:58},{o:87,c:84,h:89,l:83,vol:48,label:"回調均線"},
+      {o:84,c:88,h:89,l:83,vol:40},{o:88,c:95,h:97,l:87,vol:90,label:"確認"},
+      {o:95,c:100,h:102,l:94,vol:98},{o:100,c:97,h:103,l:96,vol:70},
+      {o:97,c:94,h:99,l:93,vol:58},{o:94,c:91,h:96,l:90,vol:46,label:"回調"},
+      {o:91,c:95,h:96,l:90,vol:40},{o:95,c:102,h:104,l:94,vol:92,label:"確認"}
+    ],
+    lines:[{val:78,color:'rgba(0,229,255,.5)',label:'20MA'}],
+    analysis:'<strong>場景D：趨勢回調買點 ✅</strong><br><br>🔍 <strong>趨勢確認：</strong>清晰的上升趨勢——HH（每波高點墊高）+ HL（每波低點也墊高）。每波回調都在20日均線附近獲得支撐。<br>📊 <strong>量能特徵：</strong>每次上漲量能放大；每次回調量能縮小——這是「健康的趨勢回調」，主力沒有大量出貨，只是短暫獲利了結。<br>✅ <strong>三次進場機會：</strong>第6、12、17天分別在均線附近縮量回調，然後次日量增確認反彈——這三次都是教科書式的「趨勢回調買點」。每次進場後，股票繼續上漲創新高。<br>🎯 <strong>停損設置：</strong>每次進場的停損設在最近的HL低點下方2%——讓市場有呼吸空間，同時不虧超過正常範圍。<br><br>💡 <strong>關鍵學習：</strong>在強趨勢中「等回調」是最好的策略，勝率和風報比都遠優於追高。'
+  }
+};
+
+function showScene(key, btn) {
+  document.querySelectorAll('.cs-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = sceneData[key];
+  // Redraw
+  const W = 580, H = 200, PAD = 28;
+  const prices = d.candles.flatMap(c => [c.h, c.l]);
+  const minP = Math.min(...prices) - 6;
+  const maxP = Math.max(...prices) + 6;
+  const scaleY = v => PAD + (1 - (v - minP) / (maxP - minP)) * (H - PAD * 2);
+  const cw = (W - PAD * 2) / d.candles.length;
+  let html = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD + (H - PAD * 2) * i / 4;
+    html += `<line x1="${PAD}" y1="${y}" x2="${W - PAD}" y2="${y}" stroke="rgba(0,229,255,0.04)" stroke-width="1"/>`;
+  }
+  if (d.lines) {
+    d.lines.forEach(ln => {
+      const y = scaleY(ln.val);
+      html += `<line x1="${PAD}" y1="${y}" x2="${W - PAD}" y2="${y}" stroke="${ln.color}" stroke-width="1.2" stroke-dasharray="5,3" opacity=".65"/>`;
+      html += `<text x="${W - PAD + 3}" y="${y + 4}" fill="${ln.color}" font-size="8" font-family="Share Tech Mono,monospace" opacity=".7">${ln.label}</text>`;
+    });
+  }
+  const maxVol = Math.max(...d.candles.map(c => c.vol || 0));
+  d.candles.forEach((c, i) => {
+    const x = PAD + i * cw + cw / 2;
+    const bw = cw * 0.52;
+    const oY = scaleY(c.o), cY = scaleY(c.c), hY = scaleY(c.h), lY = scaleY(c.l);
+    const top = Math.min(oY, cY), bot = Math.max(oY, cY);
+    const bh = Math.max(bot - top, 1.5);
+    const col = c.c >= c.o ? '#ff3d5a' : '#00e676';
+    const filled = c.c >= c.o;
+    if (c.vol) {
+      const vH = (c.vol / maxVol) * 22;
+      html += `<rect x="${x - bw/2}" y="${H - 4 - vH}" width="${bw}" height="${vH}" rx="1" fill="${col}" opacity=".28"/>`;
+    }
+    html += `<line x1="${x}" y1="${hY}" x2="${x}" y2="${lY}" stroke="${col}" stroke-width="1.3"/>`;
+    html += filled
+      ? `<rect x="${x - bw/2}" y="${top}" width="${bw}" height="${bh}" rx="1.5" fill="${col}" opacity=".85"/>`
+      : `<rect x="${x - bw/2}" y="${top}" width="${bw}" height="${bh}" rx="1.5" fill="none" stroke="${col}" stroke-width="1.5"/>`;
+    if (c.label) {
+      html += `<text x="${x}" y="${hY - 5}" fill="rgba(255,214,0,.85)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">${c.label}</text>`;
+    }
+  });
+  document.getElementById('sceneChart').innerHTML = html;
+  document.getElementById('sceneAnalysis').innerHTML = d.analysis;
+}
+// Init scene
+showScene('breakout', document.querySelector('.cs-tab'));
+</script>
+</body>
+</html>

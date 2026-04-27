@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第六章：均線——市場成本線的真相 — JellyStock 技術分析教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#03060d; --surface:#070d1a; --surface2:#0b1220;
+      --border:#0e1828; --border2:#152234;
+      --accent:#00e5ff; --accent2:#0099bb; --accent3:#00aaff;
+      --green:#00e676; --red:#ff3d5a; --yellow:#ffd600;
+      --purple:#b266ff; --pink:#ff6eb4;
+      --muted:#3a5070; --text:#d4e4f7; --text-dim:#7a9ab8; --text-faint:#4a6888;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.2) transparent;}
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    /* ── BG ── */
+    .bg-nebula{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 15% 20%,rgba(10,40,120,.22) 0%,transparent 55%),radial-gradient(ellipse 55% 40% at 85% 75%,rgba(0,80,60,.15) 0%,transparent 50%),radial-gradient(ellipse 90% 50% at 50% 0%,rgba(0,60,140,.18) 0%,transparent 55%),radial-gradient(ellipse 40% 30% at 75% 25%,rgba(60,0,120,.1) 0%,transparent 40%);}
+    .bg-scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);}
+
+    /* ── HEADER ── */
+    header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 16px;height:58px;border-bottom:1px solid rgba(0,229,255,.09);background:rgba(3,6,14,.97);backdrop-filter:blur(24px);box-shadow:0 2px 24px rgba(0,0,0,.5);}
+    header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);background-size:200% 100%;animation:headerSweep 4s linear infinite;}
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .header-left{display:flex;align-items:center;gap:0;}
+    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .back-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,255,.18);background:rgba(0,229,255,.05);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.08em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);box-shadow:0 0 14px rgba(0,229,255,.2)}
+    .back-btn svg{width:12px;height:12px;flex-shrink:0}
+    .chapter-badge{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:3px 10px;letter-spacing:.12em;}
+
+    /* ── STICKY PROGRESS ── */
+    .sticky-progress{position:sticky;top:58px;z-index:190;background:rgba(3,6,14,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,229,255,.07);}
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;}
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    /* ── CHAPTER SIDENAV ── */
+    .chapter-sidenav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;gap:0;background:rgba(3,6,14,.88);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,.1);border-left:none;border-radius:0 12px 12px 0;overflow:hidden;}
+    .ch-nav-item{display:flex;align-items:center;gap:0;padding:10px 14px 10px 12px;font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.08em;color:var(--text-faint);text-decoration:none;cursor:pointer;border-left:2px solid transparent;transition:all .2s;white-space:nowrap;border-bottom:1px solid rgba(0,229,255,.06);position:relative;overflow:hidden;}
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
+    .ch-nav-item .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
+    .ch-nav-item:hover .ch-label,.ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item:hover{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
+    .ch-nav-item.current-ch{color:var(--pink);border-left-color:var(--pink);background:rgba(255,110,180,.07);}
+    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MAIN ── */
+    main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:36px 28px 120px;}
+
+    /* ── HERO ── */
+    .hero{display:flex;align-items:center;gap:36px;margin-bottom:48px;background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));border:1px solid rgba(0,229,255,.14);border-radius:24px;padding:36px 40px;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;}
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero-icon{width:110px;height:110px;border-radius:20px;border:1px solid rgba(178,102,255,.3);background:linear-gradient(135deg,rgba(178,102,255,.12),rgba(120,60,200,.06));display:grid;place-items:center;flex-shrink:0;box-shadow:0 0 32px rgba(178,102,255,.2);}
+    .hero-icon svg{width:60px;height:60px;color:var(--purple);filter:drop-shadow(0 0 12px rgba(178,102,255,.5));}
+    .hero-content{flex:1;min-width:0;}
+    .hero-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.35em;color:var(--purple);text-transform:uppercase;opacity:.8;margin-bottom:8px;}
+    .hero-title{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;line-height:1.25;letter-spacing:.04em;margin-bottom:12px;background:linear-gradient(90deg,#fff 50%,rgba(178,102,255,.85));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(178,102,255,.2));}
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:4px 12px;border-radius:20px;letter-spacing:.08em;border:1px solid;cursor:default;}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+
+    /* ── SECTION CARD ── */
+    .section-card{background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));border:1px solid rgba(0,229,255,.12);border-radius:20px;margin-bottom:32px;overflow:hidden;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .section-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.5),transparent);animation:borderGlow 4s ease-in-out infinite;}
+    @keyframes borderGlow{0%,100%{opacity:.25}50%{opacity:1}}
+    .section-card.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);}
+    .card-header{padding:22px 28px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(0,229,255,.08);background:linear-gradient(90deg,rgba(0,229,255,.035),rgba(0,100,200,.02),transparent);}
+    .card-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(0,100,200,.06));border:1px solid rgba(0,229,255,.2);font-size:1.4rem;}
+    .card-title-wrap{flex:1}
+    .card-num{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);opacity:.7;margin-bottom:3px;}
+    .card-title{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:.04em;}
+    .card-body{padding:24px 28px;}
+
+    /* ── CONTENT ── */
+    .content-para{font-size:.9rem;line-height:1.85;color:var(--text);margin-bottom:18px;}
+    .content-para:last-child{margin-bottom:0}
+    em.hl{font-style:normal;color:var(--accent);font-weight:600;}
+    em.hl-pink{font-style:normal;color:var(--pink);font-weight:600;}
+    em.hl-yellow{font-style:normal;color:var(--yellow);font-weight:600;}
+    em.hl-green{font-style:normal;color:var(--green);font-weight:600;}
+    em.hl-purple{font-style:normal;color:var(--purple);font-weight:600;}
+    em.hl-red{font-style:normal;color:var(--red);font-weight:600;}
+
+    /* ── KEY CONCEPT ── */
+    .key-concept{text-align:center;padding:24px 28px;margin:28px 0;background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(178,102,255,.02));border:1px solid rgba(178,102,255,.2);border-radius:16px;position:relative;overflow:hidden;}
+    .key-concept::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);animation:borderGlow 3s ease-in-out infinite;}
+    .key-concept-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.25em;color:var(--purple);opacity:.7;text-transform:uppercase;margin-bottom:10px;}
+    .key-concept-text{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:var(--purple);letter-spacing:.04em;line-height:1.5;text-shadow:0 0 30px rgba(178,102,255,.3);}
+
+    /* ── INSIGHT / WARN BOX ── */
+    .insight-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(0,100,200,.04));border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .warn-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,61,90,.07),rgba(200,20,50,.03));border:1px solid rgba(255,61,90,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .trap-box{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(200,160,0,.03));border:1px solid rgba(255,214,0,.22);border-radius:14px;padding:18px 20px;margin:20px 0;}
+    .insight-icon{font-size:1.4rem;flex-shrink:0;padding-top:2px;}
+    .insight-text{font-size:.88rem;line-height:1.8;color:var(--text);}
+    .insight-quote{font-family:'Orbitron',monospace;font-size:.78rem;color:var(--accent);display:block;margin-top:8px;letter-spacing:.04em;}
+    .warn-box .insight-text{color:var(--text-dim);}
+    .trap-box .insight-text{color:var(--text-dim);}
+
+    /* ── EXAMPLE BOX ── */
+    .example-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,214,0,.15);border-radius:12px;padding:16px 20px;margin:18px 0;position:relative;}
+    .example-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--yellow);opacity:.8;margin-bottom:8px;text-transform:uppercase;}
+    .example-box p{font-size:.87rem;line-height:1.8;color:var(--text-dim);}
+
+    /* ── MA LINE VISUAL ── */
+    .ma-visual{background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.1);border-radius:14px;padding:16px;margin:20px 0;overflow:hidden;}
+    .ma-visual-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.8;margin-bottom:12px;text-transform:uppercase;}
+
+    /* ── MA TYPE GRID ── */
+    .ma-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+    @media(max-width:540px){.ma-grid{grid-template-columns:1fr;}}
+    .ma-card{padding:18px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid;transition:transform .2s,border-color .2s;}
+    .ma-card:hover{transform:translateY(-3px);}
+    .ma-card.ma5{border-color:rgba(255,214,0,.25);}
+    .ma-card.ma5:hover{border-color:rgba(255,214,0,.5);}
+    .ma-card.ma20{border-color:rgba(0,229,255,.25);}
+    .ma-card.ma20:hover{border-color:rgba(0,229,255,.5);}
+    .ma-card.ma60{border-color:rgba(178,102,255,.25);}
+    .ma-card.ma60:hover{border-color:rgba(178,102,255,.5);}
+    .ma-card.ma120{border-color:rgba(255,110,180,.25);}
+    .ma-card.ma120:hover{border-color:rgba(255,110,180,.5);}
+    .ma-card.ma240{border-color:rgba(0,230,118,.25);}
+    .ma-card.ma240:hover{border-color:rgba(0,230,118,.5);}
+    .ma-label{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;margin-bottom:6px;}
+    .ma-label.y{color:var(--yellow);}
+    .ma-label.c{color:var(--accent);}
+    .ma-label.p{color:var(--purple);}
+    .ma-label.pk{color:var(--pink);}
+    .ma-label.g{color:var(--green);}
+    .ma-name{font-size:.82rem;color:var(--text);font-weight:600;margin-bottom:4px;}
+    .ma-meaning{font-size:.78rem;color:var(--text-dim);line-height:1.6;}
+
+    /* ── SCENARIO BLOCK ── */
+    .scenario-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+    @media(max-width:560px){.scenario-row{grid-template-columns:1fr;}}
+    .scenario-card{padding:18px;border-radius:14px;border:1px solid;}
+    .scenario-card.bull{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04);}
+    .scenario-card.bear{border-color:rgba(255,61,90,.2);background:rgba(255,61,90,.04);}
+    .scenario-card.neutral{border-color:rgba(255,214,0,.2);background:rgba(255,214,0,.04);}
+    .scenario-icon{font-size:1.5rem;margin-bottom:8px;display:block;}
+    .scenario-title{font-weight:700;font-size:.9rem;margin-bottom:6px;}
+    .scenario-card.bull .scenario-title{color:var(--green);}
+    .scenario-card.bear .scenario-title{color:var(--red);}
+    .scenario-card.neutral .scenario-title{color:var(--yellow);}
+    .scenario-desc{font-size:.82rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── DIVERGENCE METER ── */
+    .diverge-demo{background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.1);border-radius:14px;padding:20px;margin:20px 0;}
+    .diverge-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.8;margin-bottom:16px;}
+    .diverge-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+    .diverge-bar-label{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);width:80px;flex-shrink:0;text-align:right;}
+    .diverge-bar-track{flex:1;height:10px;border-radius:6px;background:rgba(0,229,255,.06);overflow:hidden;position:relative;}
+    .diverge-bar-fill{height:100%;border-radius:6px;position:relative;}
+    .diverge-bar-fill.safe{background:linear-gradient(90deg,rgba(0,230,118,.4),var(--green));}
+    .diverge-bar-fill.warn{background:linear-gradient(90deg,rgba(255,214,0,.5),var(--yellow));}
+    .diverge-bar-fill.danger{background:linear-gradient(90deg,rgba(255,61,90,.5),var(--red));}
+    .diverge-bar-pct{font-family:'Share Tech Mono',monospace;font-size:.65rem;width:42px;flex-shrink:0;}
+    .diverge-bar-pct.safe{color:var(--green);}
+    .diverge-bar-pct.warn{color:var(--yellow);}
+    .diverge-bar-pct.danger{color:var(--red);}
+    .diverge-legend{font-size:.75rem;color:var(--text-faint);margin-top:10px;}
+
+    /* ── TRAP SCENARIO (黃金交叉陷阱) ── */
+    .trap-steps{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+    .trap-step{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;border-radius:10px;background:rgba(0,0,0,.2);border:1px solid rgba(255,214,0,.08);}
+    .trap-step-num{font-family:'Orbitron',monospace;font-size:.75rem;font-weight:900;color:var(--yellow);flex-shrink:0;width:22px;}
+    .trap-step-text{font-size:.85rem;color:var(--text-dim);line-height:1.65;}
+    .trap-step-text strong{color:var(--text);}
+    .trap-step.danger-step{border-color:rgba(255,61,90,.18);background:rgba(255,61,90,.04);}
+    .trap-step.danger-step .trap-step-num{color:var(--red);}
+
+    /* ── COMPARE TABLE ── */
+    .compare-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.83rem;}
+    .compare-table th{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;padding:10px 16px;border-bottom:1px solid rgba(0,229,255,.2);text-align:left;background:rgba(0,229,255,.04);}
+    .compare-table td{padding:11px 16px;border-bottom:1px solid rgba(0,229,255,.06);color:var(--text-dim);line-height:1.65;}
+    .compare-table tr:hover td{background:rgba(0,229,255,.025);}
+    .td-bull{color:var(--green)!important;font-weight:600;}
+    .td-bear{color:var(--red)!important;font-weight:600;}
+    .td-warn{color:var(--yellow)!important;font-weight:600;}
+
+    /* ── JELLY TIP ── */
+    .jelly-tip{display:flex;gap:16px;align-items:flex-start;margin:24px 0;padding:20px 22px;background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(255,110,180,.03));border:1px solid rgba(0,229,255,.15);border-radius:16px;}
+    .jelly-tip-mascot{flex-shrink:0;}
+    .jelly-mini-svg{width:52px;height:52px;}
+    .jelly-tip-bubble{background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:12px 16px;font-size:.85rem;line-height:1.75;color:var(--text);position:relative;flex:1;}
+    .jelly-tip-bubble::before{content:'';position:absolute;left:-10px;top:16px;border:5px solid transparent;border-right-color:rgba(0,229,255,.2);}
+    .jelly-tip-name{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--accent);letter-spacing:.12em;margin-bottom:6px;}
+
+    /* ── QUIZ ── */
+    .quiz-block{background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(120,60,200,.04));border:1px solid rgba(178,102,255,.22);border-radius:16px;padding:24px;margin-top:28px;}
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.22em;color:var(--purple);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .quiz-label::before{content:'⚡'}
+    .quiz-q{font-size:.92rem;font-weight:600;color:#fff;margin-bottom:16px;line-height:1.6;}
+    .quiz-options{display:flex;flex-direction:column;gap:8px;}
+    .quiz-opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;border:1px solid rgba(178,102,255,.15);background:rgba(178,102,255,.04);font-size:.87rem;color:var(--text-dim);transition:all .2s;user-select:none;}
+    .quiz-opt:hover:not(.disabled){background:rgba(178,102,255,.1);border-color:rgba(178,102,255,.35);color:var(--text)}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.5)!important;background:rgba(0,230,118,.1)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{border-color:rgba(255,61,90,.5)!important;background:rgba(255,61,90,.1)!important;color:var(--red)!important;}
+    .quiz-opt.disabled{cursor:default;pointer-events:none;}
+    .quiz-letter{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;border:1px solid rgba(178,102,255,.35);color:var(--purple);background:rgba(178,102,255,.08);}
+    .quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.85rem;line-height:1.7;display:none;}
+    .quiz-feedback.show{display:block}
+    .quiz-feedback.ok{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.25);color:#ff8fa0;}
+
+    /* ── CHECKLIST ── */
+    .checklist{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+    .check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:10px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);}
+    .check-icon{font-size:1rem;flex-shrink:0;padding-top:1px;}
+    .check-text{font-size:.86rem;color:var(--text);line-height:1.65;}
+    .check-text strong{color:var(--accent);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer{margin-top:60px;padding:28px 36px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+    .footer-info{font-size:.82rem;color:var(--text-faint);line-height:1.7;}
+    .footer-info strong{color:var(--text-dim);}
+    .next-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.06em;cursor:default;opacity:.5;}
+    .next-btn svg{width:15px;height:15px;}
+
+    /* ── FINAL SCORE ── */
+    #finalScore{display:none;margin-top:28px;padding:24px;border-radius:16px;background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(0,229,255,.05));border:1px solid rgba(178,102,255,.2);text-align:center;}
+    #scoreNum{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--purple);text-shadow:0 0 30px rgba(178,102,255,.4);}
+    #scoreMsg{font-size:.88rem;color:var(--text-dim);margin-top:10px;line-height:1.7;}
+
+    @media(max-width:640px){
+      main{padding:28px 16px 80px;}
+      .hero{flex-direction:column;text-align:center;padding:28px 20px;gap:24px;}
+      .card-body{padding:18px 18px;}
+      .card-header{padding:18px 18px 14px;}
+      .hero-title{font-size:1.2rem;}
+      .ma-grid{grid-template-columns:1fr 1fr;}
+    }
+
+    /* ══ 白天主題 theme-day ══════════════════════════════════════════════════ */
+    body.theme-day{
+      --bg:#ddeaf6;--surface:#f0f7ff;--surface2:#e4f0fa;
+      --accent:#1a7bbf;--accent2:#1565a0;
+      --green:#1a8a3c;--red:#c0392b;--yellow:#c8890a;
+      --purple:#7c4daa;--pink:#c0396e;
+      --muted:#7a9cb8;--text:#0a2540;--text-dim:#1e4060;--text-faint:#4a7090;
+      background:linear-gradient(180deg,#a8d4f0 0%,#c8e4f8 30%,#ddeaf6 100%) !important;
+    }
+    body.theme-day .bg-nebula,body.theme-day .bg-scanlines{opacity:0 !important;}
+    body.theme-day header{background:rgba(255,255,255,.88) !important;backdrop-filter:blur(20px) saturate(1.8);border-bottom:1px solid rgba(26,123,191,.18) !important;box-shadow:0 2px 20px rgba(26,100,180,.1) !important;}
+    body.theme-day header::after{background:linear-gradient(90deg,transparent,rgba(26,123,191,.55),rgba(33,150,211,.75),rgba(26,123,191,.55),transparent) !important;opacity:.8;}
+    body.theme-day .logo-text{color:#0a2540 !important;text-shadow:none !important;}
+    body.theme-day .logo-sub{color:#1a7bbf !important;opacity:.85;}
+    body.theme-day .back-btn{color:#1e4060 !important;background:rgba(26,123,191,.07) !important;border-color:rgba(26,123,191,.22) !important;}
+    body.theme-day .back-btn:hover{color:#1a7bbf !important;border-color:rgba(26,123,191,.45) !important;background:rgba(26,123,191,.13) !important;}
+    body.theme-day .chapter-badge{color:#1a7bbf !important;background:rgba(26,123,191,.1) !important;border-color:rgba(26,123,191,.3) !important;}
+    body.theme-day .sticky-progress{background:rgba(240,247,255,.96) !important;border-bottom-color:rgba(26,123,191,.15) !important;}
+    body.theme-day .progress-track-sticky{background:rgba(26,123,191,.1) !important;}
+    body.theme-day .progress-fill-sticky{background:linear-gradient(90deg,#1a7bbf,#c0396e) !important;box-shadow:0 0 8px rgba(26,123,191,.35) !important;}
+    body.theme-day .progress-label-sm{color:#4a7090 !important;}
+    body.theme-day .progress-pct-sm{color:#1a7bbf !important;}
+    body.theme-day .chapter-sidenav{background:rgba(240,247,255,.95) !important;border-color:rgba(26,123,191,.18) !important;}
+    body.theme-day .ch-nav-item{color:#4a7090 !important;border-bottom-color:rgba(26,123,191,.08) !important;}
+    body.theme-day .ch-nav-item:hover{color:#1a7bbf !important;background:rgba(26,123,191,.07) !important;border-left-color:rgba(26,123,191,.4) !important;}
+    body.theme-day .ch-nav-item.current-ch{color:#c0396e !important;background:rgba(192,57,110,.06) !important;border-left-color:#c0396e !important;}
+    body.theme-day .ch-nav-item.locked{opacity:.3 !important;}
+    body.theme-day .hero{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(240,247,255,.95)) !important;border-color:rgba(26,123,191,.2) !important;box-shadow:0 8px 32px rgba(26,100,180,.1) !important;}
+    body.theme-day .hero::before{background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.7),rgba(26,123,191,.5),transparent) !important;}
+    body.theme-day .hero-label{color:#7c4daa !important;}
+    body.theme-day .hero-title{background:linear-gradient(90deg,#0a2540 50%,#7c4daa) !important;-webkit-background-clip:text !important;background-clip:text !important;filter:none !important;}
+    body.theme-day .hero-desc{color:#1e4060 !important;}
+    body.theme-day .hero-icon{background:linear-gradient(135deg,rgba(124,77,170,.12),rgba(100,50,180,.06)) !important;border-color:rgba(124,77,170,.3) !important;box-shadow:0 0 24px rgba(124,77,170,.15) !important;}
+    body.theme-day .hero-icon svg{color:#7c4daa !important;filter:none !important;}
+    body.theme-day .section-card{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(240,247,255,.95)) !important;border-color:rgba(26,123,191,.16) !important;box-shadow:0 8px 32px rgba(26,100,180,.08) !important;}
+    body.theme-day .section-card::before{background:linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent) !important;}
+    body.theme-day .card-header{background:linear-gradient(90deg,rgba(26,123,191,.05),rgba(26,100,200,.02),transparent) !important;border-bottom-color:rgba(26,123,191,.1) !important;}
+    body.theme-day .card-icon{background:linear-gradient(135deg,rgba(26,123,191,.12),rgba(26,100,200,.06)) !important;border-color:rgba(26,123,191,.25) !important;}
+    body.theme-day .card-num{color:#1a7bbf !important;}
+    body.theme-day .card-title{color:#0a2540 !important;}
+    body.theme-day .content-para{color:#1e4060 !important;}
+    body.theme-day em.hl{color:#1a7bbf !important;}
+    body.theme-day em.hl-pink{color:#c0396e !important;}
+    body.theme-day em.hl-yellow{color:#c8890a !important;}
+    body.theme-day em.hl-green{color:#1a8a3c !important;}
+    body.theme-day em.hl-purple{color:#7c4daa !important;}
+    body.theme-day em.hl-red{color:#c0392b !important;}
+    body.theme-day .key-concept{background:linear-gradient(135deg,rgba(124,77,170,.07),rgba(124,77,170,.03)) !important;border-color:rgba(124,77,170,.22) !important;}
+    body.theme-day .key-concept-label{color:#7c4daa !important;}
+    body.theme-day .key-concept-text{color:#7c4daa !important;text-shadow:none !important;}
+    body.theme-day .insight-box{background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,100,200,.04)) !important;border-color:rgba(26,123,191,.25) !important;}
+    body.theme-day .insight-text{color:#1e4060 !important;}
+    body.theme-day .insight-quote{color:#1a7bbf !important;}
+    body.theme-day .warn-box{background:linear-gradient(135deg,rgba(192,57,110,.07),rgba(180,30,50,.03)) !important;border-color:rgba(192,57,110,.25) !important;}
+    body.theme-day .warn-box .insight-text{color:#3a1020 !important;}
+    body.theme-day .trap-box{background:linear-gradient(135deg,rgba(200,137,10,.07),rgba(180,110,0,.03)) !important;border-color:rgba(200,137,10,.25) !important;}
+    body.theme-day .trap-box .insight-text{color:#4a3000 !important;}
+    body.theme-day .example-box{background:rgba(255,255,255,.7) !important;border-color:rgba(200,137,10,.25) !important;}
+    body.theme-day .example-label{color:#c8890a !important;}
+    body.theme-day .example-box p{color:#2a4060 !important;}
+    body.theme-day .ma-card{background:rgba(255,255,255,.75) !important;}
+    body.theme-day .ma-card.ma5{border-color:rgba(200,137,10,.35) !important;}
+    body.theme-day .ma-card.ma20{border-color:rgba(26,123,191,.35) !important;}
+    body.theme-day .ma-card.ma60{border-color:rgba(124,77,170,.35) !important;}
+    body.theme-day .ma-card.ma120{border-color:rgba(192,57,110,.35) !important;}
+    body.theme-day .ma-card.ma240{border-color:rgba(26,138,60,.35) !important;}
+    body.theme-day .ma-name{color:#0a2540 !important;}
+    body.theme-day .ma-meaning{color:#2a4060 !important;}
+    body.theme-day .ma-visual{background:rgba(255,255,255,.6) !important;border-color:rgba(26,123,191,.15) !important;}
+    body.theme-day .ma-visual-title{color:#1a7bbf !important;}
+    body.theme-day .scenario-card.bull{background:rgba(26,138,60,.06) !important;border-color:rgba(26,138,60,.25) !important;}
+    body.theme-day .scenario-card.bear{background:rgba(192,57,110,.05) !important;border-color:rgba(192,57,110,.25) !important;}
+    body.theme-day .scenario-card.neutral{background:rgba(200,137,10,.05) !important;border-color:rgba(200,137,10,.25) !important;}
+    body.theme-day .scenario-desc{color:#2a4060 !important;}
+    body.theme-day .diverge-demo{background:rgba(255,255,255,.6) !important;border-color:rgba(26,123,191,.15) !important;}
+    body.theme-day .diverge-title{color:#1a7bbf !important;}
+    body.theme-day .diverge-bar-label{color:#2a4060 !important;}
+    body.theme-day .diverge-bar-track{background:rgba(26,123,191,.08) !important;}
+    body.theme-day .diverge-legend{color:#4a7090 !important;}
+    body.theme-day .compare-table th{color:#1a7bbf !important;border-bottom-color:rgba(26,123,191,.25) !important;background:rgba(26,123,191,.05) !important;}
+    body.theme-day .compare-table td{color:#2a4060 !important;border-bottom-color:rgba(26,123,191,.08) !important;}
+    body.theme-day .compare-table tr:hover td{background:rgba(26,123,191,.04) !important;}
+    body.theme-day .td-bull{color:#1a8a3c !important;}
+    body.theme-day .td-bear{color:#c0392b !important;}
+    body.theme-day .td-warn{color:#c8890a !important;}
+    body.theme-day .trap-steps .trap-step{background:rgba(255,255,255,.5) !important;border-color:rgba(200,137,10,.15) !important;}
+    body.theme-day .trap-step.danger-step{background:rgba(192,57,110,.05) !important;border-color:rgba(192,57,110,.2) !important;}
+    body.theme-day .trap-step-text{color:#2a4060 !important;}
+    body.theme-day .trap-step-text strong{color:#0a2540 !important;}
+    body.theme-day .jelly-tip{background:linear-gradient(135deg,rgba(26,123,191,.07),rgba(192,57,110,.03)) !important;border-color:rgba(26,123,191,.2) !important;}
+    body.theme-day .jelly-tip-bubble{background:rgba(255,255,255,.8) !important;border-color:rgba(26,123,191,.25) !important;color:#1e4060 !important;}
+    body.theme-day .jelly-tip-bubble::before{border-right-color:rgba(26,123,191,.25) !important;}
+    body.theme-day .jelly-tip-name{color:#1a7bbf !important;}
+    body.theme-day .quiz-block{background:linear-gradient(135deg,rgba(124,77,170,.08),rgba(100,50,180,.04)) !important;border-color:rgba(124,77,170,.25) !important;}
+    body.theme-day .quiz-label{color:#7c4daa !important;}
+    body.theme-day .quiz-q{color:#0a2540 !important;}
+    body.theme-day .quiz-opt{background:rgba(255,255,255,.6) !important;border-color:rgba(124,77,170,.18) !important;color:#2a4060 !important;}
+    body.theme-day .quiz-opt:hover:not(.disabled){background:rgba(124,77,170,.1) !important;border-color:rgba(124,77,170,.4) !important;}
+    body.theme-day .quiz-opt.correct{border-color:rgba(26,138,60,.5) !important;background:rgba(26,138,60,.1) !important;color:#1a5c30 !important;}
+    body.theme-day .quiz-opt.wrong{border-color:rgba(192,57,110,.5) !important;background:rgba(192,57,110,.1) !important;color:#8a1a35 !important;}
+    body.theme-day .quiz-letter{color:#7c4daa !important;border-color:rgba(124,77,170,.4) !important;background:rgba(124,77,170,.08) !important;}
+    body.theme-day .quiz-feedback.ok{background:rgba(26,138,60,.08) !important;border-color:rgba(26,138,60,.3) !important;color:#1a5c30 !important;}
+    body.theme-day .quiz-feedback.fail{background:rgba(192,57,110,.08) !important;border-color:rgba(192,57,110,.3) !important;color:#8a1a35 !important;}
+    body.theme-day .check-item{background:rgba(26,123,191,.04) !important;border-color:rgba(26,123,191,.12) !important;}
+    body.theme-day .check-text{color:#1e4060 !important;}
+    body.theme-day .check-text strong{color:#1a7bbf !important;}
+    body.theme-day .chapter-footer{background:rgba(255,255,255,.7) !important;border-color:rgba(26,123,191,.18) !important;}
+    body.theme-day .footer-info{color:#4a7090 !important;}
+    body.theme-day .footer-info strong{color:#1e4060 !important;}
+    body.theme-day .next-btn{background:rgba(26,123,191,.07) !important;border-color:rgba(26,123,191,.22) !important;color:#4a7090 !important;}
+    body.theme-day #finalScore{background:linear-gradient(135deg,rgba(124,77,170,.08),rgba(26,123,191,.05)) !important;border-color:rgba(124,77,170,.22) !important;}
+    body.theme-day #scoreNum{color:#7c4daa !important;text-shadow:none !important;}
+    body.theme-day #scoreMsg{color:#2a4060 !important;}
+  </style>
+<script>
+(function(){
+  function applyTheme(t){
+    if(t==='day') document.body.classList.add('theme-day');
+    else document.body.classList.remove('theme-day');
+  }
+  var t=localStorage.getItem('jelly_global_theme')||'space';
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){applyTheme(t);});
+  } else { applyTheme(t); }
+  try{
+    var bc=new BroadcastChannel('jellystock_theme');
+    bc.onmessage=function(e){
+      if(e.data&&e.data.theme){localStorage.setItem('jelly_global_theme',e.data.theme);applyTheme(e.data.theme);}
+    };
+  } catch(e){}
+  window.addEventListener('storage',function(e){
+    if(e.key==='jelly_global_theme'&&e.newValue) applyTheme(e.newValue);
+  });
+})();
+</script>
+</head>
+<body>
+
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+
+<!-- Chapter Side Nav -->
+<nav class="chapter-sidenav">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場與股票</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒解讀</span></a>
+  <span class="ch-nav-item locked"><span class="ch-num">03</span><span class="ch-label">趨勢結構</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">04</span><span class="ch-label">支撐壓力</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">05</span><span class="ch-label">量能籌碼</span></span>
+  <a class="ch-nav-item current-ch" href="/stock_site/features/chapter6.html"><span class="ch-num">06</span><span class="ch-label">均線理論</span></a>
+  <span class="ch-nav-item locked"><span class="ch-num">07</span><span class="ch-label">指標輔助</span></span>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock Logo"/></div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">技術分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a class="back-btn" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+    <span class="chapter-badge">CH.06</span>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky">
+    <div class="progress-fill-sticky" id="progressFill"></div>
+  </div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第六章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">CHAPTER 06 · 均線篇</div>
+    <h1 class="hero-title">均線——<br/>市場成本線的真相</h1>
+    <p class="hero-desc">均線不只是「平均價格」，它是整個市場在某段時間的<strong style="color:#b266ff">平均持倉成本</strong>。懂得看均線，你能看見多空的心理防線、資金的站隊方向，以及最常坑殺散戶的「假黃金交叉」陷阱。</p>
+    <div class="hero-tags">
+      <span class="tag tag-purple">成本線</span>
+      <span class="tag tag-cyan">均線糾結</span>
+      <span class="tag tag-yellow">乖離率</span>
+      <span class="tag tag-pink">假黃金交叉</span>
+      <span class="tag tag-green">趨勢研判</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 1：均線的本質 ─────────── -->
+<div class="section-card" id="sec1">
+  <div class="card-header">
+    <div class="card-icon">💰</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.1</div>
+      <div class="card-title">均線是「市場成本線」，不是魔法線</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">很多人把均線當神奇的買賣訊號，但均線的本質很簡單：<em class="hl">把過去 N 天的收盤價加總平均</em>，得到的是市場在那段時間的平均成交成本。</p>
+    <p class="content-para">20 日均線（MA20）代表的是：在過去 20 天買進這支股票的人，他們的<em class="hl-purple">平均持倉成本</em>大概在這條線附近。當股價在均線之上，代表大多數近期買進的人都在賺錢；當股價跌破均線，代表近期買進的人開始虧損，就可能引發賣壓。</p>
+
+    <div class="example-box">
+      <div class="example-label">📌 舉例理解</div>
+      <p>台積電 MA20 在 850 元。這代表過去 20 天買進台積電的人，平均成本約 850 元。<br>
+      若股價跌到 840 元 → 這批人都小虧 → 有人開始擔心，可能出現賣壓。<br>
+      若股價在 880 元 → 這批人都賺 → 他們心態穩，不容易恐慌賣出 → 股價有支撐。</p>
+    </div>
+
+    <div class="key-concept">
+      <div class="key-concept-label">💡 核心觀念</div>
+      <div class="key-concept-text">「均線是市場的心理防線，<br/>不是隨機畫出來的線。」</div>
+    </div>
+
+    <p class="content-para">這也解釋了為什麼均線會成為<em class="hl-yellow">支撐</em>與<em class="hl-pink">壓力</em>：股價靠近均線，就代表靠近一大群人的成本區，他們的行為（繼續持有 or 停損賣出）決定了股價接下來的走勢。</p>
+
+    <div class="jelly-tip">
+      <div class="jelly-tip-mascot">
+        <svg class="jelly-mini-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(0,229,255,0.07)"/>
+          <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.8" opacity="0.88"/>
+          <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff6eb4" stroke-width="1.5" opacity="0.6"/>
+          <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+          <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+          <circle cx="21" cy="30.5" r="1.7" fill="#00b8d4"/>
+          <circle cx="33" cy="30.5" r="1.7" fill="#00b8d4"/>
+          <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(0,229,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="jelly-tip-bubble">
+        <div class="jelly-tip-name">JELLY 說</div>
+        果凍是軟的，但它有個「形狀記憶」——被壓下去之後，只要壓力消失，就會彈回原形。均線就像股價的「形狀記憶」，偏離太遠就會被拉回來，這就是乖離率的魔力，等等會講到！
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 2：各種均線的意義 ─────────── -->
+<div class="section-card reveal" id="sec2">
+  <div class="card-header">
+    <div class="card-icon">📐</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.2</div>
+      <div class="card-title">各種均線代表什麼？</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">不同週期的均線，代表不同群體的持倉成本，反映不同時間維度的市場共識。它們不是獨立存在的，而是要<em class="hl">搭配看</em>才有意義。</p>
+
+    <div class="ma-grid">
+      <div class="ma-card ma5">
+        <div class="ma-label y">MA5</div>
+        <div class="ma-name">5日均線（週線）</div>
+        <div class="ma-meaning">最近一週交易者的平均成本。短線方向指標，波動大、轉彎快。偏離太遠容易被反彈。</div>
+      </div>
+      <div class="ma-card ma20">
+        <div class="ma-label c">MA20</div>
+        <div class="ma-name">20日均線（月線）</div>
+        <div class="ma-meaning">最受重視的均線之一。月線代表近一個月的市場成本，是中短線多空分界最常用的參考線。</div>
+      </div>
+      <div class="ma-card ma60">
+        <div class="ma-label p">MA60</div>
+        <div class="ma-name">60日均線（季線）</div>
+        <div class="ma-meaning">一季約60個交易日。季線通常是機構法人關注的中期趨勢參考。跌破季線常被視為轉弱訊號。</div>
+      </div>
+      <div class="ma-card ma120">
+        <div class="ma-label pk">MA120</div>
+        <div class="ma-name">120日均線（半年線）</div>
+        <div class="ma-meaning">半年的平均成本。大波段多空分界線，許多中長線投資者以此為停損停利依據。</div>
+      </div>
+      <div class="ma-card ma240">
+        <div class="ma-label g">MA240</div>
+        <div class="ma-name">240日均線（年線）</div>
+        <div class="ma-meaning">一年的市場平均成本。長線趨勢判斷，股價站上年線通常是長線多頭格局的確認。</div>
+      </div>
+    </div>
+
+    <!-- SVG 均線多空圖 -->
+    <div class="ma-visual">
+      <div class="ma-visual-title">📊 均線多頭排列示意圖（MA5 &gt; MA20 &gt; MA60）</div>
+      <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <defs>
+          <linearGradient id="priceFill6" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(0,229,255,0.2)"/>
+            <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
+          </linearGradient>
+        </defs>
+        <!-- grid -->
+        <line x1="0" y1="40" x2="600" y2="40" stroke="rgba(0,229,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="600" y2="80" stroke="rgba(0,229,255,0.04)" stroke-width="1"/>
+        <line x1="0" y1="120" x2="600" y2="120" stroke="rgba(0,229,255,0.04)" stroke-width="1"/>
+        <!-- MA240 年線 -->
+        <path d="M0,130 L600,110" fill="none" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+        <text x="8" y="128" fill="#00e676" font-family="Share Tech Mono" font-size="9" opacity="0.7">MA240</text>
+        <!-- MA60 季線 -->
+        <path d="M0,118 L600,90" fill="none" stroke="#b266ff" stroke-width="1.8" opacity="0.75"/>
+        <text x="8" y="116" fill="#b266ff" font-family="Share Tech Mono" font-size="9" opacity="0.8">MA60</text>
+        <!-- MA20 月線 -->
+        <path d="M0,104 L150,88 L300,72 L450,60 L600,50" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.9"/>
+        <text x="8" y="102" fill="#00e5ff" font-family="Share Tech Mono" font-size="9" opacity="0.9">MA20</text>
+        <!-- MA5 週線 -->
+        <path d="M0,90 L80,70 L160,55 L240,45 L320,35 L400,28 L480,22 L560,18 L600,16" fill="none" stroke="#ffd600" stroke-width="1.6" opacity="0.85"/>
+        <text x="8" y="88" fill="#ffd600" font-family="Share Tech Mono" font-size="9" opacity="0.85">MA5</text>
+        <!-- 股價 -->
+        <path d="M0,82 L60,62 L120,48 L180,40 L240,30 L310,20 L380,14 L450,10 L530,8 L600,6" fill="none" stroke="rgba(0,229,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M0,82 L60,62 L120,48 L180,40 L240,30 L310,20 L380,14 L450,10 L530,8 L600,6 L600,155 L0,155 Z" fill="url(#priceFill6)" opacity="0.4"/>
+        <!-- label -->
+        <text x="480" y="12" fill="rgba(0,229,255,.8)" font-family="Share Tech Mono" font-size="9">股價</text>
+        <text x="200" y="148" fill="rgba(0,230,118,.5)" font-family="Share Tech Mono" font-size="9" text-anchor="middle">多頭排列：MA5 &gt; MA20 &gt; MA60 &gt; MA240，趨勢向上強勁</text>
+      </svg>
+    </div>
+
+    <div class="scenario-row">
+      <div class="scenario-card bull">
+        <span class="scenario-icon">🚀</span>
+        <div class="scenario-title">多頭排列</div>
+        <div class="scenario-desc">MA5 &gt; MA20 &gt; MA60 &gt; MA120，短線均線在長線之上。代表各期間持倉者都在獲利，賣壓小、上漲動能強。</div>
+      </div>
+      <div class="scenario-card bear">
+        <span class="scenario-icon">⬇️</span>
+        <div class="scenario-title">空頭排列</div>
+        <div class="scenario-desc">MA5 &lt; MA20 &lt; MA60 &lt; MA120，短線均線在長線之下。各期持倉者都在虧損，反彈時壓力大、下跌動能強。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 3：均線糾結 vs 均線發散 ─────────── -->
+<div class="section-card reveal" id="sec3">
+  <div class="card-header">
+    <div class="card-icon">🌀</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.3</div>
+      <div class="card-title">均線糾結＝沒方向，均線發散＝趨勢強</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">看一支股票多條均線的<em class="hl">相對位置和距離</em>，可以快速判斷目前是趨勢行情還是震盪盤整。</p>
+
+    <!-- SVG 糾結 vs 發散 -->
+    <div class="ma-visual">
+      <div class="ma-visual-title">📊 均線糾結（左）vs 均線發散（右）</div>
+      <svg viewBox="0 0 600 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <!-- 分隔線 -->
+        <line x1="300" y1="10" x2="300" y2="145" stroke="rgba(0,229,255,0.1)" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="75" y="18" fill="rgba(255,214,0,.7)" font-family="Share Tech Mono" font-size="9" text-anchor="middle">糾結期 — 方向不明</text>
+        <text x="450" y="18" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono" font-size="9" text-anchor="middle">發散期 — 趨勢確立</text>
+        <!-- 糾結段均線 (左側三條線擠在一起) -->
+        <path d="M20,85 L60,78 L100,82 L140,75 L180,80 L220,76 L260,79 L295,78" fill="none" stroke="#ffd600" stroke-width="1.6" opacity="0.8"/>
+        <path d="M20,90 L60,84 L100,88 L140,82 L180,87 L220,83 L260,86 L295,84" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.8"/>
+        <path d="M20,95 L60,90 L100,93 L140,88 L180,93 L220,90 L260,92 L295,90" fill="none" stroke="#b266ff" stroke-width="1.6" opacity="0.8"/>
+        <!-- 發散段均線 (右側三條拉開) -->
+        <path d="M305,78 L360,58 L420,38 L480,22 L560,10 L590,8" fill="none" stroke="#ffd600" stroke-width="1.6" opacity="0.85"/>
+        <path d="M305,84 L360,72 L420,60 L480,50 L560,40 L590,37" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.85"/>
+        <path d="M305,90 L360,84 L420,78 L480,72 L560,68 L590,66" fill="none" stroke="#b266ff" stroke-width="1.6" opacity="0.85"/>
+        <!-- 糾結標示 -->
+        <rect x="15" y="65" width="40" height="12" rx="3" fill="rgba(255,214,0,.08)" stroke="rgba(255,214,0,.2)" stroke-width="1"/>
+        <text x="35" y="74" fill="#ffd600" font-family="Share Tech Mono" font-size="7" text-anchor="middle">MA5</text>
+        <rect x="15" y="80" width="40" height="12" rx="3" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.2)" stroke-width="1"/>
+        <text x="35" y="89" fill="#00e5ff" font-family="Share Tech Mono" font-size="7" text-anchor="middle">MA20</text>
+        <rect x="15" y="95" width="40" height="12" rx="3" fill="rgba(178,102,255,.08)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+        <text x="35" y="104" fill="#b266ff" font-family="Share Tech Mono" font-size="7" text-anchor="middle">MA60</text>
+        <!-- 說明文字 -->
+        <text x="150" y="130" fill="rgba(255,214,0,.5)" font-family="Share Tech Mono" font-size="8" text-anchor="middle">三線靠攏 → 盤整蓄力</text>
+        <text x="450" y="130" fill="rgba(0,229,255,.5)" font-family="Share Tech Mono" font-size="8" text-anchor="middle">三線拉開 → 趨勢加速</text>
+      </svg>
+    </div>
+
+    <div class="scenario-row">
+      <div class="scenario-card neutral">
+        <span class="scenario-icon">🌀</span>
+        <div class="scenario-title">均線糾結</div>
+        <div class="scenario-desc">各條均線靠在一起、頻繁交叉。代表多空力道均衡，市場在「蓄勢」。這段期間做短線很容易被來回假突破搞死，<strong>最好等突破後再追。</strong></div>
+      </div>
+      <div class="scenario-card bull">
+        <span class="scenario-icon">↗️</span>
+        <div class="scenario-title">均線發散</div>
+        <div class="scenario-desc">各條均線拉開距離、方向一致。趨勢強烈，方向清晰。多頭發散代表上漲動能強；空頭發散代表下跌動能強。<strong>順勢操作的最佳時機。</strong></div>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text">
+        均線糾結常出現在大行情爆發前——這段期間就像拉緊的弓弦。當某一方力量大到把均線拉開，就是方向確認的時刻。等「<em class="hl">放量突破糾結區</em>」再進場，比在糾結中猜方向安全得多。
+        <span class="insight-quote">「糾結是準備，發散是結果。」</span>
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q1">
+      <div class="quiz-label">小測驗 1 / 6</div>
+      <div class="quiz-q">看到一支股票的 MA5、MA20、MA60 三條均線緊密糾結在一起，你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q1','C','A')"><span class="quiz-letter">A</span>立刻買進，三線黃金交叉馬上要出現了</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','C','B')"><span class="quiz-letter">B</span>立刻放空，盤整之後一定會跌</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','C','C')"><span class="quiz-letter">C</span>耐心等待，觀察哪個方向放量突破後再決定</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','C','D')"><span class="quiz-letter">D</span>不管均線，直接看新聞決定</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 4：均線 vs 價格距離（乖離率） ─────────── -->
+<div class="section-card reveal" id="sec4">
+  <div class="card-header">
+    <div class="card-icon">📏</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.4</div>
+      <div class="card-title">均線 vs 價格的距離：乖離率</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">股價不可能永遠緊貼均線走，但也不會無限遠離均線——離得太遠，就像拉滿的橡皮筋，總有一天要彈回來。這個「距離」就叫做<em class="hl-purple">乖離率（Bias Ratio）</em>。</p>
+
+    <div class="example-box">
+      <div class="example-label">📐 乖離率公式</div>
+      <p><strong style="color:#fff">乖離率 = (股價 − 均線) ÷ 均線 × 100%</strong><br><br>
+      例：股價 1000 元，MA20 = 920 元<br>
+      乖離率 = (1000 − 920) ÷ 920 × 100% = <strong style="color:#ff3d5a">+8.7%</strong><br>
+      代表股價比 20 日均線高出 8.7%，已偏高，存在回歸均線的壓力。</p>
+    </div>
+
+    <!-- 乖離率示意 -->
+    <div class="diverge-demo">
+      <div class="diverge-title">📊 乖離率警示等級（以 MA20 為例）</div>
+      <div class="diverge-bar-row">
+        <span class="diverge-bar-label">正常範圍</span>
+        <div class="diverge-bar-track"><div class="diverge-bar-fill safe" style="width:30%"></div></div>
+        <span class="diverge-bar-pct safe">< ±3%</span>
+      </div>
+      <div class="diverge-bar-row">
+        <span class="diverge-bar-label">偏高／偏低</span>
+        <div class="diverge-bar-track"><div class="diverge-bar-fill warn" style="width:60%"></div></div>
+        <span class="diverge-bar-pct warn">±3~8%</span>
+      </div>
+      <div class="diverge-bar-row">
+        <span class="diverge-bar-label">極端乖離</span>
+        <div class="diverge-bar-track"><div class="diverge-bar-fill danger" style="width:90%"></div></div>
+        <span class="diverge-bar-pct danger">> ±8%</span>
+      </div>
+      <div class="diverge-legend">⚠️ 以上數值僅為參考，不同股票、不同市場環境的正常乖離幅度不同。高波動股乖離可以更大。</div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr><th>乖離狀況</th><th>代表意義</th><th>常見後續</th><th>操作提示</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-bull">正乖離過大（股價遠高於均線）</td>
+          <td>短線過熱，追高風險高</td>
+          <td>回測均線整理</td>
+          <td class="td-warn">不追高，等回測</td>
+        </tr>
+        <tr>
+          <td class="td-bear">負乖離過大（股價遠低於均線）</td>
+          <td>短線過冷，超賣訊號</td>
+          <td>技術性反彈</td>
+          <td class="td-bull">注意反彈機會</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim)">乖離率接近 0</td>
+          <td>股價與均線同步</td>
+          <td>繼續觀望</td>
+          <td style="color:var(--text-dim)">看其他指標輔助</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warn-box">
+      <div class="insight-icon">⚠️</div>
+      <div class="insight-text">
+        <strong style="color:var(--red)">重要提醒：</strong>乖離率只是「均值回歸的參考」，不是買賣訊號。強勢上漲的股票可以長時間維持高正乖離；弱勢股負乖離可以一路擴大。乖離率必須配合<em class="hl-yellow">成交量和趨勢方向</em>一起判斷，單獨使用容易被甩出去。
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q2">
+      <div class="quiz-label">小測驗 2 / 6</div>
+      <div class="quiz-q">一支股票股價 600 元，MA20 在 520 元，乖離率約 +15%。你應該如何看待這個訊號？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q2','C','A')"><span class="quiz-letter">A</span>乖離率高代表很強勢，立刻追買</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','B')"><span class="quiz-letter">B</span>這個訊號沒什麼用，完全不用理</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','C')"><span class="quiz-letter">C</span>短線過熱，追高風險大，等回測均線再評估進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','D')"><span class="quiz-letter">D</span>立刻放空，因為一定會跌回均線</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 5：假黃金交叉陷阱 ─────────── -->
+<div class="section-card reveal" id="sec5">
+  <div class="card-header">
+    <div class="card-icon">🪤</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.5</div>
+      <div class="card-title">「均線陷阱」——假黃金交叉如何坑殺散戶？</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">黃金交叉（MA5 上穿 MA20，或 MA20 上穿 MA60）是最多散戶知道的買進訊號。<em class="hl-red">但也是最常被主力利用來出貨的陷阱。</em></p>
+
+    <div class="key-concept">
+      <div class="key-concept-label">⚠️ 陷阱定義</div>
+      <div class="key-concept-text">「假黃金交叉 = 技術面出現買訊，<br/>但背後基本面或籌碼面已經惡化。」</div>
+    </div>
+
+    <p class="content-para">典型的假黃金交叉劇本長這樣：</p>
+
+    <div class="trap-steps">
+      <div class="trap-step">
+        <span class="trap-step-num">①</span>
+        <div class="trap-step-text"><strong>股票下跌一段後出現技術反彈</strong>——跌多了，有人開始低接，股價從低點反彈 10~20%。</div>
+      </div>
+      <div class="trap-step">
+        <span class="trap-step-num">②</span>
+        <div class="trap-step-text"><strong>MA5 從下方往上穿越 MA20</strong>——黃金交叉出現，技術分析訊號觸發，散戶看到紛紛買進。</div>
+      </div>
+      <div class="trap-step">
+        <span class="trap-step-num">③</span>
+        <div class="trap-step-text"><strong>成交量在黃金交叉當下沒有明顯放大</strong>——這是關鍵警訊！真正的突破需要量能配合，無量交叉可信度極低。</div>
+      </div>
+      <div class="trap-step danger-step">
+        <span class="trap-step-num">④</span>
+        <div class="trap-step-text"><strong>主力利用技術買訊出貨</strong>——趁散戶因為黃金交叉進場，主力在高點賣出，股價隨即反轉向下。</div>
+      </div>
+      <div class="trap-step danger-step">
+        <span class="trap-step-num">⑤</span>
+        <div class="trap-step-text"><strong>死亡交叉很快出現</strong>——剛買進的散戶直接套牢，不知道自己踩到了出貨陷阱。</div>
+      </div>
+    </div>
+
+    <div class="trap-box">
+      <div class="insight-icon">🔍</div>
+      <div class="insight-text">
+        <strong style="color:var(--yellow)">如何判斷是真 vs 假黃金交叉？</strong>看這三個條件：
+        <br><br>
+        <strong style="color:#fff">① 成交量：</strong>真黃金交叉通常伴隨量能明顯放大。無量交叉當心。<br>
+        <strong style="color:#fff">② 趨勢背景：</strong>在多頭格局中（長期均線向上）的黃金交叉比在空頭市場中可靠得多。<br>
+        <strong style="color:#fff">③ 法人動向：</strong>交叉當週法人是否同步買超？法人賣超的黃金交叉幾乎是陷阱。
+      </div>
+    </div>
+
+    <!-- SVG 假黃金交叉 vs 真黃金交叉 -->
+    <div class="ma-visual">
+      <div class="ma-visual-title">📊 假黃金交叉（左）vs 真黃金交叉（右）</div>
+      <svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <line x1="300" y1="5" x2="300" y2="155" stroke="rgba(0,229,255,.08)" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="75" y="16" fill="rgba(255,61,90,.7)" font-family="Share Tech Mono" font-size="9" text-anchor="middle">假黃金交叉</text>
+        <text x="450" y="16" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono" font-size="9" text-anchor="middle">真黃金交叉</text>
+
+        <!-- 假：左側 MA5 穿過 MA20 之後下跌 -->
+        <path d="M20,40 L80,55 L130,70 L160,65 L185,58 L210,62 L240,75 L270,90 L295,110" fill="none" stroke="#ffd600" stroke-width="1.8" opacity="0.85"/>
+        <path d="M20,75 L80,80 L130,82 L165,80 L200,78 L230,78 L260,80 L295,82" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.85"/>
+        <!-- 交叉點標示（假） -->
+        <circle cx="172" cy="62" r="5" fill="rgba(255,214,0,.2)" stroke="#ffd600" stroke-width="1.5"/>
+        <text x="175" y="50" fill="#ffd600" font-family="Share Tech Mono" font-size="8">交叉</text>
+        <!-- 下跌箭頭 -->
+        <path d="M230,70 L270,100" fill="none" stroke="rgba(255,61,90,.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="250" y="115" fill="rgba(255,61,90,.7)" font-family="Share Tech Mono" font-size="8">反轉下跌</text>
+
+        <!-- 真：右側 MA5 穿過 MA20 之後繼續漲 -->
+        <path d="M310,120 L360,100 L400,75 L430,55 L455,40 L475,28 L500,20 L540,14 L580,10" fill="none" stroke="#ffd600" stroke-width="1.8" opacity="0.85"/>
+        <path d="M310,135 L360,122 L400,108 L435,92 L465,80 L490,70 L520,62 L560,55 L590,50" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.85"/>
+        <!-- 交叉點標示（真） -->
+        <circle cx="438" cy="82" r="5" fill="rgba(0,229,255,.2)" stroke="#00e5ff" stroke-width="1.5"/>
+        <text x="445" y="72" fill="#00e5ff" font-family="Share Tech Mono" font-size="8">交叉</text>
+        <!-- 上漲箭頭 -->
+        <path d="M475,40 L510,20" fill="none" stroke="rgba(0,229,255,.6)" stroke-width="1.5"/>
+        <text x="480" y="55" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono" font-size="8">持續上漲</text>
+
+        <!-- 量柱（假：矮，真：高） -->
+        <rect x="140" y="130" width="8" height="8" rx="1" fill="rgba(0,229,255,.3)" opacity="0.6"/>
+        <rect x="155" y="126" width="8" height="12" rx="1" fill="rgba(0,229,255,.3)" opacity="0.6"/>
+        <rect x="170" y="130" width="8" height="8" rx="1" fill="rgba(0,229,255,.3)" opacity="0.6"/>
+        <text x="155" y="152" fill="rgba(255,61,90,.5)" font-family="Share Tech Mono" font-size="7" text-anchor="middle">無量交叉</text>
+
+        <rect x="420" y="118" width="8" height="20" rx="1" fill="rgba(0,229,255,.4)" opacity="0.7"/>
+        <rect x="435" y="108" width="8" height="30" rx="1" fill="rgba(0,229,255,.6)" opacity="0.8"/>
+        <rect x="450" y="114" width="8" height="24" rx="1" fill="rgba(0,229,255,.4)" opacity="0.7"/>
+        <text x="438" y="152" fill="rgba(0,229,255,.5)" font-family="Share Tech Mono" font-size="7" text-anchor="middle">放量交叉</text>
+      </svg>
+    </div>
+
+    <div class="quiz-block" id="q3">
+      <div class="quiz-label">小測驗 3 / 6</div>
+      <div class="quiz-q">你看到一支股票的 MA5 剛剛向上穿越 MA20，但是當天成交量比過去一週平均還低。你的判斷是？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q3','B','A')"><span class="quiz-letter">A</span>黃金交叉是強烈買進訊號，馬上進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','B')"><span class="quiz-letter">B</span>無量黃金交叉可信度低，先觀望等量能確認</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','C')"><span class="quiz-letter">C</span>黃金交叉配低量代表大戶悄悄進場，更要買</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','D')"><span class="quiz-letter">D</span>均線交叉訊號沒意義，完全不看</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 6：實戰應用 ─────────── -->
+<div class="section-card reveal" id="sec6">
+  <div class="card-header">
+    <div class="card-icon">⚔️</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.6</div>
+      <div class="card-title">均線實戰應用：怎麼用才不會被坑？</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para">均線的正確用法，不是看到黃金交叉就買、死亡交叉就賣——那樣你永遠在追著市場的落後訊號跑。真正的用法是把均線當<em class="hl">趨勢濾鏡</em>和<em class="hl-yellow">動態支撐壓力</em>。</p>
+
+    <div class="scenario-row">
+      <div class="scenario-card bull">
+        <span class="scenario-icon">🎯</span>
+        <div class="scenario-title">用法 1：趨勢濾鏡</div>
+        <div class="scenario-desc">只在股價站上 MA60（季線）之上做多。季線以下的個股，就算短線出現黃金交叉也不輕易追多。<br><br>這樣可以過濾掉大多數下跌趨勢中的反彈陷阱。</div>
+      </div>
+      <div class="scenario-card bull">
+        <span class="scenario-icon">🛡️</span>
+        <div class="scenario-title">用法 2：動態支撐</div>
+        <div class="scenario-desc">在上漲趨勢中，回測 MA20 附近且成交量萎縮時考慮買進，跌破 MA20 且放量時停損。<br><br>均線回測進場比追高進場，風險報酬比更好。</div>
+      </div>
+    </div>
+    <div class="scenario-row">
+      <div class="scenario-card neutral">
+        <span class="scenario-icon">📐</span>
+        <div class="scenario-title">用法 3：乖離率操作</div>
+        <div class="scenario-desc">股價快速上漲導致正乖離過大時，不是買進時機，而是考慮減倉或觀望。等回測均線後再重新評估。<br><br>遵守「不在極端乖離時追高」的紀律。</div>
+      </div>
+      <div class="scenario-card bear">
+        <span class="scenario-icon">🚫</span>
+        <div class="scenario-title">用法 4：空頭確認</div>
+        <div class="scenario-desc">當均線由多頭排列轉為空頭排列（均線死亡交叉 + 放量），確認下跌趨勢，避免在空頭市場中做多，等趨勢轉向再進場。</div>
+      </div>
+    </div>
+
+    <div class="jelly-tip">
+      <div class="jelly-tip-mascot">
+        <svg class="jelly-mini-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(0,229,255,0.07)"/>
+          <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.8" opacity="0.88"/>
+          <path d="M33 9 C40 13 44 21 44 30" fill="none" stroke="#ff6eb4" stroke-width="1.5" opacity="0.6"/>
+          <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+          <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+          <circle cx="21" cy="30.5" r="1.7" fill="#00b8d4"/>
+          <circle cx="33" cy="30.5" r="1.7" fill="#00b8d4"/>
+          <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(0,229,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="jelly-tip-bubble">
+        <div class="jelly-tip-name">JELLY 的一句話</div>
+        均線是「後照鏡」，不是「前照燈」——它告訴你過去發生什麼，不保證未來。但後照鏡非常有用，因為<strong style="color:var(--accent)">趨勢一旦形成，慣性會讓它持續</strong>。均線幫你確認趨勢，不是預測趨勢。
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q4">
+      <div class="quiz-label">小測驗 4 / 6</div>
+      <div class="quiz-q">一支股票在多頭排列中，回測 MA20 附近成交量萎縮，然後出現一根帶下影線的小紅棒。這種情況最適合？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q4','B','A')"><span class="quiz-letter">A</span>不管，繼續觀望，均線太落後了</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','B','B')"><span class="quiz-letter">B</span>這是均線回測支撐的低風險進場機會，可以考慮買進，設停損在均線下方</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','B','C')"><span class="quiz-letter">C</span>回測均線代表趨勢要反轉，快跑</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','B','D')"><span class="quiz-letter">D</span>成交量萎縮是壞事，不能買</div>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── SEC 7：章節總結 + 進階測驗 ─────────── -->
+<div class="section-card reveal" id="sec7">
+  <div class="card-header">
+    <div class="card-icon">🎯</div>
+    <div class="card-title-wrap">
+      <div class="card-num">SECTION 6.7</div>
+      <div class="card-title">本章總結 + 進階測驗</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="content-para" style="margin-bottom:20px">恭喜你完成第六章！這章把很多人誤解的均線觀念重新定位了。讓我們整理一下核心觀點：</p>
+
+    <div class="checklist">
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>均線是市場成本線</strong>，不是隨機畫的。它代表在過去 N 天買進的人，他們的平均持倉成本。</span>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>均線糾結代表蓄勢</strong>，多空力量均衡。等方向確認（放量突破）再進場，而不是在糾結中猜方向。</span>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>均線發散代表趨勢強</strong>，此時順勢操作。多頭發散做多，空頭發散避免逆勢。</span>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>乖離率是「均值回歸」的參考</strong>，偏離過大總有修正壓力，但不能單獨作為買賣依據。</span>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>假黃金交叉是最常見陷阱</strong>。無量交叉、空頭背景下的交叉、法人同步賣超——三個出現就要高度警惕。</span>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✅</span>
+        <span class="check-text"><strong>均線的正確用法</strong>：趨勢濾鏡＋動態支撐壓力，而不是盲目跟著交叉訊號做買賣。</span>
+      </div>
+    </div>
+
+    <div class="quiz-block" id="q5" style="margin-top:28px">
+      <div class="quiz-label">進階題 5 / 6</div>
+      <div class="quiz-q">下列哪個情境，黃金交叉的可信度最高？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q5','D','A')"><span class="quiz-letter">A</span>大盤處於空頭市場，個股 MA5 穿越 MA20，成交量普通</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','D','B')"><span class="quiz-letter">B</span>個股股價剛從高點跌了 60%，出現黃金交叉</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','D','C')"><span class="quiz-letter">C</span>個股黃金交叉當週，外資賣超 5000 張</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','D','D')"><span class="quiz-letter">D</span>大盤多頭格局，個股突破盤整區、MA5 穿越 MA20 且放量，外資同步買超</div>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="quiz-block" id="q6" style="margin-top:20px">
+      <div class="quiz-label">進階題 6 / 6</div>
+      <div class="quiz-q">一支股票長期在 MA240（年線）之下，短線出現黃金交叉。你會怎麼做？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q6','B','A')"><span class="quiz-letter">A</span>年線不重要，短線黃金交叉就買</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','B')"><span class="quiz-letter">B</span>長期在年線之下代表空頭格局，短線黃金交叉可信度低，先觀望</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','C')"><span class="quiz-letter">C</span>跌了那麼多一定有機會，全力做多</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','D')"><span class="quiz-letter">D</span>只要 MA5 穿越 MA20，不管其他均線位置都買</div>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <div id="finalScore">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px">── 第六章 最終成績 ──</div>
+      <div id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="chapter-footer">
+  <div class="footer-info">
+    <strong>第六章完成 ✅</strong><br>
+    你已掌握均線的本質、糾結與發散判讀、乖離率應用，以及假黃金交叉的識別方式。<br>
+    下一章：指標輔助——RSI、MACD、KD 的正確打開方式
+  </div>
+  <div class="next-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    第七章 即將推出
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ── Quiz ─────────────────────────────────────── */
+const feedbackMap = {
+  q1:{
+    correct:'🎉 正確！均線糾結代表多空力量均衡，方向未定。此時最聰明的做法是等待：觀察哪個方向先放量突破，再跟進順勢操作，避免在糾結中被來回假突破夾殺。',
+    wrong:'❌ 糾結期間方向未定，貿然做多或做空勝率都不高。等放量突破確認方向後再進場，是更安全的做法。均線交叉在糾結期間頻繁出現，大多是假訊號。'
+  },
+  q2:{
+    correct:'🎉 正確！+15% 的正乖離代表股價已大幅偏離成本線，短線回測均線的壓力大。不是立刻放空（趨勢可能仍強），而是不追高，等回測均線時再評估。',
+    wrong:'❌ 乖離率高不代表要立刻放空，也不代表沒意義。它告訴你股價目前已偏熱，追高風險大。正確做法是等回測均線後再重新評估，而不是在高乖離時追買。'
+  },
+  q3:{
+    correct:'🎉 完全正確！無量黃金交叉是重大警訊。真正有效的突破需要成交量配合。量能沒放大的交叉，代表沒有足夠的資金推動，很可能是騙線，先觀望是最保險的選擇。',
+    wrong:'❌ 無量黃金交叉是最常見的假買訊之一。真正的突破需要量能支撐，沒有量的交叉可信度極低，很可能在短時間內反轉。先觀望等量能確認才是正確做法。'
+  },
+  q4:{
+    correct:'🎉 正確！這是均線回測支撐的典型進場訊號。在多頭排列中，回測均線時量能萎縮（代表賣壓輕），搭配帶下影線K棒（代表多方承接），是風險報酬比良好的進場機會，停損設在均線下方即可。',
+    wrong:'❌ 在多頭格局中，量能萎縮地回測均線其實是好訊號——代表回檔時賣壓輕，多方仍占優勢。帶下影線代表低點有人承接。這是風險報酬比很好的進場時機，搭配停損使用。'
+  },
+  q5:{
+    correct:'🎉 滿分正確！多頭大環境＋突破盤整＋放量＋法人同步買超，這四個條件同時出現的黃金交叉可信度最高。多個條件共振，假訊號機率大幅降低。',
+    wrong:'❌ 正確答案是 D。高可信度的黃金交叉需要：①大環境多頭格局②放量突破③法人同步買超。只有一個條件符合的交叉，失敗率高。多條件共振才是真訊號。'
+  },
+  q6:{
+    correct:'🎉 正確！股價長期在年線（MA240）以下代表空頭格局，短線出現的黃金交叉大多只是反彈，不是趨勢反轉。先觀望，等股價真正站上年線並確認後再進場，是更謹慎的做法。',
+    wrong:'❌ 長期在年線之下的個股處於空頭格局，此時的短線黃金交叉成功率偏低。年線是長期趨勢的重要分界，不能忽略。先觀望，等均線整體格局改善再進場才是正確思維。'
+  }
+};
+
+const quizScore={q1:false,q2:false,q3:false,q4:false,q5:false,q6:false};
+const totalQuiz=Object.keys(quizScore).length;
+let answeredCount=0;
+
+function answer(el,quizId,correctLetter,chosenLetter){
+  const block=document.getElementById(quizId);
+  if(block.dataset.answered) return;
+  block.dataset.answered='true';
+  answeredCount++;
+  const opts=block.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const isCorrect=chosenLetter===correctLetter;
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){
+    const letters=['A','B','C','D'];
+    const ci=letters.indexOf(correctLetter);
+    if(opts[ci]) opts[ci].classList.add('correct');
+  }
+  const fb=document.getElementById(quizId+'-fb');
+  fb.textContent=isCorrect?feedbackMap[quizId].correct:feedbackMap[quizId].wrong;
+  fb.className='quiz-feedback show '+(isCorrect?'ok':'fail');
+  quizScore[quizId]=isCorrect;
+  updateProgress();
+  if(answeredCount===totalQuiz) setTimeout(showFinalScore,600);
+}
+
+function showFinalScore(){
+  const correct=Object.values(quizScore).filter(Boolean).length;
+  const el=document.getElementById('finalScore');
+  const numEl=document.getElementById('scoreNum');
+  const msgEl=document.getElementById('scoreMsg');
+  let msg='';
+  const pct=Math.round(correct/totalQuiz*100);
+  if(pct===100) msg='🏆 完美！你完全掌握了均線的本質與陷阱，是個有紀律的交易者！';
+  else if(pct>=66) msg='🎯 不錯！你已掌握大部分均線觀念。建議回頭複習答錯的部分，確保每個細節都清楚。';
+  else msg='📖 繼續加油！均線觀念非常重要，建議重新閱讀一遍後再做測驗。';
+  numEl.textContent=correct+' / '+totalQuiz;
+  msgEl.textContent=msg;
+  el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ── Progress ─────────────────────────────────── */
+function updateProgress(){
+  const correct=Object.values(quizScore).filter(Boolean).length;
+  const scrollPct=Math.min(1,window.scrollY/(document.body.scrollHeight-window.innerHeight));
+  const quizPct=correct/totalQuiz;
+  const combined=Math.round((scrollPct*.5+quizPct*.5)*100);
+  document.getElementById('progressFill').style.width=combined+'%';
+  document.getElementById('progressPct').textContent=combined+'%';
+}
+window.addEventListener('scroll',updateProgress,{passive:true});
+
+/* ── Reveal on scroll ─────────────────────────── */
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}
+  });
+},{threshold:0.08});
+document.querySelectorAll('.section-card.reveal').forEach(el=>revealObserver.observe(el));
+</script>
+</body>
+</html>

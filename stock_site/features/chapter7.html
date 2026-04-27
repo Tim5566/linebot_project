@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第七章：指標（降級成輔助）— 技術分析教學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#03060d;--surface:#070d1a;--surface2:#0b1220;
+      --border:#0e1828;--border2:#152234;
+      --accent:#00e5ff;--accent2:#0099bb;--accent3:#00aaff;
+      --green:#00e676;--red:#ff3d5a;--yellow:#ffd600;
+      --purple:#b266ff;--pink:#ff6eb4;--orange:#ff9800;
+      --muted:#3a5070;--text:#d4e4f7;--text-dim:#7a9ab8;--text-faint:#4a6888;
+      --radius-sm:10px;--radius-md:16px;--radius-lg:22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.2) transparent;}
+    body::-webkit-scrollbar{width:5px}body::-webkit-scrollbar-track{background:transparent}body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    .bg-nebula{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 20% 15%,rgba(10,40,120,.2) 0%,transparent 55%),radial-gradient(ellipse 55% 40% at 80% 80%,rgba(60,0,100,.15) 0%,transparent 50%),radial-gradient(ellipse 90% 50% at 50% 0%,rgba(0,60,140,.18) 0%,transparent 55%),radial-gradient(ellipse 40% 30% at 70% 30%,rgba(40,0,120,.1) 0%,transparent 40%);}
+    .bg-scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);}
+
+    /* ── HEADER ── */
+    header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 16px;height:58px;border-bottom:1px solid rgba(0,229,255,.09);background:rgba(3,6,14,.97);backdrop-filter:blur(24px);box-shadow:0 2px 24px rgba(0,0,0,.5);}
+    header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);background-size:200% 100%;animation:headerSweep 4s linear infinite;}
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .header-left{display:flex;align-items:center;gap:10px;}
+    .back-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,255,.18);background:rgba(0,229,255,.05);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.08em;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);box-shadow:0 0 14px rgba(0,229,255,.2)}
+    .back-btn svg{width:12px;height:12px;flex-shrink:0}
+    .header-title{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:#fff;letter-spacing:.08em;text-shadow:0 0 20px rgba(0,229,255,.35);}
+    .chapter-badge{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--orange);background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.22);border-radius:8px;padding:3px 10px;letter-spacing:.12em;}
+
+    /* ── STICKY PROGRESS ── */
+    .sticky-progress{position:sticky;top:58px;z-index:190;background:rgba(3,6,14,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,229,255,.07);}
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{height:100%;background:linear-gradient(90deg,var(--orange),var(--yellow));box-shadow:0 0 10px rgba(255,152,0,.5);transition:width .4s ease;width:0%;}
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--orange);letter-spacing:.08em;}
+
+    /* ── SIDE NAV ── */
+    .chapter-sidenav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;gap:0;background:rgba(3,6,14,.88);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,.1);border-left:none;border-radius:0 12px 12px 0;overflow:hidden;}
+    .ch-nav-item{display:flex;align-items:center;padding:10px 14px 10px 12px;font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.08em;color:var(--text-faint);text-decoration:none;cursor:pointer;border-left:2px solid transparent;transition:all .2s;white-space:nowrap;border-bottom:1px solid rgba(0,229,255,.06);}
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
+    .ch-nav-item .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
+    .ch-nav-item:hover .ch-label,.ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
+    .ch-nav-item:hover{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
+    .ch-nav-item.current-ch{color:var(--orange);border-left-color:var(--orange);background:rgba(255,152,0,.07);}
+    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MAIN ── */
+    main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:36px 28px 120px;}
+
+    /* ── HERO ── */
+    .hero{display:flex;align-items:center;gap:36px;margin-bottom:48px;background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));border:1px solid rgba(255,152,0,.15);border-radius:24px;padding:36px 40px;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--yellow),var(--orange),transparent);background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;}
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero-icon{flex-shrink:0;width:110px;height:110px;display:flex;align-items:center;justify-content:center;background:rgba(255,152,0,.04);border:1px solid rgba(255,152,0,.15);border-radius:20px;position:relative;overflow:hidden;}
+    .hero-icon::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,152,0,.07),transparent 70%);}
+    .hero-content{flex:1;min-width:0;}
+    .hero-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.35em;color:var(--orange);text-transform:uppercase;opacity:.8;margin-bottom:8px;}
+    .hero-title{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;line-height:1.25;letter-spacing:.04em;margin-bottom:12px;background:linear-gradient(90deg,#fff 50%,rgba(255,152,0,.85));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(255,152,0,.2));}
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:4px 12px;border-radius:20px;letter-spacing:.08em;border:1px solid;cursor:default;}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+
+    /* ── TOC ── */
+    .toc-strip{display:flex;align-items:center;gap:0;margin-bottom:44px;padding:18px 24px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:14px;overflow-x:auto;}
+    .toc-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:72px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:background .2s;}
+    .toc-item:hover{background:rgba(0,229,255,.08);}
+    .toc-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-faint);transition:all .3s;}
+    .toc-dot.active{border-color:var(--orange);background:rgba(255,152,0,.15);color:var(--orange);box-shadow:0 0 12px rgba(255,152,0,.3);}
+    .toc-lbl{font-size:.58rem;color:var(--text-faint);text-align:center;line-height:1.3;}
+    .toc-item:hover .toc-lbl{color:var(--text-dim);}
+    .toc-connector{flex:1;min-width:12px;height:1px;background:rgba(0,229,255,.12);}
+
+    /* ── SECTION CARD ── */
+    .section-card{background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));border:1px solid rgba(0,229,255,.12);border-radius:20px;margin-bottom:32px;overflow:hidden;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);}
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .55s,transform .55s cubic-bezier(.22,1,.36,1);}
+    .section-header{display:flex;align-items:center;gap:16px;padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);position:relative;}
+    .section-header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+    .section-num{font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;color:var(--orange);background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.22);border-radius:8px;padding:4px 10px;letter-spacing:.1em;white-space:nowrap;}
+    .section-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#fff;letter-spacing:.06em;}
+    .section-icon{margin-left:auto;font-size:1.4rem;opacity:.7;}
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--orange);font-style:normal;font-weight:500;}
+
+    /* ── CALLOUT BOXES ── */
+    .insight-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.02));border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .warn-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .gold-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.02));border:1px solid rgba(255,214,0,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .purple-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));border:1px solid rgba(178,102,255,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .orange-box{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(255,152,0,.07),rgba(255,152,0,.02));border:1px solid rgba(255,152,0,.22);border-radius:14px;padding:18px 22px;margin:20px 0;}
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .warn-box .insight-label{color:var(--red);}
+    .gold-box .insight-label{color:var(--yellow);}
+    .purple-box .insight-label{color:var(--purple);}
+    .orange-box .insight-label{color:var(--orange);}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.78;}
+
+    /* ── DIVIDER ── */
+    .sec-divider{text-align:center;margin:28px 0 22px;font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--text-faint);display:flex;align-items:center;gap:14px;}
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── CHIP ── */
+    .chip{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:3px 10px;border-radius:6px;letter-spacing:.05em;vertical-align:middle;margin:0 2px;}
+    .chip-red{background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .chip-orange{background:rgba(255,152,0,.12);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+
+    /* ── INDICATOR MASTER BLOCK ── */
+    .ind-block{background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.1);border-radius:18px;overflow:hidden;margin:24px 0;}
+    .ind-block-header{display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid rgba(0,229,255,.08);}
+    .ind-name{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;color:#fff;}
+    .ind-subtitle{font-size:.78rem;color:var(--text-dim);margin-top:3px;}
+    .ind-badge{font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:4px 10px;border-radius:6px;letter-spacing:.1em;margin-left:auto;white-space:nowrap;}
+    .ib-momentum{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);color:var(--accent);}
+    .ib-trend{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.25);color:var(--orange);}
+    .ib-oscillator{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.25);color:var(--purple);}
+    .ind-body{padding:24px;}
+
+    /* ── INDICATOR CHART AREA ── */
+    .ind-chart-wrap{background:#040b15;border:1px solid rgba(0,229,255,.08);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    .ind-chart-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--text-faint);padding:10px 16px 0;}
+
+    /* ── STATE GRID ── */
+    .state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0;}
+    .state-card{border-radius:12px;padding:16px;text-align:center;transition:transform .2s;}
+    .state-card:hover{transform:translateY(-2px);}
+    .state-card.bull{background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.2);}
+    .state-card.bear{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);}
+    .state-card.warn{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.18);}
+    .state-card.neutral{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);}
+    .state-val{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;margin-bottom:6px;}
+    .state-card.bull .state-val{color:var(--red);}
+    .state-card.bear .state-val{color:var(--green);}
+    .state-card.warn .state-val{color:var(--yellow);}
+    .state-card.neutral .state-val{color:var(--accent);}
+    .state-label{font-size:.76rem;color:var(--text-dim);line-height:1.5;}
+
+    /* ── USE / NO USE TABLE ── */
+    .use-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .use-table th{background:rgba(0,229,255,.07);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;padding:11px 14px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;}
+    .use-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-dim);vertical-align:top;line-height:1.55;}
+    .use-table tr:hover td{background:rgba(0,229,255,.03);}
+    .td-use{color:var(--green);}
+    .td-nouse{color:var(--red);}
+
+    /* ── FLOW STEPS ── */
+    .flow-wrap{margin:20px 0;}
+    .flow-step{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px;padding:16px 18px;border-radius:12px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);transition:all .2s;}
+    .flow-step:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.2);}
+    .flow-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;}
+    .fn-c{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .fn-r{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .fn-g{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .fn-y{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .fn-o{background:rgba(255,152,0,.12);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+    .fn-p{background:rgba(178,102,255,.12);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .flow-content{flex:1;}
+    .flow-heading{font-size:.88rem;color:var(--text);font-weight:600;margin-bottom:4px;}
+    .flow-sub{font-size:.8rem;color:var(--text-dim);line-height:1.6;}
+
+    /* ── INTERACTIVE INDICATOR SIMULATOR ── */
+    .sim-wrap{background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:24px;margin:24px 0;}
+    .sim-title{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--accent);margin-bottom:14px;}
+    .sim-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+    .sim-tab{padding:8px 16px;border-radius:10px;border:1px solid rgba(0,229,255,.18);background:rgba(0,229,255,.05);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.7rem;cursor:pointer;transition:all .2s;letter-spacing:.06em;}
+    .sim-tab:hover{background:rgba(0,229,255,.12);color:var(--text);}
+    .sim-tab.active{background:rgba(0,229,255,.18);border-color:var(--accent);color:var(--accent);box-shadow:0 0 10px rgba(0,229,255,.2);}
+    .sim-canvas{width:100%;height:220px;background:#040b15;border-radius:12px;border:1px solid rgba(0,229,255,.08);margin-bottom:14px;overflow:hidden;}
+    .sim-result{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 18px;font-size:.84rem;color:var(--text-dim);line-height:1.75;min-height:58px;}
+    .sim-result strong{color:var(--accent);}
+
+    /* ── COMBINATION TABLE ── */
+    .combo-wrap{margin:20px 0;}
+    .combo-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);margin-bottom:8px;transition:all .2s;}
+    .combo-row:hover{background:rgba(0,229,255,.07);}
+    .combo-ind{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--accent);white-space:nowrap;}
+    .combo-desc{font-size:.82rem;color:var(--text-dim);line-height:1.5;}
+    .combo-strength{font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:3px 10px;border-radius:6px;white-space:nowrap;}
+    .cs-high{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.25);color:var(--red);}
+    .cs-med{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.22);color:var(--yellow);}
+    .cs-low{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);}
+
+    /* ── SHADOW SIDE LINE ── */
+    .sl-wrap{display:flex;align-items:stretch;margin:14px 0;border-radius:12px;overflow:hidden;border:1px solid rgba(0,229,255,.09);}
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.red{background:linear-gradient(180deg,var(--red),rgba(255,61,90,.3));}
+    .sl-side.green{background:linear-gradient(180deg,var(--green),rgba(0,230,118,.3));}
+    .sl-side.yellow{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.3));}
+    .sl-side.cyan{background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.3));}
+    .sl-side.orange{background:linear-gradient(180deg,var(--orange),rgba(255,152,0,.3));}
+    .sl-side.purple{background:linear-gradient(180deg,var(--purple),rgba(178,102,255,.3));}
+    .sl-body{padding:14px 18px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.64rem;letter-spacing:.12em;margin-bottom:5px;}
+    .sl-top.red{color:var(--red);}
+    .sl-top.green{color:var(--green);}
+    .sl-top.yellow{color:var(--yellow);}
+    .sl-top.cyan{color:var(--accent);}
+    .sl-top.orange{color:var(--orange);}
+    .sl-top.purple{color:var(--purple);}
+    .sl-text{font-size:.82rem;color:var(--text-dim);line-height:1.65;}
+    .sl-text strong{color:var(--text);}
+
+    /* ── WHEN NOT TO USE ── */
+    .danger-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0;}
+    .danger-card{background:rgba(255,61,90,.04);border:1px solid rgba(255,61,90,.15);border-radius:13px;padding:18px;}
+    .danger-card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .danger-icon{font-size:1.2rem;}
+    .danger-title{font-size:.84rem;color:var(--red);font-weight:600;}
+    .danger-body{font-size:.79rem;color:var(--text-dim);line-height:1.6;}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{background:rgba(0,229,255,.07);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;padding:11px 14px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;}
+    .cmp-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-dim);vertical-align:top;line-height:1.55;}
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .val-r{color:var(--red);font-weight:600;}
+    .val-g{color:var(--green);font-weight:600;}
+    .val-y{color:var(--yellow);font-weight:600;}
+    .val-c{color:var(--accent);font-weight:600;}
+    .val-o{color:var(--orange);font-weight:600;}
+    .val-p{color:var(--purple);font-weight:600;}
+
+    /* ── RSI GAUGE ── */
+    .rsi-gauge-wrap{display:flex;justify-content:center;margin:20px 0;}
+
+    /* ── QUIZ ── */
+    .quiz-section{background:linear-gradient(135deg,rgba(178,102,255,.05),rgba(255,152,0,.03));border:1px solid rgba(178,102,255,.15);border-radius:20px;padding:28px;margin-bottom:32px;}
+    .quiz-section-title{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;color:#fff;letter-spacing:.08em;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+    .quiz-block{margin-bottom:28px;}
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--purple);margin-bottom:10px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:500;line-height:1.65;margin-bottom:14px;}
+    .quiz-options{display:flex;flex-direction:column;gap:9px;}
+    .quiz-opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:12px;border:1px solid rgba(0,229,255,.1);background:rgba(0,229,255,.03);cursor:pointer;transition:all .2s;font-size:.86rem;color:var(--text-dim);line-height:1.55;}
+    .quiz-opt:hover:not(.disabled){background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.25);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-opt.correct{background:rgba(0,230,118,.1)!important;border-color:rgba(0,230,118,.4)!important;color:var(--green)!important;}
+    .quiz-opt.wrong{background:rgba(255,61,90,.08)!important;border-color:rgba(255,61,90,.3)!important;color:var(--red)!important;}
+    .quiz-letter{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);}
+    .quiz-feedback{margin-top:12px;padding:14px 16px;border-radius:10px;font-size:.84rem;line-height:1.7;display:none;}
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer{background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));border:1px solid rgba(0,229,255,.12);border-radius:20px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;overflow:hidden;margin-top:16px;}
+    .chapter-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--yellow),var(--orange),transparent);}
+    .footer-info{font-size:.88rem;color:var(--text-dim);line-height:1.75;}
+    .footer-info strong{color:var(--text);}
+    .next-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:14px;border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.07);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.1em;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap;}
+    .next-btn:hover{background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 20px rgba(0,229,255,.2);}
+    .next-btn svg{width:16px;height:16px;}
+
+    @media(max-width:600px){
+      .hero{flex-direction:column;gap:20px;padding:24px;}
+      .hero-icon{width:80px;height:80px;}
+      .hero-title{font-size:1.2rem;}
+      main{padding:24px 16px 80px;}
+      .state-grid{grid-template-columns:1fr 1fr;}
+      .danger-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+
+<!-- ── SIDE NAV ── -->
+<nav class="chapter-sidenav">
+  <a href="chapter1.html" class="ch-nav-item"><span class="ch-num">01</span><span class="ch-label">市場與K線</span></a>
+  <a href="chapter2.html" class="ch-nav-item"><span class="ch-num">02</span><span class="ch-label">K棒進階解讀</span></a>
+  <span class="ch-nav-item locked"><span class="ch-num">03</span><span class="ch-label">趨勢與結構</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">04</span><span class="ch-label">支撐與壓力</span></span>
+  <a href="chapter5.html" class="ch-nav-item"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
+  <span class="ch-nav-item locked"><span class="ch-num">06</span><span class="ch-label">均線重新定位</span></span>
+  <span class="ch-nav-item current-ch"><span class="ch-num">07</span><span class="ch-label">指標輔助</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">08</span><span class="ch-label">量能與籌碼</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">09</span><span class="ch-label">交易策略</span></span>
+  <span class="ch-nav-item locked"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></span>
+</nav>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <a href="chapter5.html" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>第五章
+    </a>
+    <span class="header-title">技術分析教學</span>
+  </div>
+  <span class="chapter-badge">CH.07</span>
+</header>
+
+<!-- ── STICKY PROGRESS ── -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第七章 · 指標降級成輔助 · 學習進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-icon">
+      <svg width="70" height="80" viewBox="0 0 70 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- RSI-like oscillator wave -->
+        <rect x="4" y="10" width="62" height="60" rx="6" fill="none" stroke="rgba(255,152,0,.2)" stroke-width="1"/>
+        <!-- Overbought line -->
+        <line x1="4" y1="26" x2="66" y2="26" stroke="rgba(255,61,90,.3)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- Oversold line -->
+        <line x1="4" y1="54" x2="66" y2="54" stroke="rgba(0,230,118,.3)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- RSI line -->
+        <polyline points="8,50 16,30 22,22 30,40 38,58 46,28 54,34 62,20"
+          fill="none" stroke="#ff9800" stroke-width="2.2" stroke-linejoin="round"/>
+        <!-- Glow dots at extremes -->
+        <circle cx="22" cy="22" r="3.5" fill="#ff3d5a" opacity="0.8">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="38" cy="58" r="3.5" fill="#00e676" opacity="0.8">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" begin=".7s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Labels -->
+        <text x="8" y="23" fill="rgba(255,61,90,.6)" font-size="7" font-family="Share Tech Mono,monospace">超買</text>
+        <text x="8" y="70" fill="rgba(0,230,118,.6)" font-size="7" font-family="Share Tech Mono,monospace">超賣</text>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">CHAPTER 07 · INDICATORS AS ASSISTANTS</div>
+      <div class="hero-title">指標<br/>降級成輔助</div>
+      <div class="hero-desc">指標不是交易的主角，是配角。RSI、MACD、KD 每一個都有它的適用場景，也有它失效的時刻。真正厲害的交易者，不是會用很多指標——而是知道<strong style="color:var(--orange)">什麼時候不要用指標</strong>。</div>
+      <div class="hero-tags">
+        <span class="tag tag-orange">RSI 情緒過熱</span>
+        <span class="tag tag-cyan">MACD 動能</span>
+        <span class="tag tag-purple">KD 短線節奏</span>
+        <span class="tag tag-red">何時不用</span>
+        <span class="tag tag-yellow">指標組合</span>
+        <span class="tag tag-green">背離訊號</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOC ── -->
+  <div class="toc-strip">
+    <div class="toc-item" onclick="scrollToSec('sec1')"><div class="toc-dot active" id="d1">01</div><div class="toc-lbl">指標的<br/>定位</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec2')"><div class="toc-dot" id="d2">02</div><div class="toc-lbl">RSI<br/>情緒計</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec3')"><div class="toc-dot" id="d3">03</div><div class="toc-lbl">MACD<br/>動能儀</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec4')"><div class="toc-dot" id="d4">04</div><div class="toc-lbl">KD<br/>節奏器</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec5')"><div class="toc-dot" id="d5">05</div><div class="toc-lbl">背離<br/>訊號</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec6')"><div class="toc-dot" id="d6">06</div><div class="toc-lbl">何時不用<br/>指標</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec7')"><div class="toc-dot" id="d7">07</div><div class="toc-lbl">指標<br/>組合術</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('sec8')"><div class="toc-dot" id="d8">08</div><div class="toc-lbl">互動<br/>測驗</div></div>
+  </div>
+
+  <!-- ═══ SEC 1：指標的正確定位 ═══ -->
+  <div class="section-card reveal" id="sec1">
+    <div class="section-header">
+      <span class="section-num">SEC 01</span>
+      <span class="section-title">指標的正確定位：配角，不是主角</span>
+      <span class="section-icon">🧭</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">很多人學技術分析的方式是：找到一個「神奇指標」，照著買賣就能賺錢。這是市場上最常見、也最危險的迷思。</p>
+      <p class="prose">指標的本質，是將<strong>價格和成交量的歷史數據</strong>，用公式重新計算後呈現的衍生數值。換句話說：<em>指標永遠是落後於價格的</em>。它告訴你「剛才發生了什麼」，不是「接下來會怎樣」。</p>
+
+      <div class="warn-box">
+        <span class="insight-icon">🚨</span>
+        <div class="insight-body">
+          <div class="insight-label">── 最常見的錯誤思維 ──</div>
+          <div class="insight-text">「RSI 到 80 了，一定會跌！」→ 強勢股可以在 RSI 80 以上維持幾個月。<br/>「MACD 金叉了，趕快買！」→ 在下降趨勢中，金叉後繼續跌是常態。<br/><br/>指標是<strong>輔助確認工具</strong>，不是獨立的進出訊號。必須結合趨勢、型態、價格結構一起判斷。</div>
+        </div>
+      </div>
+
+      <!-- 指標層級圖 -->
+      <div class="sec-divider">── 正確的分析優先順序 ──</div>
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <div class="flow-num fn-r">①</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading" style="color:var(--red)">趨勢判讀（最重要）</div>
+            <div class="flow-sub">大週期趨勢是多頭還是空頭？高低點結構是否完整？這決定了你的操作方向，任何指標訊號都要在趨勢框架下解讀。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num fn-y">②</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading" style="color:var(--yellow)">支撐壓力 & 型態</div>
+            <div class="flow-sub">關鍵價位在哪？現在是突破還是回測？型態是否在形成中？這決定了進場點附近的多空力道。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num fn-c">③</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading" style="color:var(--accent)">K棒訊號 + 量能</div>
+            <div class="flow-sub">當下的K棒型態、成交量是否配合？這決定了進場時機的精確度。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num fn-o">④</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading" style="color:var(--orange)">指標輔助確認（最後一步）</div>
+            <div class="flow-sub">前三步都對齊了，再看指標確認：RSI 是否過熱/過冷？MACD 動能方向是否一致？KD 是否交叉？指標只是錦上添花，不是決策主軸。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <span class="insight-icon">💡</span>
+        <div class="insight-body">
+          <div class="insight-label">── 核心觀念 ──</div>
+          <div class="insight-text"><strong>指標越多 ≠ 訊號越準。</strong> 加入越多指標，只是把同一件事用不同方式重複說。真正的進步是：<em>用更少的指標、做更精準的判斷</em>。大多數專業交易者只用 1～2 個指標輔助，其餘靠趨勢和價格結構。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 2：RSI ═══ -->
+  <div class="section-card reveal" id="sec2">
+    <div class="section-header">
+      <span class="section-num">SEC 02</span>
+      <span class="section-title">RSI：情緒過熱指示器，不是買賣機器</span>
+      <span class="section-icon">🌡️</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">RSI（相對強弱指數）衡量的是：在一段時間內，<strong>上漲的力道</strong>相對於<strong>下跌的力道</strong>有多強。數值從 0 到 100，像溫度計一樣測量市場的「情緒熱度」。</p>
+
+      <!-- RSI視覺化 -->
+      <div class="rsi-gauge-wrap">
+        <svg width="420" height="130" viewBox="0 0 420 130" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+          <rect width="420" height="130" fill="#040b15" rx="10"/>
+          <!-- Background track -->
+          <rect x="20" y="55" width="380" height="20" rx="10" fill="rgba(255,255,255,.04)"/>
+          <!-- Color zones -->
+          <rect x="20" y="55" width="76" height="20" rx="0" fill="rgba(0,230,118,.15)"/>
+          <rect x="20" y="55" width="10" height="20" rx="10 0 0 10" fill="rgba(0,230,118,.15)"/>
+          <rect x="96" y="55" width="228" height="20" fill="rgba(255,255,255,.04)"/>
+          <rect x="324" y="55" width="76" height="20" fill="rgba(255,61,90,.15)"/>
+          <rect x="390" y="55" width="10" height="20" rx="0 10 10 0" fill="rgba(255,61,90,.15)"/>
+          <!-- Labels on track -->
+          <text x="30" y="70" fill="rgba(0,230,118,.7)" font-size="9" font-family="Share Tech Mono,monospace">0</text>
+          <text x="86" y="70" fill="rgba(0,230,118,.8)" font-size="9" font-family="Share Tech Mono,monospace">30</text>
+          <text x="200" y="70" fill="rgba(255,255,255,.3)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">50</text>
+          <text x="320" y="70" fill="rgba(255,61,90,.8)" font-size="9" font-family="Share Tech Mono,monospace">70</text>
+          <text x="398" y="70" fill="rgba(255,61,90,.7)" font-size="9" font-family="Share Tech Mono,monospace">100</text>
+          <!-- Divider lines -->
+          <line x1="96" y1="52" x2="96" y2="78" stroke="rgba(0,230,118,.4)" stroke-width="1.5"/>
+          <line x1="324" y1="52" x2="324" y2="78" stroke="rgba(255,61,90,.4)" stroke-width="1.5"/>
+          <!-- Zone labels -->
+          <text x="58" y="46" fill="rgba(0,230,118,.8)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">超賣區</text>
+          <text x="210" y="46" fill="rgba(255,255,255,.35)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">中性區</text>
+          <text x="362" y="46" fill="rgba(255,61,90,.8)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">超買區</text>
+          <!-- Animated indicator dot -->
+          <circle cx="290" cy="65" r="8" fill="#ff9800" opacity="0.9">
+            <animate attributeName="cx" values="290;320;260;290" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="fill" values="#ff9800;#ff3d5a;#ff9800;#ff9800" dur="4s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Bottom zone descriptions -->
+          <text x="58" y="100" fill="rgba(0,230,118,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">可能超跌</text>
+          <text x="58" y="112" fill="rgba(0,230,118,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">注意反彈</text>
+          <text x="210" y="100" fill="rgba(255,255,255,.25)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">觀望、跟隨趨勢</text>
+          <text x="362" y="100" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">可能過熱</text>
+          <text x="362" y="112" fill="rgba(255,61,90,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">注意回調</text>
+        </svg>
+      </div>
+
+      <!-- RSI 互動狀態解析 -->
+      <div class="sim-wrap">
+        <div class="sim-title">▶ RSI 情境解析器（點選數值區間）</div>
+        <div class="sim-tabs">
+          <div class="sim-tab" onclick="showRsi('below20',this)">RSI &lt; 20</div>
+          <div class="sim-tab active" onclick="showRsi('20to30',this)">RSI 20–30</div>
+          <div class="sim-tab" onclick="showRsi('30to50',this)">RSI 30–50</div>
+          <div class="sim-tab" onclick="showRsi('50to70',this)">RSI 50–70</div>
+          <div class="sim-tab" onclick="showRsi('70to80',this)">RSI 70–80</div>
+          <div class="sim-tab" onclick="showRsi('above80',this)">RSI &gt; 80</div>
+        </div>
+        <div class="sim-result" id="rsiResult"><strong>RSI 20–30（超賣邊緣）：</strong> 空方力道佔優但已接近極端。歷史上這個區間出現反彈的機率較高，但在強烈下跌趨勢中，RSI 可以長時間維持在 30 以下。不能單靠 RSI 在此買進，需等趨勢轉折訊號（如長下影線、放量反彈）配合。</div>
+      </div>
+
+      <div class="sec-divider">── RSI 的核心用法 ──</div>
+
+      <div class="state-grid">
+        <div class="state-card bull"><div class="state-val">50+</div><div class="state-label">RSI 站上50，多方主導。趨勢偏多，回調是加碼機會。</div></div>
+        <div class="state-card bear"><div class="state-val">50-</div><div class="state-label">RSI 跌破50，空方主導。趨勢偏空，反彈是放空機會。</div></div>
+        <div class="state-card warn"><div class="state-val">70+</div><div class="state-label">進入超買，短線過熱。強勢趨勢可繼續，但需警戒回調。</div></div>
+        <div class="state-card neutral"><div class="state-val">30-</div><div class="state-label">進入超賣，短線過冷。空方極端，但趨勢不一定立刻反轉。</div></div>
+      </div>
+
+      <div class="sl-wrap"><div class="sl-side red"></div><div class="sl-body"><div class="sl-top red">▌ RSI 最容易誤用的地方</div><div class="sl-text"><strong>「RSI 70 就賣」是最常見的虧損操作之一。</strong> 在強勢上漲趨勢中，RSI 可以在 70～90 之間停留幾週甚至幾個月。這時候看到 70 就放空，會被無情軋爆。RSI 高代表強勢，不代表立刻回頭。</div></div></div>
+
+      <div class="sl-wrap"><div class="sl-side green"></div><div class="sl-body"><div class="sl-top green">▌ RSI 真正的價值：背離訊號</div><div class="sl-text">RSI 最有價值的用法是「<strong>背離</strong>」——當價格創新高但 RSI 沒有創新高（或反之），代表動能在衰竭。這比單純看超買超賣更有預測意義（詳見第五節）。</div></div></div>
+
+      <table class="cmp-table">
+        <thead><tr><th>RSI 情境</th><th>多頭趨勢中含義</th><th>空頭趨勢中含義</th></tr></thead>
+        <tbody>
+          <tr><td>RSI 突破 50</td><td class="val-r">多方重新掌控，趨勢確認</td><td class="val-y">短線反彈，但趨勢未變</td></tr>
+          <tr><td>RSI 跌破 50</td><td class="val-y">短線回調，觀察支撐</td><td class="val-g">空方主導延續，趨勢確認</td></tr>
+          <tr><td>RSI 進入 70+</td><td class="val-y">強勢，縮緊停利觀察</td><td class="val-g">反彈過熱，放空機會</td></tr>
+          <tr><td>RSI 進入 30-</td><td class="val-r">短線超跌，注意止跌</td><td class="val-y">趨勢持續打壓，謹慎接刀</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 3：MACD ═══ -->
+  <div class="section-card reveal" id="sec3">
+    <div class="section-header">
+      <span class="section-num">SEC 03</span>
+      <span class="section-title">MACD：動能變化的雷達，不是隨便的金叉</span>
+      <span class="section-icon">📡</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">MACD（移動平均收斂擴散）由三個元素組成：<strong>MACD 線</strong>（快線減慢線）、<strong>訊號線</strong>（MACD的移動平均）、<strong>柱狀圖（Histogram）</strong>（MACD 線與訊號線的差值）。</p>
+      <p class="prose">MACD 本質上衡量的是<em>動能的方向與強度變化</em>——不是價格本身在哪裡，而是「加速還是減速」。</p>
+
+      <!-- MACD 示意 SVG -->
+      <div style="display:flex;justify-content:center;margin:22px 0;">
+        <svg width="480" height="200" viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+          <rect width="480" height="200" fill="#040b15" rx="10"/>
+          <!-- Grid -->
+          <line x1="20" y1="100" x2="460" y2="100" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="20" y1="60"  x2="460" y2="60"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="20" y1="140" x2="460" y2="140" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="22" y="97" fill="rgba(255,255,255,.2)" font-size="8" font-family="Share Tech Mono,monospace">0</text>
+          <!-- Histogram bars -->
+          <rect x="32"  y="85"  width="12" height="15" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="52"  y="78"  width="12" height="22" fill="rgba(255,61,90,.6)" rx="1"/>
+          <rect x="72"  y="68"  width="12" height="32" fill="rgba(255,61,90,.75)" rx="1"/>
+          <rect x="92"  y="74"  width="12" height="26" fill="rgba(255,61,90,.65)" rx="1"/>
+          <rect x="112" y="82"  width="12" height="18" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="132" y="91"  width="12" height="9"  fill="rgba(255,61,90,.35)" rx="1"/>
+          <rect x="152" y="100" width="12" height="10" fill="rgba(0,230,118,.35)" rx="1"/>
+          <rect x="172" y="100" width="12" height="18" fill="rgba(0,230,118,.5)" rx="1"/>
+          <rect x="192" y="100" width="12" height="25" fill="rgba(0,230,118,.6)" rx="1"/>
+          <rect x="212" y="100" width="12" height="32" fill="rgba(0,230,118,.75)" rx="1"/>
+          <rect x="232" y="100" width="12" height="26" fill="rgba(0,230,118,.65)" rx="1"/>
+          <rect x="252" y="100" width="12" height="20" fill="rgba(0,230,118,.55)" rx="1"/>
+          <rect x="272" y="100" width="12" height="12" fill="rgba(0,230,118,.4)" rx="1"/>
+          <rect x="292" y="91"  width="12" height="9"  fill="rgba(255,61,90,.3)" rx="1"/>
+          <rect x="312" y="82"  width="12" height="18" fill="rgba(255,61,90,.5)" rx="1"/>
+          <rect x="332" y="72"  width="12" height="28" fill="rgba(255,61,90,.65)" rx="1"/>
+          <rect x="352" y="78"  width="12" height="22" fill="rgba(255,61,90,.55)" rx="1"/>
+          <rect x="372" y="88"  width="12" height="12" fill="rgba(255,61,90,.4)" rx="1"/>
+          <rect x="392" y="94"  width="12" height="6"  fill="rgba(255,61,90,.25)" rx="1"/>
+          <rect x="412" y="100" width="12" height="8"  fill="rgba(0,230,118,.3)" rx="1"/>
+          <rect x="432" y="100" width="12" height="18" fill="rgba(0,230,118,.5)" rx="1"/>
+          <!-- MACD line -->
+          <polyline points="38,88 58,82 78,72 98,78 118,86 138,95 158,106 178,114 198,118 218,120 238,116 258,112 278,104 298,94 318,86 338,77 358,83 378,90 398,96 418,102 438,108"
+            fill="none" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/>
+          <!-- Signal line -->
+          <polyline points="38,90 58,86 78,79 98,81 118,88 138,96 158,104 178,111 198,116 218,119 238,116 258,113 278,106 298,97 318,88 338,80 358,83 378,89 398,94 418,99 438,105"
+            fill="none" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="5,3" stroke-linejoin="round"/>
+          <!-- Golden cross marker -->
+          <circle cx="155" cy="104" r="5" fill="none" stroke="#ffd600" stroke-width="1.5"/>
+          <text x="145" y="125" fill="rgba(255,214,0,.7)" font-size="8" font-family="Share Tech Mono,monospace">金叉</text>
+          <!-- Death cross marker -->
+          <circle cx="296" cy="94" r="5" fill="none" stroke="#00e676" stroke-width="1.5"/>
+          <text x="285" y="82" fill="rgba(0,230,118,.7)" font-size="8" font-family="Share Tech Mono,monospace">死叉</text>
+          <!-- Legend -->
+          <line x1="22" y1="180" x2="45" y2="180" stroke="#00e5ff" stroke-width="2"/>
+          <text x="50" y="183" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace">MACD線</text>
+          <line x1="120" y1="180" x2="143" y2="180" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="148" y="183" fill="rgba(255,152,0,.7)" font-size="9" font-family="Share Tech Mono,monospace">訊號線</text>
+          <rect x="220" y="174" width="10" height="10" fill="rgba(255,61,90,.5)" rx="1"/>
+          <text x="234" y="183" fill="rgba(255,61,90,.7)" font-size="9" font-family="Share Tech Mono,monospace">紅柱(正)</text>
+          <rect x="310" y="174" width="10" height="10" fill="rgba(0,230,118,.5)" rx="1"/>
+          <text x="324" y="183" fill="rgba(0,230,118,.7)" font-size="9" font-family="Share Tech Mono,monospace">綠柱(負)</text>
+        </svg>
+      </div>
+
+      <div class="sl-wrap"><div class="sl-side orange"></div><div class="sl-body"><div class="sl-top orange">▌ 金叉（黃金交叉）：MACD 線從下方穿越訊號線</div><div class="sl-text">代表短線動能開始強於長線，多方力道增強。<strong>在零軸以上發生的金叉（強勢金叉）比零軸以下的金叉更可靠。</strong> 零軸以下的金叉可能只是短線反彈，不一定是趨勢轉多。</div></div></div>
+
+      <div class="sl-wrap"><div class="sl-side green"></div><div class="sl-body"><div class="sl-top green">▌ 死叉（死亡交叉）：MACD 線從上方穿越訊號線</div><div class="sl-text">代表短線動能開始弱於長線，空方力道增強。<strong>在零軸以下發生的死叉（強勢死叉）比零軸以上的死叉更危險。</strong> 零軸以上的死叉可能只是短線回調，趨勢仍可能向上。</div></div></div>
+
+      <div class="sl-wrap"><div class="sl-side cyan"></div><div class="sl-body"><div class="sl-top cyan">▌ 柱狀圖（Histogram）：看動能「加速還是減速」</div><div class="sl-text">柱狀圖越來越長 = 動能在加速；越來越短 = 動能在衰減。<strong>柱狀圖從最高點開始縮短，往往早於金叉/死叉出現</strong>，是更早的動能轉折訊號。這是 MACD 最被低估的用法。</div></div></div>
+
+      <div class="gold-box">
+        <span class="insight-icon">⚡</span>
+        <div class="insight-body">
+          <div class="insight-label">── MACD 最重要的一個觀念 ──</div>
+          <div class="insight-text"><strong>「零軸」才是真正的多空分界線。</strong><br/>MACD 線在零軸以上 = 整體多方趨勢；MACD 線在零軸以下 = 整體空方趨勢。<br/>金叉/死叉只是短線動能的切換，零軸位置決定長線趨勢。<em>不要在零軸以下見到金叉就追多，不要在零軸以上見到死叉就放空。</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 4：KD ═══ -->
+  <div class="section-card reveal" id="sec4">
+    <div class="section-header">
+      <span class="section-num">SEC 04</span>
+      <span class="section-title">KD（隨機指標）：短線節奏器，最容易被濫用</span>
+      <span class="section-icon">🎚️</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">KD（Stochastic Oscillator）衡量的是：<strong>當前收盤價相對於最近N日高低點範圍的位置</strong>。K 值是快線，D 值是 K 值的平滑均線（慢線）。數值範圍 0～100。</p>
+      <p class="prose">KD 的本質是：告訴你價格現在是在最近的<em>高端還是低端</em>。它是典型的短線擺動指標，非常敏感，適合捕捉短線節奏，但在趨勢行情中會大量失效。</p>
+
+      <div class="state-grid">
+        <div class="state-card bull"><div class="state-val">K>D</div><div class="state-label">K 線在 D 線上方，短線偏多，多方動能較強</div></div>
+        <div class="state-card bear"><div class="state-val">K&lt;D</div><div class="state-label">K 線在 D 線下方，短線偏空，空方動能較強</div></div>
+        <div class="state-card warn"><div class="state-val">80+</div><div class="state-label">高位超買區，短線可能回調。強勢趨勢中可以在此停留很久。</div></div>
+        <div class="state-card neutral"><div class="state-val">20-</div><div class="state-label">低位超賣區，短線可能反彈。但趨勢若強，仍可繼續下跌。</div></div>
+      </div>
+
+      <div class="sec-divider">── KD 三種使用情境 ──</div>
+
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <div class="flow-num fn-g">①</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">低位黃金交叉（KD 低檔鈍化後反彈）</div>
+            <div class="flow-sub">KD 雙雙低於 20，然後 K 線向上穿越 D 線（黃金交叉）。<strong>在下跌趨勢末端、支撐位附近出現時，是可靠的短線反彈訊號。</strong> 必須配合趨勢判斷——如果整體是空頭趨勢，這只是短線反彈，不是底部。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num fn-r">②</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">高位死亡交叉（KD 高檔鈍化後回落）</div>
+            <div class="flow-sub">KD 雙雙高於 80，然後 K 線向下穿越 D 線（死亡交叉）。<strong>在上漲趨勢末端、壓力位附近出現時，是短線回調的訊號。</strong> 同樣需要趨勢背景——多頭趨勢中，高位死叉通常只是短暫回調，不是頂部。</div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="flow-step">
+          <div class="flow-num fn-y">③</div><div style="width:8px"></div>
+          <div class="flow-content">
+            <div class="flow-heading">KD 鈍化：最容易被忽略的狀態</div>
+            <div class="flow-sub">在強勢趨勢中，KD 會在 80 以上或 20 以下「卡住」（鈍化），短時間內不交叉。<strong>這不是失效，而是告訴你趨勢非常強。</strong> 在鈍化期間不要逆勢操作，等到 KD 真正轉向才反應。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <span class="insight-icon">⚠️</span>
+        <div class="insight-body">
+          <div class="insight-label">── KD 最大的陷阱 ──</div>
+          <div class="insight-text">KD 交叉訊號在橫盤震盪市場中非常準，但在<strong>單邊趨勢行情中會連續給錯誤訊號</strong>。大漲趨勢中，KD 可能在 80 以上交叉 5～10 次，每次死叉後繼續漲。如果每次死叉就放空，會被軋爆。<br/><br/>記住：<em>KD 是震盪市場的工具，不是趨勢市場的工具。</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 5：背離訊號 ═══ -->
+  <div class="section-card reveal" id="sec5">
+    <div class="section-header">
+      <span class="section-num">SEC 05</span>
+      <span class="section-title">背離訊號：指標最有價值的用法</span>
+      <span class="section-icon">⚡</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">背離（Divergence）是指標分析中最有價值的技巧，也是大多數教學最少提到的部分。它的核心概念是：<strong>當價格走勢和指標走勢出現矛盾時，往往意味著趨勢動能正在衰竭。</strong></p>
+
+      <div class="insight-box">
+        <span class="insight-icon">🔑</span>
+        <div class="insight-body">
+          <div class="insight-label">── 背離的本質 ──</div>
+          <div class="insight-text">背離是「價格與動能脫節」的訊號。價格創新高，但動能沒有創新高——說明這個新高是「空心的」，沒有足夠的力量支撐。這是趨勢可能即將轉折的早期預警。</div>
+        </div>
+      </div>
+
+      <!-- 背離模擬器 -->
+      <div class="sim-wrap">
+        <div class="sim-title">▶ 背離訊號互動解析（點選類型）</div>
+        <div class="sim-tabs">
+          <div class="sim-tab active" onclick="showDiv('bearish',this)">頂背離（看跌）</div>
+          <div class="sim-tab" onclick="showDiv('bullish',this)">底背離（看漲）</div>
+          <div class="sim-tab" onclick="showDiv('hidden_bull',this)">隱藏底背離</div>
+          <div class="sim-tab" onclick="showDiv('hidden_bear',this)">隱藏頂背離</div>
+        </div>
+        <div class="sim-canvas">
+          <svg id="divSvg" width="100%" height="100%" viewBox="0 0 540 210" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="sim-result" id="divResult"></div>
+      </div>
+
+      <div class="sec-divider">── 四種背離類型總覽 ──</div>
+
+      <table class="cmp-table">
+        <thead><tr><th>背離類型</th><th>價格走勢</th><th>指標走勢</th><th>含義</th><th>訊號方向</th></tr></thead>
+        <tbody>
+          <tr><td>頂背離（常規熊背離）</td><td class="val-r">創新高</td><td class="val-g">未創新高（走低）</td><td>上漲動能衰竭</td><td class="val-g">看跌警示</td></tr>
+          <tr><td>底背離（常規牛背離）</td><td class="val-g">創新低</td><td class="val-r">未創新低（走高）</td><td>下跌動能衰竭</td><td class="val-r">看漲警示</td></tr>
+          <tr><td>隱藏底背離</td><td class="val-r">回調高於前低</td><td class="val-g">低點低於前低</td><td>多頭趨勢仍強</td><td class="val-r">趨勢持續（做多）</td></tr>
+          <tr><td>隱藏頂背離</td><td class="val-g">反彈低於前高</td><td class="val-r">高點高於前高</td><td>空頭趨勢仍強</td><td class="val-g">趨勢持續（做空）</td></tr>
+        </tbody>
+      </table>
+
+      <div class="purple-box">
+        <span class="insight-icon">🎯</span>
+        <div class="insight-body">
+          <div class="insight-label">── 背離使用的三個前提 ──</div>
+          <div class="insight-text">
+            <strong>① 背離需要在關鍵位置出現：</strong> 頂背離在重要壓力位出現，意義最大；底背離在重要支撐位出現，意義最大。<br/>
+            <strong>② 背離是警示，不是進場訊號：</strong> 看到背離要減少倉位、縮緊停損，不是立刻反向進場。等價格確認轉折後才行動。<br/>
+            <strong>③ 背離可以持續很久：</strong> 在強勢趨勢中，可以出現多次背離後才真正反轉。背離只是說「動能在減弱」，不是說「立刻就會反轉」。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 6：何時不用指標 ═══ -->
+  <div class="section-card reveal" id="sec6">
+    <div class="section-header">
+      <span class="section-num">SEC 06</span>
+      <span class="section-title">何時不要用指標：這才是真正的進階</span>
+      <span class="section-icon">🚫</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">這是本章最重要的一節，也是大多數教學絕對不會告訴你的。<strong>知道什麼時候不用指標，比知道怎麼用指標更重要。</strong></p>
+
+      <div class="danger-grid">
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">⚡</span><span class="danger-title">強烈趨勢行情中</span></div>
+          <div class="danger-body">單邊快速拉升或崩跌時，所有震盪類指標（KD、RSI）都會嚴重失效。RSI 可以在 85 以上維持幾週，每次死叉後繼續衝高。<br/><br/>✦ 正確做法：跟趨勢走，不用指標找「超買點」放空。</div>
+        </div>
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">💥</span><span class="danger-title">重大消息事件當天</span></div>
+          <div class="danger-body">財報、央行決策、重大政策發布的當天，技術指標完全失效。任何基於歷史數據的指標，對突發消息都沒有預測能力。<br/><br/>✦ 正確做法：在消息公布前減倉，等塵埃落定後看價格反應。</div>
+        </div>
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">😴</span><span class="danger-title">極低流動性時段</span></div>
+          <div class="danger-body">亞洲盤尾段、假日前後、成交量極低的個股，一點點資金就能造成指標劇烈波動。這時候的指標訊號幾乎都是雜訊。<br/><br/>✦ 正確做法：不在低流動性環境下依賴指標交易。</div>
+        </div>
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">🔀</span><span class="danger-title">橫盤震盪轉趨勢初期</span></div>
+          <div class="danger-body">剛從橫盤突破，MACD 和 RSI 的數值還在適應新趨勢的計算，會出現大量混亂訊號。趨勢確立初期最不應該依賴指標。<br/><br/>✦ 正確做法：依靠突破K棒和量能，而非指標確認。</div>
+        </div>
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">📊</span><span class="danger-title">指標之間互相矛盾時</span></div>
+          <div class="danger-body">RSI 說超買、MACD 說金叉、KD 在低位——三個指標各說各的。這時候哪個都不可信。強迫解讀矛盾的指標是虧損的來源之一。<br/><br/>✦ 正確做法：回到最基本的趨勢和價格結構判斷，放棄指標。</div>
+        </div>
+        <div class="danger-card">
+          <div class="danger-card-top"><span class="danger-icon">🎰</span><span class="danger-title">過度優化（曲線擬合）</span></div>
+          <div class="danger-body">用歷史數據不斷調整指標參數（RSI 用 14 天還是 9 天），找到「最完美」的設定。這在回測中很好看，但在實際交易中幾乎都會失敗。<br/><br/>✦ 正確做法：用業界標準參數，不過度優化。</div>
+        </div>
+      </div>
+
+      <div class="orange-box">
+        <span class="insight-icon">🏆</span>
+        <div class="insight-body">
+          <div class="insight-label">── 真正的進階指標觀 ──</div>
+          <div class="insight-text">你的目標不是「學更多指標」，而是<strong>對你選用的 1～2 個指標，深刻理解它在什麼環境有效、什麼環境失效</strong>。與其掌握 10 個指標各知道 20%，不如掌握 2 個指標知道 95%。<br/><br/>真正的交易者的桌面往往比你想像的<em>更乾淨</em>，而不是更複雜。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 7：指標組合術 ═══ -->
+  <div class="section-card reveal" id="sec7">
+    <div class="section-header">
+      <span class="section-num">SEC 07</span>
+      <span class="section-title">指標組合術：1+1 > 2 的正確方式</span>
+      <span class="section-icon">🔧</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">如果你要用多個指標，必須確保它們是在<strong>不同維度</strong>上提供資訊，而不是重複說同一件事。正確的組合邏輯：趨勢類 + 動能類 + 超買超賣類，三個維度各一個就足夠。</p>
+
+      <div class="sec-divider">── 推薦的組合搭配 ──</div>
+
+      <div class="combo-wrap">
+        <div class="combo-row">
+          <span class="combo-ind">RSI + 趨勢線</span>
+          <div class="combo-desc">趨勢線判斷大方向 → RSI 確認動能狀態。趨勢向上且 RSI 回調到 50 附近：高勝率加碼點；趨勢向下且 RSI 反彈到 50 附近：高勝率放空點。</div>
+          <span class="combo-strength cs-high">強力</span>
+        </div>
+        <div class="combo-row">
+          <span class="combo-ind">MACD + 型態</span>
+          <div class="combo-desc">型態確認結構（如頭肩頂）→ MACD 確認動能方向（死叉且在零軸以下）。兩者同時確認，進場訊號可信度大幅提升。</div>
+          <span class="combo-strength cs-high">強力</span>
+        </div>
+        <div class="combo-row">
+          <span class="combo-ind">RSI 背離 + K棒型態</span>
+          <div class="combo-desc">RSI 出現頂背離 + 同時出現看跌吞噬型態：雙重轉折訊號，可信度高。背離給警示，K棒型態給確認點。</div>
+          <span class="combo-strength cs-high">強力</span>
+        </div>
+        <div class="combo-row">
+          <span class="combo-ind">KD + 支撐壓力</span>
+          <div class="combo-desc">KD 低位交叉（黃金交叉）發生在重要支撐位附近：短線多方訊號。KD 高位交叉（死叉）發生在重要壓力位附近：短線空方訊號。</div>
+          <span class="combo-strength cs-med">中等</span>
+        </div>
+        <div class="combo-row">
+          <span class="combo-ind">MACD + RSI</span>
+          <div class="combo-desc">兩者都是動能類指標，容易重複。僅當兩者出現不同訊號（背離）時有參考價值：MACD 金叉但 RSI 頂背離 → 動能分歧，需謹慎。</div>
+          <span class="combo-strength cs-low">一般</span>
+        </div>
+        <div class="combo-row">
+          <span class="combo-ind">KD + RSI + MACD</span>
+          <div class="combo-desc">三個全用往往導致訊號混亂。如果三者一致還好，但三者不一致時，反而讓決策更困難。不推薦同時使用三個以上的動能/擺動指標。</div>
+          <span class="combo-strength cs-low">不推薦</span>
+        </div>
+      </div>
+
+      <div class="sec-divider">── 各指標最適合的市場環境 ──</div>
+
+      <table class="cmp-table">
+        <thead><tr><th>指標</th><th>最適合</th><th>最不適合</th><th>最佳週期</th><th>核心用法</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span style="color:var(--orange);font-weight:600;">RSI</span></td>
+            <td class="td-use">震盪市場、趨勢確認、背離識別</td>
+            <td class="td-nouse">強烈單邊行情（會過早給出超買賣訊號）</td>
+            <td class="val-c">日線 / 週線</td>
+            <td>情緒溫度計 + 背離訊號</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--accent);font-weight:600;">MACD</span></td>
+            <td class="td-use">趨勢確認、動能轉折、零軸判斷</td>
+            <td class="td-nouse">橫盤震盪（金叉死叉頻繁、雜訊多）</td>
+            <td class="val-c">日線 / 4小時線</td>
+            <td>動能方向 + 柱狀圖衰竭</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--purple);font-weight:600;">KD</span></td>
+            <td class="td-use">震盪市場、短線節奏、低位/高位交叉</td>
+            <td class="td-nouse">強烈趨勢行情（鈍化頻繁、大量假訊號）</td>
+            <td class="val-c">60分線 / 日線</td>
+            <td>短線切入點 + 超買超賣</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight-box">
+        <span class="insight-icon">💡</span>
+        <div class="insight-body">
+          <div class="insight-label">── 建立你的指標系統 ──</div>
+          <div class="insight-text"><strong>建議初學者的組合：趨勢（均線/價格結構）+ RSI。</strong><br/>先搞清楚趨勢方向，再用 RSI 找情緒極端點和背離。這個組合簡單、邏輯清晰、不會互相矛盾。等熟練後再考慮加入 MACD 做動能確認。<em>記住：少而精，勝過多而亂。</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 8：互動測驗 ═══ -->
+  <div class="quiz-section reveal" id="sec8">
+    <div class="quiz-section-title"><span style="font-size:1.3rem">🧠</span> 第七章 實力測驗</div>
+
+    <!-- Q1 -->
+    <div class="quiz-block" id="q1">
+      <div class="quiz-label">基礎題 1 / 8</div>
+      <div class="quiz-q">在技術分析的決策框架中，指標的正確位置應該是？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q1','D','A')"><span class="quiz-letter">A</span>第一步就看指標，指標決定方向後再看趨勢確認</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','D','B')"><span class="quiz-letter">B</span>指標和趨勢同等重要，各佔50%決策比重</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','D','C')"><span class="quiz-letter">C</span>指標比趨勢更重要，因為有數學計算支撐</div>
+        <div class="quiz-opt" onclick="answer(this,'q1','D','D')"><span class="quiz-letter">D</span>最後一步輔助確認，趨勢→支撐壓力→K棒量能→指標</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-block" id="q2" style="margin-top:24px">
+      <div class="quiz-label">基礎題 2 / 8</div>
+      <div class="quiz-q">RSI 達到 75，這代表什麼？最正確的解讀是？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q2','C','A')"><span class="quiz-letter">A</span>立刻賣出，因為超買就一定會跌</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','B')"><span class="quiz-letter">B</span>立刻追進，因為動能很強</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','C')"><span class="quiz-letter">C</span>短線偏熱，需搭配趨勢和型態判斷；強勢趨勢中 RSI 可維持高位很久</div>
+        <div class="quiz-opt" onclick="answer(this,'q2','C','D')"><span class="quiz-letter">D</span>RSI 75 沒有任何意義，不需要理會</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-block" id="q3" style="margin-top:24px">
+      <div class="quiz-label">進階題 3 / 8</div>
+      <div class="quiz-q">MACD 金叉出現在「零軸以下」，這個訊號的可信度如何？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q3','B','A')"><span class="quiz-letter">A</span>比零軸以上的金叉更強力，因為從低位反彈，空間更大</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','B')"><span class="quiz-letter">B</span>可信度較低，可能只是短線反彈，整體仍是空方趨勢，需謹慎</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','C')"><span class="quiz-letter">C</span>和零軸位置無關，金叉就是做多訊號</div>
+        <div class="quiz-opt" onclick="answer(this,'q3','B','D')"><span class="quiz-letter">D</span>零軸以下不可能出現金叉</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-block" id="q4" style="margin-top:24px">
+      <div class="quiz-label">進階題 4 / 8</div>
+      <div class="quiz-q">你觀察到某股「價格創新高，但 RSI 卻沒有創新高」，這個現象叫做什麼？代表什麼？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q4','A','A')"><span class="quiz-letter">A</span>頂背離，代表上漲動能衰竭，是看跌警示，需警戒後續回調</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','A','B')"><span class="quiz-letter">B</span>底背離，代表下跌動能衰竭，是買入訊號</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','A','C')"><span class="quiz-letter">C</span>RSI 計算錯誤，應該重新確認數據</div>
+        <div class="quiz-opt" onclick="answer(this,'q4','A','D')"><span class="quiz-letter">D</span>這是正常現象，沒有特別意義</div>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-block" id="q5" style="margin-top:24px">
+      <div class="quiz-label">進階題 5 / 8</div>
+      <div class="quiz-q">在強烈上漲趨勢中，KD 在 80 以上反覆出現死叉，你應該怎麼做？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q5','C','A')"><span class="quiz-letter">A</span>每次死叉就放空，死叉就是空方訊號</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','C','B')"><span class="quiz-letter">C</span>忽略 KD，改用 RSI 找更準的賣出點</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','C','C')"><span class="quiz-letter">C</span>認識到這是 KD 鈍化現象，強勢趨勢中不逆勢放空，繼續持有多倉</div>
+        <div class="quiz-opt" onclick="answer(this,'q5','C','D')"><span class="quiz-letter">D</span>立刻全部賣出，因為多次死叉代表頂部確定</div>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-block" id="q6" style="margin-top:24px">
+      <div class="quiz-label">實戰題 6 / 8</div>
+      <div class="quiz-q">以下哪種情況，最適合「完全不依賴指標」來做決策？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q6','B','A')"><span class="quiz-letter">A</span>橫盤震盪了一個月，準備等突破再進場</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','B')"><span class="quiz-letter">B</span>今天聯準會突然宣布大幅升息，市場暴跌3%</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','C')"><span class="quiz-letter">C</span>日線出現頭肩頂型態，等待頸線跌破</div>
+        <div class="quiz-opt" onclick="answer(this,'q6','B','D')"><span class="quiz-letter">D</span>RSI 背離出現，同時在重要支撐位</div>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-block" id="q7" style="margin-top:24px">
+      <div class="quiz-label">觀念題 7 / 8</div>
+      <div class="quiz-q">MACD 柱狀圖（Histogram）越來越短，但還沒有出現死叉，這告訴你什麼？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q7','B','A')"><span class="quiz-letter">A</span>沒有任何意義，只有死叉才算訊號</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','B','B')"><span class="quiz-letter">B</span>上漲動能在衰減，雖然還沒死叉，但這是比死叉更早的預警訊號</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','B','C')"><span class="quiz-letter">C</span>代表即將大漲，動能縮短是蓄勢待發</div>
+        <div class="quiz-opt" onclick="answer(this,'q7','B','D')"><span class="quiz-letter">D</span>代表MACD指標失效，應換其他指標</div>
+      </div>
+      <div class="quiz-feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-block" id="q8" style="margin-top:24px">
+      <div class="quiz-label">綜合題 8 / 8</div>
+      <div class="quiz-q">你同時看到：RSI 顯示超賣（28）、MACD 在零軸以上金叉、KD 低位交叉、但整體週線趨勢仍在下跌。你應該？</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answer(this,'q8','C','A')"><span class="quiz-letter">A</span>三個指標都看多，強力做多，機率很高</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','B')"><span class="quiz-letter">B</span>指標互相矛盾，完全不操作，等下一週</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','C')"><span class="quiz-letter">C</span>週線空頭趨勢優先，短線反彈的機率高但不做多；若要操作，只做短線反彈交易，不追趨勢</div>
+        <div class="quiz-opt" onclick="answer(this,'q8','C','D')"><span class="quiz-letter">D</span>MACD 金叉最重要，做多並長期持有</div>
+      </div>
+      <div class="quiz-feedback" id="q8-fb"></div>
+    </div>
+
+    <div id="finalScore" style="display:none;margin-top:32px;padding:28px;border-radius:16px;background:linear-gradient(135deg,rgba(255,152,0,.07),rgba(255,214,0,.04));border:1px solid rgba(255,152,0,.2);text-align:center">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--orange);margin-bottom:10px">── 第七章 最終成績 ──</div>
+      <div id="scoreNum" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--orange);text-shadow:0 0 30px rgba(255,152,0,.4)"></div>
+      <div id="scoreMsg" style="font-size:.88rem;color:var(--text-dim);margin-top:12px;line-height:1.75"></div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="chapter-footer">
+    <div class="footer-info">
+      <strong>第七章完成 ✅</strong><br>
+      你已掌握 RSI、MACD、KD 的本質邏輯、背離訊號識別、何時不用指標，以及正確的組合方式。<br>
+      下一章：量能與籌碼——爆量是換手還是出貨？真正的主力行為。
+    </div>
+    <a class="next-btn" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      第八章 即將推出
+    </a>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+// RSI RESULT MAP
+// ═══════════════════════════════════════════════
+const rsiMap = {
+  below20: '<strong>RSI &lt; 20（極度超賣）：</strong> 空方力道達到極端，市場可能出現技術性恐慌拋售。歷史上這個區間短線反彈機率高，但<span style="color:var(--red)">絕對不能只靠 RSI 就買</span>。在強力下降趨勢中，RSI 可以在 20 以下停留很久。需等出現長下影線、量能萎縮後反量、或K棒底部型態才考慮進場。',
+  '20to30': '<strong>RSI 20–30（超賣邊緣）：</strong> 空方力道佔優但已接近極端。歷史上這個區間出現反彈的機率較高，但在強烈下跌趨勢中，RSI 可以長時間維持在 30 以下。不能單靠 RSI 在此買進，需等趨勢轉折訊號（如長下影線、放量反彈）配合。',
+  '30to50': '<strong>RSI 30–50（空方主導的中性區）：</strong> 整體偏空，但動能未到極端。在下降趨勢中，RSI 反彈到 40～50 附近常常是放空的好機會（逢彈放空）。在底部反轉後，RSI 重新站上 50 是趨勢轉多的確認訊號之一。',
+  '50to70': '<strong>RSI 50–70（多方主導的中性區）：</strong> 這是最健康的上升趨勢區間。RSI 在 50 以上代表多方主導，50～70 之間是趨勢持續的正常狀態。回調到 50 附近往往是順勢加碼的機會。不要在這個區間嘗試放空。',
+  '70to80': '<strong>RSI 70–80（進入超買區）：</strong> 上漲動能強，短線偏熱。在一般行情中，這個區間開始注意回調風險。但在強勢趨勢中（如牛市初期），RSI 可以在 70 以上長時間維持。<span style="color:var(--yellow)">不要因為 RSI 超買就放空，除非有明確的頂部訊號或背離。</span>',
+  above80: '<strong>RSI &gt; 80（深度超買）：</strong> 極度熱絡，短線過熱明顯。此時要特別注意是否出現「頂背離」——如果價格繼續創新高但 RSI 開始下滑，是強烈的警告訊號。同時注意成交量是否在縮，若量縮且 RSI 高位，短線風險極高。',
+};
+
+function showRsi(key, el) {
+  document.querySelectorAll('.sim-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rsiResult').innerHTML = rsiMap[key] || '';
+}
+
+// ═══════════════════════════════════════════════
+// DIVERGENCE SIMULATOR
+// ═══════════════════════════════════════════════
+const divData = {
+  bearish: {
+    desc: '<strong>頂背離（常規熊背離）：</strong> 價格創新高，但 RSI/MACD 沒有創新高，反而走低。這告訴你：雖然價格還在上漲，但推動上漲的動能已經在減弱。<span style="color:var(--green)">是看跌的早期警示</span>，常出現在頂部反轉前。<br/><br/>操作建議：不是立刻放空，而是縮緊停利、減少多倉暴露；等到價格跌破關鍵支撐或出現頂部K棒型態後，再考慮放空。',
+    draw(svg) {
+      const W=540,H=210;
+      let h = bg(W,H);
+      // Price panel (top)
+      h += label(20,20,'價格走勢','rgba(255,255,255,.35)');
+      h += label(20,115,'RSI 走勢','rgba(255,152,0,.6)');
+      // Divider
+      h += `<line x1="20" y1="110" x2="${W-20}" y2="110" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
+      // Price: creates higher high
+      h += path('50,85 120,65 180,78 250,48','#00e5ff',2);
+      // RSI: lower high
+      h += path('50,148 120,135 180,142 250,152','#ff9800',2);
+      // Arrows showing divergence
+      h += arrow(120,65,250,48,'#ff3d5a'); // price going up
+      h += arrow(120,135,250,152,'#00e676'); // RSI going down
+      // Labels
+      h += label(255,45,'新高','rgba(255,61,90,.8)');
+      h += label(255,155,'下降','rgba(0,230,118,.8)');
+      h += `<text x="140" y="200" fill="rgba(255,214,0,.6)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">頂背離：價格↑ RSI↓ → 動能衰竭警告</text>`;
+      svg.innerHTML = h;
+    }
+  },
+  bullish: {
+    desc: '<strong>底背離（常規牛背離）：</strong> 價格創新低，但 RSI/MACD 沒有創新低，反而走高。這告訴你：雖然價格還在下跌，但推動下跌的動能已經在減弱。<span style="color:var(--red)">是看漲的早期警示</span>，常出現在底部反轉前。<br/><br/>操作建議：不是立刻做多，而是停止追空、縮小空倉；等到價格突破關鍵壓力或出現底部K棒型態後，再考慮做多。',
+    draw(svg) {
+      const W=540,H=210;
+      let h = bg(W,H);
+      h += label(20,20,'價格走勢','rgba(255,255,255,.35)');
+      h += label(20,115,'RSI 走勢','rgba(255,152,0,.6)');
+      h += `<line x1="20" y1="110" x2="${W-20}" y2="110" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
+      // Price: creates lower low
+      h += path('50,45 120,70 180,58 250,85','#00e5ff',2);
+      // RSI: higher low
+      h += path('50,178 120,158 180,165 250,148','#ff9800',2);
+      h += arrow(120,70,250,85,'#00e676');
+      h += arrow(120,158,250,148,'#ff3d5a');
+      h += label(255,88,'新低','rgba(0,230,118,.8)');
+      h += label(255,145,'上升','rgba(255,61,90,.8)');
+      h += `<text x="140" y="200" fill="rgba(255,214,0,.6)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">底背離：價格↓ RSI↑ → 下跌動能衰竭</text>`;
+      svg.innerHTML = h;
+    }
+  },
+  hidden_bull: {
+    desc: '<strong>隱藏底背離：</strong> 趨勢回調時，價格的回調低點高於前一個低點（多頭趨勢結構正常），但 RSI 的低點卻低於前一個低點。這代表：表面上看 RSI 更弱，但其實<span style="color:var(--red)">多頭趨勢仍然強勁</span>，這次回調只是暫時的。<br/><br/>是順勢做多的加碼機會，不是反轉訊號。常被誤認為是熊背離，但方向完全相反！',
+    draw(svg) {
+      const W=540,H=210;
+      let h = bg(W,H);
+      h += label(20,20,'價格（回調低點越來越高）','rgba(255,255,255,.35)');
+      h += label(20,115,'RSI（低點越來越低——假弱）','rgba(255,152,0,.6)');
+      h += `<line x1="20" y1="110" x2="${W-20}" y2="110" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
+      h += path('50,80 100,60 150,72 200,55 250,65','#00e5ff',2);
+      h += path('50,145 100,160 150,150 200,168 250,155','#ff9800',2);
+      h += arrow(150,72,250,65,'#ff3d5a');
+      h += arrow(150,150,250,168,'#00e676');
+      h += label(255,62,'高點','rgba(255,61,90,.8)');
+      h += label(255,170,'更低','rgba(0,230,118,.8)');
+      h += `<text x="140" y="200" fill="rgba(0,229,255,.6)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">隱藏底背離：多頭趨勢持續訊號 → 繼續做多</text>`;
+      svg.innerHTML = h;
+    }
+  },
+  hidden_bear: {
+    desc: '<strong>隱藏頂背離：</strong> 空頭趨勢反彈時，價格的反彈高點低於前一個高點（空頭趨勢結構正常），但 RSI 的高點卻高於前一個高點。這代表：表面上看 RSI 更強，但其實<span style="color:var(--green)">空頭趨勢仍然強勁</span>，這次反彈只是暫時的。<br/><br/>是順勢做空的加碼機會，不是反轉訊號。常被誤認為是牛背離，但方向完全相反！',
+    draw(svg) {
+      const W=540,H=210;
+      let h = bg(W,H);
+      h += label(20,20,'價格（反彈高點越來越低）','rgba(255,255,255,.35)');
+      h += label(20,115,'RSI（高點越來越高——假強）','rgba(255,152,0,.6)');
+      h += `<line x1="20" y1="110" x2="${W-20}" y2="110" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
+      h += path('50,45 100,65 150,55 200,72 250,62','#00e5ff',2);
+      h += path('50,165 100,145 150,155 200,135 250,148','#ff9800',2);
+      h += arrow(150,55,250,62,'#00e676');
+      h += arrow(150,155,250,135,'#ff3d5a');
+      h += label(255,60,'更低','rgba(0,230,118,.8)');
+      h += label(255,132,'更高','rgba(255,61,90,.8)');
+      h += `<text x="140" y="200" fill="rgba(0,230,118,.6)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">隱藏頂背離：空頭趨勢持續訊號 → 繼續做空</text>`;
+      svg.innerHTML = h;
+    }
+  }
+};
+
+function bg(W,H){
+  let g=`<rect width="${W}" height="${H}" fill="#040b15" rx="10"/>`;
+  for(let x=0;x<=W;x+=80) g+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="rgba(0,229,255,0.03)" stroke-width="1"/>`;
+  for(let y=0;y<=H;y+=40) g+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(0,229,255,0.03)" stroke-width="1"/>`;
+  return g;
+}
+function path(pts,col,sw){return `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linejoin="round"/>`;}
+function label(x,y,txt,col){return `<text x="${x}" y="${y}" fill="${col}" font-size="9" font-family="Share Tech Mono,monospace">${txt}</text>`;}
+function arrow(x1,y1,x2,y2,col){
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="1.5" stroke-dasharray="5,3" opacity=".7"/>`;
+}
+
+function showDiv(key, el) {
+  document.querySelectorAll('.sim-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const d = divData[key];
+  document.getElementById('divResult').innerHTML = d.desc;
+  d.draw(document.getElementById('divSvg'));
+}
+showDiv('bearish', document.querySelector('.sim-tab'));
+
+// ═══════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════
+const feedbackMap = {
+  q1:{correct:'🎉 完全正確！指標是最後一步的輔助確認，不是第一步的決策依據。正確順序：趨勢→支撐壓力→K棒量能→指標。在決定方向之後，才用指標確認動能是否支持。',
+     wrong:'❌ 指標在決策框架中應該排在最後。先判斷趨勢、支撐壓力、K棒型態，最後才用指標輔助確認。如果先看指標再判斷趨勢，往往會被指標帶著走，忽略更重要的市場結構。'},
+  q2:{correct:'🎉 正確！RSI 75 代表短線偏熱，但不代表立刻會跌。在強勢趨勢中，RSI 可以在 70 以上維持很長時間。需要搭配趨勢方向和型態判斷，而不是看到 70 就賣。',
+     wrong:'❌ RSI 達到 75 不代表立刻要賣。在強勢上漲趨勢中，RSI 可以在 75～90 之間維持幾週甚至幾個月。「RSI 高就賣」是最常見的虧損操作之一，必須搭配趨勢和型態一起判斷。'},
+  q3:{correct:'🎉 答對了！零軸以下的金叉可信度較低，因為整體趨勢仍偏空（MACD 在零軸以下 = 長短期均線空方排列）。零軸以下的金叉只是短線反彈，不是趨勢轉多的確認。',
+     wrong:'❌ 零軸位置非常重要！MACD 在零軸以下代表長短期均線仍是空方排列。零軸以下出現金叉，可能只是短線反彈，不是趨勢轉多。在零軸以上發生的金叉才是真正可靠的多方訊號。'},
+  q4:{correct:'🎉 完全正確！這是「頂背離」——價格創新高但 RSI 未能創新高，代表上漲動能在衰竭。是看跌的早期警示，但不是立刻放空的訊號，需等價格確認轉折後才行動。',
+     wrong:'❌ 這是「頂背離」（熊背離）！價格創新高但 RSI 走低，代表上漲動能在衰竭。注意：頂背離是警示訊號，不是立刻放空的指令，需要等價格本身出現轉折確認才操作。'},
+  q5:{correct:'🎉 正確！這是 KD 鈍化現象。在強勢上漲趨勢中，KD 高位反覆死叉是正常的，不是放空訊號。強勢趨勢中不逆勢操作，KD 鈍化期間繼續持有多倉是正確策略。',
+     wrong:'❌ 在強烈上漲趨勢中，KD 高位死叉是「鈍化」現象，不是放空訊號！每次死叉就放空是 KD 最常見的錯誤用法，在強勢行情中會被反覆軋爆。正確做法是認識鈍化，不逆勢操作。'},
+  q6:{correct:'🎉 答對了！重大意外消息事件（如央行突然升息）時，所有技術指標完全失效——因為指標都是基於歷史數據計算的，無法預測突發事件。這時候依賴指標做決策是最危險的。',
+     wrong:'❌ 正確答案是 B（聯準會突然宣布大幅升息）。重大突發消息事件時，技術指標基於歷史數據，完全無法應對突發事件。這時候指標會給出完全失效的訊號，最好的做法是不依賴指標，等市場消化消息後再看技術面。'},
+  q7:{correct:'🎉 正確！MACD 柱狀圖縮短是比金叉/死叉更早出現的動能轉折訊號。柱狀圖開始縮短 = 動能在減弱，雖然還沒死叉，但這是提前預警。善用柱狀圖的人往往比只看交叉的人早一步發現趨勢衰竭。',
+     wrong:'❌ MACD 柱狀圖縮短是非常重要的早期訊號！它代表動能在衰減，比金叉/死叉的訊號更早出現。柱狀圖從最高點開始縮短，就要開始警惕趨勢可能衰竭，不要等到死叉才反應。'},
+  q8:{correct:'🎉 非常正確！趨勢（週線空頭）永遠優先於短線指標訊號。短線反彈可能存在，但在空頭趨勢中做多是逆勢操作，風險高。最多做短線反彈交易，不追長線多頭。這是趨勢優先原則的正確應用。',
+     wrong:'❌ 正確答案是 C。週線空頭趨勢優先於所有短線指標訊號。即使 RSI 超賣、MACD 金叉、KD 低位交叉，在週線空頭趨勢中做多仍是逆勢操作。可以做短線反彈，但不能當成趨勢轉多來操作。'}
+};
+
+const quizScore = {q1:false,q2:false,q3:false,q4:false,q5:false,q6:false,q7:false,q8:false};
+let answeredCount = 0;
+const totalQuiz = Object.keys(quizScore).length;
+
+function answer(el, quizId, correctLetter, chosenLetter) {
+  const block = document.getElementById(quizId);
+  if (block.dataset.answered) return;
+  block.dataset.answered = 'true';
+  answeredCount++;
+  const opts = block.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  const isCorrect = chosenLetter === correctLetter;
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    const ci = ['A','B','C','D'].indexOf(correctLetter);
+    if (opts[ci]) opts[ci].classList.add('correct');
+  }
+  const fb = document.getElementById(quizId + '-fb');
+  fb.textContent = isCorrect ? feedbackMap[quizId].correct : feedbackMap[quizId].wrong;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'fail');
+  quizScore[quizId] = isCorrect;
+  updateProgress();
+  if (answeredCount === totalQuiz) setTimeout(showFinalScore, 600);
+}
+
+function showFinalScore() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const pct = Math.round(correct / totalQuiz * 100);
+  let msg = '';
+  if (pct === 100) msg = '🏆 滿分！你真正理解了指標的定位——它是輔助，不是主角。能知道「何時不用指標」的人，已經超越大多數散戶的思維框架。第八章的量能與籌碼等著你。';
+  else if (pct >= 75) msg = '🎯 優秀！你已掌握指標分析的核心觀念。建議特別複習「零軸的重要性」和「背離訊號的四種類型」，這兩個是最容易被忽略但最有價值的部分。';
+  else msg = '📖 繼續加油！本章最重要的觀念是：趨勢永遠優先於指標，指標是輔助確認工具而非決策主軸。建議重讀「指標的正確定位」和「何時不用指標」這兩個小節。';
+  document.getElementById('scoreNum').textContent = correct + ' / ' + totalQuiz;
+  document.getElementById('scoreMsg').textContent = msg;
+  const el = document.getElementById('finalScore');
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS + SCROLL + TOC
+// ═══════════════════════════════════════════════
+function updateProgress() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const scrollPct = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
+  const quizPct = correct / totalQuiz;
+  const combined = Math.round((scrollPct * 0.5 + quizPct * 0.5) * 100);
+  document.getElementById('progressFill').style.width = combined + '%';
+  document.getElementById('progressPct').textContent = combined + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive:true });
+
+function scrollToSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+const secIds = ['sec1','sec2','sec3','sec4','sec5','sec6','sec7','sec8'];
+const dotIds = ['d1','d2','d3','d4','d5','d6','d7','d8'];
+
+const tocObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      dotIds.forEach((did, i) => {
+        const dot = document.getElementById(did);
+        if (dot) dot.classList.toggle('active', secIds[i] === e.target.id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.06 });
+
+secIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    tocObserver.observe(el);
+    if (el.classList.contains('reveal')) revealObserver.observe(el);
+  }
+});
+</script>
+</body>
+</html>

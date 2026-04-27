@@ -29,12 +29,20 @@ def _init_firebase():
     global _firebase_initialized
     if _firebase_initialized:
         return
-    cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred, {
-        "databaseURL": os.environ.get("FIREBASE_DATABASE_URL", "")
-    })
-    _firebase_initialized = True
+    try:
+        # 如果已經有初始化過的 app，直接使用，不重複初始化
+        firebase_admin.get_app()
+        _firebase_initialized = True
+        print("[firebase_sync] 使用已存在的 Firebase app")
+    except ValueError:
+        # 還沒初始化，才執行初始化
+        cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred, {
+            "databaseURL": os.environ.get("FIREBASE_DATABASE_URL", "")
+        })
+        _firebase_initialized = True
+        print("[firebase_sync] Firebase 初始化成功")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
