@@ -590,7 +590,1093 @@
     .toc-item:hover .toc-lbl { color: var(--text-dim); }
     .toc-connector { flex: 1; min-width: 12px; height: 1px; background: rgba(var(--ch-rgb, 0,229,255), .12); }
 
-          </style>
+          
+    /* ── 補充白天主題樣式（統一配色）── */
+    body.theme-day .case-study {
+      background: linear-gradient(135deg,rgba(138,96,0,.06),rgba(120,80,0,.02));
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .case-header {
+      background: rgba(138,96,0,.07);
+      border-bottom-color: rgba(138,96,0,.14);
+    }
+    body.theme-day .case-badge { background:rgba(138,96,0,.1); border-color:rgba(138,96,0,.25); color:#8a6000; }
+    body.theme-day .case-title { color:#0a1828; }
+    body.theme-day .case-body p { color:#2a3040; }
+    body.theme-day .case-lesson { background:rgba(138,96,0,.07); border-color:rgba(138,96,0,.2); color:#8a6000; }
+    body.theme-day .vocab-item { background:rgba(255,255,255,.72); border-color:rgba(26,101,168,.12); }
+    body.theme-day .vocab-item:hover { border-color:rgba(26,101,168,.28); }
+    body.theme-day .vocab-term { color:#1265a8; }
+    body.theme-day .vocab-def  { color:#1a3550; }
+    body.theme-day .psych-card.danger { background:rgba(255,255,255,.75); border-color:rgba(176,48,32,.22); }
+    body.theme-day .psych-card.warn   { background:rgba(255,255,255,.75); border-color:rgba(184,136,14,.22); }
+    body.theme-day .psych-name { color:#0a1828; }
+    body.theme-day .psych-desc { color:#1a3550; }
+    body.theme-day .psych-example { color:#3a5070; background:rgba(0,0,0,.04); }
+    body.theme-day .stat-card { background:rgba(255,255,255,.75); border-color:rgba(26,101,168,.14); }
+    body.theme-day .stat-card:hover { border-color:rgba(26,101,168,.3); }
+    body.theme-day .stat-label { color:#2a4a68; }
+    body.theme-day .kbar-demo { background:rgba(255,255,255,.75); border-color:rgba(26,123,191,.15); }
+    body.theme-day .chart-demo { background:rgba(255,255,255,.75); border-color:rgba(26,101,168,.14); }
+    body.theme-day .flow-chart { background:rgba(255,255,255,.65); border-color:rgba(26,123,191,.15); }
+    body.theme-day .flow-node { background:linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.07)); border-color:rgba(26,123,191,.3); color:#0a1828; }
+    body.theme-day .flow-arrow { color:#1265a8; }
+    body.theme-day .flow-decision { background:linear-gradient(135deg,rgba(138,96,0,.1),rgba(120,80,0,.05)); border-color:rgba(138,96,0,.3); color:#8a6000; }
+    body.theme-day .emotion-strip { border-color:rgba(26,101,168,.14); }
+    body.theme-day .chapter-footer { background:rgba(255,255,255,.75); border-color:rgba(26,123,191,.15); }
+    body.theme-day .footer-info { color:#5a8ab8; }
+    body.theme-day .footer-info strong { color:#2a4a68; }
+    body.theme-day .next-btn { background:rgba(26,123,191,.07); border-color:rgba(26,123,191,.22); color:#2a4a78; }
+    body.theme-day .tag-cyan   { color:#0d6ea8; border-color:rgba(13,110,168,.3); background:rgba(13,110,168,.08); }
+    body.theme-day .tag-pink   { color:#b0206a; border-color:rgba(176,32,106,.3); background:rgba(176,32,106,.07); }
+    body.theme-day .tag-green  { color:#157a32; border-color:rgba(21,122,50,.3); background:rgba(21,122,50,.07); }
+    body.theme-day .tag-yellow { color:#8a6000; border-color:rgba(138,96,0,.3); background:rgba(138,96,0,.07); }
+
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 — 全面修復補丁 v2
+       修復項目：
+         1. 側邊欄 (chapter-sidenav) — 白底深藍文字，清晰邊框
+         2. 進度導覽條 (toc-strip / toc-dot) — 深色圓圈文字，高對比
+         3. 章節底部 footer — 白底清晰文字，按鈕明顯
+         4. Header logo — 使用 jelly.png
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 1. 左側章節目錄 sidenav ── */
+    body.theme-day .chapter-sidenav {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-color: rgba(26,101,168,.35);
+      box-shadow: 4px 0 28px rgba(26,80,160,.18), 0 0 12px rgba(26,123,191,.08);
+    }
+    body.theme-day .chapter-sidenav:hover {
+      border-color: rgba(26,101,168,.5);
+      box-shadow: 6px 0 36px rgba(26,80,160,.22), 0 0 18px rgba(26,123,191,.1);
+    }
+    body.theme-day .chapter-sidenav::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.7), rgba(33,150,211,.5), transparent);
+    }
+    body.theme-day .chapter-sidenav::after {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.35), rgba(26,123,191,.2), transparent);
+    }
+    /* ch-nav-item 基礎：深藍文字 */
+    body.theme-day .ch-nav-item {
+      color: #1a3a60;
+      border-bottom-color: rgba(26,101,168,.1);
+      border-left-color: transparent;
+    }
+    body.theme-day .ch-nav-item::before {
+      background: linear-gradient(90deg, rgba(26,123,191,.0), rgba(26,123,191,.08));
+    }
+    body.theme-day .ch-nav-item .ch-num {
+      color: #2a5080;
+      font-weight: 700;
+    }
+    body.theme-day .ch-nav-item .ch-label {
+      color: #1a3a60;
+    }
+    /* hover 狀態 */
+    body.theme-day .ch-nav-item:hover {
+      color: #0d3d7a;
+      border-left-color: rgba(26,101,168,.55);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .ch-nav-item:hover .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item:hover .ch-label { color: #0d3d7a; }
+    /* 當前章節 */
+    body.theme-day .ch-nav-item.current-ch {
+      color: #1265a8;
+      border-left-color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    body.theme-day .ch-nav-item.current-ch .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item.current-ch .ch-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .ch-nav-item.current-ch::after {
+      background: #1265a8;
+      box-shadow: 0 0 6px rgba(26,101,168,.5);
+    }
+
+    /* ── 2. 進度導覽條 (toc-strip) ── */
+    body.theme-day .toc-strip {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .toc-item:hover {
+      background: rgba(26,123,191,.08);
+    }
+    /* toc-dot：深色圓圈，數字清晰可見 */
+    body.theme-day .toc-dot {
+      border-color: rgba(26,101,168,.35);
+      color: #1a3a60;
+      background: rgba(255,255,255,.9);
+      font-weight: 700;
+    }
+    body.theme-day .toc-dot.active {
+      border-color: #1265a8;
+      background: rgba(26,123,191,.15);
+      color: #1265a8;
+      box-shadow: 0 0 10px rgba(26,101,168,.3);
+    }
+    body.theme-day .toc-item:hover .toc-dot {
+      border-color: rgba(26,101,168,.6);
+      color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    /* toc-lbl：深色標籤文字 */
+    body.theme-day .toc-lbl {
+      color: #2a4a68;
+      font-weight: 500;
+    }
+    body.theme-day .toc-item:hover .toc-lbl { color: #0d3560; }
+    /* toc-connector：藍色連線 */
+    body.theme-day .toc-connector {
+      background: rgba(26,101,168,.2);
+    }
+
+    /* ── 3. 章節底部 footer (unified footer) ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(26,101,168,.22);
+      box-shadow: 0 6px 32px rgba(26,80,160,.1);
+    }
+    body.theme-day .chapter-footer::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), rgba(33,150,211,.65), rgba(26,123,191,.5), transparent);
+      animation: none;
+      opacity: .7;
+    }
+    /* footer 左側完成標章 */
+    body.theme-day .footer-complete-badge {
+      background: linear-gradient(135deg, rgba(26,123,191,.14), rgba(26,80,160,.08));
+      border-color: rgba(26,101,168,.3);
+    }
+    /* footer 標題 */
+    body.theme-day .footer-complete-title { color: #0a1828; }
+    body.theme-day .footer-complete-desc  { color: #2a5070; }
+    body.theme-day .footer-next-hint      { color: #1265a8; opacity: .85; }
+    /* fn-btn 上一章 */
+    body.theme-day .fn-btn.prev {
+      color: #2a5080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #0d3560;
+      border-color: rgba(26,101,168,.5);
+      background: rgba(26,123,191,.13);
+      box-shadow: 0 2px 12px rgba(26,101,168,.15);
+    }
+    /* fn-btn 下一章 (accent) */
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,101,168,.35);
+      background: rgba(26,123,191,.1);
+      font-weight: 600;
+    }
+    body.theme-day .fn-btn.next:hover {
+      color: #fff;
+      background: #1265a8;
+      border-color: #1265a8;
+      box-shadow: 0 4px 18px rgba(26,101,168,.3);
+    }
+    body.theme-day .fn-btn.locked {
+      color: #8ab0d0;
+      border-color: rgba(26,101,168,.15);
+      background: rgba(26,123,191,.04);
+    }
+
+    /* ── 舊版 footer (chapter1 樣式相容) ── */
+    body.theme-day .footer-info        { color: #2a4a68; }
+    body.theme-day .footer-info strong { color: #0a1828; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.28);
+      color: #1265a8;
+      font-weight: 600;
+    }
+    body.theme-day .next-btn:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.5);
+    }
+    body.theme-day .prev-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #2a5080;
+    }
+
+    /* ── 4. Header logo 圖片亮度 ── */
+    body.theme-day .logo-icon img {
+      filter: drop-shadow(0 2px 8px rgba(26,80,160,.25));
+      opacity: 1;
+    }
+    body.theme-day .logo-text {
+      color: #0a1828;
+      text-shadow: 0 1px 3px rgba(26,80,160,.15);
+      font-weight: 700;
+    }
+    body.theme-day .logo-sub { color: #1265a8; opacity: .9; font-weight: 600; }
+
+    /* ── 5. sticky progress bar 文字明顯化 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(26,123,191,.18);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .progress-label-sm { color: #2a4a68; font-weight: 500; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; font-weight: 700; }
+    body.theme-day .progress-track-sticky { background: rgba(26,101,168,.12); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #1a88cc);
+      box-shadow: 0 0 8px rgba(26,101,168,.4);
+    }
+
+    /* ── 6. back-btn / chapter-badge 明顯化 ── */
+    body.theme-day .back-btn {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.3);
+      color: #1a3a60;
+      font-weight: 500;
+    }
+    body.theme-day .back-btn:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.52);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,101,168,.35);
+      color: #1265a8;
+      font-weight: 700;
+    }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       COMPREHENSIVE DAY THEME PATCH — ALL MISSING COMPONENTS
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 通用：黑色背景容器 ── */
+    body.theme-day .rhythm-row,
+    body.theme-day .tri-canvas,
+    body.theme-day .pat-nav-wrap,
+    body.theme-day .sim-wrap,
+    body.theme-day .detector-wrap,
+    body.theme-day .rr-bar,
+    body.theme-day .strat-picker,
+    body.theme-day .sl-body,
+    body.theme-day .pat-output,
+    body.theme-day .tri-result,
+    body.theme-day .picker-result {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .jelly-bubble,
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+
+    /* ── 段落與 Prose ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+    body.theme-day .prose em { color: #1265a8; }
+    body.theme-day .section-title { color: #0a1828; }
+    body.theme-day .section-num { color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .section-header { border-bottom-color: rgba(26,123,191,.12); }
+    body.theme-day .section-header::after { background: linear-gradient(90deg,transparent,rgba(26,123,191,.3),transparent); }
+
+    /* ── 蠟燭卡片 ── */
+    body.theme-day .candle-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .candle-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .candle-name { color: #1265a8; }
+    body.theme-day .candle-desc { color: #1a3550; }
+
+    /* ── Insight Boxes (warn, gold, purple) ── */
+    body.theme-day .warn-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .warn-box .insight-text { color: #2a1818; }
+    body.theme-day .gold-box {
+      background: linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03));
+      border-color: rgba(184,136,14,.22);
+    }
+    body.theme-day .gold-box .insight-text { color: #2a2010; }
+    body.theme-day .purple-box {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.03));
+      border-color: rgba(102,64,192,.22);
+    }
+    body.theme-day .purple-box .insight-text { color: #1a1028; }
+    body.theme-day .danger-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .danger-box .insight-text { color: #2a1818; }
+    body.theme-day .success-box {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03));
+      border-color: rgba(21,122,50,.22);
+    }
+    body.theme-day .success-box .insight-text { color: #102018; }
+    body.theme-day .insight-box-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.07),rgba(160,80,0,.03));
+      border-color: rgba(184,100,0,.22);
+    }
+    body.theme-day .insight-box-orange .insight-label { color: #a05000; }
+    body.theme-day .insight-body .insight-text { color: #0c1c2e; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Force Meter ── */
+    body.theme-day .force-label { color: #1a3550; }
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .force-val { color: #3a5070; }
+
+    /* ── Pattern Cards ── */
+    body.theme-day .pattern-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .pattern-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .pattern-name { color: #0a1828; }
+    body.theme-day .pattern-desc { color: #1a3550; }
+    body.theme-day .pattern-key { color: #1265a8; }
+    body.theme-day .pb-bull { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .pb-bear { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .pb-warn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .pb-neutral { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+
+    /* ── Detector ── */
+    body.theme-day .detector-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .detector-title { color: #1265a8; }
+    body.theme-day .detector-item {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .detector-item:hover { background: rgba(26,123,191,.08); }
+    body.theme-day .detector-item.selected { background: rgba(26,123,191,.12); border-color: rgba(26,123,191,.35); }
+    body.theme-day .di-label { color: #1a3550; }
+    body.theme-day .detector-output {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #0a1828;
+    }
+    body.theme-day .detector-output strong { color: #1265a8; }
+
+    /* ── Sim Wrap ── */
+    body.theme-day .sim-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .sim-title { color: #1265a8; }
+    body.theme-day .sim-canvas { background: rgba(200,230,245,.5); border-color: rgba(26,101,168,.2); }
+    body.theme-day .sim-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .sim-btn:hover { background: rgba(26,123,191,.14); border-color: rgba(26,123,191,.4); }
+    body.theme-day .sim-result { color: #1a3550; }
+
+    /* ── Breakout Compare (bc-card) ── */
+    body.theme-day .bc-card.true {
+      background: rgba(176,48,32,.06);
+      border-color: rgba(176,48,32,.25);
+    }
+    body.theme-day .bc-card.false {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+    }
+    body.theme-day .bc-points { color: #1a3550; }
+
+    /* ── Flow Steps ── */
+    body.theme-day .flow-step {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .flow-step:hover { background: rgba(255,255,255,.92); border-color: rgba(26,123,191,.35); }
+    body.theme-day .flow-heading { color: #0a1828; }
+    body.theme-day .flow-sub { color: #1a3550; }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+    body.theme-day .flow-num.cn { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .flow-num.rn { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .flow-num.gn { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .flow-num.yn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .flow-num.pn { background:rgba(176,32,106,.1); border-color:rgba(176,32,106,.3); color:#b0206a; }
+    body.theme-day .flow-content .flow-sub strong { color: #0a1828; }
+
+    /* ── Shadow Lines ── */
+    body.theme-day .shadow-line,
+    body.theme-day .sl-wrap {
+      border-color: rgba(26,101,168,.15);
+      background: transparent;
+    }
+    body.theme-day .sl-body {
+      background: rgba(255,255,255,.72);
+    }
+    body.theme-day .sl-text { color: #1a3550; }
+    body.theme-day .sl-text strong { color: #0a1828; }
+
+    /* ── Chip ── */
+    body.theme-day .chip-red    { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-green  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-cyan   { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .chip-yellow { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .chip-purple { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+    body.theme-day .chip-orange { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.3); color:#a05000; }
+    body.theme-day .chip-support  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-resist   { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-neutral  { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+
+    /* ── Sec Divider ── */
+    body.theme-day .sec-divider { color: #5a8ab8; }
+    body.theme-day .sec-divider::before,
+    body.theme-day .sec-divider::after { background: rgba(26,123,191,.18); }
+
+    /* ── Val Colors ── */
+    body.theme-day .val-red,  body.theme-day .val-r { color: #a02818; }
+    body.theme-day .val-green, body.theme-day .val-g { color: #157a32; }
+    body.theme-day .val-yellow, body.theme-day .val-y { color: #8a6000; }
+    body.theme-day .val-cyan, body.theme-day .val-c { color: #0d6ea8; }
+    body.theme-day .val-purple, body.theme-day .val-p { color: #6640c0; }
+    body.theme-day .val-orange, body.theme-day .val-o { color: #a05000; }
+    body.theme-day .td-bull { color: #157a32 !important; }
+    body.theme-day .td-bear { color: #a02818 !important; }
+    body.theme-day .td-warn { color: #8a6000 !important; }
+
+    /* ── CMP/Compare Tables ── */
+    body.theme-day .cmp-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.2);
+    }
+    body.theme-day .cmp-table td {
+      color: #1a3550;
+      border-bottom-color: rgba(26,101,168,.08);
+    }
+    body.theme-day .cmp-table tr:hover td { background: rgba(26,123,191,.04); }
+
+    /* ── Quiz (all variants) ── */
+    body.theme-day .quiz-section {
+      background: linear-gradient(135deg,rgba(102,64,192,.06),rgba(26,80,160,.03));
+      border-color: rgba(102,64,192,.18);
+    }
+    body.theme-day .quiz-section-title { color: #0a1828; }
+    body.theme-day .quiz-q { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-letter {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.3);
+      color: #1265a8;
+    }
+
+    /* ── Checklist ── */
+    body.theme-day .check-item,
+    body.theme-day .check-list .check-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .check-text { color: #0a1828; }
+    body.theme-day .check-text strong { color: #1265a8; }
+
+    /* ── Before/After (ba-card) ── */
+    body.theme-day .ba-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .ba-label { color: #3a6080; }
+    body.theme-day .ba-text { color: #0a1828; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.07),rgba(26,80,160,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept-label { color: #1265a8; }
+    body.theme-day .key-concept-text { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+
+    /* ── Section Cards (general) ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    /* ── Pat Nav Tabs ── */
+    body.theme-day .pat-nav-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-nav-title { color: #1265a8; }
+    body.theme-day .pat-tab {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .pat-tab:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .pat-tab.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .pat-output {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-out-name { color: #0a1828; }
+    body.theme-day .pat-out-essence { color: #b0206a; }
+    body.theme-day .pat-out-body { color: #1a3550; }
+    body.theme-day .pat-out-body strong { color: #0a1828; }
+
+    /* ── Triangle Sim ── */
+    body.theme-day .tri-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .tri-title { color: #1265a8; }
+    body.theme-day .tri-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .tri-btn:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .tri-btn.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .tri-canvas { background: rgba(200,230,248,.6); border-color: rgba(26,101,168,.2); }
+    body.theme-day .tri-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .tri-result strong { color: #1265a8; }
+
+    /* ── Reliability Meter ── */
+    body.theme-day .rel-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rel-name { color: #0a1828; }
+    body.theme-day .rel-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .rel-pct { color: #3a6080; }
+
+    /* ── Mistake Cards ── */
+    body.theme-day .mistake-card {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-title { color: #a02818; }
+    body.theme-day .mistake-body { color: #2a1818; }
+    body.theme-day .mistake-fix {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+      color: #157a32;
+    }
+
+    /* ── Anatomy / SVG Col ── */
+    body.theme-day .anatomy-row { border-color: rgba(26,101,168,.15); }
+
+    /* ── BK Cards (支撐壓力) ── */
+    body.theme-day .bk-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .bk-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .bk-body { color: #1a3550; }
+    body.theme-day .bk-check { color: #157a32; }
+    body.theme-day .bk-icon { color: #1265a8; }
+    body.theme-day .bk-compare {
+      background: rgba(240,248,255,.7);
+      border-color: rgba(26,101,168,.15);
+    }
+
+    /* ── Danger Cards ── */
+    body.theme-day .danger-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.18);
+    }
+    body.theme-day .danger-title { color: #a02818; }
+    body.theme-day .danger-body { color: #2a2020; }
+
+    /* ── CS/Strength chips ── */
+    body.theme-day .cs-high { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.28); color:#a02818; }
+    body.theme-day .cs-med  { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.28); color:#8a6000; }
+    body.theme-day .cs-low  { background:rgba(13,110,168,.08); border-color:rgba(13,110,168,.22); color:#0d6ea8; }
+
+    /* ── Combo Row ── */
+    body.theme-day .combo-row {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .combo-ind { color: #1265a8; }
+    body.theme-day .combo-desc { color: #1a3550; }
+
+    /* ── Risk Reward Visual ── */
+    body.theme-day .rr-bar {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rr-label { color: #3a6080; }
+    body.theme-day .rr-track { background: rgba(26,80,160,.1); }
+    body.theme-day .rr-ratio-badge {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+    }
+    body.theme-day .rr-ratio-label { color: #5a8ab8; }
+
+    /* ── Error Analysis ── */
+    body.theme-day .error-analysis {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .error-header {
+      background: rgba(176,48,32,.07);
+      border-bottom-color: rgba(176,48,32,.15);
+    }
+    body.theme-day .error-title { color: #0a1828; }
+    body.theme-day .error-body p { color: #2a1818; }
+    body.theme-day .error-lesson {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.22);
+      color: #157a32;
+    }
+
+    /* ── Strategy Picker ── */
+    body.theme-day .strat-picker {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .strat-picker-title { color: #1265a8; }
+    body.theme-day .picker-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.22);
+      color: #1a3550;
+    }
+    body.theme-day .picker-btn:hover { border-color: rgba(26,123,191,.45); color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .picker-btn.active-btn { border-color: #1265a8; color: #1265a8; background: rgba(26,123,191,.14); }
+    body.theme-day .picker-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .picker-result strong { color: #0a1828; }
+
+    /* ── SOP Steps (ch10) ── */
+    body.theme-day .sop-title { color: #0a1828; }
+    body.theme-day .sop-desc { color: #1a3550; }
+    body.theme-day .sop-line { background: rgba(26,101,168,.15); }
+    body.theme-day .sc-c { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.4); color:#0d6ea8; }
+    body.theme-day .sc-g { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.35); color:#157a32; }
+    body.theme-day .sc-y { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.35); color:#8a6000; }
+    body.theme-day .sc-r { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.35); color:#a02818; }
+    body.theme-day .sc-p { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.35); color:#6640c0; }
+    body.theme-day .sc-o { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.35); color:#a05000; }
+
+    /* ── Autopsy Cards (ch10) ── */
+    body.theme-day .autopsy-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .autopsy-head {
+      background: rgba(26,123,191,.05);
+      border-bottom-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .autopsy-num { color: #3a6080; }
+    body.theme-day .autopsy-title { color: #0a1828; }
+    body.theme-day .autopsy-scene { color: #1a3550; }
+    body.theme-day .autopsy-why { color: #1265a8; }
+    body.theme-day .autopsy-fix { color: #157a32; }
+    body.theme-day .autopsy-body { color: #1a3550; }
+
+    /* ── Case Selectors (ch10) ── */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-panel {
+      background: rgba(240,248,255,.75);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .case-step { color: #1a3550; }
+
+    /* ── Graduation Badge ── */
+    body.theme-day .graduation {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(102,64,192,.05));
+      border-color: rgba(26,123,191,.22);
+    }
+
+    /* ── Flow Nodes (various) ── */
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+      color: #0a1828;
+    }
+    body.theme-day .flow-node-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.1),rgba(160,80,0,.05));
+      border-color: rgba(184,100,0,.28);
+      color: #a05000;
+    }
+    body.theme-day .flow-node-red {
+      background: linear-gradient(135deg,rgba(176,48,32,.1),rgba(150,20,10,.05));
+      border-color: rgba(176,48,32,.28);
+      color: #a02818;
+    }
+    body.theme-day .flow-node-green {
+      background: linear-gradient(135deg,rgba(21,122,50,.08),rgba(0,90,40,.04));
+      border-color: rgba(21,122,50,.28);
+      color: #157a32;
+    }
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+
+    /* ── CC Box (趨勢) ── */
+    body.theme-day .cc-box {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .cc-item { color: #1a3550; }
+    body.theme-day .cc-text { color: #0a1828; }
+
+    /* ── Before/After Cards ── */
+    body.theme-day .before-after { border-color: rgba(26,101,168,.15); }
+    body.theme-day .bull-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .bear-card {
+      background: rgba(21,122,50,.05);
+      border-color: rgba(21,122,50,.2);
+    }
+
+    /* ── Footer Buttons (fn-btn) ── */
+    body.theme-day .fn-btn.prev {
+      color: #3a6080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.06);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.45);
+      background: rgba(26,123,191,.12);
+    }
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.35);
+      background: rgba(26,123,191,.08);
+    }
+    body.theme-day .fn-btn.next:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,123,191,.55);
+    }
+    body.theme-day .footer-complete-text { color: #1a3550; }
+
+    /* ── RSI Gauge ── */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; }
+
+    /* ── Teal theme (ch9) day mode ── */
+    body.theme-day .tag-teal { color:#157a6a; border-color:rgba(21,122,106,.3); background:rgba(21,122,106,.07); }
+    body.theme-day .rr-ratio-num { color: #1265a8; }
+
+    /* ── Hero Icon border colors ── */
+    body.theme-day .hero-icon {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.25);
+      box-shadow: 0 4px 20px rgba(26,80,160,.1);
+    }
+
+    /* ── General text fixes ── */
+    body.theme-day strong { color: #0a1828; }
+    body.theme-day .section-body { color: #0c1c2e; }
+
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SPACE MODE VISUAL ENHANCEMENTS — 統一增強版
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Enhanced nebula animation for all chapters */
+    .bg-nebula {
+      animation: nebulaFloat 28s ease-in-out infinite alternate !important;
+    }
+    @keyframes nebulaFloat {
+      0%   { opacity:.75; transform:scale(1) translateX(0); }
+      50%  { opacity:.9; transform:scale(1.015) translateX(3px); }
+      100% { opacity:1;  transform:scale(1.025) translateX(-3px); }
+    }
+
+    /* Star particles overlay */
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 28%, rgba(200,240,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 5%  38%, rgba(255,255,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 33% 45%, rgba(180,220,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72% 50%, rgba(200,230,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 42%, rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 65% 65%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%),
+        radial-gradient(1px 1px at 8%  82%, rgba(255,255,255,.28) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 88%, rgba(180,220,255,.28) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 92%, rgba(255,255,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle {
+      0%   { opacity:.6; }
+      50%  { opacity:.85; }
+      100% { opacity:.7; }
+    }
+    /* Day mode: hide stars */
+    body.theme-day .bg-stars { opacity: 0; pointer-events: none; }
+
+    /* ── Enhanced card hover glow ── */
+    .section-card {
+      transition: transform .25s, box-shadow .3s, border-color .3s !important;
+    }
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 30px rgba(0,229,255,.06) !important;
+      border-color: rgba(0,229,255,.18) !important;
+    }
+    body.theme-day .section-card:hover {
+      box-shadow: 0 12px 40px rgba(26,80,160,.15), 0 0 0 1px rgba(26,123,191,.18) !important;
+      border-color: rgba(26,123,191,.3) !important;
+      transform: translateY(-2px);
+    }
+
+    /* ── Floating chapter number watermark ── */
+    .hero::after {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── Tag animations ── */
+    .tag {
+      transition: all .2s !important;
+    }
+    .tag:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.15);
+    }
+    body.theme-day .tag:hover { filter: brightness(.92); }
+
+    /* ── Better section divider ── */
+    .sec-divider {
+      position: relative;
+      overflow: visible;
+    }
+
+    /* ── Insight box border pulse ── */
+    .key-concept::after {
+      animation: borderGlow 3s ease-in-out infinite !important;
+    }
+    @keyframes borderGlow {
+      0%, 100% { opacity:.45; }
+      50%       { opacity:.85; }
+    }
+
+    /* ── Space mode: enhanced table ── */
+    .cmp-table th,
+    .compare-table th {
+      position: relative;
+    }
+    .cmp-table tbody tr:hover td,
+    .compare-table tbody tr:hover td {
+      background: rgba(0,229,255,.025) !important;
+      transition: background .15s;
+    }
+
+    /* ── Quiz option micro-animation ── */
+    .quiz-opt {
+      transition: all .18s cubic-bezier(.22,1,.36,1) !important;
+    }
+    .quiz-opt:hover:not(.disabled) {
+      transform: translateX(3px);
+    }
+
+    /* ── Day mode stars & nebula off ── */
+    body.theme-day .bg-nebula {
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+
+    /* ─── Chapter-specific dark background fixes ─── */
+
+    /* General: any container with rgba(0,0,0) bg needs white in day mode */
+    body.theme-day .pattern-master,
+    body.theme-day .vocab-item,
+    body.theme-day .struct-card,
+    body.theme-day .sign-card,
+    body.theme-day .flow-wrap,
+    body.theme-day .tb-canvas,
+    body.theme-day .label-game,
+    body.theme-day .cc-item,
+    body.theme-day .draw-zone,
+    body.theme-day .sr-sim-wrap,
+    body.theme-day .mistake-item,
+    body.theme-day .ma-visual,
+    body.theme-day .ma-card,
+    body.theme-day .diverge-demo,
+    body.theme-day .trap-step,
+    body.theme-day .ind-block,
+    body.theme-day .stat-card,
+    body.theme-day .example-box {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.32) !important; }
+    body.theme-day .vocab-term { color: #1265a8 !important; }
+    body.theme-day .vocab-def  { color: #1a3550 !important; }
+    body.theme-day .struct-card { color: #0a1828; }
+    body.theme-day .sign-card { color: #0a1828; }
+    body.theme-day .example-label { color: #8a6000 !important; }
+    body.theme-day .example-box p { color: #1a3550 !important; }
+    body.theme-day .example-box strong { color: #0a1828 !important; }
+
+    /* MA Visual (ch6) */
+    body.theme-day .ma-card { color: #0a1828; }
+    body.theme-day .ma-visual text { fill: #1a3550 !important; }
+
+    /* Trap steps (ch6) */
+    body.theme-day .trap-step { color: #1a3550; }
+
+    /* Indicator blocks (ch7) */
+    body.theme-day .ind-block { color: #0a1828; }
+
+    /* Stat cards */
+    body.theme-day .stat-card {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .stat-card:hover { border-color: rgba(26,101,168,.32) !important; }
+    body.theme-day .stat-label { color: #1a3550 !important; }
+
+    /* Flow chart containers */
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* Case selector (ch10) */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       DAY THEME VISUAL UPGRADE — 晴空動態效果
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Enhanced sky background with cloud-like wisps */
+    body.theme-day {
+      background:
+        radial-gradient(ellipse 60% 25% at 20% 15%, rgba(255,255,255,.5) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 75% 10%, rgba(255,255,255,.45) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 18% at 50% 25%, rgba(255,255,255,.3) 0%, transparent 50%),
+        linear-gradient(180deg,
+          #4fa8de 0%,
+          #6bbcec 12%,
+          #8bd0f5 28%,
+          #a8dff8 45%,
+          #c2edfb 62%,
+          #d5f3f8 78%,
+          #e4f8f2 100%
+        ) !important;
+    }
+
+    /* Animated cloud wisps */
+    body.theme-day::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 180px 35px at 15% 18%, rgba(255,255,255,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 220px 40px at 45% 12%, rgba(255,255,255,.5) 0%, transparent 70%),
+        radial-gradient(ellipse 160px 30px at 72% 22%, rgba(255,255,255,.45) 0%, transparent 65%),
+        radial-gradient(ellipse 200px 38px at 90% 8%,  rgba(255,255,255,.4) 0%, transparent 65%),
+        radial-gradient(ellipse 140px 28px at 30% 35%, rgba(255,255,255,.35) 0%, transparent 60%),
+        radial-gradient(ellipse 190px 35px at 62% 30%, rgba(255,255,255,.3) 0%, transparent 60%);
+      animation: cloudDrift 40s ease-in-out infinite alternate;
+    }
+    @keyframes cloudDrift {
+      0%   { transform: translateX(0); opacity: .8; }
+      100% { transform: translateX(18px); opacity: 1; }
+    }
+
+    /* Sun glow in top-right */
+    body.theme-day::after {
+      content: '';
+      position: fixed;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,100,.38) 0%, rgba(255,200,50,.15) 40%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+      animation: sunPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0%   { opacity: .7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+
+    /* Header sun rays effect */
+    body.theme-day header {
+      background: rgba(255,255,255,.88) !important;
+      box-shadow: 0 2px 28px rgba(26,80,160,.12), 0 1px 0 rgba(255,255,255,.8) !important;
+    }
+
+    /* Improved section card in day mode */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 8px 36px rgba(26,60,140,.1), inset 0 1px 0 rgba(255,255,255,.95) !important;
+    }
+    body.theme-day .section-card:hover {
+      background: rgba(255,255,255,.97) !important;
+      box-shadow: 0 14px 48px rgba(26,60,140,.15), inset 0 1px 0 rgba(255,255,255,1) !important;
+    }
+
+    /* Better hero in day mode */
+    body.theme-day .hero {
+      background: rgba(255,255,255,.9) !important;
+      box-shadow: 0 12px 48px rgba(26,60,140,.12), 0 2px 0 rgba(255,255,255,.9) inset !important;
+    }
+
+
+</style>
 <script>
 (function(){
   function applyTheme(t){
@@ -617,6 +1703,7 @@
 
 <div class="bg-nebula"></div>
 <div class="bg-scanlines"></div>
+  <div class="bg-stars"></div>
 
 <!-- Chapter Side Nav -->
 
@@ -640,7 +1727,7 @@
   <div class="header-left">
     <div class="logo">
       <div class="logo-icon">
-        <img src="/images/logo.png" alt="JellyStock logo" onerror="this.style.display='none'"/>
+        <img src="/images/jelly.png" alt="JellyStock" style="width:46px;height:46px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-4px;left:-4px;" onerror="this.style.display='none'"/>
       </div>
       <div>
         <div class="logo-text">JellyStock</div>
@@ -1377,5 +2464,26 @@ const revealObserver=new IntersectionObserver(entries=>{
 },{threshold:0.08});
 document.querySelectorAll('.section-card.reveal').forEach(el=>revealObserver.observe(el));
 </script>
+
+<script>
+/* 白天模式 Logo 修復：使用 jelly.png 取代 logo.png，並同步圖片尺寸 */
+(function() {
+  var logoImg = document.querySelector('.logo-icon img');
+  if (logoImg) {
+    // 統一使用 jelly.png，並設定合適尺寸
+    logoImg.src = '/images/jelly.png';
+    logoImg.alt = 'JellyStock';
+    logoImg.onerror = function() { this.style.display = 'none'; };
+    logoImg.style.width = '46px';
+    logoImg.style.height = '46px';
+    logoImg.style.objectFit = 'contain';
+    logoImg.style.borderRadius = '9px';
+    logoImg.style.position = 'relative';
+    logoImg.style.top = '-4px';
+    logoImg.style.left = '-4px';
+  }
+})();
+</script>
+
 </body>
 </html>
