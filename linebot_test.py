@@ -9,22 +9,28 @@ from push_service import start_scheduler
 from post_Info import stock_info
 from api_routes import register_api
 
+load_dotenv()  # .env 本地端載入環境變數
+
 app = Flask(__name__)
 
-# 使用 Render 環境變數設定 Token 與 Secret.
-load_dotenv()  # .env 本地端載入環境變數
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-register_api(app) # 建立網站
+register_api(app)  # 建立網站
+
+# ✅ 修正：移到模組層級，gunicorn 啟動時也會執行排程
+# 原本放在 if __name__ == "__main__" 裡，gunicorn 不會跑到
+start_scheduler(line_bot_api)
+
 
 # 保活用的 ping 路由
 @app.route("/ping")
 def ping():
     return "pong", 200
+
 
 # Webhook 路由
 @app.route("/callback", methods=['POST'])
@@ -42,18 +48,13 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_text = event.message.text.strip()
-
-    # 供查詢今日個股買賣超
     reply_text = stock_info(user_text)
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
 
-if __name__ == "__main__":
-    # 啟動推播排程
-    start_scheduler(line_bot_api)
 
-    # 使用 Render 提供的 PORT，並允許外部訪問
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

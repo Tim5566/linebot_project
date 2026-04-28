@@ -1,11 +1,11 @@
 """
 push_service.py（Firebase 同步版）
 ────────────────────────────────────────────────────────────────────────────
-排程流程：
-  1. 先呼叫 firebase_sync 同步資料到 Firebase
-  2. 再廣播 LINE 通知
-
-這樣使用者收到通知後查詢時，Firebase 已有最新資料。
+修正重點：
+  1. _run_sync 的 sync_institutional 和 sync_market 分開 try/except
+     → institutional 失敗不會連 market 也一起跳過
+  2. start_scheduler() 移到模組層級呼叫
+     → Render 用 gunicorn 啟動時也會執行排程
 ────────────────────────────────────────────────────────────────────────────
 """
 
@@ -17,17 +17,6 @@ import firebase_sync
 import pytz
 
 # ── 排程設定 ──────────────────────────────────────────────────────────────────
-# label 對應說明：
-#   0 → 休市通知（09:00）
-#   1 → 法人總買賣金額 + 大盤資訊（15:10）── 同步三大法人 + 大盤
-#   2 → 投信買賣超（15:00）
-#   3 → 外資買賣超（16:10）
-#   4 → 自營商買賣超（16:10）
-#   5 → 處置股（17:30）── 同步處置股
-#   6 → 注意股（17:30）
-#   7 → 大盤融資金額 + 大盤資訊（21:10）── 同步大盤融資
-#   8 → 借券賣出（21:30）── 同步借券賣出
-
 SCHEDULE = [
     (0, 9,  0,  "休市通知"),
     (2, 15, 0,  "投信買賣超"),
@@ -40,31 +29,48 @@ SCHEDULE = [
     (8, 21, 30, "借券賣出"),
 ]
 
+
 # ── Firebase 同步任務（各時段觸發）──────────────────────────────────────────
 def _run_sync(label: int):
     """
     根據 label 決定要同步哪些資料。
-    在廣播通知之前執行，確保使用者查詢時 Firebase 已有資料。
+    ⚠️ 每個同步任務獨立 try/except，避免一個失敗連累其他任務。
     """
     if not is_trading_day():
-        return  # 休市不同步
+        return
 
-    try:
-        if label == 1:
-            # 15:10：三大法人 + 大盤（金額）
+    if label == 1:
+        # 15:10：先同步三大法人（twse + otc），再同步大盤
+        try:
             firebase_sync.sync_institutional()
+        except Exception as e:
+            print(f"[sync_error] label={label} sync_institutional 失敗: {e}")
+
+        try:
             firebase_sync.sync_market()
-        elif label == 5:
-            # 17:30：處置股
+        except Exception as e:
+            print(f"[sync_error] label={label} sync_market 失敗: {e}")
+
+    elif label == 5:
+        # 17:30：處置股
+        try:
             firebase_sync.sync_disposal()
-        elif label == 7:
-            # 21:10：大盤融資（更新）
+        except Exception as e:
+            print(f"[sync_error] label={label} sync_disposal 失敗: {e}")
+
+    elif label == 7:
+        # 21:10：大盤融資（更新）
+        try:
             firebase_sync.sync_market()
-        elif label == 8:
-            # 21:30：借券賣出
+        except Exception as e:
+            print(f"[sync_error] label={label} sync_market 失敗: {e}")
+
+    elif label == 8:
+        # 21:30：借券賣出
+        try:
             firebase_sync.sync_short_sale()
-    except Exception as e:
-        print(f"[sync_error] label={label} {e}")
+        except Exception as e:
+            print(f"[sync_error] label={label} sync_short_sale 失敗: {e}")
 
 
 # ── 廣播訊息內容 ──────────────────────────────────────────────────────────────
@@ -117,3 +123,4 @@ def start_scheduler(line_bot_api):
         )
 
     scheduler.start()
+    print("[scheduler] 排程已啟動 ✅")

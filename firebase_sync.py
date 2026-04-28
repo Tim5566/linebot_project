@@ -1,5 +1,8 @@
 """
 firebase_sync.py - 含日期驗證 + 重試等待機制
+修正重點：
+  - _fetch_twse_institutional 改為循序執行（移除 ThreadPoolExecutor）
+    → 避免 Render 上多 thread 同時 sleep 造成 OOM 或被強制中斷
 """
 from dotenv import load_dotenv
 load_dotenv()
@@ -9,7 +12,6 @@ import re
 import datetime
 import requests
 import urllib3
-import concurrent.futures
 import time as _time
 
 import firebase_admin
@@ -30,12 +32,10 @@ def _init_firebase():
     if _firebase_initialized:
         return
     try:
-        # 如果已經有初始化過的 app，直接使用，不重複初始化
         firebase_admin.get_app()
         _firebase_initialized = True
         print("[firebase_sync] 使用已存在的 Firebase app")
     except ValueError:
-        # 還沒初始化，才執行初始化
         cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred, {
@@ -128,6 +128,7 @@ def _check_twse_stat(data, today: str, label: str):
     return data
 
 def _fetch_twse_institutional(today: str) -> dict:
+    # ✅ 修正：改為循序執行，避免多 thread 同時 sleep 在 Render 上 OOM
     def _parse_foreign():
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
         data = _check_twse_stat(_fetch_with_date_check(url, today, "上市外資"), today, "上市外資")
@@ -161,9 +162,10 @@ def _fetch_twse_institutional(today: str) -> dict:
             out[row[0].strip()] = row[10].strip()
         return out
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-        ff, ft, fp = ex.submit(_parse_foreign), ex.submit(_parse_trust), ex.submit(_parse_proprietary)
-        foreign_map, trust_map, proprietary_map = ff.result(), ft.result(), fp.result()
+    # 循序執行（不用 ThreadPoolExecutor）
+    foreign_map     = _parse_foreign()
+    trust_map       = _parse_trust()
+    proprietary_map = _parse_proprietary()
 
     if not foreign_map and not trust_map and not proprietary_map:
         print("[twse_inst] 三大法人全部未取得，略過寫入"); return {}
@@ -216,7 +218,6 @@ def _fetch_otc_institutional(today: str) -> dict:
             if attempt < MAX_DATE_RETRIES: _time.sleep(DATE_RETRY_WAIT)
             continue
 
-        # 上櫃日期格式為民國年 YYYMMDD（民國年 + 1911 = 西元年）
         raw_date = data[0].get("Date", "") if data else ""
         if raw_date:
             raw_d = re.sub(r"[^\d]", "", raw_date)
