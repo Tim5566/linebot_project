@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     :root{
+      --ch-color: var(--accent);
+      --ch-rgb: 0,229,255;
       --bg:#03060d;--surface:#070d1a;--accent:#00e5ff;
       --green:#00e676;--red:#ff3d5a;--yellow:#ffd600;
       --purple:#b266ff;--pink:#ff6eb4;--orange:#ff9800;
@@ -26,19 +28,8 @@
     .bg-scanlines{position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);}
 
     /* HEADER */
-    header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 16px;height:58px;border-bottom:1px solid rgba(0,229,255,.09);background:rgba(3,6,14,.97);backdrop-filter:blur(24px);box-shadow:0 2px 24px rgba(0,0,0,.5);}
     header::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.7) 20%,rgba(178,102,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent);background-size:200% 100%;animation:hSweep 4s linear infinite;}
     @keyframes hSweep{from{background-position:-100% 0}to{background-position:200% 0}}
-    .logo{display:flex;align-items:center;gap:14px;margin-left:4px;}
-    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
-    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
-    .logo-text{font-family:"Orbitron",monospace;font-size:.95rem;font-weight:700;letter-spacing:.1em;color:#fff;}
-    .logo-sub{font-family:"Share Tech Mono",monospace;font-size:.52rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
-    .header-right{display:flex;align-items:center;gap:10px;}
-    .back-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.05);color:var(--text-dim);font-family:"Share Tech Mono",monospace;font-size:.68rem;letter-spacing:.08em;cursor:pointer;text-decoration:none;transition:all .2s;}
-    .back-btn:hover{color:var(--accent);background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);}
-    .back-btn svg{width:12px;height:12px}
-    .chapter-badge{font-family:"Share Tech Mono",monospace;font-size:.62rem;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);border-radius:8px;padding:3px 10px;letter-spacing:.12em;}
 
     /* PROGRESS */
     .sticky-progress{position:sticky;top:58px;z-index:190;background:rgba(3,6,14,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,229,255,.07);}
@@ -48,17 +39,17 @@
     .progress-label-sm{font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
     .progress-pct-sm{font-family:"Share Tech Mono",monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
 
-    /* SIDENAV */
-    .chapter-sidenav{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:150;display:flex;flex-direction:column;background:rgba(3,6,14,.88);backdrop-filter:blur(20px);border:1px solid rgba(0,229,255,.1);border-left:none;border-radius:0 12px 12px 0;overflow:hidden;}
-    .ch-nav-item{display:flex;align-items:center;padding:10px 14px 10px 12px;font-family:"Share Tech Mono",monospace;font-size:.6rem;letter-spacing:.08em;color:var(--text-faint);text-decoration:none;cursor:pointer;border-left:2px solid transparent;transition:all .2s;white-space:nowrap;border-bottom:1px solid rgba(0,229,255,.06);}
-    .ch-nav-item:last-child{border-bottom:none;}
+    
+    
+    
+    
     .ch-num{font-size:.55rem;opacity:.5;margin-right:8px;flex-shrink:0;}
     .ch-label{opacity:0;max-width:0;overflow:hidden;transition:all .25s;font-size:.62rem;}
-    .ch-nav-item:hover .ch-label,.ch-nav-item.current-ch .ch-label{opacity:1;max-width:120px;padding-left:2px;}
-    .ch-nav-item:hover{color:var(--accent);background:rgba(0,229,255,.07);border-left-color:rgba(0,229,255,.4);}
-    .ch-nav-item.current-ch{color:var(--accent);border-left-color:var(--accent);background:rgba(0,229,255,.09);}
-    .ch-nav-item.locked{opacity:.35;cursor:default;pointer-events:none;}
-    @media(max-width:768px){.chapter-sidenav{display:none;}}
+    
+    
+    
+    
+    @media(max-width:768px){}
 
     /* MAIN */
     main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:36px 28px 120px;}
@@ -83,14 +74,14 @@
     .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
     @media(max-width:600px){.hero{flex-direction:column;gap:20px;padding:28px 22px;}.hero-icon{width:80px;height:80px;}.hero-title{font-size:1.2rem;}}
 
-    /* TOC */
-    .toc-strip{display:flex;align-items:center;gap:0;margin-bottom:44px;padding:18px 24px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:14px;overflow-x:auto;}
-    .toc-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:70px;cursor:pointer;padding:4px 8px;border-radius:10px;transition:background .2s;}
-    .toc-item:hover{background:rgba(0,229,255,.08);}
-    .toc-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;font-family:"Share Tech Mono",monospace;font-size:.6rem;color:var(--text-faint);transition:all .3s;}
-    .toc-dot.active{border-color:var(--accent);background:rgba(0,229,255,.15);color:var(--accent);box-shadow:0 0 12px rgba(0,229,255,.3);}
-    .toc-lbl{font-size:.57rem;color:var(--text-faint);text-align:center;line-height:1.3;}
-    .toc-connector{flex:1;min-width:10px;height:1px;background:rgba(0,229,255,.12);}
+    
+    
+    
+    
+    
+    
+    
+    
 
     /* SECTION CARDS */
     .section-card{background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));border:1px solid rgba(0,229,255,.12);border-radius:20px;margin-bottom:32px;overflow:hidden;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.4);}
@@ -278,159 +269,277 @@
     .back-to-top:hover{background:rgba(0,229,255,.13);box-shadow:0 0 14px rgba(0,229,255,.25);}
     .sdiv{font-family:"Share Tech Mono",monospace;font-size:.58rem;letter-spacing:.2em;color:var(--text-faint);text-align:center;margin:24px 0 16px;opacity:.5;}
   
-    /* ── CHAPTER SIDE NAV (improved) ── */
+    
+    
+    
+    /* top accent bar */
+    
+    /* bottom accent bar */
+    
+    
+    
+    /* hover glow sweep */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* chapter number dot for current */
+    
+    @media (max-width: 768px) {  }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    /* ═══ UNIFIED SIDENAV — SINGLE DEFINITIVE BLOCK ═══ */
     .chapter-sidenav {
-      position: fixed;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 150;
-      display: flex;
-      flex-direction: column;
-      background: rgba(2,5,12,.92);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(0,229,255,.13);
-      border-left: none;
-      border-radius: 0 14px 14px 0;
-      overflow: hidden;
-      box-shadow: 4px 0 32px rgba(0,0,0,.5), 0 0 20px rgba(0,229,255,.04);
-      transition: box-shadow .3s;
+      position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+      z-index: 150; display: flex; flex-direction: column;
+      background: rgba(2,5,14,.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: 1.5px solid rgba(0,229,255,.28); border-left: none;
+      border-radius: 0 18px 18px 0; overflow: hidden;
+      box-shadow: 6px 0 40px rgba(0,0,0,.65), 0 0 28px rgba(0,229,255,.08);
+      transition: box-shadow .3s, border-color .3s; min-width: 48px;
     }
     .chapter-sidenav:hover {
-      box-shadow: 4px 0 40px rgba(0,0,0,.6), 0 0 30px rgba(0,229,255,.08);
+      box-shadow: 8px 0 50px rgba(0,0,0,.7), 0 0 40px rgba(0,229,255,.12);
+      border-color: rgba(0,229,255,.35);
     }
-    /* top accent bar */
     .chapter-sidenav::before {
-      content: '';
-      display: block;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: .5;
-      flex-shrink: 0;
+      content: ''; display: block; height: 2px; flex-shrink: 0;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.9), rgba(0,229,255,.5), transparent);
     }
-    /* bottom accent bar */
     .chapter-sidenav::after {
-      content: '';
-      display: block;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: .3;
-      flex-shrink: 0;
-      margin-top: auto;
+      content: ''; display: block; height: 2px; flex-shrink: 0; margin-top: auto;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.5), rgba(0,229,255,.2), transparent);
     }
     .ch-nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      padding: 9px 16px 9px 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .58rem;
-      letter-spacing: .08em;
-      color: var(--text-faint);
-      text-decoration: none;
-      cursor: pointer;
-      border-left: 2px solid transparent;
-      transition: all .2s ease;
-      white-space: nowrap;
-      border-bottom: 1px solid rgba(0,229,255,.05);
-      position: relative;
-      overflow: hidden;
-      min-width: 42px;
+      display: flex; align-items: center;
+      padding: 10px 14px 10px 12px;
+      font-family: 'Share Tech Mono', monospace; font-size: .7rem;
+      letter-spacing: .06em; color: rgba(200,220,240,.85);
+      text-decoration: none; cursor: pointer;
+      border-left: 2.5px solid transparent;
+      transition: all .22s ease; white-space: nowrap;
+      border-bottom: 1px solid rgba(0,229,255,.06);
+      position: relative; overflow: hidden; min-width: 148px;
     }
     .ch-nav-item:last-child { border-bottom: none; }
-    /* hover glow sweep */
     .ch-nav-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(0,229,255,.06));
-      opacity: 0;
-      transition: opacity .2s;
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(0,229,255,.0), rgba(0,229,255,.07));
+      opacity: 0; transition: opacity .22s;
     }
     .ch-nav-item:hover::before { opacity: 1; }
     .ch-nav-item .ch-num {
-      font-size: .54rem;
-      opacity: .45;
-      margin-right: 0;
-      flex-shrink: 0;
-      min-width: 16px;
-      transition: opacity .2s;
+      font-size: .66rem; font-weight: 700; opacity: 1; flex-shrink: 0;
+      min-width: 20px; transition: opacity .2s, color .2s; letter-spacing: .04em;
+      color: rgba(180,210,235,.9);
     }
-    .ch-nav-item:hover .ch-num,
-    .ch-nav-item.current-ch .ch-num { opacity: .9; }
     .ch-nav-item .ch-label {
-      opacity: 0;
-      max-width: 0;
-      overflow: hidden;
+      opacity: 1; max-width: 160px; overflow: hidden;
       transition: opacity .25s, max-width .25s, padding-left .25s;
-      font-size: .62rem;
-      letter-spacing: .05em;
-    }
-    .ch-nav-item:hover .ch-label,
-    .ch-nav-item.current-ch .ch-label {
-      opacity: 1;
-      max-width: 130px;
+      font-size: .7rem; letter-spacing: .04em; color: rgba(220,235,250,.9);
       padding-left: 8px;
     }
-    .ch-nav-item:hover {
-      color: var(--accent);
-      border-left-color: rgba(0,229,255,.5);
-      background: rgba(0,229,255,.05);
-    }
+    .ch-nav-item:hover .ch-label,
+    .ch-nav-item.current-ch .ch-label { opacity: 1; max-width: 140px; padding-left: 8px; }
+    .ch-nav-item:hover { color: var(--accent); border-left-color: rgba(0,229,255,.6); background: rgba(0,229,255,.05); }
+    .ch-nav-item:hover .ch-num { opacity: 1; color: var(--accent); }
     .ch-nav-item.current-ch {
-      color: var(--pink);
-      border-left-color: var(--pink);
-      background: rgba(255,110,180,.07);
+      color: var(--ch-color, var(--accent));
+      border-left-color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .08);
     }
-    .ch-nav-item.current-ch .ch-num { color: var(--pink); }
-    .ch-nav-item.locked {
-      opacity: .28;
-      cursor: default;
-      pointer-events: none;
-    }
-    /* chapter number dot for current */
+    .ch-nav-item.current-ch .ch-num { opacity: 1; color: var(--ch-color, var(--accent)); }
+    .ch-nav-item.current-ch .ch-label { color: var(--ch-color, var(--accent)); }
     .ch-nav-item.current-ch::after {
-      content: '';
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--pink);
-      box-shadow: 0 0 6px var(--pink);
+      content: ''; position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ch-color, var(--accent));
+      box-shadow: 0 0 8px var(--ch-color, var(--accent));
     }
+    .ch-nav-item.locked { opacity: .28; cursor: default; pointer-events: none; }
     @media (max-width: 768px) { .chapter-sidenav { display: none; } }
 
-    </style>
+    /* ═══ UNIFIED TOC STRIP ═══ */
+    .toc-strip {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 44px; padding: 18px 24px;
+      background: rgba(var(--ch-rgb, 0,229,255), .03);
+      border: 1px solid rgba(var(--ch-rgb, 0,229,255), .12);
+      border-radius: 16px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .toc-strip::-webkit-scrollbar { display: none; }
+    .toc-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 7px; min-width: 64px; cursor: pointer;
+      padding: 5px 8px; border-radius: 10px; transition: background .2s;
+      flex-shrink: 0;
+    }
+    .toc-item:hover { background: rgba(var(--ch-rgb, 0,229,255), .08); }
+    .toc-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid rgba(var(--ch-rgb, 0,229,255), .28);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace; font-size: .62rem; font-weight: 700;
+      color: var(--text-faint); transition: all .3s; flex-shrink: 0;
+    }
+    .toc-dot.active {
+      border-color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .15);
+      color: var(--ch-color, var(--accent));
+      box-shadow: 0 0 14px rgba(var(--ch-rgb, 0,229,255), .35);
+    }
+    .toc-item:hover .toc-dot {
+      border-color: rgba(var(--ch-rgb, 0,229,255), .55);
+      color: rgba(var(--ch-rgb, 0,229,255), .8);
+    }
+    .toc-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem; color: var(--text-faint);
+      text-align: center; line-height: 1.35; transition: color .3s;
+      letter-spacing: .03em;
+    }
+    .toc-item:hover .toc-lbl { color: var(--text-dim); }
+    .toc-connector {
+      flex: 1; min-width: 12px; height: 1px;
+      background: rgba(var(--ch-rgb, 0,229,255), .12);
+    }
+
+    /* ══ UNIFIED HEADER ══ */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 0 14px; height: 58px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: rgba(3,6,14,.97);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--accent, #00e5ff) 20%, rgba(0,170,255,.9) 50%, var(--accent, #00e5ff) 80%, transparent);
+      background-size: 200% 100%; animation: headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep { from { background-position: -100% 0 } to { background-position: 200% 0 } }
+    .header-left { display: flex; align-items: center; gap: 0; }
+    .logo { display: flex; align-items: center; gap: 12px; margin-left: 2px; }
+    .logo-icon { width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center; position: relative; flex-shrink: 0; overflow: visible; }
+    .logo-icon img { width: 52px; height: 52px; object-fit: contain; border-radius: 9px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -5px; left: -5px; }
+    .logo-text { font-family: 'Orbitron', monospace; font-size: .92rem; font-weight: 700; letter-spacing: .1em; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,.4); }
+    .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: .5rem; color: var(--accent); letter-spacing: .22em; opacity: .65; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .back-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 16px; border-radius: 20px;
+      border: 1px solid rgba(0,229,255,.22);
+      background: rgba(0,229,255,.06);
+      color: #a0c8e8; font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem; letter-spacing: .07em; cursor: pointer;
+      text-decoration: none; transition: all .2s;
+      font-weight: 400;
+    }
+    .back-btn:hover { color: var(--accent); background: rgba(0,229,255,.14); border-color: rgba(0,229,255,.5); box-shadow: 0 0 16px rgba(0,229,255,.2); }
+    .back-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .chapter-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: .65rem;
+      color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .09);
+      border: 1px solid rgba(var(--ch-rgb, 0,229,255), .28);
+      border-radius: 9px; padding: 4px 12px; letter-spacing: .14em;
+      text-shadow: 0 0 12px var(--ch-color, var(--accent));
+    }
+
+    /* ══ UNIFIED FOOTER (single-row) ══ */
+    .chapter-footer {
+      margin-top: 64px; padding: 0;
+      background: linear-gradient(135deg, rgba(6,12,26,.99), rgba(4,8,18,.99));
+      border: 1.5px solid rgba(0,229,255,.16);
+      border-radius: 20px; overflow: hidden; position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 0 30px rgba(0,229,255,.04);
+    }
+    .chapter-footer::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--ch-color, var(--accent)), rgba(0,229,255,.6), var(--ch-color, var(--accent)), transparent);
+      background-size: 300% 100%; animation: footerEdge 4s ease-in-out infinite;
+    }
+    @keyframes footerEdge { 0%,100%{background-position:-100% 0;opacity:.5}50%{background-position:200% 0;opacity:1} }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 28px; gap: 20px; flex-wrap: wrap;
+    }
+    .footer-left {
+      display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;
+    }
+    .footer-right {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .footer-complete-badge {
+      flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(var(--ch-rgb,0,229,255),.14), rgba(var(--ch-rgb,0,229,255),.06));
+      border: 1px solid rgba(var(--ch-rgb,0,229,255),.3);
+      display: grid; place-items: center; font-size: 1.3rem;
+    }
+    .footer-complete-text { flex: 1; min-width: 0; }
+    .footer-complete-title {
+      font-family: 'Orbitron', monospace; font-size: .82rem; font-weight: 700;
+      color: #fff; letter-spacing: .04em; margin-bottom: 4px;
+    }
+    .footer-complete-desc { font-size: .8rem; color: #7a9ab8; line-height: 1.6; }
+    .footer-next-hint {
+      font-size: .73rem; color: rgba(var(--ch-rgb,0,229,255),.8);
+      margin-top: 3px; font-family: 'Share Tech Mono', monospace;
+      letter-spacing: .04em; opacity: .75;
+    }
+    .fn-btn {
+      display: flex; align-items: center; gap: 9px;
+      padding: 11px 20px; border-radius: 12px;
+      font-family: 'Share Tech Mono', monospace; font-size: .74rem;
+      letter-spacing: .07em; cursor: pointer; text-decoration: none;
+      transition: all .22s; white-space: nowrap; border: 1.5px solid;
+    }
+    .fn-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .fn-btn.prev { color: #a0c8e8; border-color: rgba(0,229,255,.2); background: rgba(0,229,255,.05); }
+    .fn-btn.prev:hover { color: var(--accent); border-color: rgba(0,229,255,.45); background: rgba(0,229,255,.12); box-shadow: 0 0 14px rgba(0,229,255,.18); }
+    .fn-btn.next { color: var(--ch-color, var(--accent)); border-color: rgba(var(--ch-rgb,0,229,255),.3); background: rgba(var(--ch-rgb,0,229,255),.07); }
+    .fn-btn.next:hover { background: rgba(var(--ch-rgb,0,229,255),.15); border-color: rgba(var(--ch-rgb,0,229,255),.6); box-shadow: 0 0 18px rgba(var(--ch-rgb,0,229,255),.22); }
+    .fn-btn.locked { color: #a0c8e8; border-color: rgba(0,229,255,.2); background: rgba(0,229,255,.05); cursor: default; }
+    @media(max-width:600px){
+      .footer-inner { flex-direction: column; align-items: stretch; }
+      .footer-right { justify-content: center; }
+      .fn-btn { justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 <div class="bg-nebula"></div>
 <div class="bg-scanlines"></div>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon"><img src="/images/logo.png" alt="logo" onerror="this.style.display='none'"/></div>
-    <div><div class="logo-text">STOCKWISE</div><div class="logo-sub">TECHNICAL ANALYSIS</div></div>
-  </div>
-  <div class="header-right">
-    <span class="chapter-badge">CH.10</span>
-    <a href="javascript:history.back()" class="back-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>返回
-    </a>
-  </div>
-</header>
 
-<div class="sticky-progress">
-  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
-  <div class="progress-info-row">
-    <span class="progress-label-sm">第十章進度 ── CH.10 PROGRESS</span>
-    <span class="progress-pct-sm" id="progressPct">0%</span>
-  </div>
-</div>
+<!-- Chapter Side Nav -->
 
+
+<!-- Chapter Side Nav -->
 <nav class="chapter-sidenav" aria-label="章節導覽">
   <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場與股票</span></a>
   <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒解讀</span></a>
@@ -443,6 +552,36 @@
   <a class="ch-nav-item" href="/stock_site/features/chapter9.html"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
   <a class="ch-nav-item current-ch" href="/stock_site/features/chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
 </nav>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/logo.png" alt="JellyStock logo" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">技術分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a class="back-btn" href="/stock_site/index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+    <span class="chapter-badge">CH.10</span>
+  </div>
+</header>
+
+<div class="sticky-progress">
+  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第十章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
 
 <main>
   <!-- HERO -->
@@ -1200,18 +1339,31 @@
     技術分析不是終點，而是起點。接下來，每一次看盤，每一次進出場，每一次覆盤，才是讓這些知識變成你的直覺、變成你的武器的過程。<br><br>
     <strong style="color:var(--accent)">市場天天都在，好機會等你。祝你操作順利。</strong></div>
   </div>
+  <!-- ── CHAPTER FOOTER ── -->
 
   <div class="chapter-footer">
-    <div class="footer-info">
-      <strong>🎉 全系列完成！</strong><br>
-      CH.01～CH.10 技術分析教學課程已全部完成。<br>
-      繼續回顧任何章節，或到主頁查看即時盤勢分析。
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="footer-complete-badge">✅</div>
+        <div class="footer-complete-text">
+          <div class="footer-complete-title">第10章完成</div>
+          <div class="footer-complete-desc">你已完成全部實戰案例演練，掌握真實K線的解題方法與完整的交易思維框架。</div>
+          <div class="footer-next-hint">🎉 恭喜完成全部十章課程！你已建立完整的技術分析框架。</div>
+        </div>
+      </div>
+      <div class="footer-right">
+        <a class="fn-btn prev" href="/stock_site/features/chapter9.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          第9章
+        </a>
+        <span class="fn-btn locked">
+          課程完成
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+        </span>
+      </div>
     </div>
-    <a class="back-to-top" href="/">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      回到主頁
-    </a>
   </div>
+
 </main>
 
 <script>
