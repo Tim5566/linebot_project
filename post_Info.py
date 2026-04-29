@@ -11,6 +11,10 @@ post_Info.py（Firebase 快取版）
   1. 檢查今日是否交易日、時間是否 ≥ 15:00
   2. 查 Firebase stock_data/{today}/twse/{stock_id} 或 otc/{stock_id}
   3. 若 Firebase 無資料 → fallback 打 TWSE API（和舊版一樣）
+
+修正重點：
+  - _init_firebase 補上 firebase_admin.get_app() 判斷
+    → 避免與 firebase_sync.py 重複初始化衝突
 ────────────────────────────────────────────────────────────────────────────
 """
 from __future__ import annotations
@@ -49,15 +53,22 @@ def _init_firebase():
     if _firebase_initialized:
         return
     try:
-        cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred, {
-            "databaseURL": os.environ.get("FIREBASE_DATABASE_URL", "")
-        })
+        # ✅ 修正：先檢查 App 是否已存在（避免與 firebase_sync.py 衝突）
+        firebase_admin.get_app()
         _firebase_initialized = True
-        print("✅ Firebase 初始化成功")
-    except Exception as e:
-        print(f"❌ Firebase 初始化失敗: {e}")
+        print("[post_Info] 使用已存在的 Firebase app")
+    except ValueError:
+        # App 不存在，才初始化
+        try:
+            cred_path = os.environ.get("FIREBASE_CREDENTIAL_PATH", "firebase_credentials.json")
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred, {
+                "databaseURL": os.environ.get("FIREBASE_DATABASE_URL", "")
+            })
+            _firebase_initialized = True
+            print("✅ Firebase 初始化成功")
+        except Exception as e:
+            print(f"❌ Firebase 初始化失敗: {e}")
 
 _init_firebase()
 
@@ -494,9 +505,9 @@ def _fallback_otc(keyword: str, today: str) -> str:
     API_Short_Sale = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-        fd = ex.submit(_otc_disposal,     keyword, API_Disposal)
+        fd = ex.submit(_otc_disposal,      keyword, API_Disposal)
         fi = ex.submit(_otc_institutional, keyword, API_inst,       today)
-        fs = ex.submit(_otc_short_sale,   keyword, API_Short_Sale,  today)
+        fs = ex.submit(_otc_short_sale,    keyword, API_Short_Sale, today)
         D        = fd.result()
         F, T, P  = fi.result()
         S        = fs.result()
@@ -508,6 +519,44 @@ def _fallback_otc(keyword: str, today: str) -> str:
     reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
     reply += (S + "\n") if S else "借卷賣出：🚫 暫未更新\n"
     return reply.strip()
+
+
+def _fallback_search(keyword: str, today: str):
+    """代碼清單為空（冷啟動失敗）時的備用查詢。"""
+    print(f"[fallback] keyword={keyword}")
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
+            ff = ex.submit(_twse_foreign,     keyword,
+                           f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}", today)
+            ft = ex.submit(_twse_trust,       keyword,
+                           f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}", today)
+            fp = ex.submit(_twse_proprietary, keyword,
+                           f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}", today)
+            F, T, P = ff.result(), ft.result(), fp.result()
+        if F or T or P:
+            r  = f"{keyword} (今盤後買賣超)\n"
+            r += (F + "\n") if F else "外資：🚫 暫未更新\n"
+            r += (T + "\n") if T else "投信：🚫 暫未更新\n"
+            r += (P + "\n") if P else "自營商：🚫 暫未更新\n"
+            return r.strip()
+    except Exception as e:
+        print(f"[fallback] 上市失敗: {e}")
+
+    try:
+        F2, T2, P2 = _otc_institutional(
+            keyword,
+            "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json",
+            today)
+        if F2 or T2 or P2:
+            r  = f"{keyword} (今盤後買賣超)\n"
+            r += (F2 + "\n") if F2 else "外資：🚫 暫未更新\n"
+            r += (T2 + "\n") if T2 else "投信：🚫 暫未更新\n"
+            r += (P2 + "\n") if P2 else "自營商：🚫 暫未更新\n"
+            return r.strip()
+    except Exception as e:
+        print(f"[fallback] 上櫃失敗: {e}")
+
+    return None
 
 
 def stock_info(keyword: str) -> str:
@@ -551,44 +600,6 @@ def stock_info(keyword: str) -> str:
     if result:
         return result
     return f"❌找不到「{keyword}」今盤後資料。"
-
-
-def _fallback_search(keyword: str, today: str):
-    """代碼清單為空（冷啟動失敗）時的備用查詢。"""
-    print(f"[fallback] keyword={keyword}")
-    try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-            ff = ex.submit(_twse_foreign,     keyword,
-                           f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}", today)
-            ft = ex.submit(_twse_trust,       keyword,
-                           f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}", today)
-            fp = ex.submit(_twse_proprietary, keyword,
-                           f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}", today)
-            F, T, P = ff.result(), ft.result(), fp.result()
-        if F or T or P:
-            r  = f"{keyword} (今盤後買賣超)\n"
-            r += (F + "\n") if F else "外資：🚫 暫未更新\n"
-            r += (T + "\n") if T else "投信：🚫 暫未更新\n"
-            r += (P + "\n") if P else "自營商：🚫 暫未更新\n"
-            return r.strip()
-    except Exception as e:
-        print(f"[fallback] 上市失敗: {e}")
-
-    try:
-        F2, T2, P2 = _otc_institutional(
-            keyword,
-            "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json",
-            today)
-        if F2 or T2 or P2:
-            r  = f"{keyword} (今盤後買賣超)\n"
-            r += (F2 + "\n") if F2 else "外資：🚫 暫未更新\n"
-            r += (T2 + "\n") if T2 else "投信：🚫 暫未更新\n"
-            r += (P2 + "\n") if P2 else "自營商：🚫 暫未更新\n"
-            return r.strip()
-    except Exception as e:
-        print(f"[fallback] 上櫃失敗: {e}")
-
-    return None
 
 
 # ══════════════════════════════════════════════════════════════════════════════

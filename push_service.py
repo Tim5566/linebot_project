@@ -1,12 +1,14 @@
 """
 push_service.py（Firebase 同步版）
 ────────────────────────────────────────────────────────────────────────────
-修正：同步邏輯拆開，各 label 只同步自己負責的欄位
-  label 2 (15:00) → 只同步投信 sync_trust()
-  label 1 (15:10) → 只同步大盤 sync_market()
-  label 3 (16:10) → 只同步外資 sync_foreign()
-  label 4 (16:10) → 只同步自營商 sync_proprietary()
-  各自用 ref.child(sid).update() 寫入，不互相覆蓋
+修正重點：
+  1. _run_sync 的 sync_institutional 和 sync_market 分開 try/except
+     → institutional 失敗不會連 market 也一起跳過
+  2. 新增 label=9（15:20）專門同步 OTC 三大法人
+     → OTC 獨立排程，不被 TWSE 的 retry 拖累
+  3. sync_institutional 改為只跑 TWSE，OTC 由 label=9 負責
+  4. start_scheduler() 移到模組層級呼叫
+     → Render 用 gunicorn 啟動時也會執行排程
 ────────────────────────────────────────────────────────────────────────────
 """
 
@@ -17,11 +19,23 @@ from get_trading_holidays import is_trading_day
 import firebase_sync
 import pytz
 
-# ── 排程設定（時間維持原本）─────────────────────────────────────────────────────
+# ── 排程設定 ──────────────────────────────────────────────────────────────────
+# label 說明：
+#   0  = 09:00 休市通知
+#   1  = 15:10 TWSE 三大法人 + 大盤
+#   2  = 15:00 投信買賣超廣播
+#   3  = 16:10 外資買賣超廣播
+#   4  = 16:10 自營商買賣超廣播
+#   5  = 17:30 處置股
+#   6  = 17:30 注意股
+#   7  = 21:10 大盤融資金額更新
+#   8  = 21:30 借券賣出
+#   9  = 15:20 OTC 三大法人（獨立排程，與 TWSE 不互相拖累）
 SCHEDULE = [
     (0, 9,  0,  "休市通知"),
     (2, 15, 0,  "投信買賣超"),
     (1, 15, 10, "法人總買賣金額"),
+    (9, 15, 10, "OTC三大法人"),       # ✅ 新增：OTC 獨立排程，與 TWSE 同時觸發但跑在不同 thread
     (3, 16, 10, "外資買賣超"),
     (4, 16, 10, "自營商買賣超"),
     (5, 17, 30, "處置股"),
@@ -31,38 +45,33 @@ SCHEDULE = [
 ]
 
 
-# ── Firebase 同步任務 ─────────────────────────────────────────────────────────
+# ── Firebase 同步任務（各時段觸發）──────────────────────────────────────────
 def _run_sync(label: int):
+    """
+    根據 label 決定要同步哪些資料。
+    ⚠️ 每個同步任務獨立 try/except，避免一個失敗連累其他任務。
+    """
     if not is_trading_day():
         return
 
-    if label == 2:
-        # 15:00：只同步投信（TWT44U 14:50 就好了）
+    if label == 1:
+        # 15:10：只同步 TWSE 三大法人，再同步大盤
         try:
-            firebase_sync.sync_trust()
+            firebase_sync.sync_institutional()
         except Exception as e:
-            print(f"[sync_error] label={label} sync_trust 失敗: {e}")
+            print(f"[sync_error] label={label} sync_institutional 失敗: {e}")
 
-    elif label == 1:
-        # 15:10：只同步大盤法人合計 + market
         try:
             firebase_sync.sync_market()
         except Exception as e:
             print(f"[sync_error] label={label} sync_market 失敗: {e}")
 
-    elif label == 3:
-        # 16:10：只同步外資（TWT38U 16:05 才好）
+    elif label == 9:
+        # 15:20：OTC 三大法人（獨立排程，不被 TWSE retry 拖累）
         try:
-            firebase_sync.sync_foreign()
+            firebase_sync.sync_otc_institutional()
         except Exception as e:
-            print(f"[sync_error] label={label} sync_foreign 失敗: {e}")
-
-    elif label == 4:
-        # 16:10：只同步自營商（TWT43U 16:05 才好）
-        try:
-            firebase_sync.sync_proprietary()
-        except Exception as e:
-            print(f"[sync_error] label={label} sync_proprietary 失敗: {e}")
+            print(f"[sync_error] label={label} sync_otc_institutional 失敗: {e}")
 
     elif label == 5:
         # 17:30：處置股
@@ -72,7 +81,7 @@ def _run_sync(label: int):
             print(f"[sync_error] label={label} sync_disposal 失敗: {e}")
 
     elif label == 7:
-        # 21:10：大盤融資更新
+        # 21:10：大盤融資（更新）
         try:
             firebase_sync.sync_market()
         except Exception as e:
@@ -106,9 +115,9 @@ def _build_message(label):
         5: "📢 今盤後，處置股已更新❗\n目前個股可供查詢。",
         6: "📢 今盤後，注意股已更新❗\n目前個股可供查詢。",
         8: "📢 今盤後，借券賣出已更新❗\n目前個股可供查詢。",
+        # label=9 是後台同步，不對用戶廣播
     }
-    t = texts.get(label)
-    return TextSendMessage(text=t) if t else None
+    return TextSendMessage(text=texts[label])
 
 
 # ── 廣播執行 ──────────────────────────────────────────────────────────────────
@@ -118,8 +127,14 @@ def broadcast_post_inf(line_bot_api, label):
             line_bot_api.broadcast(TextSendMessage(text="📢 今日週末或連假未開盤❗"))
         return
 
+    # 先同步 Firebase
     _run_sync(label)
 
+    # label=9 是後台靜默同步，不廣播給用戶
+    if label == 9:
+        return
+
+    # 其他 label 才廣播通知
     msg = _build_message(label)
     if msg:
         line_bot_api.broadcast(msg)
