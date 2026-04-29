@@ -223,8 +223,8 @@
     <div class="sec-num">Section 02</div>
     <div class="sec-title">我們收集的資訊</div>
     <div class="doc-body">
-      <p>本網站為純工具型服務，<strong>不要求用戶註冊帳號，不主動收集任何可直接識別個人身份的資料</strong>（如姓名、身分證號碼、電話號碼等）。</p>
-      <p>在您使用本網站過程中，系統可能自動收集以下技術資訊，僅用於維持服務正常運作：</p>
+      <p>本網站核心查詢功能<strong>無需登入即可使用</strong>。Google 登入為選擇性功能，僅用於啟用「個股收藏清單」及個人化設定。</p>
+      <p><strong>未登入時</strong>，系統可能自動收集以下匿名技術資訊，用於維持服務正常運作：</p>
       <ul>
         <li>瀏覽器類型、版本與語言設定</li>
         <li>裝置類型（桌機、手機、平板）及作業系統</li>
@@ -233,23 +233,55 @@
         <li>國家或地區（依 IP 位址粗略判斷，不記錄精確位置）</li>
         <li>股票查詢關鍵字（僅用於即時查詢回應，不儲存於本站資料庫）</li>
       </ul>
+      <p><strong>選擇以 Google 帳號登入後</strong>，本站將透過 Google OAuth 取得並處理以下資訊：</p>
+      <ul>
+        <li><strong>Google 帳號顯示名稱</strong> — 用於顯示於介面右上角</li>
+        <li><strong>Google 帳號 Email 地址</strong> — 用於識別使用者身份，作為個人收藏清單與設定的儲存識別鍵，並以匿名方式傳送至本站伺服器進行訪客計數統計</li>
+        <li><strong>Google 帳號大頭貼圖片網址</strong> — 僅用於顯示頭像於介面，不在本站伺服器另行儲存圖片</li>
+      </ul>
+      <div class="hl-box">
+        上述資訊（名稱、Email、大頭貼網址）在您登入後<strong>暫存於您瀏覽器的 localStorage</strong>，不上傳至本站資料庫。登出時本站將自動清除此暫存資料。<strong>Access Token 不會被儲存</strong>，頁面關閉後即失效。
+      </div>
     </div>
   </div>
 
   <div class="doc-card">
     <div class="sec-num">Section 03</div>
-    <div class="sec-title">Cookie 使用說明</div>
+    <div class="sec-title">Google 登入與 OAuth</div>
     <div class="doc-body">
-      <p>本網站可能使用 Cookie 及類似技術儲存使用者偏好設定（如音樂播放狀態），以提升使用體驗。</p>
+      <p>本網站使用 <strong>Google Identity Services（Google OAuth 2.0）</strong>提供登入功能。當您點擊「Google 登入」時，您將透過 Google 官方彈窗授權，本站不會接觸或儲存您的 Google 帳號密碼。</p>
+      <p>登入授權範圍（OAuth Scope）僅包含：</p>
+      <ul>
+        <li><strong>openid</strong> — 驗證您的 Google 身份</li>
+        <li><strong>email</strong> — 取得您的 Email 地址（用於識別與訪客統計）</li>
+        <li><strong>profile</strong> — 取得您的顯示名稱與大頭貼網址（用於介面顯示）</li>
+      </ul>
+      <p>本站<strong>不會</strong>要求存取您的 Google 雲端硬碟、Gmail、聯絡人或其他任何 Google 服務資料。</p>
       <div class="hl-box">
-        <strong>本網站不使用廣告追蹤 Cookie</strong>，亦不透過任何廣告平台投放廣告或進行個人化行為追蹤。
+        <strong>資料儲存方式：</strong>登入後的名稱、Email、大頭貼網址暫存於您裝置的瀏覽器 localStorage，並在您登出時自動清除。本站伺服器<strong>僅接收 Email 用於訪客計數</strong>，不建立使用者資料庫，不儲存您的個人資料。
       </div>
-      <p>如需停用 Cookie，可透過瀏覽器設定管理，惟部分偏好設定功能可能受影響。</p>
+      <p>您可隨時至 <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google 帳號授權管理頁面</a> 撤銷本站的存取授權。撤銷後，您於本站儲存於 localStorage 的收藏清單及設定資料仍會保留於您的裝置，不受影響。</p>
     </div>
   </div>
 
   <div class="doc-card">
     <div class="sec-num">Section 04</div>
+    <div class="sec-title">Cookie 與廣告追蹤技術</div>
+    <div class="doc-body">
+      <p>本網站使用 Cookie 及類似技術，用途分為以下兩類：</p>
+      <ul>
+        <li><strong>功能性 Cookie</strong> — 儲存使用者偏好設定（如介面主題、音樂播放狀態），以維持個人化體驗，不涉及個人身份識別。</li>
+        <li><strong>廣告追蹤 Cookie</strong> — 本網站目前或未來可能引入 Google AdSense 等第三方廣告服務。這些服務商會透過 Cookie 收集匿名瀏覽行為，用於提供相關性廣告。Google 作為第三方廣告商，可能依據您過去訪問本站及其他網站的紀錄提供廣告。</li>
+      </ul>
+      <div class="hl-box">
+        <strong>如何管理廣告 Cookie：</strong>您可至 <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google 廣告設定</a> 選擇退出個人化廣告，或透過 <a href="https://www.aboutads.info" target="_blank" rel="noopener">aboutads.info</a> 管理廣告偏好，亦可透過瀏覽器設定停用所有第三方 Cookie。
+      </div>
+      <p>停用廣告 Cookie 不會影響本站核心查詢功能的使用，但您仍可能看到非個人化廣告。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 05</div>
     <div class="sec-title">資訊的使用目的</div>
     <div class="doc-body">
       <p>我們收集的技術資訊，僅用於以下目的：</p>
@@ -258,12 +290,24 @@
         <li>了解功能使用狀況，改善用戶體驗</li>
         <li>防範異常存取或濫用行為</li>
       </ul>
-      <p><strong>我們不會將任何資訊出售、出租或提供給任何第三方用於商業目的。</strong></p>
+      <p><strong>本站不會將您的個人身份資訊出售或出租給任何第三方。</strong>惟本站使用之廣告服務商（如 Google AdSense）依其服務性質，可能透過 Cookie 收集匿名瀏覽行為數據，此屬廣告服務商之獨立資料處理行為，適用其自身之隱私政策，本站不對此等資料處理負責。</p>
     </div>
   </div>
 
   <div class="doc-card">
-    <div class="sec-num">Section 05</div>
+    <div class="sec-num">Section 06</div>
+    <div class="sec-title">第三方廣告服務</div>
+    <div class="doc-body">
+      <p>本網站目前或未來可能使用以下第三方廣告服務，各服務商有其獨立的隱私政策與資料使用方式：</p>
+      <ul>
+        <li><strong>Google AdSense / Google Ad Manager</strong> — Google 依據 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 隱私政策</a> 處理相關資料，您可至 <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google 廣告設定</a> 管理個人化廣告偏好。</li>
+      </ul>
+      <p>本站對上述第三方廣告服務商之資料收集行為、廣告內容及隱私實踐<strong>不負任何責任</strong>，建議您自行閱讀各服務商之隱私政策。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">Section 07</div>
     <div class="sec-title">資料安全</div>
     <div class="doc-body">
       <p>本網站採取合理的技術措施保護所收集的資訊，防止未經授權的存取或揭露。</p>
@@ -272,7 +316,7 @@
   </div>
 
   <div class="doc-card">
-    <div class="sec-num">Section 06</div>
+    <div class="sec-num">Section 08</div>
     <div class="sec-title">隱私政策修訂</div>
     <div class="doc-body">
       <p>本隱私政策可能因應法規修訂或服務調整而不定期更新。更新後版本將於本頁面公告，並更新頂部的「最後更新日期」。繼續使用本服務即視為接受修訂後的政策。</p>
@@ -280,7 +324,7 @@
   </div>
 
   <div class="doc-card">
-    <div class="sec-num">Section 07</div>
+    <div class="sec-num">Section 09</div>
     <div class="sec-title">聯絡我們</div>
     <div class="doc-body">
       <p>若您對本隱私政策有任何疑問，請透過以下方式聯繫：</p>
