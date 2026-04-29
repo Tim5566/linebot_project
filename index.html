@@ -3904,6 +3904,12 @@
                 picture: info.picture || '',
                 token:   tokenResponse.access_token,
               };
+              // ✅ 持久化：存入 localStorage（不含 token，只存顯示用資料）
+              localStorage.setItem('_authUser', JSON.stringify({
+                name:    window._currentUser.name,
+                email:   window._currentUser.email,
+                picture: window._currentUser.picture,
+              }));
               _updateAuthUI(window._currentUser);
               document.dispatchEvent(new Event('_authChanged'));
             } catch(e) {
@@ -3923,8 +3929,21 @@
       }
     }
 
-    // DOMContentLoaded 後開始嘗試初始化
-    document.addEventListener('DOMContentLoaded', _initGIS);
+    // DOMContentLoaded 後開始嘗試初始化，並恢復上次登入狀態
+    document.addEventListener('DOMContentLoaded', () => {
+      // ✅ 從 localStorage 恢復登入狀態（跨分頁、重新載入都有效）
+      const saved = localStorage.getItem('_authUser');
+      if (saved) {
+        try {
+          window._currentUser = JSON.parse(saved);
+          _updateAuthUI(window._currentUser);
+          document.dispatchEvent(new Event('_authChanged'));
+        } catch(e) {
+          localStorage.removeItem('_authUser');
+        }
+      }
+      _initGIS();
+    });
 
     function _updateAuthUI(user) {
       const loginWrap = document.getElementById('authLoginWrap');
@@ -3975,6 +3994,7 @@
         google.accounts.oauth2.revoke(window._currentUser.token);
       }
       window._currentUser = null;
+      localStorage.removeItem('_authUser'); // ✅ 清除持久化
       _updateAuthUI(null);
       document.dispatchEvent(new Event('_authChanged'));
     };

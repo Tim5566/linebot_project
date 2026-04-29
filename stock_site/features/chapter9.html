@@ -67,6 +67,8 @@
     @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
     .hero::after{content:'CH.09';position:absolute;right:24px;bottom:-16px;font-family:'Orbitron',monospace;font-size:6rem;font-weight:900;color:rgba(0,229,176,.04);pointer-events:none;line-height:1;}
     .hero-jelly{flex-shrink:0;width:130px;height:130px;position:relative;}
+    .hero-icon{flex-shrink:0;width:110px;height:110px;display:flex;align-items:center;justify-content:center;background:rgba(0,229,176,.04);border:1px solid rgba(0,229,176,.2);border-radius:20px;position:relative;overflow:hidden;}
+    .hero-icon::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(0,229,176,.08),transparent 70%);}
     .jelly-svg{width:100%;height:100%;}
     .hero-content{flex:1;min-width:0;}
     .hero-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.35em;color:var(--teal);text-transform:uppercase;opacity:.85;margin-bottom:8px;}
@@ -495,7 +497,7 @@
     .logo-text { font-family: 'Orbitron', monospace; font-size: .92rem; font-weight: 700; letter-spacing: .1em; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,.4); }
     .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: .5rem; color: var(--accent); letter-spacing: .22em; opacity: .65; margin-top: 2px; }
     .header-right { display: flex; align-items: center; gap: 10px; }
-    .back-btn {
+    .btn-back {
       display: flex; align-items: center; gap: 7px;
       padding: 6px 16px; border-radius: 20px;
       border: 1px solid rgba(0,229,255,.22);
@@ -505,8 +507,8 @@
       text-decoration: none; transition: all .2s;
       font-weight: 400;
     }
-    .back-btn:hover { color: var(--accent); background: rgba(0,229,255,.14); border-color: rgba(0,229,255,.5); box-shadow: 0 0 16px rgba(0,229,255,.2); }
-    .back-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .btn-back:hover { color: var(--accent); background: rgba(0,229,255,.14); border-color: rgba(0,229,255,.5); box-shadow: 0 0 16px rgba(0,229,255,.2); }
+    .btn-back svg { width: 12px; height: 12px; flex-shrink: 0; }
     .chapter-badge {
       font-family: 'Share Tech Mono', monospace; font-size: .65rem;
       color: var(--ch-color, var(--accent));
@@ -631,12 +633,12 @@
     body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(26,100,180,.2)); }
 
     /* ── 返回按鈕 / 章節 badge ── */
-    body.theme-day .back-btn {
+    body.theme-day .btn-back {
       background: rgba(26,123,191,.08);
       border-color: rgba(26,123,191,.22);
       color: #1a4a78;
     }
-    body.theme-day .back-btn:hover {
+    body.theme-day .btn-back:hover {
       background: rgba(26,123,191,.15);
       border-color: rgba(26,123,191,.4);
       color: #0d3560;
@@ -1117,13 +1119,13 @@
     }
 
     /* ── 6. back-btn / chapter-badge 明顯化 ── */
-    body.theme-day .back-btn {
+    body.theme-day .btn-back {
       background: rgba(26,123,191,.09);
       border-color: rgba(26,101,168,.3);
       color: #1a3a60;
       font-weight: 500;
     }
-    body.theme-day .back-btn:hover {
+    body.theme-day .btn-back:hover {
       background: rgba(26,123,191,.16);
       border-color: rgba(26,101,168,.52);
       color: #0d3560;
@@ -1962,6 +1964,638 @@
     }
 
 
+
+    /* ═══════════════════════════════════════════════════════════
+       SVG 圖表白天模式完整修復 — 統一透明化暗色背景
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 所有 SVG 容器：白天模式統一白色背景 ── */
+    body.theme-day .vol-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .vol-chart-title { color: #1265a8 !important; opacity: 1 !important; }
+
+    body.theme-day .trend-visual {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .trend-visual-title { color: #1265a8 !important; opacity: 1 !important; }
+
+    body.theme-day .case-chart {
+      background: rgba(240,248,255,.92) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      box-shadow: 0 4px 16px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .cs-display {
+      background: rgba(240,248,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    body.theme-day .rsi-gauge-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-radius: 12px !important;
+      padding: 8px !important;
+      border: 1px solid rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+
+    body.theme-day .sim-canvas {
+      background: rgba(230,244,255,.88) !important;
+      border-color: rgba(26,101,168,.2) !important;
+    }
+
+    body.theme-day .anatomy-svg-col {
+      background: rgba(255,255,255,.9) !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+    }
+
+    /* ── SVG 內部：白天模式透明化暗底色 rect ── */
+    /* Target the background rect (first rect in SVG) in day mode */
+    body.theme-day .vol-chart-wrap svg > rect:first-child,
+    body.theme-day .sim-canvas svg > rect:first-child,
+    body.theme-day .rsi-gauge-wrap svg > rect:first-child,
+    body.theme-day .trend-visual svg > rect:first-child,
+    body.theme-day .case-chart svg > rect:first-child,
+    body.theme-day .anatomy-svg-col svg > rect:first-child,
+    body.theme-day .chart-demo svg > rect:first-child,
+    body.theme-day .tri-canvas svg > rect:first-child,
+    body.theme-day .ma-visual svg > rect:first-child,
+    body.theme-day .pattern-master svg > rect:first-child,
+    body.theme-day .diverge-demo svg > rect:first-child,
+    body.theme-day .ind-block svg > rect:first-child {
+      fill: transparent !important;
+    }
+
+    /* ── RSI Gauge SVG 白天模式完整修復 ── */
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(2) {
+      /* background track */
+      fill: rgba(26,101,168,.12) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(3),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(4),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(5) {
+      /* oversold zone */
+      fill: rgba(21,122,50,.2) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(6) {
+      /* neutral track */
+      fill: rgba(26,101,168,.08) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(7),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(8),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(9) {
+      /* overbought zone */
+      fill: rgba(176,48,32,.2) !important;
+    }
+    /* RSI text in day mode */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; opacity: 1 !important; }
+
+    /* ── Vol chart SVG：文字顏色在白天模式 ── */
+    body.theme-day .vol-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,255,255"] {
+      fill: #1a3550 !important;
+    }
+    body.theme-day .vol-chart-wrap svg text[fill*="0.5)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".5)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".3)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".25)"] {
+      opacity: 1 !important;
+    }
+
+    /* ── Trend visual SVG text ── */
+    body.theme-day .trend-visual svg text { opacity: 1 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255"] { 
+      stroke: rgba(26,101,168,.3) !important; 
+    }
+
+    /* ── Sim canvas SVG text ── */
+    body.theme-day .sim-canvas svg text { opacity: 1 !important; }
+    body.theme-day .sim-canvas svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .sim-canvas svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+
+    /* ── Chart demo SVG text ── */
+    body.theme-day .chart-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .chart-demo svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .chart-demo { 
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* ── Pattern Master (ch5 head/shoulders) ── */
+    body.theme-day .pattern-master {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .pattern-master svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .pattern-master svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .pattern-master svg text[fill*=".3)"],
+    body.theme-day .pattern-master svg text[fill*=".25)"],
+    body.theme-day .pattern-master svg text[fill*=".5)"] { opacity: 1 !important; }
+
+    /* ── Tri-canvas SVG text ── */
+    body.theme-day .tri-canvas svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .tri-canvas svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+
+    /* ── MA visual SVG text (ch6) ── */
+    body.theme-day .ma-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .ma-visual svg text[fill*=".5)"],
+    body.theme-day .ma-visual svg text[fill*=".3)"] { opacity: 1 !important; }
+
+    /* ── Diverge demo (ch6) ── */
+    body.theme-day .diverge-demo {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .diverge-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── Ind block (ch7) ── */
+    body.theme-day .ind-block {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .ind-block svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── Case chart (ch10) ── */
+    body.theme-day .case-chart svg text { opacity: 1 !important; }
+    body.theme-day .case-chart svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .case-chart svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .case-chart svg line[stroke*="rgba(255,255,255"] {
+      stroke: rgba(26,101,168,.25) !important;
+    }
+
+    /* ── CS display (ch10) ── */
+    body.theme-day .cs-display svg text { opacity: 1 !important; }
+    body.theme-day .cs-display svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .cs-display svg line[stroke*="rgba(255,255,255"] {
+      stroke: rgba(26,101,168,.25) !important;
+    }
+
+    /* ── Example box（所有章節）── */
+    body.theme-day .example-box {
+      background: linear-gradient(135deg,rgba(255,245,210,.9),rgba(255,248,225,.8)) !important;
+      border-color: rgba(184,136,14,.28) !important;
+    }
+    body.theme-day .example-label { color: #8a6000 !important; opacity: 1 !important; }
+    body.theme-day .example-box p { color: #1a2830 !important; }
+    body.theme-day .example-box strong { color: #0a1828 !important; }
+
+    /* ── Struct cards (ch3) ── */
+    body.theme-day .struct-card {
+      background: rgba(255,255,255,.88) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .struct-card.bull-card {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(255,255,255,.88)) !important;
+      border-color: rgba(21,122,50,.25) !important;
+    }
+    body.theme-day .struct-card.bear-card {
+      background: linear-gradient(135deg,rgba(176,48,32,.06),rgba(255,255,255,.88)) !important;
+      border-color: rgba(176,48,32,.22) !important;
+    }
+    body.theme-day .struct-card.side-card {
+      background: linear-gradient(135deg,rgba(26,101,168,.06),rgba(255,255,255,.88)) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+    body.theme-day .struct-title { color: #0a1828 !important; }
+    body.theme-day .struct-desc  { color: #1a3550 !important; }
+
+    /* ── Hi-Lo chips ── */
+    body.theme-day .hilo-hh { color: #a02818 !important; background:rgba(176,48,32,.1) !important; border-color:rgba(176,48,32,.3) !important; }
+    body.theme-day .hilo-hl { color: #7a3838 !important; background:rgba(176,80,80,.07) !important; border-color:rgba(176,80,80,.2) !important; }
+    body.theme-day .hilo-lh { color: #206840 !important; background:rgba(21,120,60,.07) !important; border-color:rgba(21,120,60,.2) !important; }
+    body.theme-day .hilo-ll { color: #157a32 !important; background:rgba(21,122,50,.1) !important; border-color:rgba(21,122,50,.3) !important; }
+
+    /* ── Vocab items ── */
+    body.theme-day .vocab-item {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.32) !important; }
+
+    /* ── Flow wrap ── */
+    body.theme-day .flow-wrap {
+      background: rgba(240,248,255,.75) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* ── Candle SVG backdrop cards ── */
+    body.theme-day .red-card  { background: rgba(255,240,240,.9) !important; border-color: rgba(176,48,32,.2) !important; }
+    body.theme-day .green-card{ background: rgba(235,255,240,.9) !important; border-color: rgba(21,122,50,.2) !important; }
+
+    /* ── Error analysis ── */
+    body.theme-day .error-analysis {
+      background: linear-gradient(135deg,rgba(176,48,32,.05),rgba(255,255,255,.88)) !important;
+      border-color: rgba(176,48,32,.2) !important;
+    }
+    body.theme-day .error-header { background: rgba(176,48,32,.07) !important; border-bottom-color: rgba(176,48,32,.15) !important; }
+
+    /* ── Breakout demo (ch4,ch9) ── */
+    body.theme-day .breakout-demo,
+    body.theme-day .pullback-demo {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .breakout-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .pullback-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── SVG grid lines: make visible on white ── */
+    body.theme-day svg line[stroke*="rgba(0,229,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day svg line[stroke*="rgba(255,255,255,.1"] { stroke: rgba(26,101,168,.12) !important; }
+
+    /* ── General: any SVG container with dark bg ── */
+    body.theme-day .section-card svg > rect:first-child,
+    body.theme-day .section-body svg > rect:first-child {
+      fill: rgba(240,248,255,.5) !important;
+    }
+
+    /* ── SVG defs grid pattern: day mode ── */
+    body.theme-day svg pattern rect { fill: transparent !important; }
+    body.theme-day svg pattern line { stroke: rgba(26,101,168,.06) !important; }
+
+
+
+    /* ─── SVG 圖表容器：白天模式統一修復 ─── */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .svg-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.3"] { fill: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.3"] { fill: #157a32 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.3"] { fill: #8a6000 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.3"] { fill: #6640c0 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.3"] { fill: #a02818 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,229,255,.2"],
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,229,255,.1"] { stroke: rgba(26,101,168,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,230,118,.2"] { stroke: rgba(21,122,50,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(255,214,0,.2"] { stroke: rgba(160,110,0,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(255,255,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day .svg-chart-wrap svg > rect:first-child { fill: transparent !important; }
+
+    /* ── 九章整合框架 SVG (ch10) 專屬修復 ── */
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(0,229,255"] { 
+      fill: rgba(26,101,168,.08) !important; 
+      stroke: rgba(26,101,168,.3) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(0,230,118"] { 
+      fill: rgba(21,122,50,.07) !important; 
+      stroke: rgba(21,122,50,.28) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(255,214,0"] { 
+      fill: rgba(160,110,0,.07) !important; 
+      stroke: rgba(160,110,0,.28) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(178,102,255"] { 
+      fill: rgba(102,64,192,.06) !important; 
+      stroke: rgba(102,64,192,.25) !important;
+    }
+
+    /* ── var(--accent) text in SVG: override for day ── */
+    body.theme-day .svg-chart-wrap svg text[fill="var(--accent)"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--green)"]  { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--yellow)"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--purple)"] { fill: #6640c0 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--red)"]    { fill: #a02818 !important; }
+
+    /* ── RSI gauge 完整修復 ── */
+    body.theme-day .rsi-gauge-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border: 1px solid rgba(26,101,168,.15) !important;
+      border-radius: 12px !important;
+      padding: 8px !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(255,255,255,.0"] { fill: rgba(26,101,168,.08) !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(0,230,118"] { fill: rgba(21,122,50,.18) !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(255,61,90"] { fill: rgba(176,48,32,.18) !important; }
+    body.theme-day .rsi-gauge-wrap svg text { opacity: 1 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+
+    /* ── Vol chart wrap (ch8) ── */
+    body.theme-day .vol-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .vol-chart-title { color: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(178,102,255"] { fill: #6640c0 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .vol-chart-wrap svg line[stroke*="rgba(255,255,255"] { stroke: rgba(26,101,168,.12) !important; }
+    body.theme-day .vol-chart-wrap svg line[stroke*="rgba(0,229,255"] { stroke: rgba(26,101,168,.25) !important; }
+
+    /* ── Trend visual (ch3) ── */
+    body.theme-day .trend-visual {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .trend-visual-title { color: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .trend-visual svg text { opacity: 1 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .trend-visual svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255,.1"] { stroke: rgba(26,101,168,.12) !important; }
+
+    /* ── Anatomy SVG col (ch5) ── */
+    body.theme-day .anatomy-svg-col svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .anatomy-svg-col svg text { opacity: 1 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+
+    /* ── Standalone SVG (not in named wrapper) day mode ── */
+    body.theme-day .section-body > div[style*="display:flex"] > svg > rect:first-child,
+    body.theme-day .section-body > div[style*="justify-content:center"] > svg > rect:first-child {
+      fill: rgba(240,248,255,.5) !important;
+    }
+
+
+
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE FIX — 手機版完整修復
+       統一適用所有章節，breakpoint: 480px & 640px
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── Tables: scroll on mobile ── */
+    .cmp-table,
+    .compare-table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Vol chart & sim canvas: ensure responsive ── */
+    .vol-chart-wrap,
+    .sim-canvas,
+    .rsi-gauge-wrap,
+    .tri-canvas,
+    .trend-visual,
+    .anatomy-svg-col,
+    .chart-demo,
+    .ma-visual,
+    .diverge-demo,
+    .ind-block,
+    .case-chart,
+    .cs-display,
+    .svg-chart-wrap {
+      width: 100%;
+      box-sizing: border-box;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── SVG: always scale to container ── */
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 640px) {
+
+      /* ─── Core Layout ─── */
+      body { font-size: 15px; }
+      main { padding: 20px 14px 80px !important; }
+      .section-card { padding: 0; border-radius: 16px; }
+      .section-body { padding: 18px 16px 20px !important; }
+      .card-body, .card-header { padding: 16px 16px !important; }
+
+      /* ─── Hero ─── */
+      .hero {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 22px 18px !important;
+        gap: 18px !important;
+      }
+      .hero-title { font-size: 1.1rem !important; line-height: 1.5 !important; }
+      .hero-sub   { font-size: .82rem !important; }
+      .hero-icon  { width: 70px !important; height: 70px !important; margin: 0 auto !important; }
+      .hero-jelly { width: 80px !important; height: 80px !important; margin: 0 auto !important; }
+
+      /* ─── Section Header ─── */
+      .section-header { padding: 16px 16px 12px !important; gap: 8px !important; }
+      .section-title  { font-size: .95rem !important; }
+      .section-num    { font-size: .62rem !important; padding: 3px 8px !important; }
+
+      /* ─── Prose & Text ─── */
+      .prose, .section-body p { font-size: .9rem !important; line-height: 1.75 !important; }
+      .prose strong { font-size: .9rem !important; }
+
+      /* ─── ALL GRIDS → single column on mobile ─── */
+      .stat-row,
+      .psych-grid,
+      .candle-showcase,
+      .pattern-grid,
+      .detector-grid,
+      .breakout-compare,
+      .struct-grid,
+      .sign-grid,
+      .before-after,
+      .ba-grid,
+      .signal-grid,
+      .role-grid,
+      .bk-compare,
+      .pm-grid,
+      .pm-entry-exit,
+      .rel-grid,
+      .anatomy-row,
+      .ma-grid,
+      .scenario-row,
+      .state-grid,
+      .combo-row,
+      .danger-grid,
+      .strategy-grid,
+      .case-grid,
+      .label-points,
+      .pattern-master-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ─── Candle showcase: 2 per row on small mobile ─── */
+      .candle-showcase { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+      /* ─── Combo row: vertical stacking ─── */
+      .combo-row { grid-template-columns: 1fr !important; text-align: center !important; }
+      .combo-ind { justify-content: center !important; }
+
+      /* ─── Anatomy row ─── */
+      .anatomy-row { grid-template-columns: 1fr !important; }
+      .anatomy-svg-col { justify-content: center !important; }
+      .anatomy-svg-col svg { max-width: 100% !important; height: auto !important; }
+
+      /* ─── Flow steps ─── */
+      .flow-step { padding: 14px 14px !important; gap: 10px !important; }
+      .flow-heading { font-size: .88rem !important; }
+      .flow-sub { font-size: .8rem !important; }
+
+      /* ─── Cards padding ─── */
+      .candle-card, .pattern-card, .bk-card, .rel-card,
+      .mistake-card, .danger-card, .autopsy-card,
+      .ba-card, .vocab-item, .stat-card {
+        padding: 14px !important;
+      }
+
+      /* ─── Vol chart & charts ─── */
+      .vol-chart-wrap { margin: 12px 0 !important; border-radius: 10px !important; }
+      .vol-chart-title { font-size: .56rem !important; padding: 8px 12px 0 !important; }
+      .vol-chart-wrap svg,
+      .chart-demo svg,
+      .sim-canvas svg,
+      .trend-visual svg,
+      .tri-canvas svg {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      /* ─── Tables ─── */
+      .cmp-table, .compare-table {
+        font-size: .78rem !important;
+      }
+      .cmp-table th, .cmp-table td,
+      .compare-table th, .compare-table td {
+        padding: 8px 10px !important;
+        white-space: nowrap;
+      }
+
+      /* ─── Quiz ─── */
+      .quiz-opt { padding: 10px 14px !important; font-size: .86rem !important; }
+      .quiz-q   { font-size: .9rem !important; }
+      .quiz-letter { width: 26px !important; height: 26px !important; font-size: .72rem !important; min-width: 26px !important; }
+
+      /* ─── Check list ─── */
+      .check-item { padding: 12px 14px !important; gap: 10px !important; }
+      .check-text { font-size: .87rem !important; }
+
+      /* ─── Insight boxes ─── */
+      .insight-box, .key-concept,
+      .warn-box, .gold-box, .purple-box, .danger-box, .success-box {
+        padding: 14px 14px !important;
+      }
+      .insight-text { font-size: .87rem !important; }
+
+      /* ─── Chips ─── */
+      .chip { font-size: .68rem !important; padding: 2px 7px !important; }
+
+      /* ─── Nav tabs (pat-tab, tri-btn) ─── */
+      .pat-tab, .tri-btn, .picker-btn, .sim-btn, .strat-btn {
+        font-size: .68rem !important;
+        padding: 7px 10px !important;
+      }
+
+      /* ─── RSI gauge ─── */
+      .rsi-gauge-wrap { padding: 6px !important; }
+      .rsi-gauge-wrap svg { max-height: 100px !important; }
+
+      /* ─── Flow chart ─── */
+      .flow-chart { padding: 14px !important; gap: 6px !important; }
+      .flow-node, .flow-node-orange, .flow-node-red, .flow-node-green {
+        font-size: .75rem !important;
+        padding: 8px 10px !important;
+      }
+
+      /* ─── Sim canvas ─── */
+      .sim-canvas { height: 180px !important; }
+      .sim-controls { gap: 6px !important; }
+
+      /* ─── Trend visual ─── */
+      .trend-visual { padding: 16px !important; }
+      .trend-visual-title { font-size: .56rem !important; }
+
+      /* ─── Footer navigation ─── */
+      .footer-inner { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+      .fn-btn { justify-content: center !important; text-align: center !important; }
+      .footer-complete-text { font-size: .8rem !important; text-align: center !important; }
+
+      /* ─── Progress bar ─── */
+      .progress-label-sm { font-size: .62rem !important; }
+
+      /* ─── Sidenav hide on mobile ─── */
+      .chapter-sidenav { display: none !important; }
+
+      /* ─── TOC ─── */
+      .toc { display: none !important; }
+      .toc-strip { display: none !important; }
+
+      /* ─── Section divider ─── */
+      .sec-divider { font-size: .7rem !important; margin: 20px 0 !important; }
+      .sdiv { font-size: .68rem !important; }
+
+      /* ─── MA Visual ─── */
+      .ma-visual { min-height: 160px !important; }
+
+      /* ─── Case chart (ch10) ─── */
+      .case-chart { height: 180px !important; }
+      .case-selector { padding: 12px !important; }
+
+      /* ─── SOP steps ─── */
+      .sop-step { padding: 14px !important; }
+      .sop-title { font-size: .88rem !important; }
+      .sop-desc  { font-size: .82rem !important; }
+
+      /* ─── Error analysis ─── */
+      .error-analysis { padding: 0 !important; }
+      .error-header, .error-body { padding: 12px 14px !important; }
+
+      /* ─── Autopsy cards ─── */
+      .autopsy-head { padding: 12px 14px !important; }
+      .autopsy-body { padding: 14px !important; }
+
+      /* ─── Graduation badge ─── */
+      .graduation { padding: 20px 16px !important; }
+
+      /* ─── Image in jelly tip ─── */
+      .jelly-tip-mascot { display: none !important; }
+
+      /* ─── Chapter title watermark smaller ─── */
+      .hero::after { font-size: 4rem !important; }
+    }
+
+    @media (max-width: 400px) {
+      /* ─── Extra small phones ─── */
+      main { padding: 16px 10px 80px !important; }
+      .section-body { padding: 14px 12px 16px !important; }
+      .hero-title { font-size: 1rem !important; }
+      .candle-showcase { grid-template-columns: 1fr 1fr !important; }
+      .pat-tab, .tri-btn { font-size: .62rem !important; padding: 6px 8px !important; }
+      .cmp-table th, .cmp-table td { font-size: .72rem !important; padding: 6px 8px !important; }
+      .sim-canvas { height: 160px !important; }
+    }
+
+
 </style>
 </head>
 <body>
@@ -2000,7 +2634,7 @@
     </div>
   </div>
   <div class="header-right">
-    <a class="back-btn" href="/stock_site/index.html">
+    <a class="btn-back" href="/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
     </a>
@@ -2023,42 +2657,24 @@
 
   <!-- ── HERO ── -->
   <div class="hero">
-    <div class="hero-jelly">
-      <svg class="jelly-svg" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="jellyBodyGrad9" cx="42%" cy="38%" r="58%">
-            <stop offset="0%" stop-color="rgba(0,229,176,0.22)"/>
-            <stop offset="100%" stop-color="rgba(0,60,80,0.08)"/>
-          </radialGradient>
-          <filter id="jellyGlow9"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="jellyGlowCyan9"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <ellipse cx="65" cy="115" rx="42" ry="7" fill="rgba(0,229,176,0.1)"/>
-        <path d="M65 18 C35 18 22 38 20 58 C18 78 22 98 30 108 C38 118 92 118 100 108 C108 98 112 78 110 58 C108 38 95 18 65 18 Z"
-              fill="url(#jellyBodyGrad9)" stroke="#00e5b0" stroke-width="2.2" filter="url(#jellyGlow9)" opacity="0.92"/>
-        <ellipse cx="50" cy="52" rx="10" ry="16" fill="rgba(0,229,176,0.13)" transform="rotate(-15,50,52)"/>
-        <ellipse cx="80" cy="60" rx="8" ry="13" fill="rgba(0,229,255,0.1)" transform="rotate(12,80,60)"/>
-        <path d="M80 22 C95 30 110 48 110 68 C110 88 100 108 88 114"
-              fill="none" stroke="#00e5ff" stroke-width="2" filter="url(#jellyGlowCyan9)" opacity="0.65"/>
-        <!-- Chart uptrend on body -->
-        <polyline points="38,82 50,68 62,74 74,56 86,62 98,44"
-              fill="none" stroke="rgba(0,229,176,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="98" cy="44" r="3" fill="rgba(0,229,176,0.8)"><animate attributeName="r" values="2;4;2" dur="1.5s" repeatCount="indefinite"/></circle>
-        <!-- Swirls -->
-        <path d="M50 65 C48 58 54 54 58 60 C62 66 56 72 52 68" fill="none" stroke="#00e5b0" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-        <!-- Eyes -->
-        <ellipse cx="52" cy="78" rx="5.5" ry="6.5" fill="#fff" opacity="0.95"/>
-        <ellipse cx="78" cy="78" rx="5.5" ry="6.5" fill="#fff" opacity="0.95"/>
-        <circle cx="53.5" cy="79" r="3.2" fill="#007a6e"/>
-        <circle cx="79.5" cy="79" r="3.2" fill="#007a6e"/>
-        <circle cx="54.5" cy="77.5" r="1.1" fill="#fff"/>
-        <circle cx="80.5" cy="77.5" r="1.1" fill="#fff"/>
-        <path d="M56 92 Q65 99 74 92" fill="none" stroke="rgba(0,229,176,0.8)" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="34" cy="50" r="2" fill="#00e5b0" opacity="0.7"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.1s" repeatCount="indefinite"/></circle>
-        <circle cx="96" cy="60" r="1.8" fill="#00e5ff" opacity="0.6"><animate attributeName="opacity" values="0.2;0.9;0.2" dur="1.7s" repeatCount="indefinite"/></circle>
-        <circle cx="42" cy="90" r="1.5" fill="#ffd600" opacity="0.5"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="2.5s" repeatCount="indefinite"/></circle>
-        <line x1="65" y1="18" x2="65" y2="8" stroke="#00e5b0" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
-        <circle cx="65" cy="6" r="3" fill="#00e5b0" opacity="0.9"><animate attributeName="r" values="2.5;4;2.5" dur="1.5s" repeatCount="indefinite"/></circle>
+    <div class="hero-icon">
+      <!-- Trading Strategy icon: crosshair/target + entry arrow -->
+      <svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Target crosshair -->
+        <circle cx="35" cy="35" r="22" stroke="rgba(0,229,176,0.25)" stroke-width="1.5"/>
+        <circle cx="35" cy="35" r="14" stroke="rgba(0,229,176,0.45)" stroke-width="1.5"/>
+        <circle cx="35" cy="35" r="6" stroke="#00e5b0" stroke-width="1.8"/>
+        <circle cx="35" cy="35" r="2.5" fill="#00e5b0" opacity="0.9">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Crosshair lines -->
+        <line x1="35" y1="8" x2="35" y2="26" stroke="rgba(0,229,176,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="35" y1="44" x2="35" y2="62" stroke="rgba(0,229,176,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="8" y1="35" x2="26" y2="35" stroke="rgba(0,229,176,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="44" y1="35" x2="62" y2="35" stroke="rgba(0,229,176,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Entry arrow pointing to center from bottom-right -->
+        <line x1="56" y1="56" x2="42" y2="42" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+        <polyline points="52,57 56,56 55,52" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="hero-content">
@@ -2956,7 +3572,7 @@ function updateProgress() {
   const correct = Object.values(quizScore).filter(Boolean).length;
   const scrollPct = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
   const quizPct = correct / totalQuiz;
-  const combined = Math.round((scrollPct * 0.5 + quizPct * 0.5) * 100);
+  const combined = Math.round(scrollPct * 100);
   document.getElementById('progressFill').style.width = combined + '%';
   document.getElementById('progressPct').textContent = combined + '%';
 }
@@ -3072,5 +3688,175 @@ function showSituation(btn, key) {
 })();
 </script>
 
+  
+
+  <script>
+  /* ── SVG Day Mode Complete Fix v2 ── */
+  (function() {
+    const DARK_BG_FILLS = ['#040b15','#050c1a','#030a12','#040d18','#020810','#03080f','#060d1a'];
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+      return {r,g,b};
+    }
+
+    function isDarkColor(fill) {
+      if (!fill) return false;
+      const low = fill.toLowerCase();
+      if (DARK_BG_FILLS.includes(low)) return true;
+      const m = low.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (m) {
+        const r=+m[1],g=+m[2],b=+m[3];
+        return (r+g+b) < 60;
+      }
+      if (low.startsWith('#') && low.length >= 7) {
+        const {r,g,b} = hexToRgb(low);
+        return (r+g+b) < 60;
+      }
+      return false;
+    }
+
+    function isFaintColor(fill) {
+      if (!fill) return false;
+      const m = fill.match(/rgba?\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
+      return m && parseFloat(m[1]) <= 0.25;
+    }
+
+    function getReadableColor(fill) {
+      if (!fill) return null;
+      const low = fill.toLowerCase();
+      if (/rgba?\(0,\s*229,\s*255|rgba?\(0,\s*230,\s*255/.test(low)) return '#1265a8';
+      if (/rgba?\(0,\s*230,\s*118|rgba?\(0,\s*255,\s*118/.test(low)) return '#157a32';
+      if (/rgba?\(255,\s*61,\s*90|rgba?\(255,\s*0,\s*80/.test(low)) return '#a02818';
+      if (/rgba?\(255,\s*214,\s*0|rgba?\(255,\s*200,\s*0/.test(low)) return '#8a6000';
+      if (/rgba?\(178,\s*102,\s*255|rgba?\(160,\s*80,\s*255/.test(low)) return '#6640c0';
+      if (/rgba?\(255,\s*255,\s*255/.test(low)) return '#1a3550';
+      if (/rgba?\(0,\s*229,\s*176/.test(low)) return '#157a6a';
+      return null;
+    }
+
+    function fixSvgsForMode(isDay) {
+      /* 1. Fix dark background rects */
+      document.querySelectorAll('svg rect').forEach(r => {
+        const f = r.getAttribute('fill') || '';
+        if (!r.dataset.origFill) r.dataset.origFill = f;
+        const orig = r.dataset.origFill;
+
+        if (isDay) {
+          if (isDarkColor(orig)) {
+            r.setAttribute('fill', 'rgba(235,248,255,0.4)');
+          }
+        } else {
+          r.setAttribute('fill', orig);
+        }
+      });
+
+      /* 2. Fix faint / invisible SVG text */
+      document.querySelectorAll('svg text').forEach(t => {
+        const f = t.getAttribute('fill') || '';
+        if (!t.dataset.origFill) t.dataset.origFill = f;
+        const orig = t.dataset.origFill;
+
+        if (isDay) {
+          const readable = getReadableColor(orig);
+          if (readable) {
+            t.setAttribute('fill', readable);
+            t.style.opacity = '1';
+          } else if (isFaintColor(orig)) {
+            t.setAttribute('fill', '#1a3550');
+            t.style.opacity = '1';
+          } else if (isDarkColor(orig) || orig === 'white' || orig === '#fff') {
+            t.setAttribute('fill', '#1a3550');
+            t.style.opacity = '1';
+          }
+          /* CSS var overrides */
+          const cssVar = orig.match(/var\(--(\w+)\)/);
+          if (cssVar) {
+            const map = {accent:'#1265a8', green:'#157a32', red:'#a02818', yellow:'#8a6000', purple:'#6640c0', teal:'#157a6a'};
+            if (map[cssVar[1]]) { t.setAttribute('fill', map[cssVar[1]]); t.style.opacity='1'; }
+          }
+        } else {
+          t.setAttribute('fill', orig);
+          t.style.opacity = '';
+        }
+      });
+
+      /* 3. Fix faint SVG lines */
+      document.querySelectorAll('svg line, svg polyline').forEach(el => {
+        const s = el.getAttribute('stroke') || '';
+        if (!el.dataset.origStroke) el.dataset.origStroke = s;
+        const orig = el.dataset.origStroke;
+
+        if (isDay) {
+          if (/rgba?\(255,255,255,0?\.[0-1]/.test(orig)) {
+            el.setAttribute('stroke', 'rgba(26,101,168,0.15)');
+          }
+        } else {
+          el.setAttribute('stroke', orig);
+        }
+      });
+
+      /* 4. Fix SVG pattern (grid lines) */
+      document.querySelectorAll('svg pattern rect').forEach(r => {
+        if (isDay) r.setAttribute('fill', 'transparent');
+        else if (r.dataset.origFill) r.setAttribute('fill', r.dataset.origFill);
+      });
+      document.querySelectorAll('svg pattern line').forEach(l => {
+        if (!l.dataset.origStroke) l.dataset.origStroke = l.getAttribute('stroke') || '';
+        if (isDay) l.setAttribute('stroke', 'rgba(26,101,168,0.06)');
+        else l.setAttribute('stroke', l.dataset.origStroke);
+      });
+    }
+
+    function run() {
+      const isDay = document.body.classList.contains('theme-day');
+      fixSvgsForMode(isDay);
+    }
+
+    /* Hook theme toggle */
+    const origToggle = window.toggleTheme;
+    window.toggleTheme = function() {
+      if (origToggle) origToggle();
+      setTimeout(run, 30);
+    };
+
+    /* Also hook any custom draw functions to re-run fix after they render */
+    const origSetTimeout = window.setTimeout;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Initial run */
+      run();
+      /* Watch for class changes on body (theme switches) */
+      const obs = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'class') run();
+        });
+      });
+      obs.observe(document.body, { attributes: true });
+
+      /* Also watch for SVG content injection (JS-drawn charts) */
+      document.querySelectorAll('.tri-canvas, .sim-canvas, .vol-chart-wrap, .rsi-gauge-wrap, .cs-display, .case-chart').forEach(function(container) {
+        const svgObs = new MutationObserver(function() {
+          if (document.body.classList.contains('theme-day')) run();
+        });
+        svgObs.observe(container, { childList: true, subtree: true });
+      });
+    });
+  })();
+  </script>
+
+  <script>
+  /* ── Table Mobile Scroll Wrapper ── */
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("table.cmp-table, table.compare-table").forEach(function(table) {
+      if (table.parentElement.classList.contains("table-scroll-wrap")) return;
+      var wrapper = document.createElement("div");
+      wrapper.className = "table-scroll-wrap";
+      wrapper.style.cssText = "width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;";
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+  });
+  </script>
 </body>
 </html>
