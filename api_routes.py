@@ -179,7 +179,7 @@ def register_api(app):
                         "date":   date,
                         "time":   time,
                         "title":  title[:60] + ("..." if len(title) > 60 else ""),
-                        "link":   "https://mops.twse.com.tw/mops/web/t05sr01_1",
+                        "link":   f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?skey={skey}" if skey else "https://mops.twse.com.tw/mops/#/web/home",
                         "skey":   skey,
                     })
                 print(f"[api/news] 抓到 {len(items)} 筆重大訊息")
