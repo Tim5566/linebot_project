@@ -10,6 +10,39 @@ from firebase_admin import db as firebase_db
 def register_api(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+    # ── HTTP 安全 Headers ──────────────────────────────────────────────────────
+    @app.after_request
+    def set_security_headers(response):
+        # 防止 iframe 嵌入（點擊劫持攻擊）
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        # 防止瀏覽器猜測 MIME 類型（內容注入攻擊）
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        # 控制 Referer 資訊洩漏
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        # 防止 XSS 攻擊（限制資源來源）
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+                "https://cdnjs.cloudflare.com "
+                "https://pagead2.googlesyndication.com "
+                "https://adservice.google.com "
+                "https://www.googletagservices.com "
+                "https://partner.googleadservices.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https:; "
+            "connect-src 'self' "
+                "https://pagead2.googlesyndication.com "
+                "https://adservice.google.com; "
+            "frame-src https://googleads.g.doubleclick.net "
+                "https://tpc.googlesyndication.com; "
+            "media-src 'self'; "
+            "frame-ancestors 'self';"
+        )
+        # 強制 HTTPS（Render 部署後才有效）
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
+
     # ── 首頁 ───────────────────────────────────────────────────────────────────
     @app.route("/")
     def index():
@@ -82,6 +115,11 @@ def register_api(app):
     @app.route("/stock_site/features/chapter10.html")
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
+
+    # ── 財經新聞頁 ───────────────────────────────────────────────────────────────
+    @app.route("/stock_site/news/news.html")
+    def page_news():
+        return send_from_directory('stock_site/news', 'news.html')
 
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")

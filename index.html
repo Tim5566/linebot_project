@@ -2,6 +2,8 @@
 <html lang="zh-TW" style="scroll-behavior:smooth">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="apple-touch-icon" href="/images/jelly.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>台股即時法人追蹤</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1954,6 +1956,8 @@
     .nav-group-sys > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,180,220,.2), transparent); }
     .nav-group-about > .nav-group-label { color: rgba(170,185,210,.5); }
     .nav-group-about > .nav-group-label::after { background: linear-gradient(90deg, rgba(170,185,210,.15), transparent); }
+    .nav-group-news > .nav-group-label { color: rgba(6,214,160,.65); }
+    .nav-group-news > .nav-group-label::after { background: linear-gradient(90deg, rgba(6,214,160,.22), transparent); }
     /* "關於本站" 區塊標籤 — 特別加強 */
     .about-section-label {
       font-family: 'Noto Sans TC', sans-serif;
@@ -3874,6 +3878,21 @@
       filter: drop-shadow(0 0 2px rgba(26,101,168,.4));
     }
 
+  
+    .search-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: rgba(0,229,255,.45);
+      letter-spacing: .08em;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    body.theme-day .search-hint {
+      color: rgba(26,101,168,.5);
+    }
+    @media (max-width: 600px) {
+      .search-hint { font-size: .66rem; letter-spacing: .04em; }
+    }
   </style>
   <!-- Google Identity Services（OAuth Popup 方式） -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -4218,7 +4237,23 @@
 
     <div class="drawer-divider"></div>
 
-    <!-- ── 群組 3：學習資源（Accordion）── -->
+    <!-- ── 群組 3：財經新聞 ── -->
+    <div class="drawer-section nav-group-news">
+      <span class="nav-group-label">財經新聞</span>
+
+      <a class="nav-item" href="/stock_site/news/news.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+          <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+        </svg>
+        即時財經新聞
+        <span style="margin-left:auto;font-size:.58rem;color:#06d6a0;font-family:'Share Tech Mono',monospace;letter-spacing:.06em;opacity:.8;">LIVE</span>
+      </a>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <!-- ── 群組 4：學習資源（Accordion）── -->
     <div class="drawer-section nav-group-learn">
       <span class="nav-group-label">學習資源</span>
 
@@ -4595,6 +4630,9 @@
       <p class="section-label">· 個股查詢 ·</p>
             <svg id="mainTitleSvg" xmlns="http://www.w3.org/2000/svg" style="width:auto;height:1.55em;overflow:visible;display:block;margin-bottom:24px;" viewBox="0 0 380 30"><defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="60%" stop-color="#ffffff"/><stop offset="100%" stop-color="rgba(0,229,255,0.8)"/></linearGradient><linearGradient id="tg1day" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0a4a8a"/><stop offset="55%" stop-color="#1265a8"/><stop offset="100%" stop-color="#1a88cc"/></linearGradient></defs><text x="0" y="24" font-family="Orbitron,monospace" font-size="26" font-weight="700" letter-spacing="0.9" fill="url(#tg1)" id="mainTitleText">盤後買賣超查詢</text></svg>
     </div>
+    <p class="search-hint">
+        輸入股票代碼或名稱，即時查詢今日三大法人買賣超｜資料來源：TWSE / TPEx 官方 API，每日盤後自動更新
+      </p>
     <div class="search-row">
       <div class="search-input-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
