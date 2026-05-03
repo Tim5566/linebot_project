@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>關於本站 — 盤後雷達 JellyStock</title>
-  <meta name="description" content="盤後雷達 JellyStock 是一個完全免費的台股三大法人買賣超查詢工具，提供上市上櫃個股法人動向、大盤資訊與 LINE Bot 推播服務。" />
+  <meta name="description" content="盤後雷達 JellyStock 是一個完全免費的台股三大法人買賣超查詢工具，提供上市上櫃個股法人動向查詢、大盤資訊與技術分析教學。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
@@ -234,37 +234,34 @@
   <div class="mission-banner">
     <div class="mission-label">Our Mission · 開站初衷</div>
     <div class="mission-text">「官方盤後資料雖然公開，但分散在多個網站且不易快速閱讀。這個工具希望把每天必看的法人籌碼整合到同一個地方，讓查詢流程更直覺、更快速。」</div>
+    <div class="mission-text" style="margin-top:14px;font-size:.9rem;color:var(--text-dim);">接觸台股多年，每天盤後都要在 TWSE、TPEx 幾個官網之間來回切換查資料，覺得太麻煩——乾脆自己寫一個工具。從第一行程式碼到現在，JellyStock 一直是個人開發、個人維護的小網站，沒有團隊、沒有業配，只希望讓有同樣需求的投資人用起來方便。</div>
+  </div>
+
+  <div class="doc-card" style="margin-bottom:18px;">
+    <div class="sec-num">About · 00</div>
+    <div class="sec-title">關於開發者</div>
+    <div class="doc-body">
+      <div style="display:flex;align-items:center;gap:24px;margin-bottom:22px;flex-wrap:wrap;">
+        <div style="width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,229,255,.3);overflow:hidden;flex-shrink:0;display:grid;place-items:center;background:rgba(0,229,255,.06);box-shadow:0 0 20px rgba(0,229,255,.15);">
+          <img src="/images/jelly.png" alt="果凍老師" style="width:72px;height:72px;object-fit:contain;display:block;margin:auto;"/>
+        </div>
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:.06em;margin-bottom:6px;">果凍老師</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.15em;opacity:.75;margin-bottom:8px;">JELLYSTOCK · FOUNDER &amp; DEVELOPER</div>
+          <div style="font-size:.84rem;color:var(--text-dim);line-height:1.8;">台股散戶出身，長期研究籌碼面與技術分析，深知資料查詢的痛點。白天上班，下班寫 code 維護這個網站。</div>
+        </div>
+      </div>
+      <p>JellyStock 盤後雷達從規劃、設計、前後端開發到伺服器維運，全部由一個人完成。後端使用 Python Flask 搭配 Firebase Realtime Database，每天盤後自動從 TWSE 與 TPEx 官方 API 抓取資料、同步至雲端，再透過網站即時提供查詢服務。</p>
+      <p style="margin-top:12px;">除了查詢工具，網站內也附有一套完整的<strong>技術分析教學（共 10 章）</strong>，從股票本質、K棒解讀、趨勢結構到實戰案例，全部免費開放，希望對正在學習技術分析的朋友有所幫助。</p>
+      <div class="stats-row" style="margin-top:22px;">
+        <div class="stat-box"><div class="stat-num">10</div><div class="stat-label">技術分析教學章節</div></div>
+        <div class="stat-box"><div class="stat-num">9</div><div class="stat-label">每日資料更新次數</div></div>
+        <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">核心功能免費</div></div>
+      </div>
+    </div>
   </div>
 
   <div class="feature-grid">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-      <div class="feature-title">個股即時查詢</div>
-      <div class="feature-desc">輸入股票代碼或名稱，即可查詢外資、投信、自營商當日買賣超股數，支援上市與上櫃全市場。</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      </div>
-      <div class="feature-title">三大法人排行</div>
-      <div class="feature-desc">每日盤後更新上市、上櫃三大法人買超 / 賣超前 50 名排行，快速掌握主力資金動向。</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      </div>
-      <div class="feature-title">大盤綜合資訊</div>
-      <div class="feature-desc">整合三大法人合計買賣金額、融資增減、融資水位等大盤籌碼指標，一頁完整呈現。</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <div class="feature-title">LINE Bot 推播</div>
-      <div class="feature-desc">結合 LINE Bot，盤後資料更新時主動推播通知，不需開網頁也能隨時掌握法人動態。（功能規劃中）</div>
-    </div>
     <div class="feature-card">
       <div class="feature-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.04.033.05A19.9 19.9 0 0 0 6.045 20.1a.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
@@ -303,7 +300,6 @@
         <li>個股處置、注意股狀態查詢</li>
         <li>上市 / 上櫃三大法人買賣超前 50 名排行榜</li>
         <li>大盤三大法人合計買賣金額、融資增減、融資水位統計</li>
-        <li>LINE Bot 盤後推播服務（功能規劃中）</li>
       </ul>
       <p>本站為個人開發維護之工具型網站，功能持續改善中。若有異常或建議，歡迎透過下方聯絡方式反映。</p>
     </div>
@@ -338,14 +334,6 @@
             <div class="c-val" style="text-decoration:underline;text-underline-offset:3px;">llowoll5566@gmail.com</div>
           </div>
         </div>
-        <div class="contact-row">
-          <div class="c-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2H3v16h5l3 3 3-3h7z"/></svg>
-          </div>
-          <div>
-            <div class="c-label">LINE BOT</div>
-            <div class="c-val">⏳ 功能規劃中，敬請期待</div>
-          </div>
         </div>
       </div>
     </div>

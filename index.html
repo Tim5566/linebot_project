@@ -1603,9 +1603,10 @@
       .modal-tabs { padding: 8px 12px 0; gap: 5px; flex-wrap: wrap; }
       .modal-tab { padding: 7px 12px; font-size: .7rem; }
       .modal-toggle { padding: 8px 12px; gap: 6px; flex-wrap: wrap; }
-      .modal-body { padding: 0 8px 16px; max-height: calc(92vh - 160px); }
-      .top50-table { font-size: .76rem; }
-      .top50-table td, .top50-table th { padding: 8px 6px; }
+      .modal-body { padding: 0 8px 16px; max-height: calc(92vh - 160px); overflow-y: auto; overflow-x: hidden; }
+      .top50-table { font-size: .74rem; }
+      .top50-table td, .top50-table th { padding: 8px 10px; white-space: nowrap; }
+      .top50-table th { font-size: .62rem; letter-spacing: .1em; }
 
       /* ── Watchlist modal - 手機版重新排版 ── */
       .wl-list { padding: 8px 10px 24px; gap: 10px; display: flex; flex-direction: column; }
@@ -6093,7 +6094,8 @@ function renderTop50() {
   const isBuy = _top50Side === 'buy';
 
   let html = `
-    <table class="top50-table">
+    <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table class="top50-table" style="min-width:420px;">
       <thead>
         <tr>
           <th>#</th>
@@ -6236,7 +6238,8 @@ function renderOtcTop50() {
   const isBuy = _otcTop50Side === 'buy';
 
   let html = `
-    <table class="top50-table">
+    <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table class="top50-table" style="min-width:420px;">
       <thead>
         <tr>
           <th>#</th>

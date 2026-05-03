@@ -293,6 +293,10 @@
       .footer-inner { flex-direction: column; align-items: stretch; }
       .footer-right { justify-content: center; }
       .fn-btn { justify-content: center; }
+    .fn-btn.home { color: #7a9ab8; border-color: rgba(0,229,255,.15); background: rgba(0,229,255,.03); }
+    .fn-btn.home:hover { color: #00e5ff; border-color: rgba(0,229,255,.4); background: rgba(0,229,255,.09); box-shadow: 0 0 14px rgba(0,229,255,.15); }
+    body.theme-day .fn-btn.home { color: #2a5080; border-color: rgba(26,101,168,.2); background: rgba(26,123,191,.05); }
+    body.theme-day .fn-btn.home:hover { color: #1265a8; border-color: rgba(26,123,191,.45); background: rgba(26,123,191,.12); }
     }
     /* ── FINAL SCORE ── */
     #finalScore{display:none;margin-top:28px;padding:24px;border-radius:16px;background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(0,229,255,.05));border:1px solid rgba(178,102,255,.2);text-align:center;}
@@ -2330,6 +2334,29 @@
   });
 })();
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "第6章：均線——市場成本線的真相",
+  "description": "均線是市場平均持倉成本，看懂均線糾結與假黃金交叉陷阱，不再被坑。",
+  "author": {
+    "@type": "Person",
+    "name": "果凍老師"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "JellyStock",
+    "url": "https://jellystock.com"
+  },
+  "isPartOf": {
+    "@type": "Book",
+    "name": "JellyStock 技術分析教學",
+    "numberOfPages": 10
+  },
+  "position": 6
+}
+</script>
 </head>
 <body>
 
@@ -2992,6 +3019,9 @@
         </div>
       </div>
       <div class="footer-right">
+        <a class="fn-btn home" href="/">
+          🏠 回首頁
+        </a>
         <a class="fn-btn prev" href="/stock_site/features/chapter5.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           第5章

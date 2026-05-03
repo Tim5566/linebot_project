@@ -528,6 +528,10 @@
       .footer-inner { flex-direction: column; align-items: stretch; }
       .footer-right { justify-content: center; }
       .fn-btn { justify-content: center; }
+    .fn-btn.home { color: #7a9ab8; border-color: rgba(0,229,255,.15); background: rgba(0,229,255,.03); }
+    .fn-btn.home:hover { color: #00e5ff; border-color: rgba(0,229,255,.4); background: rgba(0,229,255,.09); box-shadow: 0 0 14px rgba(0,229,255,.15); }
+    body.theme-day .fn-btn.home { color: #2a5080; border-color: rgba(26,101,168,.2); background: rgba(26,123,191,.05); }
+    body.theme-day .fn-btn.home:hover { color: #1265a8; border-color: rgba(26,123,191,.45); background: rgba(26,123,191,.12); }
     }
   
     /* ═══════════════════════════════════════════════════════════════
@@ -2545,6 +2549,29 @@
 
 
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "第10章：實戰案例解析",
+  "description": "成功案例三則完整解析，失敗案例直接解剖——把所有工具整合起來看真實行情。",
+  "author": {
+    "@type": "Person",
+    "name": "果凍老師"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "JellyStock",
+    "url": "https://jellystock.com"
+  },
+  "isPartOf": {
+    "@type": "Book",
+    "name": "JellyStock 技術分析教學",
+    "numberOfPages": 10
+  },
+  "position": 10
+}
+</script>
 </head>
 <body>
 <div class="bg-nebula"></div>
@@ -3368,6 +3395,9 @@
         </div>
       </div>
       <div class="footer-right">
+        <a class="fn-btn home" href="/">
+          🏠 回首頁
+        </a>
         <a class="fn-btn prev" href="/stock_site/features/chapter9.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           第9章
