@@ -4,8 +4,8 @@ push_service.py（Firebase 同步版）
 修正重點：
   1. _run_sync 的 sync_institutional 和 sync_market 分開 try/except
      → institutional 失敗不會連 market 也一起跳過
-  2. 新增 label=9（15:20）專門同步 OTC 三大法人
-     → OTC 獨立排程，不被 TWSE 的 retry 拖累
+  2. 新增 label=9（15:30）專門同步 OTC 三大法人
+     → OTC 獨立排程，從 15:10 改為 15:30，避免與 TWSE 同時搶資源
   3. sync_institutional 改為只跑 TWSE，OTC 由 label=9 負責
   4. start_scheduler() 移到模組層級呼叫
      → Render 用 gunicorn 啟動時也會執行排程
@@ -30,12 +30,12 @@ import pytz
 #   6  = 17:30 注意股
 #   7  = 21:10 大盤融資金額更新
 #   8  = 21:30 借券賣出
-#   9  = 15:20 OTC 三大法人（獨立排程，與 TWSE 不互相拖累）
+#   9  = 15:30 OTC 三大法人（獨立排程，延後至 15:30 避免與 TWSE 搶資源）
 SCHEDULE = [
     (0, 9,  0,  "休市通知"),
     (2, 15, 0,  "投信買賣超"),
     (1, 15, 10, "法人總買賣金額"),
-    (9, 15, 10, "OTC三大法人"),       # ✅ 新增：OTC 獨立排程，與 TWSE 同時觸發但跑在不同 thread
+    (9, 15, 30, "OTC三大法人"),       # ✅ 修正：從 15:10 改為 15:30，讓 TWSE 先跑完再跑 OTC
     (3, 16, 10, "外資買賣超"),
     (4, 16, 10, "自營商買賣超"),
     (5, 17, 30, "處置股"),
@@ -67,7 +67,7 @@ def _run_sync(label: int):
             print(f"[sync_error] label={label} sync_market 失敗: {e}")
 
     elif label == 9:
-        # 15:20：OTC 三大法人（獨立排程，不被 TWSE retry 拖累）
+        # 15:30：OTC 三大法人（延後觸發，不被 TWSE retry 拖累）
         try:
             firebase_sync.sync_otc_institutional()
         except Exception as e:
@@ -93,6 +93,10 @@ def _run_sync(label: int):
             firebase_sync.sync_short_sale()
         except Exception as e:
             print(f"[sync_error] label={label} sync_short_sale 失敗: {e}")
+
+    else:
+        # 未對應的 label（2,3,4,6）不需要額外 sync，資料已在 label=1 時同步完畢
+        print(f"[sync_info] label={label} 無需額外同步，略過")
 
 
 # ── 廣播訊息內容 ──────────────────────────────────────────────────────────────

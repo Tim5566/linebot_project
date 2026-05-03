@@ -5,9 +5,9 @@ firebase_sync.py - 含日期驗證 + 重試等待機制
      → 避免 Render 上多 thread 同時 sleep 造成 OOM 或被強制中斷
   2. 三大法人合併邏輯改為「只寫有值的欄位」
      → 避免某個 API 尚未更新時，把其他股票的欄位污染成 "0"
-  3. DATE_RETRY_WAIT 縮短為 60 秒，MAX_DATE_RETRIES 縮短為 3 次
-     → 最壞情況阻塞時間從 45 分鐘縮到 9 分鐘，降低 Render timeout 風險
-  4. 新增 sync_otc_institutional()，供獨立排程呼叫
+  3. MAX_DATE_RETRIES 縮短為 2 次，DATE_RETRY_WAIT 縮短為 30 秒
+     → 最壞情況阻塞時間從 9 分鐘縮到 3 分鐘，大幅降低 Render timeout 風險
+  4. 新增 sync_otc_institutional()，供獨立排程呼叫（15:30 觸發）
      → OTC 和 TWSE 完全不互相拖累
 """
 from dotenv import load_dotenv
@@ -27,8 +27,8 @@ from zoneinfo import ZoneInfo
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ── 重試設定 ──────────────────────────────────────────────────────────────────
-MAX_DATE_RETRIES = 3    # 次數縮短（原本 5）
-DATE_RETRY_WAIT  = 60   # 等待縮短為 60 秒（原本 180 秒）
+MAX_DATE_RETRIES = 2    # ✅ 修正：從 3 縮短為 2（最壞情況阻塞時間從 9 分鐘降到 3 分鐘）
+DATE_RETRY_WAIT  = 30   # ✅ 修正：從 60 秒縮短為 30 秒
 
 # ── Firebase 初始化（單例）────────────────────────────────────────────────────
 _firebase_initialized = False
@@ -364,7 +364,7 @@ def sync_institutional(today: str = None):
     print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
 
 def sync_otc_institutional(today: str = None):
-    """同步 OTC 三大法人（獨立函式，由獨立排程呼叫，不與 TWSE 互相拖累）。"""
+    """同步 OTC 三大法人（獨立函式，由獨立排程呼叫 15:30 觸發，不與 TWSE 互相拖累）。"""
     if today is None: today = get_today()
     print(f"[sync] 開始同步 OTC 三大法人 date={today}")
     otc_inst = _fetch_otc_institutional(today)
