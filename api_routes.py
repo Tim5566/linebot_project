@@ -116,6 +116,81 @@ def register_api(app):
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
 
+    # ── 重大訊息 API ──────────────────────────────────────────────────────────────
+    @app.route("/api/news")
+    def api_news():
+        from flask import jsonify as _jsonify
+        import requests as _req
+        import urllib3 as _u3
+        import datetime, re as _re
+        _u3.disable_warnings(_u3.exceptions.InsecureRequestWarning)
+
+        tz    = __import__("zoneinfo").ZoneInfo("Asia/Taipei")
+        today = datetime.datetime.now(tz).strftime("%Y%m%d")
+
+        hdrs = {
+            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-TW,zh;q=0.9",
+            "Content-Type":    "application/x-www-form-urlencoded",
+            "Referer":         "https://mopsov.twse.com.tw/mops/web/index",
+            "Origin":          "https://mopsov.twse.com.tw",
+        }
+
+        items = []
+        try:
+            res = _req.post(
+                "https://mopsov.twse.com.tw/mops/web/ajax_index",
+                headers=hdrs, data="stp=1&TYPEK1=all",
+                timeout=15, verify=False
+            )
+            if res.status_code == 200:
+                html = res.text
+                rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", html, _re.DOTALL)
+                for row in rows:
+                    tds = _re.findall(r"<td[^>]*>(.*?)</td>", row, _re.DOTALL)
+                    if len(tds) < 5:
+                        continue
+                    code  = _re.sub(r"<[^>]+>", "", tds[0]).strip()
+                    name  = _re.sub(r"<[^>]+>", "", tds[1]).strip()
+                    date  = _re.sub(r"<[^>]+>", "", tds[2]).strip()
+                    time  = _re.sub(r"<[^>]+>", "", tds[3]).strip()
+                    # title from button title attribute
+                    tm = _re.search(r'title="([^"]+)"', tds[4])
+                    if not tm:
+                        tm = _re.search(r"title='([^']+)'", tds[4])
+                    title = tm.group(1).replace("\n", " ").strip() if tm else _re.sub(r"<[^>]+>", "", tds[4]).strip()
+                    # skey for link
+                    sm = _re.search(r"skey\.value='([^']+)'", tds[4])
+                    skey = sm.group(1) if sm else ""
+                    if not (code and name and title):
+                        continue
+                    # rough market classification
+                    try:
+                        ci = int(code)
+                        is_otc = (4000 <= ci <= 4999) or (6000 <= ci <= 6999) or ci >= 8000
+                    except ValueError:
+                        is_otc = False
+                    items.append({
+                        "source": "OTC"  if is_otc else "TWSE",
+                        "label":  "上櫃" if is_otc else "上市",
+                        "code":   code,
+                        "name":   name,
+                        "date":   date,
+                        "time":   time,
+                        "title":  title[:60] + ("..." if len(title) > 60 else ""),
+                        "link":   "https://mops.twse.com.tw/mops/web/t05sr01_1",
+                        "skey":   skey,
+                    })
+                print(f"[api/news] 抓到 {len(items)} 筆重大訊息")
+            else:
+                print(f"[api/news] HTTP {res.status_code}")
+        except Exception as e:
+            print(f"[api/news] 失敗: {e}")
+
+        return jsonify({"date": today, "count": len(items), "data": items})
+
+
     # ── 財經新聞頁 ───────────────────────────────────────────────────────────────
     @app.route("/stock_site/news/news.html")
     def page_news():

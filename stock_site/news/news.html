@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>財經新聞 — JellyStock 盤後雷達</title>
-  <meta name="description" content="台股財經即時新聞，整合鉅亨網、MoneyDJ、經濟日報最新報導，每30分鐘自動更新。"/>
-  <meta property="og:title" content="財經新聞 — JellyStock 盤後雷達"/>
-  <meta property="og:description" content="台股財經即時新聞，整合多家媒體最新報導。"/>
+  <title>重大訊息 — JellyStock 盤後雷達</title>
+  <meta name="description" content="台股上市上櫃今日重大訊息公告，資料來源 TWSE、TPEx 官方，即時更新。"/>
+  <meta property="og:title" content="重大訊息 — JellyStock 盤後雷達"/>
+  <meta property="og:description" content="台股上市上櫃今日重大訊息公告，資料來源 TWSE、TPEx 官方。"/>
   <meta property="og:image" content="/images/jelly.png"/>
   <link rel="icon" type="image/png" href="/images/jelly.png"/>
   <link rel="apple-touch-icon" href="/images/jelly.png"/>
@@ -14,207 +14,130 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg:        #03060d;
-      --surface:   #070d1a;
-      --surface2:  #0b1220;
-      --border:    #0e1828;
-      --border2:   #152234;
-      --accent:    #00e5ff;
-      --accent2:   #0099bb;
-      --green:     #00e676;
-      --red:       #ff3d5a;
-      --yellow:    #ffd600;
-      --text:      #d4e4f7;
-      --text-dim:  #7a9ab8;
-      --text-faint:#4a6888;
+      --bg:#03060d; --surface:#070d1a; --surface2:#0b1220;
+      --border:rgba(0,229,255,.1); --accent:#00e5ff; --green:#00e676;
+      --red:#ff3d5a; --yellow:#ffd600;
+      --text:#d4e4f7; --text-dim:#7a9ab8; --text-faint:#4a6888;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; min-height:100vh; }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html,body{ background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; min-height:100vh; }
 
-    /* ── Header ── */
-    header {
-      position: sticky; top:0; z-index:100;
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:100;
       height:56px; display:flex; align-items:center; justify-content:space-between;
       padding:0 20px;
-      background:rgba(3,6,13,.92); backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(0,229,255,.1);
+      background:rgba(3,6,13,.93); backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
     }
-    .header-left { display:flex; align-items:center; gap:14px; }
-    .back-btn {
+    .header-left{ display:flex; align-items:center; gap:14px; }
+    .back-btn{
       display:flex; align-items:center; gap:7px;
       color:var(--text-dim); text-decoration:none;
       font-family:'Share Tech Mono',monospace; font-size:.72rem; letter-spacing:.08em;
       padding:7px 12px; border-radius:10px;
-      border:1px solid rgba(0,229,255,.12);
-      background:rgba(0,229,255,.03);
+      border:1px solid rgba(0,229,255,.12); background:rgba(0,229,255,.03);
       transition:all .2s;
     }
-    .back-btn:hover { color:var(--accent); border-color:rgba(0,229,255,.3); background:rgba(0,229,255,.07); }
-    .back-btn svg { width:14px; height:14px; }
-    .header-title {
-      font-family:'Orbitron',monospace; font-size:.82rem; font-weight:700;
-      color:#fff; letter-spacing:.06em;
-    }
-    .header-title span { color:var(--accent); }
-    .refresh-info {
-      font-family:'Share Tech Mono',monospace; font-size:.62rem;
-      color:var(--text-faint); letter-spacing:.06em;
-      display:flex; align-items:center; gap:8px;
-    }
-    .refresh-dot {
-      width:6px; height:6px; border-radius:50%;
-      background:var(--green);
-      box-shadow:0 0 8px var(--green);
-      animation:pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .back-btn:hover{ color:var(--accent); border-color:rgba(0,229,255,.3); background:rgba(0,229,255,.07); }
+    .back-btn svg{ width:14px; height:14px; }
+    .header-title{ font-family:'Orbitron',monospace; font-size:.82rem; font-weight:700; color:#fff; letter-spacing:.06em; }
+    .header-title span{ color:var(--accent); }
+    .refresh-info{ font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.06em; display:flex; align-items:center; gap:8px; }
+    .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 2s ease-in-out infinite; }
+    @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── Main ── */
-    main { max-width:860px; margin:0 auto; padding:28px 16px 60px; }
+    /* Main */
+    main{ max-width:900px; margin:0 auto; padding:28px 16px 60px; }
 
-    /* ── Page Title ── */
-    .page-title-wrap {
-      margin-bottom:28px;
-      padding-bottom:20px;
-      border-bottom:1px solid rgba(0,229,255,.08);
-    }
-    .page-tag {
-      font-family:'Share Tech Mono',monospace; font-size:.65rem;
-      color:var(--accent); letter-spacing:.3em; opacity:.7;
-      margin-bottom:8px;
-    }
-    .page-title {
-      font-family:'Orbitron',monospace; font-size:1.4rem; font-weight:900;
-      color:#fff; letter-spacing:.04em;
-      text-shadow:0 0 40px rgba(0,229,255,.3);
-    }
-    .page-desc {
-      font-size:.8rem; color:var(--text-dim); margin-top:8px; line-height:1.7;
-      font-family:'Share Tech Mono',monospace; letter-spacing:.04em;
-    }
+    /* Page Title */
+    .page-title-wrap{ margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid rgba(0,229,255,.08); }
+    .page-tag{ font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--accent); letter-spacing:.3em; opacity:.7; margin-bottom:8px; }
+    .page-title{ font-family:'Orbitron',monospace; font-size:1.35rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); }
+    .page-desc{ font-size:.78rem; color:var(--text-dim); margin-top:8px; line-height:1.7; font-family:'Share Tech Mono',monospace; letter-spacing:.04em; }
 
-    /* ── Source Filter Tabs ── */
-    .filter-bar {
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-bottom:24px;
-    }
-    .filter-btn {
+    /* Filter */
+    .filter-bar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+    .filter-btn{
       font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:.1em;
-      padding:7px 14px; border-radius:20px; cursor:pointer;
-      border:1px solid rgba(0,229,255,.15);
-      background:rgba(0,229,255,.03); color:var(--text-dim);
-      transition:all .2s; white-space:nowrap;
+      padding:7px 16px; border-radius:20px; cursor:pointer;
+      border:1px solid rgba(0,229,255,.15); background:rgba(0,229,255,.03); color:var(--text-dim);
+      transition:all .2s;
     }
-    .filter-btn.active, .filter-btn:hover {
-      color:var(--accent); border-color:rgba(0,229,255,.4);
-      background:rgba(0,229,255,.08);
-      box-shadow:0 0 12px rgba(0,229,255,.12);
-    }
-    .filter-btn.active { font-weight:700; }
+    .filter-btn.active, .filter-btn:hover{ color:var(--accent); border-color:rgba(0,229,255,.4); background:rgba(0,229,255,.08); box-shadow:0 0 12px rgba(0,229,255,.12); }
 
-    /* ── Source color badges ── */
-    .src-cnyes  { --src-color: #00b4d8; }
-    .src-moneydj{ --src-color: #06d6a0; }
-    .src-udn    { --src-color: #f4a261; }
-    .src-badge {
-      font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.12em;
-      padding:3px 8px; border-radius:6px;
-      background:rgba(var(--src-rgb),.12);
-      color:var(--src-color);
-      border:1px solid rgba(var(--src-rgb),.25);
-      white-space:nowrap; flex-shrink:0;
-    }
-    .src-cnyes  .src-badge { --src-rgb:0,180,216; }
-    .src-moneydj .src-badge { --src-rgb:6,214,160; }
-    .src-udn    .src-badge { --src-rgb:244,162,97; }
+    /* Stats */
+    .stats-bar{ display:flex; gap:16px; align-items:center; margin-bottom:16px; font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.06em; flex-wrap:wrap; }
+    .stats-bar strong{ color:var(--accent); }
 
-    /* ── News Cards ── */
-    .news-list { display:flex; flex-direction:column; gap:10px; }
+    /* News list */
+    .news-list{ display:flex; flex-direction:column; gap:8px; }
 
-    .news-card {
-      display:flex; flex-direction:column; gap:0;
-      background:var(--surface);
-      border:1px solid rgba(0,229,255,.07);
-      border-radius:14px; overflow:hidden;
+    .news-card{
+      display:flex; align-items:flex-start; gap:14px;
+      padding:14px 18px; border-radius:12px;
+      background:var(--surface); border:1px solid rgba(0,229,255,.07);
       text-decoration:none; color:inherit;
-      transition:all .22s cubic-bezier(.22,1,.36,1);
-      position:relative;
+      transition:all .2s cubic-bezier(.22,1,.36,1);
+      position:relative; overflow:hidden;
     }
-    .news-card::before {
-      content:''; position:absolute; left:0; top:0; bottom:0;
-      width:2px; background:var(--src-color);
-      opacity:.5; transition:opacity .2s;
+    .news-card::before{
+      content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+      background:var(--src-color,var(--accent)); opacity:.5; transition:opacity .2s;
     }
-    .news-card:hover { border-color:rgba(0,229,255,.18); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,.3); }
-    .news-card:hover::before { opacity:1; }
+    .news-card:hover{ border-color:rgba(0,229,255,.2); transform:translateX(3px); box-shadow:0 4px 24px rgba(0,0,0,.3); }
+    .news-card:hover::before{ opacity:1; }
 
-    .card-inner { padding:14px 16px 14px 20px; display:flex; align-items:flex-start; gap:12px; }
+    /* Labels */
+    .label-twse{ --src-color:#00e5ff; }
+    .label-otc { --src-color:#06d6a0; }
 
-    .card-meta { display:flex; align-items:center; gap:8px; margin-bottom:7px; flex-wrap:wrap; }
-    .card-time {
-      font-family:'Share Tech Mono',monospace; font-size:.6rem;
-      color:var(--text-faint); letter-spacing:.06em;
+    .card-left{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:52px; }
+    .src-badge{
+      font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.1em;
+      padding:3px 8px; border-radius:6px;
+      color:var(--src-color,var(--accent));
+      background:rgba(0,229,255,.06);
+      border:1px solid rgba(0,229,255,.15);
+      white-space:nowrap;
     }
-    .card-title {
-      font-size:.88rem; font-weight:500; line-height:1.55;
-      color:var(--text);
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-      transition:color .2s;
-    }
-    .news-card:hover .card-title { color:#fff; }
+    .label-otc .src-badge{ color:#06d6a0; background:rgba(6,214,160,.06); border-color:rgba(6,214,160,.2); }
+    .card-code{ font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--text-dim); letter-spacing:.06em; }
 
-    .card-arrow {
-      flex-shrink:0; margin-left:auto; margin-top:2px;
-      width:20px; height:20px;
-      display:grid; place-items:center;
-      color:var(--text-faint); transition:color .2s, transform .2s;
-    }
-    .news-card:hover .card-arrow { color:var(--accent); transform:translateX(3px); }
+    .card-body{ flex:1; min-width:0; }
+    .card-meta{ display:flex; align-items:center; gap:10px; margin-bottom:5px; flex-wrap:wrap; }
+    .card-name{ font-size:.82rem; font-weight:700; color:#fff; }
+    .card-time{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); }
+    .card-title{ font-size:.84rem; color:var(--text-dim); line-height:1.55; }
+    .news-card:hover .card-title{ color:var(--text); }
 
-    /* ── Loading / Error State ── */
-    .state-box {
+    .card-arrow{ flex-shrink:0; color:var(--text-faint); transition:color .2s, transform .2s; margin-top:2px; }
+    .news-card:hover .card-arrow{ color:var(--accent); transform:translateX(3px); }
+
+    /* State boxes */
+    .state-box{
       text-align:center; padding:60px 20px;
-      font-family:'Share Tech Mono',monospace;
-      font-size:.78rem; color:var(--text-faint); letter-spacing:.08em;
-      border:1px solid rgba(0,229,255,.07); border-radius:14px;
-      background:var(--surface);
+      font-family:'Share Tech Mono',monospace; font-size:.76rem; color:var(--text-faint); letter-spacing:.08em;
+      border:1px solid rgba(0,229,255,.07); border-radius:14px; background:var(--surface);
     }
-    .state-box .icon { font-size:2rem; margin-bottom:16px; }
-    .loading-spinner {
-      width:28px; height:28px; margin:0 auto 16px;
-      border:2px solid rgba(0,229,255,.15);
-      border-top-color:var(--accent);
-      border-radius:50%; animation:spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform:rotate(360deg); } }
+    .state-icon{ font-size:2rem; margin-bottom:14px; }
+    .spinner{ width:28px; height:28px; margin:0 auto 16px; border:2px solid rgba(0,229,255,.15); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin{ to{transform:rotate(360deg)} }
 
-    /* ── Stats bar ── */
-    .stats-bar {
-      display:flex; gap:16px; align-items:center;
-      margin-bottom:16px;
-      font-family:'Share Tech Mono',monospace; font-size:.62rem;
-      color:var(--text-faint); letter-spacing:.06em;
-      flex-wrap:wrap;
+    /* Footer note */
+    .footer-note{
+      margin-top:28px; padding:14px 18px;
+      background:rgba(0,229,255,.02); border:1px solid rgba(0,229,255,.06); border-radius:12px;
+      font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.05em; line-height:1.8;
     }
-    .stats-bar strong { color:var(--accent); }
 
-    /* ── Footer note ── */
-    .footer-note {
-      margin-top:32px; padding:16px 18px;
-      background:rgba(0,229,255,.02); border:1px solid rgba(0,229,255,.06);
-      border-radius:12px;
-      font-family:'Share Tech Mono',monospace; font-size:.64rem;
-      color:var(--text-faint); letter-spacing:.05em; line-height:1.8;
-    }
-    .footer-note a { color:var(--text-dim); }
-
-    /* ── Mobile ── */
+    /* Mobile */
     @media(max-width:600px){
-      header { padding:0 12px; }
-      main { padding:20px 12px 60px; }
-      .page-title { font-size:1.1rem; }
-      .card-title { font-size:.84rem; }
-      .refresh-info span { display:none; }
+      header{ padding:0 12px; }
+      main{ padding:20px 12px 60px; }
+      .page-title{ font-size:1.1rem; }
+      .card-left{ min-width:44px; }
+      .refresh-info span:last-child{ display:none; }
     }
   </style>
 </head>
@@ -223,190 +146,130 @@
 <header>
   <div class="header-left">
     <a class="back-btn" href="/">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
     </a>
     <div class="header-title">Jelly<span>Stock</span></div>
   </div>
   <div class="refresh-info">
-    <div class="refresh-dot"></div>
-    <span>每30分鐘更新</span>
-    <span id="lastUpdate">--</span>
+    <div class="live-dot"></div>
+    <span id="updateTime">載入中...</span>
   </div>
 </header>
 
 <main>
   <div class="page-title-wrap">
-    <div class="page-tag">FINANCIAL NEWS · 財經新聞</div>
-    <div class="page-title">即時財經新聞</div>
-    <div class="page-desc">整合國內主要財經媒體 · 資料來源：鉅亨網 / MoneyDJ / 經濟日報 · 點擊標題前往原始報導</div>
+    <div class="page-tag">MAJOR ANNOUNCEMENT · 重大訊息</div>
+    <div class="page-title">今日重大訊息公告</div>
+    <div class="page-desc">資料來源：TWSE 上市 / TPEx 上櫃 官方公告 · 點擊可至公開資訊觀測站查看詳細內容</div>
   </div>
 
   <div class="filter-bar">
-    <button class="filter-btn active" onclick="filterNews('all')">全部</button>
-    <button class="filter-btn" onclick="filterNews('cnyes')">鉅亨網</button>
-    <button class="filter-btn" onclick="filterNews('moneydj')">MoneyDJ</button>
-    <button class="filter-btn" onclick="filterNews('udn')">經濟日報</button>
+    <button class="filter-btn active" onclick="filterNews('all', this)">全部</button>
+    <button class="filter-btn" onclick="filterNews('TWSE', this)">上市（TWSE）</button>
+    <button class="filter-btn" onclick="filterNews('OTC', this)">上櫃（OTC）</button>
   </div>
 
   <div class="stats-bar">
-    <span>共 <strong id="newsCount">--</strong> 則新聞</span>
+    <span>共 <strong id="newsCount">--</strong> 則公告</span>
     <span>·</span>
-    <span>上次更新：<strong id="updateTime">載入中...</strong></span>
+    <span>日期：<strong id="newsDate">--</strong></span>
   </div>
 
   <div class="news-list" id="newsList">
     <div class="state-box">
-      <div class="loading-spinner"></div>
-      正在抓取最新財經新聞...
+      <div class="spinner"></div>
+      正在載入今日重大訊息...
     </div>
   </div>
 
   <div class="footer-note">
-    ⚠️ 本頁新聞內容來自各媒體 RSS 公開訂閱源，版權歸原始媒體所有，點擊標題將跳轉至原始報導頁面。本站僅提供標題摘要與連結，不轉載任何內文。
+    ⚠️ 本頁資料來源為 TWSE 台灣證券交易所及 TPEx 證券櫃檯買賣中心官方公告，版權歸原始單位所有。本站僅提供摘要查詢，點擊後將跳轉至公開資訊觀測站（MOPS）查看完整公告。
   </div>
 </main>
 
 <script>
-// ── RSS 來源設定 ──────────────────────────────────────────────────────────────
-const RSS_SOURCES = [
-  {
-    id:    'cnyes',
-    name:  '鉅亨網',
-    color: '#00b4d8',
-    // 透過 rss2json 免費 proxy 解決 CORS
-    url:   'https://api.rss2json.com/v1/api.json?rss_url=' +
-           encodeURIComponent('https://news.cnyes.com/rss/cat/tw_stock')
-  },
-  {
-    id:    'moneydj',
-    name:  'MoneyDJ',
-    color: '#06d6a0',
-    url:   'https://api.rss2json.com/v1/api.json?rss_url=' +
-           encodeURIComponent('https://www.moneydj.com/KMDJ/rss/RssNewsList.aspx?svc=NW')
-  },
-  {
-    id:    'udn',
-    name:  '經濟日報',
-    color: '#f4a261',
-    url:   'https://api.rss2json.com/v1/api.json?rss_url=' +
-           encodeURIComponent('https://money.udn.com/rssfeed/news/1001/5591?ch=money')
-  },
-];
-
-// ── 狀態 ──────────────────────────────────────────────────────────────────────
-let _allNews    = [];
+let _allNews = [];
 let _activeFilter = 'all';
-let _refreshTimer = null;
-const REFRESH_MS  = 30 * 60 * 1000; // 30 分鐘
 
-// ── 相對時間 ──────────────────────────────────────────────────────────────────
-function relativeTime(dateStr) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1)  return '剛剛';
-  if (m < 60) return `${m} 分鐘前`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} 小時前`;
-  return `${Math.floor(h / 24)} 天前`;
-}
-
-// ── 抓單一來源 ────────────────────────────────────────────────────────────────
-async function fetchSource(src) {
+async function loadNews() {
+  document.getElementById('newsList').innerHTML = `
+    <div class="state-box"><div class="spinner"></div>正在載入今日重大訊息...</div>`;
   try {
-    const res  = await fetch(src.url);
+    const res  = await fetch('/api/news');
     const data = await res.json();
-    if (data.status !== 'ok') return [];
-    return (data.items || []).slice(0, 20).map(item => ({
-      id:      src.id,
-      name:    src.name,
-      color:   src.color,
-      title:   item.title?.trim() || '',
-      link:    item.link  || item.url || '#',
-      pubDate: item.pubDate || '',
-    }));
+
+    _allNews = data.data || [];
+
+    // Update date display
+    const d = data.date || '';
+    if (d.length === 8) {
+      document.getElementById('newsDate').textContent =
+        `${d.slice(0,4)}/${d.slice(4,6)}/${d.slice(6,8)}`;
+    }
+
+    renderNews();
   } catch(e) {
-    console.warn(`[news] ${src.name} 抓取失敗:`, e);
-    return [];
+    document.getElementById('newsList').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">⚠️</div>
+        載入失敗，請稍後再試
+      </div>`;
   }
 }
 
-// ── 抓全部來源 ────────────────────────────────────────────────────────────────
-async function fetchAllNews() {
-  document.getElementById('newsList').innerHTML = `
-    <div class="state-box">
-      <div class="loading-spinner"></div>
-      正在抓取最新財經新聞...
-    </div>`;
-
-  const results = await Promise.all(RSS_SOURCES.map(fetchSource));
-  _allNews = results
-    .flat()
-    .filter(n => n.title)
-    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-
-  // 更新時間
-  const now = new Date();
-  const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-  document.getElementById('updateTime').textContent = timeStr;
-  document.getElementById('lastUpdate').textContent  = timeStr;
-
-  renderNews();
-
-  // 設定下次刷新
-  clearTimeout(_refreshTimer);
-  _refreshTimer = setTimeout(fetchAllNews, REFRESH_MS);
-}
-
-// ── 渲染新聞 ──────────────────────────────────────────────────────────────────
 function renderNews() {
   const list = _activeFilter === 'all'
     ? _allNews
-    : _allNews.filter(n => n.id === _activeFilter);
+    : _allNews.filter(n => n.source === _activeFilter);
 
   document.getElementById('newsCount').textContent = list.length;
+
+  // Update time
+  const now = new Date();
+  document.getElementById('updateTime').textContent =
+    `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} 更新`;
 
   if (!list.length) {
     document.getElementById('newsList').innerHTML = `
       <div class="state-box">
-        <div class="icon">📭</div>
-        目前沒有新聞資料，請稍後再試
+        <div class="state-icon">📭</div>
+        今日尚無重大訊息公告
       </div>`;
     return;
   }
 
   document.getElementById('newsList').innerHTML = list.map(n => `
-    <a class="news-card src-${n.id}" href="${n.link}" target="_blank" rel="noopener noreferrer">
-      <div class="card-inner">
-        <div style="flex:1;min-width:0;">
-          <div class="card-meta">
-            <span class="src-badge">${n.name}</span>
-            <span class="card-time">${relativeTime(n.pubDate)}</span>
-          </div>
-          <div class="card-title">${n.title}</div>
+    <a class="news-card label-${n.source.toLowerCase()}"
+       href="${n.link}" target="_blank" rel="noopener noreferrer">
+      <div class="card-left">
+        <span class="src-badge">${n.label}</span>
+        <span class="card-code">${n.code || '--'}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-name">${n.name || '--'}</span>
+          <span class="card-time">${n.time || ''}</span>
         </div>
-        <div class="card-arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </div>
+        <div class="card-title">${n.title || '--'}</div>
+      </div>
+      <div class="card-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
       </div>
     </a>
   `).join('');
 }
 
-// ── 篩選 ──────────────────────────────────────────────────────────────────────
-function filterNews(id) {
+function filterNews(id, btn) {
   _activeFilter = id;
-  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   renderNews();
 }
 
-// ── 啟動 ──────────────────────────────────────────────────────────────────────
-fetchAllNews();
+loadNews();
 </script>
 </body>
 </html>
