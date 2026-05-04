@@ -25,26 +25,30 @@
     /* Header */
     header{
       position:sticky; top:0; z-index:100;
-      height:56px; display:flex; align-items:center; justify-content:space-between;
+      height:58px; display:flex; align-items:center; justify-content:space-between;
       padding:0 20px;
       background:rgba(3,6,13,.93); backdrop-filter:blur(12px);
-      border-bottom:1px solid var(--border);
+      border-bottom:1px solid rgba(0,229,255,.1);
     }
-    .header-left{ display:flex; align-items:center; gap:14px; }
+    .header-left{ display:flex; align-items:center; gap:0; padding-left:4px; }
+    .header-right{ display:flex; align-items:center; gap:16px; }
+    .logo{ display:flex; align-items:center; gap:12px; }
+    .logo-icon{ width:44px; height:44px; border-radius:10px; display:grid; place-items:center; position:relative; flex-shrink:0; overflow:visible; }
+    .logo-icon img{ width:46px; height:46px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(0,229,255,.4)); }
+    .logo-text{ font-family:'Orbitron',monospace; font-size:1.15rem; font-weight:900; letter-spacing:.04em; color:#fff; text-shadow:0 0 24px rgba(0,229,255,.45); margin:0; padding:0; }
+    .logo-sub{ font-family:'Noto Sans TC',sans-serif; font-size:.62rem; font-weight:300; color:var(--accent); letter-spacing:.12em; opacity:.7; margin-top:3px; }
     .back-btn{
       display:flex; align-items:center; gap:7px;
       color:var(--text-dim); text-decoration:none;
-      font-family:'Share Tech Mono',monospace; font-size:.72rem; letter-spacing:.08em;
-      padding:7px 12px; border-radius:10px;
+      font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:.08em;
+      padding:7px 14px; border-radius:10px;
       border:1px solid rgba(0,229,255,.12); background:rgba(0,229,255,.03);
-      transition:all .2s;
+      transition:all .2s; white-space:nowrap;
     }
     .back-btn:hover{ color:var(--accent); border-color:rgba(0,229,255,.3); background:rgba(0,229,255,.07); }
     .back-btn svg{ width:14px; height:14px; }
-    .header-title{ font-family:'Orbitron',monospace; font-size:.82rem; font-weight:700; color:#fff; letter-spacing:.06em; }
-    .header-title span{ color:var(--accent); }
-    .refresh-info{ font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.06em; display:flex; align-items:center; gap:8px; }
-    .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 2s ease-in-out infinite; }
+    .refresh-info{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); letter-spacing:.06em; display:flex; align-items:center; gap:7px; }
+    .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 2s ease-in-out infinite; flex-shrink:0; }
     @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* Main */
@@ -74,19 +78,15 @@
     .news-list{ display:flex; flex-direction:column; gap:8px; }
 
     .news-card{
-      display:flex; align-items:flex-start; gap:14px;
+      display:flex; align-items:center; gap:14px;
       padding:14px 18px; border-radius:12px;
       background:var(--surface); border:1px solid rgba(0,229,255,.07);
-      text-decoration:none; color:inherit;
-      transition:all .2s cubic-bezier(.22,1,.36,1);
-      position:relative; overflow:hidden;
+      color:inherit; position:relative; overflow:hidden;
     }
     .news-card::before{
       content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-      background:var(--src-color,var(--accent)); opacity:.5; transition:opacity .2s;
+      background:var(--src-color,var(--accent)); opacity:.6;
     }
-    .news-card:hover{ border-color:rgba(0,229,255,.2); transform:translateX(3px); box-shadow:0 4px 24px rgba(0,0,0,.3); }
-    .news-card:hover::before{ opacity:1; }
 
     /* Labels */
     .label-twse{ --src-color:#00e5ff; }
@@ -111,8 +111,16 @@
     .card-title{ font-size:.84rem; color:var(--text-dim); line-height:1.55; }
     .news-card:hover .card-title{ color:var(--text); }
 
-    .card-arrow{ flex-shrink:0; color:var(--text-faint); transition:color .2s, transform .2s; margin-top:2px; }
-    .news-card:hover .card-arrow{ color:var(--accent); transform:translateX(3px); }
+    .mops-btn{
+      flex-shrink:0; display:flex; align-items:center; gap:6px;
+      font-family:'Share Tech Mono',monospace; font-size:.62rem; letter-spacing:.08em;
+      padding:6px 12px; border-radius:8px; text-decoration:none;
+      color:var(--accent); border:1px solid rgba(0,229,255,.2);
+      background:rgba(0,229,255,.04); white-space:nowrap;
+      transition:all .2s;
+    }
+    .mops-btn:hover{ background:rgba(0,229,255,.1); border-color:rgba(0,229,255,.4); box-shadow:0 0 12px rgba(0,229,255,.15); }
+    .mops-btn svg{ width:12px; height:12px; flex-shrink:0; }
 
     /* State boxes */
     .state-box{
@@ -133,11 +141,20 @@
 
     /* Mobile */
     @media(max-width:600px){
-      header{ padding:0 12px; }
+      header{ padding:0 10px; height:54px; }
+      .logo-icon{ width:38px; height:38px; }
+      .logo-icon img{ width:40px; height:40px; }
+      .logo-text{ font-size:.72rem; }
+      .logo-sub{ display:none; }
+      .back-btn{ font-size:.62rem; padding:6px 10px; }
+      .back-btn svg{ display:none; }
+      .refresh-info{ display:none; }
       main{ padding:20px 12px 60px; }
       .page-title{ font-size:1.1rem; }
       .card-left{ min-width:44px; }
-      .refresh-info span:last-child{ display:none; }
+      .mops-btn span{ display:none; }
+      .card-name{ font-size:.8rem; }
+      .card-title{ font-size:.8rem; }
     }
   </style>
 </head>
@@ -145,15 +162,25 @@
 
 <header>
   <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock Logo"/>
+      </div>
+      <div>
+        <div class="logo-text">Jelly<span style="color:var(--accent);">Stock</span></div>
+        <div class="logo-sub">重大訊息公告</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="refresh-info">
+      <div class="live-dot"></div>
+      <span id="updateTime">載入中...</span>
+    </div>
     <a class="back-btn" href="/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
     </a>
-    <div class="header-title">Jelly<span>Stock</span></div>
-  </div>
-  <div class="refresh-info">
-    <div class="live-dot"></div>
-    <span id="updateTime">載入中...</span>
   </div>
 </header>
 
@@ -240,7 +267,7 @@ function renderNews() {
   }
 
   document.getElementById('newsList').innerHTML = list.map((n,i) => `
-    <div class="news-card label-${n.source.toLowerCase()}" onclick="openMops(${i})" style="cursor:pointer;">
+    <div class="news-card label-${n.source.toLowerCase()}">
       <div class="card-left">
         <span class="src-badge">${n.label}</span>
         <span class="card-code">${n.code || '--'}</span>
@@ -252,11 +279,15 @@ function renderNews() {
         </div>
         <div class="card-title">${n.title || '--'}</div>
       </div>
-      <div class="card-arrow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
+      <a class="mops-btn"
+         href="https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}"
+         target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
         </svg>
-      </div>
+        MOPS查詢
+      </a>
     </div>
   `).join('');
 }
@@ -268,17 +299,7 @@ function filterNews(id, btn) {
   renderNews();
 }
 
-// Open MOPS company announcement search page
-function openMops(idx) {
-  const list = _activeFilter === 'all'
-    ? _allNews
-    : _allNews.filter(n => n.source === _activeFilter);
-  const n = list[idx];
-  if (!n) return;
-  // Link to MOPS company search - user can see all announcements for this company
-  const url = `https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}`;
-  window.open(url, '_blank');
-}
+
 
 loadNews();
 </script>
