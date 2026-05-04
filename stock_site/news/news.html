@@ -268,61 +268,16 @@ function filterNews(id, btn) {
   renderNews();
 }
 
-// Open MOPS detail via POST form
+// Open MOPS company announcement search page
 function openMops(idx) {
   const list = _activeFilter === 'all'
     ? _allNews
     : _allNews.filter(n => n.source === _activeFilter);
   const n = list[idx];
   if (!n) return;
-
-  const skey = n.skey || '';
-  if (!skey) {
-    window.open('https://mops.twse.com.tw/mops/#/web/home', '_blank');
-    return;
-  }
-
-  // Parse skey: companyId + date(YYYYMMDD) + seqNo
-  // e.g. 2258202605021 => co_id=2258, date=20260502, seq=1
-  const co_id   = n.code;
-  const seqno   = skey.slice(-1);
-  const dateRaw = skey.slice(co_id.length, co_id.length + 8);
-  const spokeDate = dateRaw;
-  const spokeTime = n.time ? n.time.replace(/:/g, '') : '';
-
-  // Build and submit POST form to old MOPS
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = 'https://mops.twse.com.tw/mops/web/ajax_t05sr01_1';
-  form.target = '_blank';
-
-  const fields = {
-    step:         '1',
-    firstin:      'true',
-    off:          '1',
-    TYPEK:        'all',
-    co_id:        co_id,
-    COMPANY_ID:   co_id,
-    COMPANY_NAME: n.name,
-    SPOKE_DATE:   spokeDate,
-    SPOKE_TIME:   spokeTime,
-    SEQ_NO:       seqno,
-    skey:         skey,
-    newstuff:     '',
-    hhc_co_name:  n.name,
-  };
-
-  Object.entries(fields).forEach(([k, v]) => {
-    const input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = k;
-    input.value = v;
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  // Link to MOPS company search - user can see all announcements for this company
+  const url = `https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}`;
+  window.open(url, '_blank');
 }
 
 loadNews();
