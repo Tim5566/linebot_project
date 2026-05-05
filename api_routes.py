@@ -151,8 +151,23 @@ def register_api(app):
                 if not tm:
                     tm = _re.search(r"title='([^']+)'", tds[4])
                 title = tm.group(1).replace("\n", " ").replace("\r", " ").strip() if tm else _re.sub(r"<[^>]+>", "", tds[4]).strip()
-                sm    = _re.search(r"skey\.value='([^']+)'", tds[4])
+                # Try multiple skey patterns (different MOPS endpoints use different formats)
+                sm = (_re.search(r"skey\.value='([^']+)'", tds[4]) or
+                      _re.search(r'skey\.value="([^"]+)"', tds[4]) or
+                      _re.search(r"skey=([A-Za-z0-9]+)", tds[4]) or
+                      _re.search(r"'skey','([^']+)'", tds[4]))
                 skey  = sm.group(1) if sm else ""
+                # If skey still empty, try to construct from code+date+seq
+                if not skey and code and date:
+                    # date format: 115/05/05 -> 20260505
+                    try:
+                        parts = date.replace(" ","").split("/")
+                        if len(parts) == 3:
+                            yr = int(parts[0]) + 1911
+                            skey_date = f"{yr}{parts[1]}{parts[2]}"
+                            skey = f"{code}{skey_date}1"
+                    except Exception:
+                        pass
                 if not (code and name and title):
                     continue
                 try:
