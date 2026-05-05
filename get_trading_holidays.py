@@ -10,9 +10,14 @@ headers = {"User-Agent": "Mozilla/5.0"}
 Trading_day = {"國曆新年開始交易日", "農曆春節前最後交易日"}
 
 def _fetch_holidays():
-    res  = requests.get(API_Holidays, headers=headers, verify=False)
-    data = res.json()
-    return {item[0]: item[1] for item in data["data"]}
+    # ✅ 修正：加上 timeout 和 try/except，API 失敗時回傳空字典不崩潰
+    try:
+        res  = requests.get(API_Holidays, headers=headers, verify=False, timeout=10)
+        data = res.json()
+        return {item[0]: item[1] for item in data["data"]}
+    except Exception as e:
+        print(f"[holidays] API 失敗: {e}，回傳空字典，預設為交易日")
+        return {}  # 失敗時回傳空字典，is_trading_day 會預設為交易日
 
 def _is_trading_day_for(d: date, holidays: dict) -> bool:
     if d.weekday() >= 5:

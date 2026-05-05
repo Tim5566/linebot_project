@@ -3,14 +3,12 @@ push_service.py（Firebase 同步版）
 ────────────────────────────────────────────────────────────────────────────
 修正重點：
   1. 所有排程時間點（除了 label=0 休市通知）都自動呼叫 /api/sync_test
-     → 確保每個時段資料更新後都能完整寫入 Firebase
   2. 同時段的 label 合併為一個，避免重複呼叫 sync_test
-     → 16:10 外資+自營商合併、17:30 處置股+注意股合併
   3. 廣播簡化：
      - 15:00 發送今日盤後更新時間表
      - 15:10 發送法人總買賣金額更新提示 + 大盤數據（同一則）
      - 21:10 發送大盤融資金額更新提示 + 數據（同一則）
-  4. 其他時段只做背景同步，不廣播
+  4. is_trading_day() 加 try/except，API 失敗時預設繼續執行，不讓排程崩潰
 ────────────────────────────────────────────────────────────────────────────
 """
 
@@ -85,9 +83,6 @@ def _call_sync_test():
 
 # ── Firebase 同步任務（各時段觸發）──────────────────────────────────────────
 def _run_sync(label: int):
-    if not is_trading_day():
-        return
-
     if label == 0:
         return  # 休市通知，不需要同步
 
@@ -97,7 +92,14 @@ def _run_sync(label: int):
 
 # ── 廣播執行 ──────────────────────────────────────────────────────────────────
 def broadcast_post_inf(line_bot_api, label):
-    if not is_trading_day():
+    # ✅ 修正：is_trading_day() 加 try/except，API 失敗時預設繼續執行，不讓排程崩潰
+    try:
+        trading = is_trading_day()
+    except Exception as e:
+        print(f"[trading_day] 判斷失敗，預設為交易日繼續執行: {e}")
+        trading = True
+
+    if not trading:
         if label == 0:
             line_bot_api.broadcast(TextSendMessage(text="📢 今日週末或連假未開盤❗"))
         return
@@ -112,13 +114,13 @@ def broadcast_post_inf(line_bot_api, label):
     elif label == 1:
         # 15:10 廣播法人總買賣金額更新提示 + 大盤數據（同一則）
         line_bot_api.broadcast(TextSendMessage(
-            text="📢 今盤後，法人總買賣金額已更新❗\n" + market_pnfo()
+            text="📢 今盤後，法人總買賣金額已更新❗\n\n" + market_pnfo()
         ))
 
     elif label == 7:
         # 21:10 廣播大盤融資金額更新提示 + 數據（同一則）
         line_bot_api.broadcast(TextSendMessage(
-            text="📢 今盤後，大盤融資金額已更新❗\n" + market_pnfo()
+            text="📢 今盤後，大盤融資金額已更新❗\n\n" + market_pnfo()
         ))
 
     # 其他 label：背景同步，不廣播

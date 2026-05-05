@@ -1,14 +1,11 @@
 """
 firebase_sync.py - 含日期驗證 + 重試等待機制
 修正重點：
-  1. _fetch_twse_institutional 改為循序執行（移除 ThreadPoolExecutor）
-     → 避免 Render 上多 thread 同時 sleep 造成 OOM 或被強制中斷
-  2. 三大法人合併邏輯改為「只寫有值的欄位」
-     → 避免某個 API 尚未更新時，把其他股票的欄位污染成 "0"
-  3. MAX_DATE_RETRIES 縮短為 2 次，DATE_RETRY_WAIT 縮短為 30 秒
-     → 最壞情況阻塞時間從 9 分鐘縮到 3 分鐘，大幅降低 Render timeout 風險
-  4. 新增 sync_otc_institutional()，供獨立排程呼叫（15:30 觸發）
-     → OTC 和 TWSE 完全不互相拖累
+  1. sync_short_sale 加上空字串 sid 過濾
+     → 避免 ValueError: Invalid path argument: "" 導致 sync_all 崩潰
+  2. _fetch_twse_institutional 循序執行（移除 ThreadPoolExecutor）
+  3. MAX_DATE_RETRIES=2、DATE_RETRY_WAIT=30 秒
+  4. sync_otc_institutional() 獨立函式，15:30 觸發
 """
 from dotenv import load_dotenv
 load_dotenv()
@@ -27,8 +24,8 @@ from zoneinfo import ZoneInfo
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ── 重試設定 ──────────────────────────────────────────────────────────────────
-MAX_DATE_RETRIES = 2    # ✅ 修正：從 3 縮短為 2（最壞情況阻塞時間從 9 分鐘降到 3 分鐘）
-DATE_RETRY_WAIT  = 30   # ✅ 修正：從 60 秒縮短為 30 秒
+MAX_DATE_RETRIES = 2
+DATE_RETRY_WAIT  = 30
 
 # ── Firebase 初始化（單例）────────────────────────────────────────────────────
 _firebase_initialized = False
@@ -90,7 +87,6 @@ def _fetch(url, retries=3, delay=2.0):
     return None
 
 def _fetch_with_date_check(url: str, today: str, label: str = ""):
-    """GET + 日期驗證，日期不符則等待重試。"""
     for attempt in range(1, MAX_DATE_RETRIES + 1):
         data = _fetch(url)
         if data is None:
@@ -134,10 +130,6 @@ def _check_twse_stat(data, today: str, label: str):
     return data
 
 def _fetch_twse_institutional(today: str) -> dict:
-    """
-    循序執行三支 TWSE API，合併時只寫「有值」的欄位。
-    ✅ 修正：不再用 "0" 當 default，避免 API 尚未更新時污染 Firebase。
-    """
     def _parse_foreign():
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
         data = _check_twse_stat(_fetch_with_date_check(url, today, "上市外資"), today, "上市外資")
@@ -171,7 +163,6 @@ def _fetch_twse_institutional(today: str) -> dict:
             out[row[0].strip()] = row[10].strip()
         return out
 
-    # 循序執行（不用 ThreadPoolExecutor）
     foreign_map     = _parse_foreign()
     trust_map       = _parse_trust()
     proprietary_map = _parse_proprietary()
@@ -181,8 +172,7 @@ def _fetch_twse_institutional(today: str) -> dict:
 
     result = {}
     for sid in set(foreign_map) | set(trust_map) | set(proprietary_map):
-        entry = foreign_map.get(sid, {})
-        # ✅ 修正：只寫有值的欄位，不用 "0" 當預設
+        entry  = foreign_map.get(sid, {})
         record = {"name": entry.get("name", sid)}
         if entry.get("foreign") is not None:
             record["foreign"] = entry["foreign"]
@@ -203,8 +193,10 @@ def _fetch_twse_short_sale(today: str) -> dict:
     for row in data.get("data", []):
         name = row[1].strip()
         if re.search(r'購|售|認購|認售', name): continue
+        sid = row[0].strip()
+        if not sid: continue  # ✅ 修正：過濾空字串 sid
         try:
-            out[row[0].strip()] = str(int(row[9].replace(',','')) - int(row[10].replace(',','')))
+            out[sid] = str(int(row[9].replace(',','')) - int(row[10].replace(',','')))
         except: pass
     print(f"[twse_short] 共 {len(out)} 筆 ✅")
     return out
@@ -216,7 +208,9 @@ def _fetch_twse_disposal(today: str) -> dict:
     out = {}
     try:
         for row in data.get("data", []):
-            out[row[2].strip()] = f"處置：⭕ 至 {row[6][10:] if len(row)>6 else ''}"
+            sid = row[2].strip()
+            if not sid: continue  # 過濾空字串
+            out[sid] = f"處置：⭕ 至 {row[6][10:] if len(row)>6 else ''}"
     except Exception as e:
         print(f"[twse_disposal] 解析失敗: {e}")
     print(f"[twse_disposal] 共 {len(out)} 筆 ✅")
@@ -250,6 +244,7 @@ def _fetch_otc_institutional(today: str) -> dict:
         for row in data:
             sid  = row.get("SecuritiesCompanyCode", "").strip()
             name = row.get("CompanyName", "").strip()
+            if not sid: continue  # 過濾空字串
             if re.search(r'購|售|認購|認售', name): continue
             try:
                 out[sid] = {
@@ -281,8 +276,10 @@ def _fetch_otc_short_sale(today: str) -> dict:
         out = {}
         try:
             for row in data["tables"][0]["data"]:
+                sid = row[0].strip()
+                if not sid: continue  # 過濾空字串
                 try:
-                    out[row[0].strip()] = str(int(row[9].replace(',','')) - int(row[10].replace(',','')))
+                    out[sid] = str(int(row[9].replace(',','')) - int(row[10].replace(',','')))
                 except: pass
         except Exception as e:
             print(f"[otc_short] 解析失敗: {e}")
@@ -297,7 +294,9 @@ def _fetch_otc_disposal(today: str) -> dict:
     out = {}
     try:
         for row in data["tables"][0]["data"]:
-            out[row[2].strip()] = f"處置：⭕ 至 {row[5][10:] if len(row)>5 else ''}"
+            sid = row[2].strip()
+            if not sid: continue  # 過濾空字串
+            out[sid] = f"處置：⭕ 至 {row[5][10:] if len(row)>5 else ''}"
     except Exception as e:
         print(f"[otc_disposal] 解析失敗: {e}")
     print(f"[otc_disposal] 共 {len(out)} 筆 ✅")
@@ -348,7 +347,6 @@ def _write_batch(ref_path: str, data: dict, chunk_size: int = 500):
 # ── 公開同步函式 ───────────────────────────────────────────────────────────────
 
 def sync_institutional(today: str = None):
-    """同步 TWSE 三大法人（不含 OTC，OTC 由獨立排程呼叫）。"""
     if today is None: today = get_today()
     print(f"[sync] 開始同步 TWSE 三大法人 date={today}")
     twse_inst = _fetch_twse_institutional(today)
@@ -364,7 +362,6 @@ def sync_institutional(today: str = None):
     print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
 
 def sync_otc_institutional(today: str = None):
-    """同步 OTC 三大法人（獨立函式，由獨立排程呼叫 15:30 觸發，不與 TWSE 互相拖累）。"""
     if today is None: today = get_today()
     print(f"[sync] 開始同步 OTC 三大法人 date={today}")
     otc_inst = _fetch_otc_institutional(today)
@@ -387,14 +384,20 @@ def sync_short_sale(today: str = None):
     _init_firebase()
     if twse_short:
         ref = firebase_db.reference(f"stock_data/{today}/twse")
-        for sid, val in twse_short.items(): ref.child(sid).update({"short_sale": val})
+        for sid, val in twse_short.items():
+            if not sid: continue  # ✅ 修正：過濾空字串 sid，避免 Firebase crash
+            ref.child(sid).update({"short_sale": val})
         print(f"[sync] 上市借券 {len(twse_short)} 筆 ✅")
-    else: print("[sync] 上市借券無資料，略過 ⚠️")
+    else:
+        print("[sync] 上市借券無資料，略過 ⚠️")
     if otc_short:
         ref = firebase_db.reference(f"stock_data/{today}/otc")
-        for sid, val in otc_short.items(): ref.child(sid).update({"short_sale": val})
+        for sid, val in otc_short.items():
+            if not sid: continue  # ✅ 修正：過濾空字串 sid，避免 Firebase crash
+            ref.child(sid).update({"short_sale": val})
         print(f"[sync] 上櫃借券 {len(otc_short)} 筆 ✅")
-    else: print("[sync] 上櫃借券無資料，略過 ⚠️")
+    else:
+        print("[sync] 上櫃借券無資料，略過 ⚠️")
     firebase_db.reference(f"stock_data/{today}/meta").update({
         "short_sale_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
     })
@@ -407,11 +410,15 @@ def sync_disposal(today: str = None):
     _init_firebase()
     if twse_disp:
         ref = firebase_db.reference(f"stock_data/{today}/twse")
-        for sid, val in twse_disp.items(): ref.child(sid).update({"disposal": val})
+        for sid, val in twse_disp.items():
+            if not sid: continue
+            ref.child(sid).update({"disposal": val})
         print(f"[sync] 上市處置 {len(twse_disp)} 筆 ✅")
     if otc_disp:
         ref = firebase_db.reference(f"stock_data/{today}/otc")
-        for sid, val in otc_disp.items(): ref.child(sid).update({"disposal": val})
+        for sid, val in otc_disp.items():
+            if not sid: continue
+            ref.child(sid).update({"disposal": val})
         print(f"[sync] 上櫃處置 {len(otc_disp)} 筆 ✅")
     firebase_db.reference(f"stock_data/{today}/meta").update({
         "disposal_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
@@ -428,10 +435,10 @@ def sync_market(today: str = None):
             "market_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
         })
         print(f"[sync] 大盤同步完成 ✅")
-    else: print("[sync] 大盤無資料，略過 ⚠️")
+    else:
+        print("[sync] 大盤無資料，略過 ⚠️")
 
 def sync_all(today: str = None):
-    """手動觸發全量同步（sync_test 用），TWSE 和 OTC 都會跑。"""
     if today is None: today = get_today()
     print(f"[sync_all] 開始全量同步 date={today}")
     sync_institutional(today)
