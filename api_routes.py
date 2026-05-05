@@ -119,7 +119,6 @@ def register_api(app):
     # ── 重大訊息 API ──────────────────────────────────────────────────────────────
     @app.route("/api/news")
     def api_news():
-        from flask import jsonify as _jsonify
         import requests as _req
         import urllib3 as _u3
         import datetime, re as _re
@@ -137,59 +136,70 @@ def register_api(app):
             "Origin":          "https://mopsov.twse.com.tw",
         }
 
+        def parse_rows(html):
+            items = []
+            rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", html, _re.DOTALL)
+            for row in rows:
+                tds = _re.findall(r"<td[^>]*>(.*?)</td>", row, _re.DOTALL)
+                if len(tds) < 5:
+                    continue
+                code  = _re.sub(r"<[^>]+>", "", tds[0]).strip()
+                name  = _re.sub(r"<[^>]+>", "", tds[1]).strip()
+                date  = _re.sub(r"<[^>]+>", "", tds[2]).strip()
+                time_ = _re.sub(r"<[^>]+>", "", tds[3]).strip()
+                tm    = _re.search(r'title="([^"]+)"', tds[4])
+                if not tm:
+                    tm = _re.search(r"title='([^']+)'", tds[4])
+                title = tm.group(1).replace("\n", " ").replace("\r", " ").strip() if tm else _re.sub(r"<[^>]+>", "", tds[4]).strip()
+                sm    = _re.search(r"skey\.value='([^']+)'", tds[4])
+                skey  = sm.group(1) if sm else ""
+                if not (code and name and title):
+                    continue
+                try:
+                    ci     = int(code)
+                    is_otc = (4000 <= ci <= 4999) or (6000 <= ci <= 6999) or ci >= 8000
+                except ValueError:
+                    is_otc = False
+                items.append({
+                    "source": "OTC"  if is_otc else "TWSE",
+                    "label":  "上櫃" if is_otc else "上市",
+                    "code":   code, "name": name, "date": date, "time": time_,
+                    "title":  title[:60] + ("..." if len(title) > 60 else ""),
+                    "link":   f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={code}",
+                    "skey":   skey,
+                })
+            return items
+
         items = []
         try:
-            res = _req.post(
-                "https://mopsov.twse.com.tw/mops/web/ajax_index",
-                headers=hdrs, data="stp=1&TYPEK1=all",
-                timeout=15, verify=False
-            )
-            if res.status_code == 200:
-                html = res.text
-                rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", html, _re.DOTALL)
-                for row in rows:
-                    tds = _re.findall(r"<td[^>]*>(.*?)</td>", row, _re.DOTALL)
-                    if len(tds) < 5:
+            # 第一步：嘗試抓完整當日列表（今日總覽）
+            endpoints = [
+                ("https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1",
+                 "TYPEK=all&step=0&stp=1&firstin=true&newstuff=1&off=1&keyword4=&code1=&TYPEK2=&checkbtn="),
+                ("https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1",
+                 "TYPEK=all&step=1&stp=1&firstin=true&newstuff=1&off=1"),
+                # 最後備援：ajax_index（只有8筆）
+                ("https://mopsov.twse.com.tw/mops/web/ajax_index",
+                 "stp=1&TYPEK1=all"),
+            ]
+
+            for ep_url, ep_data in endpoints:
+                try:
+                    r = _req.post(ep_url, headers=hdrs, data=ep_data, timeout=15, verify=False)
+                    if r.status_code != 200:
                         continue
-                    code  = _re.sub(r"<[^>]+>", "", tds[0]).strip()
-                    name  = _re.sub(r"<[^>]+>", "", tds[1]).strip()
-                    date  = _re.sub(r"<[^>]+>", "", tds[2]).strip()
-                    time  = _re.sub(r"<[^>]+>", "", tds[3]).strip()
-                    # title from button title attribute
-                    tm = _re.search(r'title="([^"]+)"', tds[4])
-                    if not tm:
-                        tm = _re.search(r"title='([^']+)'", tds[4])
-                    title = tm.group(1).replace("\n", " ").strip() if tm else _re.sub(r"<[^>]+>", "", tds[4]).strip()
-                    # skey for link
-                    sm = _re.search(r"skey\.value='([^']+)'", tds[4])
-                    skey = sm.group(1) if sm else ""
-                    if not (code and name and title):
-                        continue
-                    # rough market classification
-                    try:
-                        ci = int(code)
-                        is_otc = (4000 <= ci <= 4999) or (6000 <= ci <= 6999) or ci >= 8000
-                    except ValueError:
-                        is_otc = False
-                    items.append({
-                        "source": "OTC"  if is_otc else "TWSE",
-                        "label":  "上櫃" if is_otc else "上市",
-                        "code":   code,
-                        "name":   name,
-                        "date":   date,
-                        "time":   time,
-                        "title":  title[:60] + ("..." if len(title) > 60 else ""),
-                        "link":   f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?skey={skey}" if skey else "https://mops.twse.com.tw/mops/#/web/home",
-                        "skey":   skey,
-                    })
-                print(f"[api/news] 抓到 {len(items)} 筆重大訊息")
-            else:
-                print(f"[api/news] HTTP {res.status_code}")
+                    parsed = parse_rows(r.text)
+                    print(f"[api/news] {ep_url.split('/')[-1]} ({ep_data[:30]}): {len(parsed)} rows")
+                    if parsed:
+                        items = parsed
+                        break
+                except Exception as ep_e:
+                    print(f"[api/news] endpoint error: {ep_e}")
+
         except Exception as e:
             print(f"[api/news] 失敗: {e}")
 
         return jsonify({"date": today, "count": len(items), "data": items})
-
 
     # ── 財經新聞頁 ───────────────────────────────────────────────────────────────
     @app.route("/stock_site/news/news.html")

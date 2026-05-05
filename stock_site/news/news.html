@@ -119,7 +119,7 @@
       padding:6px 12px; border-radius:8px; text-decoration:none;
       color:var(--accent); border:1px solid rgba(0,229,255,.2);
       background:rgba(0,229,255,.04); white-space:nowrap;
-      transition:all .2s;
+      transition:all .2s; cursor:pointer;
     }
     .mops-btn:hover{ background:rgba(0,229,255,.1); border-color:rgba(0,229,255,.4); box-shadow:0 0 12px rgba(0,229,255,.15); }
     .mops-btn svg{ width:12px; height:12px; flex-shrink:0; }
@@ -373,15 +373,13 @@ function renderNews() {
         </div>
         <div class="card-title">${n.title || '--'}</div>
       </div>
-      <a class="mops-btn"
-         href="https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}"
-         target="_blank" rel="noopener noreferrer">
+      <button class="mops-btn" onclick="openDetail(${i})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
           <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
         </svg>
         MOPS查詢
-      </a>
+      </button>
     </div>
   `).join('');
 }
@@ -394,6 +392,64 @@ function filterNews(id, btn) {
 }
 
 
+
+// 開啟 MOPS 單筆公告（前端 POST，從用戶瀏覽器直接送出）
+function openDetail(idx) {
+  const list = _activeFilter === 'all'
+    ? _allNews
+    : _allNews.filter(n => n.source === _activeFilter);
+  const n = list[idx];
+  if (!n) return;
+
+  const skey = n.skey || '';
+
+  // 有 skey 才用 POST 開單筆，否則開公司列表
+  if (!skey) {
+    window.open(`https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}`, '_blank');
+    return;
+  }
+
+  // 解析 skey 取得各參數
+  const co_id     = n.code;
+  const spokeTime = (n.time || '').replace(/:/g, '');
+  // skey 格式：公司代號 + 日期8碼 + 序號
+  const dateStart = co_id.length;
+  const spokeDate = skey.slice(dateStart, dateStart + 8);
+  const seqNo     = skey.slice(dateStart + 8) || '1';
+
+  // 動態建立 POST 表單，從瀏覽器直接送出到 MOPS
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1';
+  form.target = '_blank';
+
+  const fields = {
+    step:         '1',
+    firstin:      'true',
+    off:          '1',
+    TYPEK:        'all',
+    co_id:        co_id,
+    COMPANY_ID:   co_id,
+    COMPANY_NAME: n.name,
+    SPOKE_DATE:   spokeDate,
+    SPOKE_TIME:   spokeTime,
+    SEQ_NO:       seqNo,
+    skey:         skey,
+    newstuff:     '1',
+    hhc_co_name:  n.name,
+    stp:          '1',
+  };
+
+  Object.entries(fields).forEach(([k, v]) => {
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = k; inp.value = v;
+    form.appendChild(inp);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
 
 // ── 主題同步（與主站、chapter 頁共用）──────────────────────────
 (function() {
