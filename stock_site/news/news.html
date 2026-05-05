@@ -403,9 +403,27 @@ function openDetail(idx) {
 
   const skey = n.skey || '';
 
-  // 有 skey 才用 POST 開單筆，否則開公司列表
+  // 有 skey 才用 POST 開單筆，否則開公司列表（舊版 MOPS 格式）
   if (!skey) {
-    window.open(`https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id=${n.code}`, '_blank');
+    // 用舊版 mopsov 網址，直接帶 co_id 查詢該公司今日公告
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://mopsov.twse.com.tw/mops/web/t05sr01_1';
+    form.target = '_blank';
+    const fields = {
+      step: '0', firstin: 'true', off: '1',
+      TYPEK: 'all', newstuff: '1',
+      co_id: n.code, COMPANY_ID: n.code,
+      COMPANY_NAME: n.name, stp: '1',
+    };
+    Object.entries(fields).forEach(([k,v]) => {
+      const inp = document.createElement('input');
+      inp.type='hidden'; inp.name=k; inp.value=v;
+      form.appendChild(inp);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
     return;
   }
 
