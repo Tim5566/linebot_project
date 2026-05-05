@@ -136,7 +136,8 @@ def register_api(app):
             "Origin":          "https://mopsov.twse.com.tw",
         }
 
-        def parse_rows(html):
+        def parse_html(html, extract_skey=False):
+            """Parse MOPS HTML rows into list of dicts."""
             items = []
             rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", html, _re.DOTALL)
             for row in rows:
@@ -150,69 +151,80 @@ def register_api(app):
                 tm    = _re.search(r'title="([^"]+)"', tds[4])
                 if not tm:
                     tm = _re.search(r"title='([^']+)'", tds[4])
-                title = tm.group(1).replace("\n", " ").replace("\r", " ").strip() if tm else _re.sub(r"<[^>]+>", "", tds[4]).strip()
-                # Try multiple skey patterns (different MOPS endpoints use different formats)
-                sm = (_re.search(r"skey\.value='([^']+)'", tds[4]) or
-                      _re.search(r'skey\.value="([^"]+)"', tds[4]) or
-                      _re.search(r"skey=([A-Za-z0-9]+)", tds[4]) or
-                      _re.search(r"'skey','([^']+)'", tds[4]))
-                skey  = sm.group(1) if sm else ""
-                # If skey still empty, try to construct from code+date+seq
-                if not skey and code and date:
-                    # date format: 115/05/05 -> 20260505
-                    try:
-                        parts = date.replace(" ","").split("/")
-                        if len(parts) == 3:
-                            yr = int(parts[0]) + 1911
-                            skey_date = f"{yr}{parts[1]}{parts[2]}"
-                            skey = f"{code}{skey_date}1"
-                    except Exception:
-                        pass
+                title = tm.group(1).replace("\n"," ").replace("\r"," ").strip() if tm else _re.sub(r"<[^>]+>","",tds[4]).strip()
                 if not (code and name and title):
                     continue
+                skey = ""
+                if extract_skey:
+                    sm = _re.search(r"skey\.value='([^']+)'", tds[4])
+                    if not sm:
+                        sm = _re.search(r'skey\.value="([^"]+)"', tds[4])
+                    skey = sm.group(1) if sm else ""
                 try:
                     ci     = int(code)
-                    is_otc = (4000 <= ci <= 4999) or (6000 <= ci <= 6999) or ci >= 8000
+                    is_otc = (4000<=ci<=4999) or (6000<=ci<=6999) or ci>=8000
                 except ValueError:
                     is_otc = False
                 items.append({
                     "source": "OTC"  if is_otc else "TWSE",
                     "label":  "上櫃" if is_otc else "上市",
-                    "code":   code, "name": name, "date": date, "time": time_,
-                    "title":  title[:60] + ("..." if len(title) > 60 else ""),
-                    "link":   f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={code}",
-                    "skey":   skey,
+                    "code": code, "name": name, "date": date, "time": time_,
+                    "title": title[:60] + ("..." if len(title)>60 else ""),
+                    "skey": skey,
                 })
             return items
 
+        # ── Step 1: ajax_index → 最新8筆，含正確 skey ─────────────────────────
+        skey_map = {}  # key: (code, time) -> skey
+        try:
+            r = _req.post(
+                "https://mopsov.twse.com.tw/mops/web/ajax_index",
+                headers=hdrs, data="stp=1&TYPEK1=all",
+                timeout=12, verify=False
+            )
+            if r.status_code == 200:
+                for item in parse_html(r.text, extract_skey=True):
+                    if item["skey"]:
+                        skey_map[(item["code"], item["time"])] = item["skey"]
+                print(f"[api/news] ajax_index skey_map: {len(skey_map)} entries")
+        except Exception as e:
+            print(f"[api/news] ajax_index 失敗: {e}")
+
+        # ── Step 2: ajax_t05sr01_1 → 完整當日列表 ─────────────────────────────
         items = []
         try:
-            # 第一步：嘗試抓完整當日列表（今日總覽）
-            endpoints = [
-                ("https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1",
-                 "TYPEK=all&step=0&stp=1&firstin=true&newstuff=1&off=1&keyword4=&code1=&TYPEK2=&checkbtn="),
-                ("https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1",
-                 "TYPEK=all&step=1&stp=1&firstin=true&newstuff=1&off=1"),
-                # 最後備援：ajax_index（只有8筆）
-                ("https://mopsov.twse.com.tw/mops/web/ajax_index",
-                 "stp=1&TYPEK1=all"),
-            ]
-
-            for ep_url, ep_data in endpoints:
-                try:
-                    r = _req.post(ep_url, headers=hdrs, data=ep_data, timeout=15, verify=False)
-                    if r.status_code != 200:
-                        continue
-                    parsed = parse_rows(r.text)
-                    print(f"[api/news] {ep_url.split('/')[-1]} ({ep_data[:30]}): {len(parsed)} rows")
-                    if parsed:
-                        items = parsed
-                        break
-                except Exception as ep_e:
-                    print(f"[api/news] endpoint error: {ep_e}")
-
+            r = _req.post(
+                "https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1",
+                headers=hdrs,
+                data="TYPEK=all&step=0&stp=1&firstin=true&newstuff=1&off=1&keyword4=&code1=&TYPEK2=&checkbtn=",
+                timeout=15, verify=False
+            )
+            if r.status_code == 200:
+                parsed = parse_html(r.text, extract_skey=False)
+                print(f"[api/news] ajax_t05sr01_1: {len(parsed)} rows")
+                for item in parsed:
+                    # 從 skey_map 補入 skey
+                    skey = skey_map.get((item["code"], item["time"]), "")
+                    item["skey"] = skey
+                    item["link"] = f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={item['code']}"
+                    items.append(item)
         except Exception as e:
-            print(f"[api/news] 失敗: {e}")
+            print(f"[api/news] ajax_t05sr01_1 失敗: {e}")
+
+        # ── Fallback: 若完整列表失敗，用 ajax_index 的8筆 ──────────────────────
+        if not items and skey_map:
+            try:
+                r = _req.post(
+                    "https://mopsov.twse.com.tw/mops/web/ajax_index",
+                    headers=hdrs, data="stp=1&TYPEK1=all",
+                    timeout=12, verify=False
+                )
+                if r.status_code == 200:
+                    for item in parse_html(r.text, extract_skey=True):
+                        item["link"] = f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={item['code']}"
+                        items.append(item)
+            except Exception as e:
+                print(f"[api/news] fallback 失敗: {e}")
 
         return jsonify({"date": today, "count": len(items), "data": items})
 
