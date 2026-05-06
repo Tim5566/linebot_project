@@ -440,10 +440,21 @@ def sync_market(today: str = None):
 
 def sync_all(today: str = None):
     if today is None: today = get_today()
-    print(f"[sync_all] 開始全量同步 date={today}")
-    sync_institutional(today)
-    sync_otc_institutional(today)
-    sync_disposal(today)
+    now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour
+    print(f"[sync_all] 開始全量同步 date={today} hour={now_hour}")
+
+    # ── 三大法人、處置股：只在下午跑（15:00~18:00）──────────────────────────
+    # 晚上不重跑，避免 API 已關閉回傳空資料，把白天正確寫入的資料覆蓋掉
+    if 15 <= now_hour < 18:
+        sync_institutional(today)
+        sync_otc_institutional(today)
+        sync_disposal(today)
+
+    # ── 大盤：下午和晚上都跑（15:10 法人買賣、21:10 融資更新）──────────────
     sync_market(today)
-    sync_short_sale(today)
+
+    # ── 借券賣出：只在晚上跑（21:30 才有資料）───────────────────────────────
+    if now_hour >= 21:
+        sync_short_sale(today)
+
     print(f"[sync_all] 全部完成 date={today}")

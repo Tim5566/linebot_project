@@ -17,12 +17,12 @@
       --bg:#03060d; --surface:#070d1a; --surface2:#0b1220;
       --border:rgba(0,229,255,.1); --accent:#00e5ff; --green:#00e676;
       --red:#ff3d5a; --yellow:#ffd600;
-      --text:#d4e4f7; --text-dim:#7a9ab8; --text-faint:#4a6888;
+      --text:#d4e4f7; --text-dim:#9ab8d4; --text-faint:#5a7a98;
     }
     *{ margin:0; padding:0; box-sizing:border-box; }
     html,body{ background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; min-height:100vh; }
 
-    /* Header — matches chapter style */
+    /* Header */
     header {
       position: sticky; top: 0; z-index: 200;
       display: flex; align-items: center; justify-content: space-between;
@@ -55,80 +55,94 @@
     main{ max-width:900px; margin:0 auto; padding:28px 16px 60px; }
 
     /* Page Title */
-    .page-title-wrap{ margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid rgba(0,229,255,.08); }
+    .page-title-wrap{ margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid rgba(0,229,255,.14); }
     .page-tag{ font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--accent); letter-spacing:.3em; opacity:.9; margin-bottom:8px; }
     .page-title{ font-family:'Orbitron',monospace; font-size:1.35rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); }
-    .page-desc{ font-size:.78rem; color:var(--text); margin-top:8px; line-height:1.7; font-family:'Share Tech Mono',monospace; letter-spacing:.04em; }
+    .page-desc{ font-size:.78rem; color:var(--text-dim); margin-top:8px; line-height:1.7; font-family:'Share Tech Mono',monospace; letter-spacing:.04em; }
 
     /* Filter */
-    .filter-bar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+    .filter-bar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:20px; }
     .filter-btn{
       font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:.1em;
       padding:7px 16px; border-radius:20px; cursor:pointer;
       border:1px solid rgba(0,229,255,.15); background:rgba(0,229,255,.03); color:var(--text-dim);
-      transition:all .2s;
+      transition:all .2s; line-height:1;
     }
     .filter-btn.active, .filter-btn:hover{ color:var(--accent); border-color:rgba(0,229,255,.4); background:rgba(0,229,255,.08); box-shadow:0 0 12px rgba(0,229,255,.12); }
-    .refresh-inline{ display:flex; align-items:center; gap:7px; margin-left:auto; font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.06em; white-space:nowrap; }
-    .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 2s ease-in-out infinite; flex-shrink:0; }
+    .news-card:hover { border-color:rgba(0,229,255,.18); }
+    .mops-global-btn{
+      margin-left:auto; display:flex; align-items:center; gap:7px;
+      font-family:'Share Tech Mono',monospace; font-size:.65rem; letter-spacing:.1em;
+      padding:7px 16px; border-radius:20px; text-decoration:none; white-space:nowrap;
+      color:var(--accent); border:1px solid rgba(0,229,255,.3);
+      background:rgba(0,229,255,.06); line-height:1;
+      transition:all .2s;
+    }
+    .mops-global-btn:hover{ background:rgba(0,229,255,.13); border-color:rgba(0,229,255,.55); box-shadow:0 0 14px rgba(0,229,255,.18); }
 
     /* Stats */
-    .stats-bar{ display:flex; gap:16px; align-items:center; margin-bottom:16px; font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:.06em; flex-wrap:wrap; }
-    .stats-bar strong{ color:var(--accent); }
+    .stats-bar{ display:flex; gap:12px; align-items:center; margin-bottom:18px; font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); letter-spacing:.06em; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid rgba(0,229,255,.08); }
+    .stats-bar strong{ color:var(--accent); font-size:.7rem; }
+    .stats-divider{ color:rgba(0,229,255,.25); }
 
     /* News list */
-    .news-list{ display:flex; flex-direction:column; gap:8px; }
+    .news-list{ display:flex; flex-direction:column; gap:6px; }
 
     .news-card{
-      display:flex; align-items:center; gap:14px;
-      padding:14px 18px; border-radius:12px;
+      display:flex; align-items:stretch; gap:0;
+      border-radius:10px;
       background:var(--surface); border:1px solid rgba(0,229,255,.07);
       color:inherit; position:relative; overflow:hidden;
+      transition:border-color .15s, box-shadow .15s;
     }
+    .news-card:hover { border-color:rgba(0,229,255,.18); box-shadow:0 0 20px rgba(0,229,255,.06); }
+
+    /* 左側彩色邊條 */
     .news-card::before{
-      content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-      background:var(--src-color,var(--accent)); opacity:.6;
+      content:''; flex-shrink:0; width:4px; align-self:stretch;
+      background:var(--src-color,var(--accent));
+      opacity:.8;
     }
 
     /* Labels */
     .label-twse{ --src-color:#00e5ff; }
     .label-otc { --src-color:#06d6a0; }
 
-    .card-left{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; min-width:52px; }
+    /* 左側欄 */
+    .card-left{
+      flex-shrink:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:5px; width:62px; padding:12px 0;
+      border-right:1px solid rgba(0,229,255,.08);
+    }
+    .card-code{
+      font-family:'Share Tech Mono',monospace; font-size:.9rem;
+      font-weight:700; color:#fff; letter-spacing:.04em;
+      text-shadow:0 0 12px rgba(0,229,255,.25);
+    }
+    .label-otc .card-code{ text-shadow:0 0 12px rgba(6,214,160,.25); }
     .src-badge{
-      font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.1em;
-      padding:3px 8px; border-radius:6px;
+      font-family:'Share Tech Mono',monospace; font-size:.5rem; letter-spacing:.12em;
+      padding:2px 6px; border-radius:4px;
       color:var(--src-color,var(--accent));
-      background:rgba(0,229,255,.06);
-      border:1px solid rgba(0,229,255,.15);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
       white-space:nowrap;
     }
-    .label-otc .src-badge{ color:#06d6a0; background:rgba(6,214,160,.06); border-color:rgba(6,214,160,.2); }
-    .card-code{ font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--text-dim); letter-spacing:.06em; }
+    .label-otc .src-badge{ color:#06d6a0; background:rgba(6,214,160,.05); border-color:rgba(6,214,160,.18); }
 
-    .card-body{ flex:1; min-width:0; }
-    .card-meta{ display:flex; align-items:center; gap:10px; margin-bottom:5px; flex-wrap:wrap; }
-    .card-name{ font-size:.82rem; font-weight:700; color:#fff; }
-    .card-time{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-dim); }
-    .card-title{ font-size:.84rem; color:var(--text); opacity:.85; line-height:1.55; }
-    .news-card:hover .card-title{ color:var(--text); }
-
-    .mops-btn{
-      flex-shrink:0; display:flex; align-items:center; gap:6px;
-      font-family:'Share Tech Mono',monospace; font-size:.62rem; letter-spacing:.08em;
-      padding:6px 12px; border-radius:8px; text-decoration:none;
-      color:var(--accent); border:1px solid rgba(0,229,255,.2);
-      background:rgba(0,229,255,.04); white-space:nowrap;
-      transition:all .2s; cursor:pointer;
-    }
-    .mops-btn:hover{ background:rgba(0,229,255,.1); border-color:rgba(0,229,255,.4); box-shadow:0 0 12px rgba(0,229,255,.15); }
-    .mops-btn svg{ width:12px; height:12px; flex-shrink:0; }
+    .card-body{ flex:1; min-width:0; padding:12px 16px; }
+    .card-meta{ display:flex; align-items:baseline; gap:7px; margin-bottom:6px; flex-wrap:wrap; }
+    .card-name{ font-size:.88rem; font-weight:700; color:#fff; letter-spacing:.02em; }
+    .card-sep{ color:var(--text-faint); font-size:.7rem; }
+    .card-time{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); }
+    .card-title{ font-size:.82rem; color:var(--text-dim); line-height:1.6; }
 
     /* State boxes */
     .state-box{
       text-align:center; padding:60px 20px;
       font-family:'Share Tech Mono',monospace; font-size:.76rem; color:var(--text-faint); letter-spacing:.08em;
-      border:1px solid rgba(0,229,255,.07); border-radius:14px; background:var(--surface);
+      border:1px solid rgba(0,229,255,.08); border-radius:14px; background:var(--surface);
     }
     .state-icon{ font-size:2rem; margin-bottom:14px; }
     .spinner{ width:28px; height:28px; margin:0 auto 16px; border:2px solid rgba(0,229,255,.15); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
@@ -137,11 +151,10 @@
     /* Footer note */
     .footer-note{
       margin-top:28px; padding:14px 18px;
-      background:rgba(0,229,255,.02); border:1px solid rgba(0,229,255,.06); border-radius:12px;
+      background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.1); border-radius:12px;
       font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--text-faint); letter-spacing:.05em; line-height:1.8;
     }
 
-    /* Mobile */
     @media(max-width:600px){
       header{ padding:0 12px; height:54px; }
       .logo-text{ font-size:.78rem; }
@@ -154,17 +167,16 @@
       .page-desc{ font-size:.72rem; }
       .filter-bar{ gap:6px; margin-bottom:16px; }
       .filter-btn{ font-size:.62rem; padding:6px 11px; }
-      .stats-bar{ font-size:.58rem; gap:10px; }
-      .news-list{ gap:7px; }
-      .news-card{ padding:11px 12px; gap:10px; }
-      .card-left{ min-width:40px; }
-      .src-badge{ font-size:.54rem; padding:2px 6px; }
-      .card-code{ font-size:.64rem; }
+      .mops-global-btn{ font-size:.6rem; padding:6px 10px; }
+      .stats-bar{ font-size:.56rem; gap:8px; margin-bottom:14px; }
+      .news-list{ gap:5px; }
+      .card-left{ width:52px; padding:10px 0; }
+      .card-code{ font-size:.8rem; }
+      .src-badge{ font-size:.46rem; }
+      .card-body{ padding:10px 12px; }
       .card-name{ font-size:.82rem; }
-      .card-time{ font-size:.58rem; }
-      .card-title{ font-size:.78rem; line-height:1.5; }
-      .mops-btn{ font-size:.58rem; padding:5px 8px; gap:4px; }
-      .mops-btn svg{ width:10px; height:10px; }
+      .card-time{ font-size:.56rem; }
+      .card-title{ font-size:.76rem; line-height:1.55; }
       .footer-note{ font-size:.6rem; padding:12px 14px; }
     }
 
@@ -172,85 +184,114 @@
        ☀️  白天晴空主題 (theme-day)
        ═══════════════════════════════════════════════════════ */
     body.theme-day {
-      --bg:         #cce0f2;
-      --surface:    rgba(255,255,255,.88);
-      --surface2:   rgba(232,246,255,.92);
-      --border:     rgba(26,101,168,.18);
-      --accent:     #1265a8;
-      --green:      #157a32;
-      --red:        #b03020;
-      --text:       #0c1c2e;
-      --text-dim:   #1a3550;
+      /* 完整覆蓋所有 CSS variable，讓繼承鏈正確 */
+      --bg:         #b8d4ec;
+      --surface:    rgba(255,255,255,.96);
+      --surface2:   rgba(232,246,255,.94);
+      --border:     rgba(10,60,120,.18);
+      --accent:     #0a52a0;
+      --green:      #0d6e2a;
+      --red:        #a02818;
+      --text:       #071628;
+      --text-dim:   #1a3a5c;
       --text-faint: #3a6080;
     }
     body.theme-day {
-      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 80%,#e8f8f0 100%);
+      background: linear-gradient(170deg,#5aaee0 0%,#7dcaf5 22%,#a8dcfc 45%,#c8eefa 65%,#daf4f0 85%,#e6f8ec 100%);
     }
+
+    /* Header */
     body.theme-day header {
-      background: rgba(255,255,255,.82);
-      backdrop-filter: blur(20px) saturate(1.8);
-      border-bottom: 1px solid rgba(26,123,191,.15);
-      box-shadow: 0 2px 20px rgba(26,100,180,.1);
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(24px) saturate(2);
+      border-bottom: 1px solid rgba(10,80,160,.14);
+      box-shadow: 0 2px 24px rgba(10,60,140,.12);
     }
-    body.theme-day .logo-text { color:#0a1828; text-shadow:0 1px 4px rgba(26,80,160,.18); }
-    body.theme-day .logo-sub  { color:#1265a8; opacity:.85; }
-    body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(26,100,180,.2)); }
-    body.theme-day .btn-back { background:rgba(26,123,191,.08); border-color:rgba(26,123,191,.22); color:#1a4a78; }
-    body.theme-day .btn-back:hover { background:rgba(26,123,191,.15); border-color:rgba(26,123,191,.4); color:#0d3560; }
+    body.theme-day .logo-text { color:#050f1e; text-shadow:none; }
+    body.theme-day .logo-sub  { color:#0a52a0; opacity:.9; }
+    body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(10,80,160,.22)); }
+    body.theme-day .btn-back {
+      background:rgba(10,80,160,.08); border-color:rgba(10,80,160,.22); color:#0a3060;
+    }
+    body.theme-day .btn-back:hover {
+      background:rgba(10,80,160,.16); border-color:rgba(10,80,160,.42); color:#061830;
+    }
 
-    /* 白天模式 — 高對比深藍方案 */
-    body.theme-day .page-tag  { color:#0a3060; opacity:1; font-weight:600; }
-    body.theme-day .page-title{ color:#020e1e; text-shadow:none; }
-    body.theme-day .page-desc { color:#0a2238; opacity:1; }
+    /* Page title 區 */
+    body.theme-day .page-title-wrap { border-bottom-color:rgba(10,60,120,.16); }
+    body.theme-day .page-tag   { color:#0a3a70; opacity:1; font-weight:700; letter-spacing:.35em; }
+    body.theme-day .page-title { color:#040e1c; text-shadow:none; }
+    body.theme-day .page-desc  { color:#1a3a5c; }
 
+    /* Filter bar */
     body.theme-day .filter-btn {
-      color:#0a2a4a; border-color:rgba(10,48,96,.35);
-      background:rgba(255,255,255,.55); font-weight:500;
+      color:#0a2a4a; border-color:rgba(10,60,120,.28);
+      background:rgba(255,255,255,.65); font-weight:500;
     }
     body.theme-day .filter-btn.active {
       color:#fff; border-color:#0a4a8a;
-      background:#0a4a8a; box-shadow:0 2px 12px rgba(10,74,138,.35);
+      background:#0a4a8a; box-shadow:0 2px 14px rgba(10,74,138,.3);
     }
     body.theme-day .filter-btn:hover:not(.active) {
-      color:#0a2a4a; border-color:rgba(10,48,96,.5);
-      background:rgba(255,255,255,.75);
+      color:#071628; border-color:rgba(10,60,120,.45);
+      background:rgba(255,255,255,.88);
+    }
+    body.theme-day .mops-global-btn {
+      color:#0a4a8a; border-color:rgba(10,74,138,.38);
+      background:rgba(10,74,138,.09); font-weight:600;
+    }
+    body.theme-day .mops-global-btn:hover {
+      background:rgba(10,74,138,.17); border-color:rgba(10,74,138,.58);
+      box-shadow:0 2px 14px rgba(10,74,138,.22); color:#061830;
     }
 
-    body.theme-day .stats-bar { color:#0a2a4a; }
-    body.theme-day .stats-bar strong { color:#0a3a7a; }
+    /* Stats bar */
+    body.theme-day .stats-bar {
+      color:#2a5070; border-bottom-color:rgba(10,60,120,.14);
+    }
+    body.theme-day .stats-bar strong { color:#0a3a7a; font-weight:700; }
+    body.theme-day .stats-divider { color:rgba(10,60,120,.28); }
 
+    /* News cards */
     body.theme-day .news-card {
-      background: rgba(255,255,255,.95);
-      border-color: rgba(10,48,96,.18);
-      box-shadow: 0 2px 12px rgba(10,30,80,.12);
+      background: rgba(255,255,255,.97);
+      border-color: rgba(10,60,120,.14);
+      box-shadow: 0 1px 6px rgba(10,40,100,.07);
     }
-    body.theme-day .label-twse { --src-color:#0a4a8a; }
-    body.theme-day .label-otc  { --src-color:#0a6a32; }
-    body.theme-day .news-card::before { opacity:.8; }
+    body.theme-day .news-card:hover {
+      border-color:rgba(10,60,120,.32);
+      box-shadow:0 4px 22px rgba(10,40,100,.13);
+    }
+    body.theme-day .label-twse { --src-color:#0a52a0; }
+    body.theme-day .label-otc  { --src-color:#0a7030; }
+    body.theme-day .news-card::before { opacity:.9; }
+
+    /* Card left 欄 */
+    body.theme-day .card-left { border-right-color:rgba(10,60,120,.12); }
+    body.theme-day .card-code { color:#071628; text-shadow:none; font-weight:800; }
+    body.theme-day .label-otc .card-code { text-shadow:none; }
     body.theme-day .src-badge {
-      color:#0a4a8a; background:rgba(10,74,138,.1);
-      border-color:rgba(10,74,138,.3); font-weight:600;
+      color:#0a52a0; background:rgba(10,82,160,.09);
+      border-color:rgba(10,82,160,.28); font-weight:700;
     }
     body.theme-day .label-otc .src-badge {
-      color:#0a6a32; background:rgba(10,106,50,.1);
-      border-color:rgba(10,106,50,.3);
-    }
-    body.theme-day .card-code  { color:#0a3060; font-weight:700; }
-    body.theme-day .card-name  { color:#020e1e; font-weight:700; }
-    body.theme-day .card-time  { color:#0a3060; font-weight:500; }
-    body.theme-day .card-title { color:#0a2238; opacity:1; }
-
-    body.theme-day .mops-btn {
-      color:#0a4a8a; border-color:rgba(10,74,138,.4);
-      background:rgba(10,74,138,.08); font-weight:600;
-    }
-    body.theme-day .mops-btn:hover {
-      background:rgba(10,74,138,.18); border-color:rgba(10,74,138,.6);
-      box-shadow:0 2px 12px rgba(10,74,138,.25); color:#062a5a;
+      color:#0a7030; background:rgba(10,112,48,.09);
+      border-color:rgba(10,112,48,.28);
     }
 
-    body.theme-day .state-box  { background:rgba(255,255,255,.9); border-color:rgba(10,48,96,.18); color:#0a2a4a; }
-    body.theme-day .footer-note{ background:rgba(255,255,255,.6); border-color:rgba(10,48,96,.15); color:#0a2a4a; }
+    /* Card body 文字 */
+    body.theme-day .card-name  { color:#040e1c; }
+    body.theme-day .card-sep   { color:#6090b8; }
+    body.theme-day .card-time  { color:#3a6080; }
+    body.theme-day .card-title { color:#1a3a5c; }
+
+    /* State / footer */
+    body.theme-day .state-box {
+      background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.14); color:#2a5070;
+    }
+    body.theme-day .footer-note {
+      background:rgba(255,255,255,.55); border-color:rgba(10,60,120,.14); color:#2a5070;
+    }
   </style>
 </head>
 <body>
@@ -286,12 +327,18 @@
     <button class="filter-btn active" onclick="filterNews('all', this)">全部</button>
     <button class="filter-btn" onclick="filterNews('TWSE', this)">上市（TWSE）</button>
     <button class="filter-btn" onclick="filterNews('OTC', this)">上櫃（OTC）</button>
-
+    <a class="mops-global-btn" href="https://mopsov.twse.com.tw/mops/web/t05sr01_1" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      MOPS 查詢站
+    </a>
   </div>
 
   <div class="stats-bar">
     <span>共 <strong id="newsCount">--</strong> 則公告</span>
-    <span>·</span>
+    <span class="stats-divider">·</span>
     <span>日期：<strong id="newsDate">--</strong></span>
   </div>
 
@@ -310,11 +357,36 @@
 <script>
 let _allNews = [];
 let _activeFilter = 'all';
+let _renderedCount = 0;
+const PAGE_SIZE = 50;
 
-const REFRESH_MS = 20 * 60 * 1000; // 20 分鐘
+// ── 前端 sessionStorage 快取（同一個 tab 不重複打 API）──────────
+// 後端 /api/news 建議也做 server-side 快取（memory 或檔案），
+// 每 5 分鐘更新一次，這樣不管多少用戶進來都只打一次上游 TWSE/TPEx。
+const CACHE_KEY   = 'jelly_news_cache';
+const CACHE_TTL   = 5 * 60 * 1000; // 5 分鐘
+const REFRESH_MS  = 20 * 60 * 1000;
 let _refreshTimer = null;
 
-async function loadNews() {
+async function loadNews(forceRefresh = false) {
+  // 嘗試從 sessionStorage 讀快取
+  if (!forceRefresh) {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const cache = JSON.parse(raw);
+        if (Date.now() - cache.ts < CACHE_TTL) {
+          _allNews = cache.data;
+          setDate(cache.date);
+          renderNews();
+          clearTimeout(_refreshTimer);
+          _refreshTimer = setTimeout(() => loadNews(true), REFRESH_MS);
+          return; // 命中快取，直接返回
+        }
+      }
+    } catch(e) {}
+  }
+
   document.getElementById('newsList').innerHTML = `
     <div class="state-box"><div class="spinner"></div>正在載入今日重大訊息...</div>`;
   try {
@@ -323,13 +395,14 @@ async function loadNews() {
 
     _allNews = data.data || [];
 
-    // Update date display
-    const d = data.date || '';
-    if (d.length === 8) {
-      document.getElementById('newsDate').textContent =
-        `${d.slice(0,4)}/${d.slice(4,6)}/${d.slice(6,8)}`;
-    }
+    // 寫入 sessionStorage 快取
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        ts: Date.now(), data: _allNews, date: data.date || ''
+      }));
+    } catch(e) {}
 
+    setDate(data.date || '');
     renderNews();
   } catch(e) {
     document.getElementById('newsList').innerHTML = `
@@ -339,15 +412,44 @@ async function loadNews() {
       </div>`;
   }
 
-  // 20 分鐘後自動重抓
   clearTimeout(_refreshTimer);
-  _refreshTimer = setTimeout(loadNews, REFRESH_MS);
+  _refreshTimer = setTimeout(() => loadNews(true), REFRESH_MS);
+}
+
+function setDate(d) {
+  if (d && d.length === 8) {
+    document.getElementById('newsDate').textContent =
+      `${d.slice(0,4)}/${d.slice(4,6)}/${d.slice(6,8)}`;
+  }
+}
+
+function getFilteredList() {
+  return _activeFilter === 'all'
+    ? _allNews
+    : _allNews.filter(n => n.source === _activeFilter);
+}
+
+function cardHTML(n, globalIdx) {
+  return `
+    <div class="news-card label-${n.source.toLowerCase()}">
+      <div class="card-left">
+        <span class="card-code">${n.code || '--'}</span>
+        <span class="src-badge">${n.label}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-name">${n.name || '--'}</span>
+          <span class="card-sep">·</span>
+          <span class="card-time">${n.time || ''}</span>
+        </div>
+        <div class="card-title">${n.title || '--'}</div>
+      </div>
+    </div>`;
 }
 
 function renderNews() {
-  const list = _activeFilter === 'all'
-    ? _allNews
-    : _allNews.filter(n => n.source === _activeFilter);
+  const list = getFilteredList();
+  _renderedCount = 0;
 
   document.getElementById('newsCount').textContent = list.length;
 
@@ -360,28 +462,40 @@ function renderNews() {
     return;
   }
 
-  document.getElementById('newsList').innerHTML = list.map((n,i) => `
-    <div class="news-card label-${n.source.toLowerCase()}">
-      <div class="card-left">
-        <span class="src-badge">${n.label}</span>
-        <span class="card-code">${n.code || '--'}</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta">
-          <span class="card-name">${n.name || '--'}</span>
-          <span class="card-time">${n.time || ''}</span>
-        </div>
-        <div class="card-title">${n.title || '--'}</div>
-      </div>
-      <button class="mops-btn" onclick="openDetail(${i})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-        </svg>
-        MOPS查詢
-      </button>
-    </div>
-  `).join('');
+  const batch = list.slice(0, PAGE_SIZE);
+  _renderedCount = batch.length;
+  document.getElementById('newsList').innerHTML =
+    batch.map((n, i) => cardHTML(n, i)).join('') +
+    (_renderedCount < list.length ? `<div id="load-sentinel" style="height:40px;"></div>` : '');
+
+  setupSentinel(list);
+}
+
+function appendMore(list) {
+  const sentinel = document.getElementById('load-sentinel');
+  if (!sentinel) return;
+
+  const batch = list.slice(_renderedCount, _renderedCount + PAGE_SIZE);
+  if (!batch.length) { sentinel.remove(); return; }
+
+  const startIdx = _renderedCount;
+  batch.forEach((n, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = cardHTML(n, startIdx + i);
+    sentinel.before(div.firstElementChild);
+  });
+  _renderedCount += batch.length;
+
+  if (_renderedCount >= list.length) sentinel.remove();
+}
+
+function setupSentinel(list) {
+  const sentinel = document.getElementById('load-sentinel');
+  if (!sentinel) return;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) appendMore(list);
+  }, { rootMargin: '200px' });
+  obs.observe(sentinel);
 }
 
 function filterNews(id, btn) {
