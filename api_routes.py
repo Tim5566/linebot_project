@@ -116,7 +116,7 @@ def register_api(app):
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
 
-    # ── 重大訊息 API ──────────────────────────────────────────────────────────────
+    # ── 公司重大訊息 API ──────────────────────────────────────────────────────────────
     @app.route("/api/news")
     def api_news():
         import requests as _req
@@ -228,10 +228,39 @@ def register_api(app):
 
         return jsonify({"date": today, "count": len(items), "data": items})
 
-    # ── 財經新聞頁 ───────────────────────────────────────────────────────────────
+    # ── 公司重大訊息頁 ───────────────────────────────────────────────────────────────
     @app.route("/stock_site/news/news.html")
     def page_news():
         return send_from_directory('stock_site/news', 'news.html')
+
+    # ── 注意股查詢頁 ─────────────────────────────────────────────────────────────────
+    @app.route("/stock_site/news/notice.html")
+    def page_notice():
+        return send_from_directory('stock_site/news', 'notice.html')
+
+    # ── 注意股 API proxy ──────────────────────────────────────────────────────────────
+    @app.route("/api/notice")
+    def api_notice():
+        import requests as _req
+        import time as _time
+        import urllib3 as _u3
+        _u3.disable_warnings(_u3.exceptions.InsecureRequestWarning)
+
+        ts = int(_time.time() * 1000)
+        url = f"https://www.twse.com.tw/rwd/zh/announcement/notice?response=json&_={ts}"
+        hdrs = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-TW,zh;q=0.9",
+            "Referer": "https://www.twse.com.tw/",
+        }
+        try:
+            r = _req.get(url, headers=hdrs, timeout=10, verify=False)
+            r.raise_for_status()
+            return jsonify(r.json())
+        except Exception as e:
+            print(f"[api/notice] 失敗: {e}")
+            return jsonify({"stat": "error", "error": str(e), "data": []}), 200
 
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
