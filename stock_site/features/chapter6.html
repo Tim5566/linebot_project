@@ -2314,7 +2314,22 @@
     }
 
 
-</style>
+
+    #subClock {
+      font-family: 'Share Tech Mono', monospace; font-size: .75rem;
+      color: var(--accent); letter-spacing: .1em;
+      text-shadow: 0 0 10px rgba(0,229,255,.35);
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.14);
+      border-radius: 20px; padding: 5px 14px;
+      white-space: nowrap;
+    }
+    body.theme-day #subClock {
+      color: #0a3a7a; text-shadow: none;
+      background: rgba(10,60,160,.05);
+      border-color: rgba(10,60,160,.16);
+    }
+  </style>
 <script>
 (function(){
   function applyTheme(t){
@@ -2397,11 +2412,12 @@
     </div>
   </div>
   <div class="header-right">
+        <span id="subClock">--:--:--</span>
     <a class="btn-back" href="/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
     </a>
-    <span class="chapter-badge">CH.06</span>
+    
   </div>
 </header>
 
@@ -3319,5 +3335,19 @@ document.querySelectorAll('.section-card.reveal').forEach(el=>revealObserver.obs
     });
   });
   </script>
+
+<script>
+(function() {
+  function tick() {
+    var now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    var str = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    var el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
 </body>
 </html>

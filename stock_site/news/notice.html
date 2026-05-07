@@ -29,34 +29,28 @@
     body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); border-radius: 4px; }
 
     /* ── BACKGROUND ── */
-    #galaxyCanvas2 {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    }
+    #galaxyCanvas2 { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
     .bg-nebula2 {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
         radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%, transparent 55%),
         radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%, transparent 50%),
-        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%, transparent 55%);
+        radial-gradient(ellipse 90% 50% at 50% 0%, rgba(0,60,140,.18) 0%, transparent 55%);
       animation: nebulaFloat 28s ease-in-out infinite alternate;
     }
-    @keyframes nebulaFloat {
-      0%   { opacity:.7; transform:scale(1) translateX(0px); }
-      100% { opacity:1;  transform:scale(1.02) translateX(2px); }
-    }
+    @keyframes nebulaFloat { 0%{opacity:.7;transform:scale(1)} 100%{opacity:1;transform:scale(1.02)} }
     .bg-scanlines2 {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
     }
-    /* 白天模式天空層 */
     .bg-day2 {
       position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
       transition: opacity .8s ease;
       background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 78%,#e8f8f0 100%);
     }
-    body.theme-day .bg-day2    { opacity: 1; }
+    body.theme-day .bg-day2 { opacity: 1; }
     body.theme-day #galaxyCanvas2 { opacity: 0; transition: opacity .8s; }
-    body.theme-day .bg-nebula2    { opacity: 0; transition: opacity .8s; }
+    body.theme-day .bg-nebula2 { opacity: 0; transition: opacity .8s; }
     body.theme-day .bg-scanlines2 { opacity: 0; }
     body.theme-day {
       --bg:#c8dff2; --surface:rgba(255,255,255,.96); --surface2:rgba(232,246,255,.94);
@@ -103,6 +97,21 @@
     .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.35); background:rgba(0,229,255,.1); }
     .btn-back svg { width:14px; height:14px; }
 
+    #subClock {
+      font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      color:var(--accent); letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px; padding:5px 14px;
+      white-space:nowrap;
+    }
+    body.theme-day #subClock {
+      color:#0a3a7a; text-shadow:none;
+      background:rgba(10,60,160,.05);
+      border-color:rgba(10,60,160,.16);
+    }
+
     body.theme-day header { background:rgba(255,255,255,.88); backdrop-filter:blur(24px) saturate(2); border-bottom:1px solid rgba(10,80,160,.14); box-shadow:0 2px 24px rgba(10,60,140,.12); }
     body.theme-day header::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.7),rgba(26,123,191,.5),transparent); background-size:200% 100%; }
     body.theme-day .logo-text { color:#050f1e; text-shadow:none; }
@@ -114,143 +123,154 @@
     main { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:28px 16px 80px; }
 
     /* ── PAGE TITLE ── */
-    .page-title-wrap { margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid rgba(0,229,255,.14); }
-    .page-tag  { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--accent); letter-spacing:.3em; opacity:.9; margin-bottom:8px; }
-    .page-title{ font-family:'Orbitron',monospace; font-size:1.35rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); }
-    .page-desc { font-size:.78rem; color:var(--text-dim); margin-top:8px; line-height:1.7; font-family:'Share Tech Mono',monospace; letter-spacing:.04em; }
+    .page-title-wrap { margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(0,229,255,.12); }
+    .page-tag  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--accent); letter-spacing:.3em; opacity:.85; margin-bottom:6px; }
+    .page-title{ font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); margin-bottom:6px; }
+    .page-desc { font-size:.74rem; color:var(--text-faint); line-height:1.6; font-family:'Share Tech Mono',monospace; letter-spacing:.03em; }
+    .page-desc .sep { margin:0 6px; opacity:.4; }
 
     body.theme-day .page-title-wrap { border-bottom-color:rgba(10,60,120,.16); }
     body.theme-day .page-tag   { color:#0a3a70; font-weight:700; }
     body.theme-day .page-title { color:#040e1c; text-shadow:none; }
-    body.theme-day .page-desc  { color:#1a3a5c; }
+    body.theme-day .page-desc  { color:#3a6080; }
 
-    /* ── STATUS BAR ── */
-    .status-bar {
-      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-bottom:18px; padding:10px 16px;
-      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.08);
+    /* ── STATUS BAR (hidden) ── */
+    .status-bar { display:none; }
+
+    /* ── META ROW (replaces status bar) ── */
+    .meta-row {
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+      margin-bottom:14px; padding:10px 16px;
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.07);
       border-radius:10px;
       font-family:'Share Tech Mono',monospace; font-size:.62rem;
-      color:var(--text-faint); letter-spacing:.06em;
+      color:var(--text-faint); letter-spacing:.05em;
     }
-    .status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-    .status-dot.live    { background:var(--green); box-shadow:0 0 8px var(--green); animation:sonarPulse 2s infinite; }
-    .status-dot.pending { background:var(--yellow); box-shadow:0 0 6px var(--yellow); animation:sonarPulse 2.5s infinite; }
-    .status-dot.closed  { background:var(--text-faint); }
-    .status-dot.error   { background:var(--red); box-shadow:0 0 6px var(--red); }
-    @keyframes sonarPulse { 0%{box-shadow:0 0 0 0 rgba(0,230,118,.6)} 70%{box-shadow:0 0 0 8px rgba(0,230,118,0)} 100%{box-shadow:0 0 0 0 rgba(0,230,118,0)} }
-    .status-count strong { color:var(--accent); font-size:.7rem; }
-    .status-sep { color:rgba(0,229,255,.2); }
-    .status-time { margin-left:auto; }
+    .meta-date { color:var(--accent); font-size:.65rem; font-weight:700; letter-spacing:.08em; }
+    .meta-count { color:var(--text-dim); }
+    .meta-count strong { color:var(--accent); font-size:.72rem; }
+    body.theme-day .meta-row { background:rgba(10,60,120,.04); border-color:rgba(10,60,120,.12); color:#2a5070; }
+    body.theme-day .meta-date { color:#0a3a7a; }
+    body.theme-day .meta-count strong { color:#0a3a7a; }
 
-    body.theme-day .status-bar { background:rgba(10,60,120,.05); border-color:rgba(10,60,120,.14); color:#2a5070; }
-    body.theme-day .status-count strong { color:#0a3a7a; }
-    body.theme-day .status-sep { color:rgba(10,60,120,.28); }
-    body.theme-day .status-dot.live    { background:#0d6e2a; box-shadow:0 0 7px rgba(13,110,42,.5); }
-    body.theme-day .status-dot.pending { background:#8a6000; box-shadow:0 0 6px rgba(138,96,0,.4); }
+    @keyframes sonarPulse { 0%{box-shadow:0 0 0 0 rgba(0,230,118,.6)} 70%{box-shadow:0 0 0 8px rgba(0,230,118,0)} 100%{box-shadow:0 0 0 0 rgba(0,230,118,0)} }
 
     /* ── INFO BOX ── */
     .info-box {
-      display:flex; align-items:flex-start; gap:12px; padding:14px 18px;
-      margin-bottom:18px;
-      border-radius:10px; border:1px solid rgba(255,152,0,.25);
-      background:rgba(255,152,0,.04);
-      font-size:.78rem; color:var(--text-dim); line-height:1.7;
+      display:flex; align-items:flex-start; gap:11px; padding:12px 16px;
+      margin-bottom:14px;
+      border-radius:8px; border:1px solid rgba(255,152,0,.2);
+      background:rgba(255,152,0,.03);
+      font-size:.75rem; color:var(--text-dim); line-height:1.65;
     }
-    .info-box svg { flex-shrink:0; color:var(--orange); margin-top:2px; }
-    body.theme-day .info-box { border-color:rgba(176,80,0,.28); background:rgba(176,80,0,.05); color:#1a3a5c; }
-    body.theme-day .info-box svg { color:#b05000; }
+    .info-box-icon { flex-shrink:0; color:var(--orange); margin-top:1px; opacity:.9; }
+    .info-highlight { color:var(--orange); font-weight:700; font-family:'Share Tech Mono',monospace; }
+    body.theme-day .info-box { border-color:rgba(176,80,0,.22); background:rgba(176,80,0,.04); color:#1a3a5c; }
+    body.theme-day .info-highlight { color:#b05000; }
 
     /* ── STATE BOXES ── */
     .state-wrap {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:16px; padding:60px 24px; text-align:center;
-      border:1px solid rgba(0,229,255,.08); border-radius:14px;
+      gap:14px; padding:56px 24px; text-align:center;
+      border:1px solid rgba(0,229,255,.07); border-radius:12px;
       background:var(--surface);
     }
-    .state-icon { font-size:2.5rem; }
-    .state-title { font-family:'Orbitron',monospace; font-size:.9rem; color:var(--text-dim); letter-spacing:.08em; }
-    .state-sub   { font-family:'Share Tech Mono',monospace; font-size:.68rem; color:var(--text-faint); letter-spacing:.06em; line-height:1.8; }
-    .state-timer { font-family:'Share Tech Mono',monospace; font-size:1.2rem; color:var(--yellow); letter-spacing:.1em; text-shadow:0 0 12px rgba(255,214,0,.4); }
-    .spinner2 { width:32px; height:32px; border:2px solid rgba(0,229,255,.15); border-top-color:var(--accent); border-radius:50%; animation:spin2 .85s linear infinite; }
+    .state-icon { font-size:2.2rem; }
+    .state-title { font-family:'Orbitron',monospace; font-size:.85rem; color:var(--text-dim); letter-spacing:.08em; }
+    .state-sub   { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-faint); letter-spacing:.05em; line-height:1.8; }
+    .state-timer { font-family:'Share Tech Mono',monospace; font-size:1.15rem; color:var(--yellow); letter-spacing:.12em; text-shadow:0 0 12px rgba(255,214,0,.4); }
+    .spinner2 { width:30px; height:30px; border:2px solid rgba(0,229,255,.13); border-top-color:var(--accent); border-radius:50%; animation:spin2 .85s linear infinite; }
     @keyframes spin2 { to{transform:rotate(360deg)} }
-    body.theme-day .state-wrap { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.14); }
+    body.theme-day .state-wrap { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.12); }
     body.theme-day .state-title { color:#1a3a5c; }
     body.theme-day .state-sub   { color:#3a6080; }
     body.theme-day .state-timer { color:#8a6000; text-shadow:none; }
 
     /* ── NOTICE LIST ── */
-    .notice-list { display:flex; flex-direction:column; gap:6px; }
+    .notice-list { display:flex; flex-direction:column; gap:5px; }
 
     .notice-card {
       display:flex; align-items:stretch;
-      border-radius:10px;
-      background:var(--surface); border:1px solid rgba(0,229,255,.07);
+      border-radius:9px;
+      background:var(--surface); border:1px solid rgba(0,229,255,.06);
       position:relative; overflow:hidden;
       transition:border-color .15s, box-shadow .15s;
     }
-    /* 左側橘色警示邊條 */
     .notice-card::before {
-      content:''; flex-shrink:0; width:4px; align-self:stretch;
-      background:linear-gradient(to bottom, #ff9800, #ff6b00);
-      opacity:.85;
+      content:''; flex-shrink:0; width:3px; align-self:stretch;
+      background:linear-gradient(180deg, #ffb347 0%, #ff7800 100%);
     }
-    .notice-card:hover { border-color:rgba(255,152,0,.3); box-shadow:0 0 18px rgba(255,152,0,.08); }
+    .notice-card:hover {
+      border-color:rgba(255,152,0,.15);
+      box-shadow:0 2px 12px rgba(255,120,0,.05);
+    }
 
-    /* 左側欄：代號 */
     .notice-card-left {
       flex-shrink:0; display:flex; flex-direction:column;
       align-items:center; justify-content:center;
-      gap:5px; width:62px; padding:12px 0;
-      border-right:1px solid rgba(255,152,0,.1);
+      gap:5px; width:78px; padding:14px 8px;
+      border-right:1px solid rgba(255,152,0,.12);
+      background:rgba(255,100,0,.04);
     }
     .notice-code {
       font-family:'Share Tech Mono',monospace; font-size:.88rem;
       font-weight:700; color:#fff; letter-spacing:.04em;
-      text-shadow:0 0 12px rgba(255,152,0,.3);
+      text-shadow:0 0 12px rgba(255,140,0,.3);
     }
     .notice-badge {
-      font-family:'Share Tech Mono',monospace; font-size:.48rem;
-      letter-spacing:.12em; padding:2px 5px; border-radius:4px;
-      color:#ff9800; background:rgba(255,152,0,.07);
-      border:1px solid rgba(255,152,0,.2); white-space:nowrap;
+      font-family:'Share Tech Mono',monospace; font-size:.44rem;
+      letter-spacing:.12em; padding:1px 5px; border-radius:3px;
+      color:#ff9800; background:rgba(255,152,0,.1);
+      border:1px solid rgba(255,152,0,.25); white-space:nowrap;
     }
 
-    /* 右側內容 */
-    .notice-card-body { flex:1; min-width:0; padding:12px 16px; }
-    .notice-card-meta { display:flex; align-items:baseline; gap:7px; margin-bottom:5px; flex-wrap:wrap; }
-    .notice-name { font-size:.88rem; font-weight:700; color:#fff; letter-spacing:.02em; }
-    .notice-sep  { color:var(--text-faint); font-size:.7rem; }
-    .notice-date { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); }
-    .notice-reason { font-size:.78rem; color:var(--text-dim); line-height:1.6; }
-    .notice-tag {
-      display:inline-block; margin-top:5px;
-      font-family:'Share Tech Mono',monospace; font-size:.56rem;
-      letter-spacing:.1em; padding:2px 8px; border-radius:5px;
-      color:#ff9800; background:rgba(255,152,0,.08);
-      border:1px solid rgba(255,152,0,.18);
+    .notice-card-body {
+      flex:1; min-width:0; padding:13px 14px;
+      display:flex; flex-direction:column; justify-content:center; gap:5px;
     }
+    .notice-name-row {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .notice-name { font-size:.86rem; font-weight:700; color:#fff; letter-spacing:.02em; }
+    /* 累計次數 — 右側內嵌 badge */
+    .notice-count-badge {
+      display:inline-flex; align-items:center; gap:3px;
+      font-family:'Share Tech Mono',monospace; font-size:.6rem; font-weight:700;
+      color:#fff;
+      background:linear-gradient(135deg, rgba(255,130,0,.82), rgba(255,70,0,.72));
+      border:1px solid rgba(255,152,0,.45);
+      border-radius:5px; padding:2px 7px;
+      letter-spacing:.04em;
+      box-shadow:0 0 8px rgba(255,100,0,.22), inset 0 1px 0 rgba(255,255,255,.1);
+      white-space:nowrap;
+    }
+    .notice-count-badge::before {
+      content:'累計';
+      font-size:.48rem; opacity:.75; letter-spacing:.04em; font-weight:400;
+    }
+    .notice-reason { font-size:.76rem; color:var(--text-dim); line-height:1.62; }
 
-    /* 白天模式 cards */
-    body.theme-day .notice-card { background:rgba(255,255,255,.97); border-color:rgba(10,60,120,.14); box-shadow:0 1px 6px rgba(10,40,100,.07); }
-    body.theme-day .notice-card:hover { border-color:rgba(176,80,0,.35); box-shadow:0 4px 22px rgba(176,80,0,.12); }
-    body.theme-day .notice-card-left { border-right-color:rgba(176,80,0,.12); }
+    .notice-card-body { flex:1; min-width:0; padding:13px 16px; }
+    .notice-name { font-size:.86rem; font-weight:700; color:#fff; letter-spacing:.02em; margin-bottom:5px; }
+    .notice-reason { font-size:.76rem; color:var(--text-dim); line-height:1.62; }
+
+    body.theme-day .notice-card { background:rgba(255,255,255,.97); border-color:rgba(10,60,120,.1); box-shadow:0 1px 4px rgba(10,40,100,.06); }
+    body.theme-day .notice-card:hover { border-color:rgba(176,80,0,.3); box-shadow:0 3px 18px rgba(176,80,0,.1); }
+    body.theme-day .notice-card-left { border-right-color:rgba(176,80,0,.12); background:rgba(176,80,0,.03); }
     body.theme-day .notice-code  { color:#071628; text-shadow:none; font-weight:800; }
-    body.theme-day .notice-badge { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); font-weight:700; }
+    body.theme-day .notice-badge { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .notice-count-badge { background:linear-gradient(135deg, rgba(176,80,0,.82), rgba(140,45,0,.72)); border-color:rgba(176,80,0,.45); box-shadow:0 0 8px rgba(176,80,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
     body.theme-day .notice-name  { color:#040e1c; }
-    body.theme-day .notice-sep   { color:#6090b8; }
-    body.theme-day .notice-date  { color:#3a6080; }
     body.theme-day .notice-reason{ color:#1a3a5c; }
-    body.theme-day .notice-tag   { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.2); }
 
     /* ── FOOTER NOTE ── */
     .footer-note {
-      margin-top:28px; padding:14px 18px;
-      background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.1);
-      border-radius:12px; font-family:'Share Tech Mono',monospace;
-      font-size:.62rem; color:var(--text-faint); letter-spacing:.05em; line-height:1.8;
+      margin-top:24px; padding:12px 16px;
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.08);
+      border-radius:8px; font-family:'Share Tech Mono',monospace;
+      font-size:.6rem; color:var(--text-faint); letter-spacing:.04em; line-height:1.75;
     }
-    body.theme-day .footer-note { background:rgba(255,255,255,.55); border-color:rgba(10,60,120,.14); color:#2a5070; }
+    body.theme-day .footer-note { background:rgba(255,255,255,.45); border-color:rgba(10,60,120,.12); color:#3a6080; }
 
     /* ── RESPONSIVE ── */
     @media(max-width:600px){
@@ -260,13 +280,12 @@
       .btn-back  { font-size:.62rem; padding:5px 10px; }
       main { padding:16px 12px 64px; }
       .page-title { font-size:1.05rem; }
-      .page-desc  { font-size:.72rem; }
-      .notice-card-left { width:52px; padding:10px 0; }
-      .notice-code { font-size:.8rem; }
-      .notice-badge{ font-size:.44rem; }
+      .notice-card-left { width:64px; padding:12px 6px; }
+      .notice-code { font-size:.82rem; }
+      .notice-count-badge { font-size:.56rem; padding:2px 6px; }
       .notice-card-body { padding:10px 12px; }
       .notice-name { font-size:.82rem; }
-      .notice-reason { font-size:.74rem; }
+      .notice-reason { font-size:.73rem; }
     }
   </style>
 </head>
@@ -292,6 +311,7 @@
     </div>
   </div>
   <div class="header-right">
+    <span id="subClock">--:--:--</span>
     <a class="btn-back" href="/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
@@ -305,26 +325,28 @@
   <div class="page-title-wrap">
     <div class="page-tag">NOTICE STOCKS · 注意股</div>
     <div class="page-title">今日注意股查詢</div>
-    <div class="page-desc">資料來源：TWSE 臺灣證券交易所官方公告 · 每日 17:45 更新 · 點擊代號可至交易所查看詳情</div>
+    <div class="page-desc">
+      資料來源：TWSE 臺灣證券交易所官方公告
+      <span class="sep">·</span>
+      盤後約 17:45 更新
+      <span class="sep">·</span>
+      點擊代號可至交易所查看詳情
+    </div>
   </div>
 
   <div class="info-box">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
       <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
     <span>
-      注意股為交易所依市場監視規定公布的股票，表示近期交易量或漲跌幅異常。列入注意並非代表公司有問題，投資人應自行審慎判斷。資料每日盤後約 <strong style="color:var(--orange)">17:45</strong> 更新，尚未更新前仍顯示前一個交易日資料。
+      注意股為交易所依市場監視規定公布的股票，表示近期交易量或漲跌幅異常，列入注意並不代表公司經營有問題。資料於每日盤後 <span class="info-highlight">約 17:45 前後</span> 更新，更新前顯示前一交易日資料，請投資人自行審慎判斷。
     </span>
   </div>
 
-  <div class="status-bar" id="statusBar">
-    <span class="status-dot closed" id="statusDot"></span>
-    <span id="statusText">準備載入...</span>
-    <span class="status-sep">·</span>
-    <span class="status-count">共 <strong id="noticeCount">--</strong> 檔</span>
-    <span class="status-sep">·</span>
-    <span class="status-time" id="statusTime">--</span>
+  <div class="meta-row" id="metaRow">
+    <span class="meta-date" id="metaDate">載入中...</span>
+    <span class="meta-count">共 <strong id="noticeCount">--</strong> 檔注意股</span>
   </div>
 
   <div id="noticeContent">
@@ -336,7 +358,7 @@
   </div>
 
   <div class="footer-note">
-    ⚠️ 本頁資料直接來源為臺灣證券交易所（TWSE）官方公告，資料僅供參考，不構成任何投資建議。每日盤後約 17:45 更新，若尚未更新將顯示「等待更新」提示。本站不保證資料之即時性，使用者應自行審慎判斷並承擔投資風險。
+    資料直接來源為臺灣證券交易所（TWSE）官方公告，僅供參考，不構成任何投資建議。本站不保證資料之即時性，投資人應自行承擔決策風險。
   </div>
 </main>
 
@@ -409,7 +431,7 @@
 })();
 
 // ── 核心邏輯 ──────────────────────────────────────────────────────────────────
-const API_URL = 'https://www.twse.com.tw/rwd/zh/announcement/notice?response=json&_=';
+const API_URL = '/api/notice?_=';
 
 // 台灣時間
 function getTWTime() {
@@ -446,10 +468,17 @@ function formatCountdown(secs) {
 
 // ── 設定狀態列 ──────────────────────────────────────────────────────────────
 function setStatus(dotClass, text, count, timeText) {
-  document.getElementById('statusDot').className = `status-dot ${dotClass}`;
-  document.getElementById('statusText').textContent = text;
+  // legacy status bar (hidden, kept for compatibility)
+  const dotEl = document.getElementById('statusDot');
+  const textEl = document.getElementById('statusText');
+  if (dotEl) dotEl.className = `status-dot ${dotClass}`;
+  if (textEl) textEl.textContent = text;
   if (count != null) document.getElementById('noticeCount').textContent = count;
-  if (timeText != null) document.getElementById('statusTime').textContent = timeText;
+  // Update meta date display
+  if (timeText != null) {
+    const dateEl = document.getElementById('metaDate');
+    if (dateEl && timeText !== '--') dateEl.textContent = `更新時間：${timeText}`;
+  }
 }
 
 // ── 顯示等待更新中（倒數）──────────────────────────────────────────────────
@@ -525,12 +554,10 @@ function renderNotice(items, date) {
 
   const content = document.getElementById('noticeContent');
   const html = items.map(item => {
-    const code = (item.StockCode || item.Code || item.code || '--').trim();
-    const name = (item.StockName || item.Name || item.name || '--').trim();
-    // 多種可能的欄位名稱
-    const noticeDate = (item.PublishDate || item.Date || item.date || date || '').trim();
-    const reason = (item.Reason || item.reason || item.Note || item.note || item.Cause || '').trim();
-    const type   = (item.NoticeType || item.Type || item.type || '').trim();
+    const code   = (item.StockCode || '--').trim();
+    const name   = (item.StockName || '--').trim();
+    const count  = (item.Count || '').trim();
+    const reason = (item.Reason || '').trim();
 
     // TWSE 查詢連結
     const mopsUrl = `https://www.twse.com.tw/rwd/zh/announcement/notice?response=html&StockCode=${code}`;
@@ -542,17 +569,20 @@ function renderNotice(items, date) {
           <span class="notice-badge">注意</span>
         </div>
         <div class="notice-card-body">
-          <div class="notice-card-meta">
+          <div class="notice-name-row">
             <span class="notice-name">${name}</span>
-            ${noticeDate ? `<span class="notice-sep">·</span><span class="notice-date">${noticeDate}</span>` : ''}
+            ${count ? `<span class="notice-count-badge">${count}次</span>` : ''}
           </div>
           ${reason ? `<div class="notice-reason">${reason}</div>` : ''}
-          ${type ? `<span class="notice-tag">${type}</span>` : ''}
         </div>
       </div>`;
   }).join('');
 
   content.innerHTML = `<div class="notice-list">${html}</div>`;
+  // Update meta date
+  const dateEl = document.getElementById('metaDate');
+  if (dateEl && date) dateEl.textContent = `日期：${date}`;
+  else if (dateEl) dateEl.textContent = `日期：${getTWTime().toLocaleDateString('zh-TW')}`;
   setStatus('live', '資料已載入', items.length, getTWTime().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
 }
 
@@ -588,30 +618,32 @@ async function loadNotice() {
 
     if (data.stat === 'OK' || data.stat === 'ok') {
       apiDate = data.date || '';
-      // 嘗試各種可能的資料欄位
-      if (Array.isArray(data.data) && data.data.length > 0) {
-        const fields = data.fields || [];
-        items = data.data.map(row => {
-          // 若 row 是 array，對應 fields
+
+      // 將 array row + fields 轉成 {StockCode, StockName, Count, Reason}
+      function parseRows(rows, fields) {
+        return rows.map(row => {
+          const obj = {};
           if (Array.isArray(row)) {
-            const obj = {};
-            fields.forEach((f, i) => { obj[f] = row[i] || ''; });
-            return obj;
+            fields.forEach((f, i) => { obj[f] = (row[i] || '').toString().trim(); });
+          } else {
+            Object.assign(obj, row);
           }
-          return row;
-        });
+          // TWSE 實際欄位：編號, 證券代號, 證券名稱, 累計次數, 注意交易資訊, 日期, 收盤價, 本益比
+          return {
+            StockCode: obj['證券代號'] || obj['股票代號'] || obj['公司代號'] || '',
+            StockName: obj['證券名稱'] || obj['股票簡稱'] || obj['公司簡稱'] || '',
+            Count:     obj['累計次數'] || '',
+            Reason:    obj['注意交易資訊'] || obj['注意原因'] || obj['原因'] || '',
+          };
+        }).filter(r => r.StockCode);
+      }
+
+      if (Array.isArray(data.data) && data.data.length > 0) {
+        items = parseRows(data.data, data.fields || []);
       } else if (Array.isArray(data.tables) && data.tables.length > 0) {
-        // 某些版本回傳 tables
         data.tables.forEach(t => {
           if (Array.isArray(t.data)) {
-            const fields = t.fields || [];
-            t.data.forEach(row => {
-              if (Array.isArray(row)) {
-                const obj = {};
-                fields.forEach((f, i) => { obj[f] = row[i] || ''; });
-                items.push(obj);
-              } else items.push(row);
-            });
+            items.push(...parseRows(t.data, t.fields || []));
           }
         });
       }
@@ -661,6 +693,19 @@ async function loadNotice() {
 
 // 頁面載入時執行
 loadNotice();
+</script>
+<script>
+(function() {
+  function tick() {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const pad = n => String(n).padStart(2, '0');
+    const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
 </script>
 </body>
 </html>

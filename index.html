@@ -3291,6 +3291,17 @@
     body.theme-day .nav-group-about .nav-item:hover { color: #0d3560; background: rgba(100,130,170,.05); border-color: rgba(100,130,170,.15); }
     body.theme-day .nav-group-about .nav-item:hover svg { color: rgba(150,165,195,.9); filter: none; opacity: 1; }
 
+    /* 今日快訊：綠色 icon（黑夜 #00e676，白天 #0a7a40）*/
+    .nav-group-news .nav-item { color: rgba(255,255,255,.92); }
+    .nav-group-news .nav-item svg { color: #00e676; filter: drop-shadow(0 0 3px rgba(0,230,118,.35)); }
+    .nav-group-news .nav-item:hover { color: #ffffff; background: rgba(0,230,118,.08); border-color: rgba(0,230,118,.28); }
+    .nav-group-news .nav-item:hover svg { color: #00e676; filter: drop-shadow(0 0 6px rgba(0,230,118,.55)); }
+
+    body.theme-day .nav-group-news .nav-item { color: #1a4a78; }
+    body.theme-day .nav-group-news .nav-item svg { color: #0a7a40; filter: none; opacity: 1; }
+    body.theme-day .nav-group-news .nav-item:hover { color: #0d3560; background: rgba(10,122,64,.06); border-color: rgba(10,122,64,.18); }
+    body.theme-day .nav-group-news .nav-item:hover svg { color: #0d9450; filter: none; opacity: 1; }
+
     /* 我的最愛：紅色（跟太空一致）*/
     body.theme-day .nav-item.fav-nav-item { color: #9a1a28; border-color: rgba(255,61,90,.08); }
     body.theme-day .nav-item.fav-nav-item svg { color: rgba(255,61,90,.85); filter: none; opacity: 1; }
@@ -4241,22 +4252,20 @@
     <div class="drawer-section nav-group-news">
       <span class="nav-group-label">今日快訊</span>
 
-      <a class="nav-item" href="/stock_site/news/news.html">
+      <a class="nav-item nav-item-news" href="/stock_site/news/news.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
           <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
         </svg>
         公司重大訊息
-        <span style="margin-left:auto;font-size:.58rem;color:#06d6a0;font-family:'Share Tech Mono',monospace;letter-spacing:.06em;opacity:.8;">LIVE</span>
       </a>
 
-      <a class="nav-item" href="/stock_site/news/notice.html">
+      <a class="nav-item nav-item-news" href="/stock_site/news/notice.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
           <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         注意股查詢
-        <span style="margin-left:auto;font-size:.56rem;color:#ff9800;font-family:'Share Tech Mono',monospace;letter-spacing:.06em;opacity:.85;">17:45</span>
       </a>
     </div>
 
