@@ -497,7 +497,7 @@ def register_api(app):
 
         return jsonify(result)
 
-    # ── 訪客統計 API ───────────────────────────────────────────────────────────
+    # ── 訪客統計 API ──────────────────────────────────────────────────────────
     @app.route("/api/visitor", methods=["POST"])
     def api_visitor():
         from datetime import datetime, timezone, timedelta
