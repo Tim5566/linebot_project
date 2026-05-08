@@ -4215,6 +4215,13 @@
         我的最愛
         <span class="nav-badge" id="favCountBadge" style="display:none">0</span>
       </button>
+
+      <button class="nav-item" data-nav-id="wave" onclick="openWaveChart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12 Q5 5 8 12 Q11 19 14 12 Q17 5 20 12 L22 12"/>
+        </svg>
+        波浪走勢分析
+      </button>
     </div>
 
     <div class="drawer-divider"></div>
@@ -6401,6 +6408,16 @@ function openWatchlistModal() {
   document.getElementById('watchlistModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   loadWatchlist();
+}
+
+// ── 波浪走勢分析 ──
+function openWaveChart() {
+  closeDrawer();
+  const inputEl = document.getElementById('stockInput') || document.querySelector('input[placeholder*="代碼"]');
+  const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
+  const base = '/stock_site/tools/wave_chart.html';
+  const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function closeWatchlistModal() {

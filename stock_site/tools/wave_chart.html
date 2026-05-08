@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>波浪走勢分析｜台股技術分析</title>
+  <link rel="icon" type="image/png" href="/images/jelly.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #02050e;
+      --bg2:       #050a18;
+      --surface:   #08111f;
+      --surface2:  #0c1828;
+      --surface3:  #101f30;
+      --border:    #0f1e30;
+      --border2:   #162840;
+      --accent:    #00e5ff;
+      --accent2:   #0099cc;
+      --green:     #00e676;
+      --green2:    #00b85e;
+      --red:       #ff3d5a;
+      --red2:      #cc1e35;
+      --yellow:    #ffd600;
+      --orange:    #ff7b00;
+      --purple:    #9c6aff;
+      --muted:     #2a4060;
+      --text:      #cfe0f0;
+      --text-dim:  #5a7890;
+      --text-dark: #3a5568;
+
+      /* Candle */
+      --cup:   #00c896;
+      --cdn:   #f44336;
+
+      /* MA */
+      --ma5:  #ff9a3c;
+      --ma10: #c084fc;
+      --ma20: #38bdf8;
+
+      /* Wave impulse colors */
+      --w1: #00e5ff;
+      --w2: #ff6b6b;
+      --w3: #00e676;
+      --w4: #ffd600;
+      --w5: #e040fb;
+      --wa: #ff9a3c;
+      --wb: #4db6ff;
+      --wc: #f06292;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* ══ BACKGROUND MESH ══ */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,100,180,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 90% 80%, rgba(0,60,120,.06) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 30% at 50% 50%, rgba(0,229,255,.015) 0%, transparent 70%);
+    }
+
+    /* ══ HEADER ══ */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(2,5,14,.95);
+      border-bottom: 1px solid rgba(0,229,255,.1);
+      backdrop-filter: blur(24px) saturate(180%);
+    }
+    header::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.8) 20%, rgba(0,180,255,1) 50%, rgba(0,229,255,.8) 80%, transparent 100%);
+      background-size: 300% 100%;
+      animation: scanline 5s linear infinite;
+    }
+    @keyframes scanline { 0%{background-position:-100% 0} 100%{background-position:300% 0} }
+
+    .hd-left  { display:flex; align-items:center; gap:14px }
+    .hd-right { display:flex; align-items:center; gap:10px }
+
+    .btn-back {
+      display:flex; align-items:center; gap:5px;
+      color: var(--text-dim); font-size:.76rem; text-decoration:none;
+      padding:5px 12px; border-radius:8px;
+      border:1px solid rgba(0,229,255,.12);
+      font-family:'JetBrains Mono',monospace;
+      transition: all .2s;
+    }
+    .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.4); background:rgba(0,229,255,.05) }
+    .btn-back svg  { width:13px; height:13px }
+
+    .hd-brand {
+      display:flex; flex-direction:column; gap:1px;
+    }
+    .hd-title {
+      font-family:'Orbitron',monospace;
+      font-size:.84rem; font-weight:700;
+      color:#fff; letter-spacing:.08em;
+      text-shadow: 0 0 20px rgba(0,229,255,.4);
+    }
+    .hd-sub {
+      font-family:'JetBrains Mono',monospace;
+      font-size:.54rem; color:var(--accent); opacity:.55;
+      letter-spacing:.22em;
+    }
+    .hd-pill {
+      font-size:.62rem; padding:3px 10px; border-radius:20px;
+      background:rgba(0,229,255,.07); border:1px solid rgba(0,229,255,.2);
+      color:rgba(0,229,255,.8); font-family:'JetBrains Mono',monospace;
+      letter-spacing:.04em;
+    }
+
+    /* ══ LAYOUT ══ */
+    .app { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:18px 16px 60px }
+
+    /* ══ SEARCH PANEL ══ */
+    .search-panel {
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:16px;
+      padding:18px;
+      margin-bottom:14px;
+    }
+    .search-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px }
+
+    .input-wrap {
+      flex:1; min-width:220px;
+      display:flex; align-items:center; gap:10px;
+      background:var(--bg2); border:1.5px solid rgba(0,229,255,.15);
+      border-radius:10px; padding:0 14px;
+      transition: all .2s;
+    }
+    .input-wrap:focus-within {
+      border-color:rgba(0,229,255,.5);
+      box-shadow:0 0 0 3px rgba(0,229,255,.08), inset 0 0 0 1px rgba(0,229,255,.1);
+    }
+    .input-wrap svg { width:15px; height:15px; color:var(--text-dim); flex-shrink:0 }
+    .input-wrap input {
+      flex:1; background:none; border:none; outline:none;
+      color:var(--text); font-size:.9rem; padding:12px 0;
+      font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
+    }
+    .input-wrap input::placeholder { color:var(--muted) }
+
+    .btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:11px 20px; border-radius:10px; border:none;
+      font-size:.82rem; font-weight:600; cursor:pointer;
+      font-family:'Noto Sans TC',sans-serif;
+      transition:all .2s; white-space:nowrap;
+    }
+    .btn svg { width:14px; height:14px; flex-shrink:0 }
+    .btn-primary {
+      background:linear-gradient(135deg, rgba(0,200,230,.18), rgba(0,130,180,.12));
+      border:1.5px solid rgba(0,229,255,.38);
+      color:var(--accent);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background:rgba(0,229,255,.2);
+      box-shadow:0 0 20px rgba(0,229,255,.25), 0 4px 12px rgba(0,0,0,.4);
+      transform:translateY(-1px);
+    }
+    .btn-primary:disabled { opacity:.35; cursor:not-allowed }
+    .btn-ghost {
+      background:rgba(255,255,255,.03); border:1.5px solid rgba(255,255,255,.1);
+      color:var(--text-dim);
+    }
+    .btn-ghost:hover { background:rgba(255,255,255,.07); color:var(--text); border-color:rgba(255,255,255,.2) }
+
+    /* period tabs */
+    .controls-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap }
+    .ctrl-label { font-size:.7rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; white-space:nowrap }
+    .tab-group { display:flex; gap:4px }
+    .tab-btn {
+      padding:5px 14px; border-radius:8px; border:1px solid rgba(0,229,255,.12);
+      background:transparent; color:var(--text-dim);
+      font-size:.74rem; font-weight:600; cursor:pointer;
+      font-family:'JetBrains Mono',monospace;
+      transition:all .18s;
+    }
+    .tab-btn:hover { border-color:rgba(0,229,255,.3); color:var(--text) }
+    .tab-btn.active {
+      background:rgba(0,229,255,.12); border-color:rgba(0,229,255,.5);
+      color:var(--accent); box-shadow:0 0 10px rgba(0,229,255,.15);
+    }
+
+    /* chart type toggle */
+    .chart-type-group { display:flex; gap:4px }
+    .ct-btn {
+      padding:5px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.1);
+      background:transparent; color:var(--text-dim);
+      font-size:.72rem; cursor:pointer; font-family:'JetBrains Mono',monospace;
+      transition:all .18s;
+    }
+    .ct-btn:hover { border-color:rgba(255,255,255,.25); color:var(--text) }
+    .ct-btn.active {
+      background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.25);
+      color:var(--text);
+    }
+
+    /* ══ STATUS BAR ══ */
+    .status-bar {
+      display:flex; align-items:center; gap:8px;
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:10px; padding:9px 14px; margin-bottom:12px;
+      font-size:.74rem; color:var(--text-dim);
+      font-family:'JetBrains Mono',monospace;
+      min-height:38px;
+      transition: all .3s;
+    }
+    .status-bar.ok   { border-color:rgba(0,230,118,.25); color:var(--green)  }
+    .status-bar.err  { border-color:rgba(255,61,90,.25);  color:var(--red)   }
+    .status-bar.warn { border-color:rgba(255,214,0,.25);  color:var(--yellow) }
+    .status-bar.load { border-color:rgba(0,229,255,.25);  color:var(--accent) }
+    .status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0 }
+    .status-dot.pulse { animation:pulse 1.2s ease-in-out infinite }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+    .spin { display:inline-block; animation:spin .7s linear infinite }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ══ STOCK INFO BAR ══ */
+    .stock-info-bar {
+      display:none;
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:14px;
+      padding:14px 18px;
+      margin-bottom:12px;
+      align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    }
+    .sib-left { display:flex; align-items:baseline; gap:10px }
+    .sib-name { font-size:1.2rem; font-weight:700; color:#fff }
+    .sib-code { font-family:'JetBrains Mono',monospace; font-size:.76rem; color:var(--text-dim); background:var(--bg2); padding:2px 8px; border-radius:5px; border:1px solid var(--border2) }
+    .sib-mid { display:flex; gap:20px; align-items:center; flex-wrap:wrap }
+    .sib-price {
+      font-family:'JetBrains Mono',monospace;
+      font-size:1.8rem; font-weight:600; line-height:1;
+    }
+    .sib-price.up   { color:var(--cup) }
+    .sib-price.down { color:var(--cdn) }
+    .sib-chg { font-family:'JetBrains Mono',monospace; font-size:.82rem }
+    .sib-chg.up   { color:var(--cup) }
+    .sib-chg.down { color:var(--cdn) }
+    .sib-stats { display:flex; gap:16px; flex-wrap:wrap }
+    .sib-stat { display:flex; flex-direction:column; gap:2px; align-items:center }
+    .sib-stat-label { font-size:.62rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace }
+    .sib-stat-val   { font-size:.82rem; font-weight:600; font-family:'JetBrains Mono',monospace }
+    .sib-date { font-size:.68rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace }
+
+    /* ══ CHART AREA ══ */
+    .chart-wrap {
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:16px;
+      overflow:hidden;
+      margin-bottom:12px;
+      position:relative;
+    }
+    .chart-toolbar {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:10px 16px;
+      border-bottom:1px solid var(--border);
+      flex-wrap:wrap;
+    }
+    .chart-label {
+      font-family:'JetBrains Mono',monospace;
+      font-size:.72rem; color:var(--accent); opacity:.7;
+      letter-spacing:.08em;
+    }
+    .legend { display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+    .leg-item { display:flex; align-items:center; gap:5px; font-size:.67rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace }
+    .leg-sq   { width:9px; height:9px; border-radius:2px; flex-shrink:0 }
+    .leg-line { width:18px; height:2px; border-radius:2px; flex-shrink:0 }
+    .leg-dash { width:18px; height:0; border-top:2px dashed; flex-shrink:0 }
+
+    .chart-main-area { background:#070e1a; position:relative }
+    canvas { display:block; width:100%; height:auto }
+
+    .chart-tooltip {
+      position:absolute; pointer-events:none;
+      background:rgba(5,10,20,.96); border:1px solid rgba(0,229,255,.3);
+      border-radius:10px; padding:10px 14px;
+      font-family:'JetBrains Mono',monospace;
+      font-size:.72rem; line-height:1.7;
+      color:var(--text); z-index:50;
+      box-shadow:0 8px 32px rgba(0,0,0,.6);
+      display:none;
+      backdrop-filter:blur(10px);
+    }
+    .tooltip-date  { color:var(--accent); font-weight:600; margin-bottom:4px; font-size:.74rem }
+    .tooltip-ohlc  { color:var(--text) }
+    .tooltip-vol   { color:var(--text-dim) }
+    .tooltip-wave  { color:var(--yellow); margin-top:4px; font-size:.68rem }
+
+    .chart-crosshair {
+      position:absolute; pointer-events:none;
+      z-index:40; display:none;
+    }
+    .xhair-h, .xhair-v {
+      position:absolute; background:rgba(0,229,255,.2);
+    }
+    .xhair-h { left:0; right:0; height:1px }
+    .xhair-v { top:0; bottom:0; width:1px }
+
+    /* volume chart */
+    .vol-area { background:#050b16; border-top:1px solid var(--border) }
+
+    /* chart empty */
+    .chart-empty {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      height:400px; gap:14px; background:#070e1a;
+    }
+    .empty-rings {
+      position:relative; width:80px; height:80px;
+    }
+    .empty-rings::before, .empty-rings::after {
+      content:''; position:absolute; inset:0;
+      border-radius:50%;
+      border:2px solid transparent;
+    }
+    .empty-rings::before { border-top-color:rgba(0,229,255,.3); animation:spin 2s linear infinite }
+    .empty-rings::after  { inset:12px; border-top-color:rgba(0,229,255,.15); animation:spin 1.4s linear infinite reverse }
+    .empty-icon { font-size:30px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) }
+    .empty-text { color:var(--muted); font-size:.82rem; text-align:center; line-height:1.8 }
+    .empty-hint { font-size:.7rem; color:var(--text-dark); font-family:'JetBrains Mono',monospace }
+
+    /* ══ WAVE SECTION ══ */
+    .wave-section { margin-bottom:12px }
+    .section-title {
+      font-size:.72rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace;
+      letter-spacing:.12em; text-transform:uppercase;
+      margin-bottom:8px; display:flex; align-items:center; gap:8px;
+    }
+    .section-title::after {
+      content:''; flex:1; height:1px;
+      background:linear-gradient(90deg, var(--border2), transparent);
+    }
+
+    .wave-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:8px }
+    .wave-card {
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:12px;
+      padding:12px;
+      border-top-width:3px;
+      transition: all .2s;
+      cursor:default;
+    }
+    .wave-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.4) }
+    .wc-label {
+      font-family:'Orbitron',monospace;
+      font-size:.95rem; font-weight:700;
+      margin-bottom:5px;
+    }
+    .wc-type {
+      font-size:.62rem; color:var(--text-dim); margin-bottom:6px;
+      font-family:'JetBrains Mono',monospace;
+    }
+    .wc-range {
+      font-family:'JetBrains Mono',monospace;
+      font-size:.75rem; font-weight:600; margin-bottom:3px;
+    }
+    .wc-change {
+      font-size:.68rem; font-family:'JetBrains Mono',monospace;
+    }
+    .wc-pct {
+      font-size:.62rem; color:var(--text-dim);
+    }
+    .wc-days {
+      font-size:.62rem; color:var(--text-dim); margin-top:4px;
+      font-family:'JetBrains Mono',monospace;
+    }
+
+    /* ══ STATS GRID ══ */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:10px; padding:12px 14px;
+    }
+    .stat-label { font-size:.64rem; color:var(--text-dim); margin-bottom:5px; font-family:'JetBrains Mono',monospace }
+    .stat-value { font-size:.9rem; font-weight:700; font-family:'JetBrains Mono',monospace }
+
+    /* ══ WAVE GUIDE ══ */
+    .wave-guide {
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:14px;
+      padding:18px;
+      margin-bottom:12px;
+    }
+    .wg-title {
+      font-size:.78rem; font-weight:700; color:var(--text);
+      margin-bottom:14px; display:flex; align-items:center; gap:8px;
+    }
+    .wg-title-badge {
+      font-size:.6rem; padding:2px 8px; border-radius:20px;
+      background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.18);
+      color:var(--accent); font-family:'JetBrains Mono',monospace;
+    }
+    .wg-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    .wg-block {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:10px; padding:12px;
+    }
+    .wg-block-title {
+      font-size:.7rem; font-weight:700; margin-bottom:8px;
+      font-family:'JetBrains Mono',monospace;
+    }
+    .wg-rules { display:flex; flex-direction:column; gap:5px }
+    .wg-rule {
+      display:flex; gap:7px; font-size:.7rem; color:var(--text-dim); line-height:1.5;
+      align-items:flex-start;
+    }
+    .wg-rule-dot { flex-shrink:0; width:5px; height:5px; border-radius:50%; margin-top:5px }
+
+    /* ══ SUMMARY PANEL ══ */
+    .summary-panel {
+      background:var(--surface);
+      border:1px solid var(--border2);
+      border-radius:14px;
+      padding:18px;
+      margin-bottom:12px;
+    }
+    .summary-title {
+      font-size:.76rem; font-weight:700; color:var(--text);
+      margin-bottom:14px; display:flex; align-items:center; gap:8px;
+    }
+    .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    .summary-block {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:10px; padding:14px;
+    }
+    .sb-title { font-size:.68rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-bottom:8px }
+    .sb-content { font-size:.78rem; color:var(--text); line-height:1.8 }
+    .sb-tag {
+      display:inline-block; padding:2px 8px; border-radius:5px;
+      font-size:.65rem; font-family:'JetBrains Mono',monospace;
+      font-weight:700; margin-right:5px;
+    }
+    .tag-up   { background:rgba(0,200,150,.12); color:var(--green); border:1px solid rgba(0,200,150,.2) }
+    .tag-down { background:rgba(255,61,90,.1);  color:var(--red);   border:1px solid rgba(255,61,90,.2) }
+    .tag-neutral { background:rgba(255,214,0,.08); color:var(--yellow); border:1px solid rgba(255,214,0,.2) }
+
+    /* ══ FIBONACCI ══ */
+    .fib-row { display:flex; flex-direction:column; gap:5px }
+    .fib-item {
+      display:flex; align-items:center; gap:8px;
+      font-size:.72rem; font-family:'JetBrains Mono',monospace;
+    }
+    .fib-ratio { color:var(--text-dim); width:38px; flex-shrink:0; font-size:.65rem }
+    .fib-bar-wrap { flex:1; background:rgba(255,255,255,.04); border-radius:3px; height:4px; overflow:hidden }
+    .fib-bar { height:100%; border-radius:3px }
+    .fib-price { width:55px; text-align:right; color:var(--text); flex-shrink:0; font-size:.7rem }
+
+    /* ══ DISCLAIMER ══ */
+    .disclaimer {
+      text-align:center; color:var(--text-dark); font-size:.65rem;
+      margin-top:14px; padding-top:14px;
+      border-top:1px solid var(--border);
+      line-height:1.8;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:600px) {
+      .stats-grid { grid-template-columns:repeat(2,1fr) }
+      .summary-grid { grid-template-columns:1fr }
+      .wg-grid { grid-template-columns:1fr }
+      .hd-pill, .hd-sub { display:none }
+      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(110px,1fr)) }
+    }
+
+    /* ══ SCROLL BAR ══ */
+    ::-webkit-scrollbar { width:6px; height:6px }
+    ::-webkit-scrollbar-track { background:var(--bg) }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px }
+    ::-webkit-scrollbar-thumb:hover { background:var(--muted) }
+
+    /* ══ FADE IN ══ */
+    .fade-in { animation: fadeUp .4s ease both }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="hd-left">
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回
+    </a>
+    <div class="hd-brand">
+      <div class="hd-title">WAVE ANALYSIS</div>
+      <div class="hd-sub">ELLIOTT WAVE · 艾略特波浪理論</div>
+    </div>
+    <span class="hd-pill">台股技術分析</span>
+  </div>
+  <div class="hd-right">
+    <span id="hdTime" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-dark)"></span>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="app">
+
+  <!-- SEARCH PANEL -->
+  <div class="search-panel fade-in">
+    <div class="search-row">
+      <div class="input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="stockInput" placeholder="股票代碼或名稱  例：2313 / 華通 / 台積電" maxlength="20"
+               onkeydown="if(event.key==='Enter') doSearch()"/>
+      </div>
+      <button class="btn btn-primary" id="searchBtn" onclick="doSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        分析走勢
+      </button>
+      <button class="btn btn-ghost" onclick="loadDemo()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        示範
+      </button>
+    </div>
+    <div class="controls-row">
+      <span class="ctrl-label">資料期間</span>
+      <div class="tab-group" id="periodGroup">
+        <button class="tab-btn" data-m="1" onclick="setPeriod(1)">1M</button>
+        <button class="tab-btn active" data-m="3" onclick="setPeriod(3)">3M</button>
+        <button class="tab-btn" data-m="6" onclick="setPeriod(6)">6M</button>
+        <button class="tab-btn" data-m="9" onclick="setPeriod(9)">9M</button>
+        <button class="tab-btn" data-m="12" onclick="setPeriod(12)">12M</button>
+      </div>
+      <span class="ctrl-label" style="margin-left:8px">圖表類型</span>
+      <div class="chart-type-group" id="chartTypeGroup">
+        <button class="ct-btn active" data-type="candle" onclick="setChartType('candle')">K線</button>
+        <button class="ct-btn" data-type="line"   onclick="setChartType('line')">折線</button>
+        <button class="ct-btn" data-type="area"   onclick="setChartType('area')">面積</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-dot"></span>
+    <span id="statusText">輸入股票代碼後按「分析走勢」，或點「示範」查看效果</span>
+  </div>
+
+  <!-- STOCK INFO BAR -->
+  <div class="stock-info-bar fade-in" id="stockInfoBar">
+    <div class="sib-left">
+      <span class="sib-name" id="sibName">--</span>
+      <span class="sib-code" id="sibCode">--</span>
+    </div>
+    <div class="sib-mid">
+      <div>
+        <div class="sib-price" id="sibPrice">--</div>
+        <div class="sib-chg"   id="sibChg"></div>
+      </div>
+      <div class="sib-stats">
+        <div class="sib-stat">
+          <span class="sib-stat-label">開盤</span>
+          <span class="sib-stat-val" id="sibOpen" style="color:var(--text)">--</span>
+        </div>
+        <div class="sib-stat">
+          <span class="sib-stat-label">最高</span>
+          <span class="sib-stat-val" id="sibHigh" style="color:var(--cup)">--</span>
+        </div>
+        <div class="sib-stat">
+          <span class="sib-stat-label">最低</span>
+          <span class="sib-stat-val" id="sibLow" style="color:var(--cdn)">--</span>
+        </div>
+        <div class="sib-stat">
+          <span class="sib-stat-label">成交量(張)</span>
+          <span class="sib-stat-val" id="sibVol" style="color:var(--text-dim)">--</span>
+        </div>
+      </div>
+    </div>
+    <div class="sib-date" id="sibDate"></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-wrap fade-in" id="chartWrap">
+    <div class="chart-toolbar">
+      <span class="chart-label">▸ PRICE · K-LINE CHART</span>
+      <div class="legend" id="chartLegend" style="display:none">
+        <div class="leg-item"><div class="leg-sq" style="background:var(--cup)"></div>收漲</div>
+        <div class="leg-item"><div class="leg-sq" style="background:var(--cdn)"></div>收跌</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--ma5)"></div>MA5</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--ma10)"></div>MA10</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--ma20)"></div>MA20</div>
+        <div class="leg-item"><div class="leg-dash" style="border-color:var(--yellow)"></div>波浪</div>
+      </div>
+    </div>
+    <div class="chart-main-area" id="chartMainArea" style="position:relative">
+      <div class="chart-empty" id="chartEmpty">
+        <div class="empty-rings"><span class="empty-icon">📈</span></div>
+        <div class="empty-text">請輸入股票代碼開始分析<br><span class="empty-hint">支援上市・上櫃 全市場個股</span></div>
+      </div>
+      <canvas id="mainCanvas" width="1020" height="440" style="display:none"></canvas>
+      <div class="chart-tooltip" id="tooltip">
+        <div class="tooltip-date" id="tt-date"></div>
+        <div class="tooltip-ohlc" id="tt-ohlc"></div>
+        <div class="tooltip-vol"  id="tt-vol"></div>
+        <div class="tooltip-wave" id="tt-wave"></div>
+      </div>
+      <div class="chart-crosshair" id="crosshair">
+        <div class="xhair-h" id="xhairH"></div>
+        <div class="xhair-v" id="xhairV"></div>
+      </div>
+    </div>
+    <div class="vol-area">
+      <canvas id="volCanvas" width="1020" height="80" style="display:none; width:100%"></canvas>
+    </div>
+  </div>
+
+  <!-- WAVE CARDS -->
+  <div class="wave-section fade-in" id="waveSection" style="display:none">
+    <div class="section-title">波浪結構識別</div>
+    <div class="wave-cards" id="waveCards"></div>
+  </div>
+
+  <!-- SUMMARY PANEL -->
+  <div class="summary-panel fade-in" id="summaryPanel" style="display:none">
+    <div class="summary-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      波浪分析摘要
+    </div>
+    <div class="summary-grid">
+      <div class="summary-block" id="sbWavePos">
+        <div class="sb-title">當前波浪位置</div>
+        <div class="sb-content" id="sbWavePosContent">--</div>
+      </div>
+      <div class="summary-block" id="sbTrend">
+        <div class="sb-title">趨勢判斷</div>
+        <div class="sb-content" id="sbTrendContent">--</div>
+      </div>
+      <div class="summary-block">
+        <div class="sb-title">黃金比例 (Fibonacci) 回撤</div>
+        <div class="fib-row" id="fibRow"></div>
+      </div>
+      <div class="summary-block">
+        <div class="sb-title">統計摘要</div>
+        <div class="sb-content" id="sbStatsContent">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE GUIDE -->
+  <div class="wave-guide fade-in" id="waveGuide" style="display:none">
+    <div class="wg-title">
+      艾略特波浪理論說明
+      <span class="wg-title-badge">Elliott Wave Theory</span>
+    </div>
+    <div class="wg-grid">
+      <div class="wg-block">
+        <div class="wg-block-title" style="color:var(--cup)">▲ 推動浪（五浪結構）</div>
+        <div class="wg-rules">
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w1)"></div>波浪1：趨勢啟動，成交量增加</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w2)"></div>波浪2：修正波，不超過浪1起點</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w3)"></div>波浪3：最強力浪，通常最長，成交量大</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w4)"></div>波浪4：調整波，通常為三角整理</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w5)"></div>波浪5：末升浪，成交量或萎縮</div>
+        </div>
+      </div>
+      <div class="wg-block">
+        <div class="wg-block-title" style="color:var(--cdn)">▼ 修正浪（ABC結構）</div>
+        <div class="wg-rules">
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wa)"></div>A浪：反向修正開始，跌勢出現</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wb)"></div>B浪：反彈修正，常見假突破</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wc)"></div>C浪：終極修正浪，力道強勁</div>
+          <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--yellow)"></div>
+            關鍵規則：浪2不能超過浪1起點；浪3不能是最短的推動浪；浪4不能與浪1重疊
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠ 本工具僅供技術研究與學習參考，波浪標記為演算法自動識別，不代表實際市場走勢判斷<br>
+    艾略特波浪理論具有主觀性，同一走勢可有多種解讀，請投資人自行評估風險，本工具不構成任何投資建議
+  </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  return (h==='localhost'||h==='127.0.0.1')
+    ? 'http://127.0.0.1:5000'
+    : 'https://linebot-project-oxnw.onrender.com';
+})();
+
+const C = {
+  bg:     '#070e1a',
+  grid:   '#0e1c2e',
+  grid2:  '#0c1828',
+  cup:    '#00c896',
+  cdn:    '#f44336',
+  wick:   { up:'#009e75', dn:'#c62828' },
+  ma:     { 5:'#ff9a3c', 10:'#c084fc', 20:'#38bdf8' },
+  vol:    { up:'rgba(0,200,150,.45)', dn:'rgba(244,67,54,.45)' },
+  wave:   {
+    '1':'#00e5ff','2':'#ff6b6b','3':'#00e676',
+    '4':'#ffd600','5':'#e040fb',
+    'A':'#ff9a3c','B':'#4db6ff','C':'#f06292',
+  },
+  waveDefault: '#aabbcc',
+  crosshair: 'rgba(0,229,255,.25)',
+  label: '#ffd700',
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let DATA      = [];
+let WAVES     = [];
+let MONTHS    = 3;
+let KEYWORD   = '';
+let STOCK_NO  = '';
+let STOCK_NAME= '';
+let IS_DEMO   = false;
+let CHART_TYPE= 'candle'; // candle | line | area
+let HOVER_IDX = -1;
+let CAM       = { start:0, end:1 }; // viewport ratio
+
+// canvas refs
+let mainCvs, mainCtx, volCvs, volCtx;
+// layout
+let PAD = { l:72, r:20, t:48, b:36 };
+let VOL_PAD = { l:72, r:20, t:6, b:18 };
+
+// ═══════════════════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════════════════
+function tickClock() {
+  const d = new Date();
+  const s = `${d.toLocaleDateString('zh-TW')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+  document.getElementById('hdTime').textContent = s;
+}
+setInterval(tickClock, 1000); tickClock();
+
+// ═══════════════════════════════════════════════════════
+// PERIOD / TYPE CONTROLS
+// ═══════════════════════════════════════════════════════
+function setPeriod(m) {
+  MONTHS = m;
+  document.querySelectorAll('#periodGroup .tab-btn').forEach(b => {
+    b.classList.toggle('active', +b.dataset.m === m);
+  });
+  if (KEYWORD) doSearch(true);
+  else if (IS_DEMO) loadDemo();
+}
+function setChartType(t) {
+  CHART_TYPE = t;
+  document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === t);
+  });
+  if (DATA.length) renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// DATA FETCH
+// ═══════════════════════════════════════════════════════
+async function doSearch(silent=false) {
+  const kw = document.getElementById('stockInput').value.trim();
+  if (!kw && !silent) { setStatus('⚠ 請輸入股票代碼或名稱', 'warn'); return; }
+  if (kw) KEYWORD = kw;
+
+  setStatus('<span class="spin">◌</span> 透過後端 Proxy 抓取 TWSE 資料…', 'load');
+  setDotPulse(true);
+  document.getElementById('searchBtn').disabled = true;
+
+  try {
+    const url = `${API_BASE}/api/wave_data?keyword=${encodeURIComponent(KEYWORD)}&months=${MONTHS}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    if (!json.data?.length) throw new Error('查無股價資料');
+
+    STOCK_NAME = json.name    || KEYWORD;
+    STOCK_NO   = json.stockNo || KEYWORD;
+    IS_DEMO    = false;
+    DATA       = json.data;
+
+    const n = DATA.length;
+    setStatus(`✔ 真實資料 ｜ ${STOCK_NAME}（${STOCK_NO}）｜ ${n} 筆　${DATA[0].date} ～ ${DATA[n-1].date}`, 'ok');
+  } catch(e) {
+    // CORS fallback
+    const r = await fetchTWSEFallback(KEYWORD);
+    if (r) {
+      STOCK_NAME = r.name; STOCK_NO = r.stockNo; IS_DEMO = false; DATA = r.data;
+      setStatus(`✔ 資料已取得 ｜ ${DATA.length} 筆`, 'ok');
+    } else {
+      setStatus(`✖ 無法取得「${KEYWORD}」資料：${e.message}`, 'err');
+      document.getElementById('searchBtn').disabled = false;
+      setDotPulse(false);
+      return;
+    }
+  }
+
+  document.getElementById('searchBtn').disabled = false;
+  setDotPulse(false);
+  renderAll();
+}
+
+async function fetchTWSEFallback(keyword) {
+  if (!/^\d+$/.test(keyword)) return null;
+  const now = new Date(); const rows = [];
+  for (let m = MONTHS-1; m >= 0; m--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
+    const yyyymm = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`;
+    try {
+      const j = await (await fetch(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=${yyyymm}01&stockNo=${keyword}&response=json`)).json();
+      if (j.stat==='OK' && j.data) j.data.forEach(row => {
+        const c = parseFloat(row[6].replace(/,/g,''));
+        if (c>0) rows.push({ date:row[0], open:+row[3].replace(/,/g,''), high:+row[4].replace(/,/g,''), low:+row[5].replace(/,/g,''), close:c, volume:+row[1].replace(/,/g,'') });
+      });
+    } catch {}
+  }
+  return rows.length ? { name:keyword, stockNo:keyword, data:rows } : null;
+}
+
+function loadDemo() {
+  IS_DEMO=true; STOCK_NAME='台積電'; STOCK_NO='2330'; KEYWORD='2330';
+  document.getElementById('stockInput').value='2330';
+  DATA = buildDemoData(MONTHS);
+  setStatus(`◈ 示範模式 ｜ 台積電（2330）模擬走勢 ｜ ${DATA.length} 筆`, 'warn');
+  renderAll();
+}
+
+function buildDemoData(months) {
+  const total = months * 21;
+  let price = 780; let dayOff = 0;
+  const base = new Date(2025, 0, 2);
+  const out = [];
+  for (let i=0; i<total; i++) {
+    const ph = i/total;
+    let drift = 0;
+    if      (ph<.2)  drift =  1.2 + Math.random()*.8;
+    else if (ph<.38) drift = -1.5 + Math.random()*.6;
+    else if (ph<.62) drift =  2.0 + Math.random()*1.0;
+    else if (ph<.75) drift = -0.9 + Math.random()*.4;
+    else             drift =  1.3 + Math.random()*.7;
+    price += drift + (Math.random()-.5)*6;
+    price = Math.max(700, Math.min(1050, price));
+    const d = new Date(base); d.setDate(base.getDate()+dayOff);
+    while(d.getDay()===0||d.getDay()===6){d.setDate(d.getDate()+1);dayOff++;}
+    dayOff++;
+    const yr = d.getFullYear()-1911;
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const close = +price.toFixed(1);
+    const open  = +(close+(Math.random()-.5)*12).toFixed(1);
+    const high  = +(Math.max(open,close)+Math.random()*10).toFixed(1);
+    const low   = +(Math.min(open,close)-Math.random()*10).toFixed(1);
+    out.push({date:`${yr}/${mm}/${dd}`,open,high,low,close,volume:Math.floor(Math.random()*25000+8000)*1000});
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════
+// WAVE DETECTION — improved pivot algorithm
+// ═══════════════════════════════════════════════════════
+function detectWaves(data) {
+  if (!data || data.length < 14) return [];
+  const closes = data.map(d=>d.close);
+  const n = closes.length;
+  // Adaptive window: bigger dataset = wider lookback
+  const win = Math.max(3, Math.min(8, Math.floor(n/16)));
+
+  // Find local extrema
+  const pivots = [];
+  for (let i=win; i<n-win; i++) {
+    const v = closes[i];
+    const lo = closes.slice(i-win, i+win+1);
+    if (lo.every(x=>x<=v)) pivots.push({idx:i, price:v, type:'H'});
+    else if (lo.every(x=>x>=v)) pivots.push({idx:i, price:v, type:'L'});
+  }
+
+  // Remove consecutive same-type, keep extreme
+  const alt = [];
+  for (const p of pivots) {
+    if (alt.length && alt[alt.length-1].type === p.type) {
+      const last = alt[alt.length-1];
+      if ((p.type==='H' && p.price>last.price)||(p.type==='L' && p.price<last.price))
+        alt[alt.length-1] = p;
+    } else alt.push(p);
+  }
+
+  // Take last 9 pivots for labeling
+  const pts = alt.slice(Math.max(0, alt.length-9));
+  if (pts.length < 2) return [];
+
+  const waveLabels = ['1','2','3','4','5','A','B','C'];
+  const result = [];
+  for (let i=0; i<pts.length-1 && i<8; i++) {
+    const f=pts[i], t=pts[i+1];
+    const label = waveLabels[i] || `W${i+1}`;
+    const isImpulse = ['1','3','5','B'].includes(label);
+    const pct = ((t.price-f.price)/f.price*100);
+    result.push({
+      fromIdx:f.idx, toIdx:t.idx,
+      fromPrice:f.price, toPrice:t.price,
+      label, isImpulse,
+      pct: pct,
+      days: t.idx - f.idx,
+      color: C.wave[label] || C.waveDefault,
+    });
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// MA
+// ═══════════════════════════════════════════════════════
+function calcMA(data, period) {
+  return data.map((_,i) => {
+    if (i<period-1) return null;
+    return data.slice(i-period+1,i+1).reduce((s,d)=>s+d.close,0)/period;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════
+function initCanvas() {
+  mainCvs = document.getElementById('mainCanvas');
+  mainCtx = mainCvs.getContext('2d');
+  volCvs  = document.getElementById('volCanvas');
+  volCtx  = volCvs.getContext('2d');
+
+  // Mouse events
+  mainCvs.addEventListener('mousemove', onMouseMove);
+  mainCvs.addEventListener('mouseleave', onMouseLeave);
+}
+
+function getScaleFactors() {
+  const rect = mainCvs.getBoundingClientRect();
+  return { sx: mainCvs.width/rect.width, sy: mainCvs.height/rect.height };
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW MAIN CHART
+// ═══════════════════════════════════════════════════════
+function drawMain(data, waves) {
+  if (!mainCvs) initCanvas();
+  const W = mainCvs.width, H = mainCvs.height;
+  const ctx = mainCtx;
+  const p = PAD;
+  const cW = W-p.l-p.r, cH = H-p.t-p.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = C.bg; ctx.fillRect(0,0,W,H);
+
+  // ── price range (with padding)
+  const allP  = data.flatMap(d=>[d.high,d.low]);
+  const minRaw = Math.min(...allP);
+  const maxRaw = Math.max(...allP);
+  const margin = (maxRaw-minRaw)*.06;
+  const minP = minRaw-margin;
+  const maxP = maxRaw+margin;
+  const range = maxP-minP || 1;
+
+  const xS = i => p.l + (i/(data.length-1||1))*cW;
+  const yS = v => p.t + (1-(v-minP)/range)*cH;
+
+  // ── grid lines + price axis
+  const gridCount = 6;
+  for (let i=0; i<=gridCount; i++) {
+    const yy = p.t + (i/gridCount)*cH;
+    const pv = maxP - (i/gridCount)*range;
+    // Horizontal grid
+    ctx.strokeStyle = C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
+    ctx.beginPath(); ctx.moveTo(p.l,yy); ctx.lineTo(W-p.r,yy); ctx.stroke();
+    // Price label
+    ctx.fillStyle = '#3a5570'; ctx.font = '10px "JetBrains Mono",monospace';
+    ctx.textAlign = 'right'; ctx.fillText(pv.toFixed(1), p.l-6, yy+4);
+  }
+
+  // ── candle width
+  const cw = Math.max(2, Math.min(16, cW/data.length*.7));
+
+  // ── draw chart by type
+  if (CHART_TYPE==='area' || CHART_TYPE==='line') {
+    // area fill
+    if (CHART_TYPE==='area') {
+      ctx.beginPath();
+      ctx.moveTo(xS(0), H-p.b);
+      data.forEach((d,i)=>ctx.lineTo(xS(i), yS(d.close)));
+      ctx.lineTo(xS(data.length-1), H-p.b);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0,p.t,0,H-p.b);
+      grad.addColorStop(0,'rgba(0,229,255,.18)');
+      grad.addColorStop(1,'rgba(0,229,255,.01)');
+      ctx.fillStyle = grad; ctx.fill();
+    }
+    // line
+    ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 2; ctx.beginPath();
+    data.forEach((d,i)=> i===0 ? ctx.moveTo(xS(i),yS(d.close)) : ctx.lineTo(xS(i),yS(d.close)));
+    ctx.stroke();
+  } else {
+    // K-LINE
+    data.forEach((d,i) => {
+      const isUp = d.close >= d.open;
+      const bodyTop = yS(Math.max(d.open,d.close));
+      const bodyBtm = yS(Math.min(d.open,d.close));
+      const bodyH   = Math.max(1, bodyBtm-bodyTop);
+      const x = xS(i);
+      // wick
+      ctx.strokeStyle = isUp ? C.wick.up : C.wick.dn; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x,yS(d.high)); ctx.lineTo(x,yS(d.low)); ctx.stroke();
+      // body
+      ctx.fillStyle = isUp ? C.cup : C.cdn;
+      ctx.fillRect(x-cw/2, bodyTop, cw, bodyH);
+    });
+  }
+
+  // ── MA lines
+  [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
+    const ma = calcMA(data,p2);
+    ctx.strokeStyle=col; ctx.lineWidth=1.4; ctx.beginPath(); let started=false;
+    ma.forEach((v,i)=>{
+      if (!v) return;
+      if (!started){ctx.moveTo(xS(i),yS(v));started=true;}
+      else ctx.lineTo(xS(i),yS(v));
+    });
+    ctx.stroke();
+  });
+
+  // ── Wave lines
+  waves.forEach(w => {
+    const x1=xS(w.fromIdx), y1=yS(w.fromPrice), x2=xS(w.toIdx), y2=yS(w.toPrice);
+    const col = w.color;
+
+    // shadow for depth
+    ctx.save();
+    ctx.shadowColor = col; ctx.shadowBlur = 8;
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.setLineDash([8,4]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Arrow at end
+    const ang = Math.atan2(y2-y1,x2-x1), L=11;
+    ctx.fillStyle = col; ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-L*Math.cos(ang-.45), y2-L*Math.sin(ang-.45));
+    ctx.lineTo(x2-L*Math.cos(ang+.45), y2-L*Math.sin(ang+.45));
+    ctx.closePath(); ctx.fill();
+
+    // Dot at start
+    ctx.beginPath(); ctx.arc(x1,y1,5,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.arc(x1,y1,5,0,Math.PI*2);
+    ctx.strokeStyle=C.bg; ctx.lineWidth=2; ctx.stroke();
+
+    // Label
+    const mx=(x1+x2)/2+4, my=(y1+y2)/2-14;
+    ctx.save();
+    // label bg
+    ctx.font='bold 11px "Orbitron",monospace';
+    const tw = ctx.measureText(`W${w.label}`).width + 10;
+    ctx.fillStyle='rgba(5,10,20,.7)';
+    ctx.beginPath();
+    ctx.roundRect(mx-tw/2,my-12,tw,18,4);
+    ctx.fill();
+    // label text
+    ctx.fillStyle=col; ctx.textAlign='center';
+    ctx.fillText(`W${w.label}`, mx, my+2);
+    ctx.restore();
+  });
+
+  // ── hover crosshair candle
+  if (HOVER_IDX>=0 && HOVER_IDX<data.length) {
+    const x = xS(HOVER_IDX);
+    // vertical line
+    ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x,p.t); ctx.lineTo(x,H-p.b); ctx.stroke();
+    ctx.setLineDash([]);
+    // highlight candle ring
+    const d = data[HOVER_IDX];
+    const isUp = d.close>=d.open;
+    ctx.strokeStyle = isUp ? C.cup : C.cdn; ctx.lineWidth=1.5;
+    const bt=yS(Math.max(d.open,d.close)), bb=yS(Math.min(d.open,d.close));
+    ctx.strokeRect(xS(HOVER_IDX)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
+  }
+
+  // ── X-axis dates
+  ctx.fillStyle='#2e4460'; ctx.font='9px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  const step = Math.max(1, Math.ceil(data.length/10));
+  data.forEach((d,i)=>{
+    if (i%step===0) {
+      ctx.fillText(d.date.slice(0,8), xS(i), H-10);
+    }
+  });
+
+  // ── top label
+  ctx.fillStyle='rgba(0,229,255,.5)'; ctx.font='11px "JetBrains Mono",monospace';
+  ctx.textAlign='left';
+  ctx.fillText('PRICE', p.l+2, 22);
+  if (CHART_TYPE==='candle') {
+    ctx.fillStyle='rgba(255,255,255,.15)'; ctx.font='9px "JetBrains Mono",monospace';
+    ctx.fillText('K-LINE', p.l+48, 22);
+  }
+
+  // ── current price line
+  const lastClose = data[data.length-1].close;
+  const yLast = yS(lastClose);
+  ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
+  ctx.beginPath(); ctx.moveTo(p.l,yLast); ctx.lineTo(W-p.r,yLast); ctx.stroke();
+  ctx.setLineDash([]);
+  // price tag
+  ctx.fillStyle='rgba(0,229,255,.8)'; ctx.font='bold 10px "JetBrains Mono",monospace';
+  ctx.textAlign='left';
+  ctx.fillText(lastClose.toFixed(1), W-p.r+2, yLast+4);
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW VOLUME CHART
+// ═══════════════════════════════════════════════════════
+function drawVolume(data) {
+  if (!volCvs) return;
+  const W=volCvs.width, H=volCvs.height;
+  const ctx=volCtx;
+  const p=VOL_PAD;
+  const cW=W-p.l-p.r, cH=H-p.t-p.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#050b16'; ctx.fillRect(0,0,W,H);
+
+  const maxVol = Math.max(...data.map(d=>d.volume));
+  const xS = i => p.l+(i/(data.length-1||1))*cW;
+  const bw  = Math.max(2, cW/data.length*.7);
+
+  data.forEach((d,i)=>{
+    const isUp = d.close>=d.open;
+    const bh = (d.volume/maxVol)*cH;
+    const x  = xS(i);
+    ctx.fillStyle = isUp ? C.vol.up : C.vol.dn;
+    if (HOVER_IDX===i) ctx.fillStyle = isUp ? 'rgba(0,200,150,.8)' : 'rgba(244,67,54,.8)';
+    ctx.fillRect(x-bw/2, H-p.b-bh, bw, bh);
+  });
+
+  // Vol label
+  ctx.fillStyle='rgba(90,120,150,.6)'; ctx.font='9px "JetBrains Mono",monospace';
+  ctx.textAlign='left'; ctx.fillText('VOL', p.l+2, p.t+10);
+}
+
+// ═══════════════════════════════════════════════════════
+// MOUSE INTERACTION
+// ═══════════════════════════════════════════════════════
+function onMouseMove(e) {
+  if (!DATA.length) return;
+  const rect = mainCvs.getBoundingClientRect();
+  const {sx,sy} = getScaleFactors();
+  const mx = (e.clientX-rect.left)*sx;
+  const my = (e.clientY-rect.top)*sy;
+
+  // find closest candle index
+  const cW = mainCvs.width-PAD.l-PAD.r;
+  const rawIdx = Math.round((mx-PAD.l)/cW*(DATA.length-1));
+  const idx = Math.max(0,Math.min(DATA.length-1,rawIdx));
+
+  if (HOVER_IDX !== idx) {
+    HOVER_IDX = idx;
+    // redraw
+    drawMain(DATA, WAVES);
+    drawVolume(DATA);
+  }
+
+  // Update tooltip
+  updateTooltip(idx, e.clientX-rect.left, e.clientY-rect.top, rect.width, rect.height);
+}
+
+function onMouseLeave() {
+  HOVER_IDX = -1;
+  document.getElementById('tooltip').style.display='none';
+  document.getElementById('crosshair').style.display='none';
+  if (DATA.length) { drawMain(DATA,WAVES); drawVolume(DATA); }
+}
+
+function updateTooltip(idx, cx, cy, rw, rh) {
+  const d = DATA[idx];
+  const isUp = d.close >= d.open;
+  const chg = idx>0 ? d.close-DATA[idx-1].close : 0;
+  const pct = idx>0 ? (chg/DATA[idx-1].close*100).toFixed(2) : '0.00';
+  const vol = (d.volume/1000).toFixed(0);
+
+  // find overlapping wave
+  const wLabel = WAVES.filter(w => idx>=w.fromIdx && idx<=w.toIdx).map(w=>`W${w.label}`).join(' ');
+
+  document.getElementById('tt-date').textContent = `📅 ${d.date}`;
+  document.getElementById('tt-ohlc').innerHTML =
+    `開 <span style="color:${isUp?'#00c896':'#f44336'}">${d.open}</span>　`+
+    `高 <span style="color:#00c896">${d.high}</span>　`+
+    `低 <span style="color:#f44336">${d.low}</span>　`+
+    `收 <span style="color:${isUp?'#00c896':'#f44336'};font-weight:700">${d.close}</span>　`+
+    `<span style="color:${chg>=0?'#00c896':'#f44336'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)} (${chg>=0?'+':''}${pct}%)</span>`;
+  document.getElementById('tt-vol').textContent = `成交量 ${parseInt(vol).toLocaleString()} 張`;
+  document.getElementById('tt-wave').textContent = wLabel ? `波段：${wLabel}` : '';
+  document.getElementById('tt-wave').style.display = wLabel ? '' : 'none';
+
+  const tip = document.getElementById('tooltip');
+  tip.style.display = 'block';
+  // Position
+  const tw=200, th=90;
+  let tx = cx+16, ty = cy-th/2;
+  if (tx+tw > rw) tx = cx-tw-10;
+  if (ty<0) ty=4;
+  if (ty+th>rh) ty=rh-th-4;
+  tip.style.left = tx+'px'; tip.style.top = ty+'px';
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════════════════
+function renderAll() {
+  if (!DATA.length) return;
+  if (!mainCvs) initCanvas();
+
+  WAVES = detectWaves(DATA);
+
+  // Show canvas, hide empty
+  document.getElementById('chartEmpty').style.display='none';
+  document.getElementById('mainCanvas').style.display='block';
+  document.getElementById('volCanvas').style.display='block';
+  document.getElementById('chartLegend').style.display='flex';
+
+  drawMain(DATA, WAVES);
+  drawVolume(DATA);
+
+  updateStockInfoBar();
+  updateWaveCards();
+  updateSummaryPanel();
+
+  // Show sections
+  ['stockInfoBar','waveSection','summaryPanel','waveGuide'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.style.display = id==='stockInfoBar'?'flex':'block';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// UPDATE STOCK INFO BAR
+// ═══════════════════════════════════════════════════════
+function updateStockInfoBar() {
+  const last = DATA[DATA.length-1];
+  const prev = DATA[DATA.length-2];
+  const chg  = prev ? last.close-prev.close : 0;
+  const pct  = prev ? (chg/prev.close*100).toFixed(2) : '0.00';
+  const isUp = chg >= 0;
+  const dir  = isUp ? '▲' : '▼';
+
+  document.getElementById('sibName').textContent  = STOCK_NAME;
+  document.getElementById('sibCode').textContent  = STOCK_NO;
+  document.getElementById('sibDate').textContent  = `最後交易日 ${last.date}`;
+  document.getElementById('sibPrice').textContent = last.close.toFixed(2);
+  document.getElementById('sibPrice').className   = 'sib-price '+(isUp?'up':'down');
+  document.getElementById('sibChg').textContent   = `${dir} ${Math.abs(chg).toFixed(2)}　(${isUp?'+':''}${pct}%)`;
+  document.getElementById('sibChg').className     = 'sib-chg '+(isUp?'up':'down');
+  document.getElementById('sibOpen').textContent  = last.open.toFixed(1);
+  document.getElementById('sibHigh').textContent  = last.high.toFixed(1);
+  document.getElementById('sibLow').textContent   = last.low.toFixed(1);
+  document.getElementById('sibVol').textContent   = Math.round(last.volume/1000).toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════
+// WAVE CARDS
+// ═══════════════════════════════════════════════════════
+function updateWaveCards() {
+  const wrap = document.getElementById('waveCards');
+  wrap.innerHTML = '';
+  if (!WAVES.length) {
+    document.getElementById('waveSection').style.display='none'; return;
+  }
+  document.getElementById('waveSection').style.display='block';
+
+  WAVES.forEach(w => {
+    const isUp  = w.toPrice > w.fromPrice;
+    const isImp = w.isImpulse;
+    const typeTxt = isImp ? '推動浪' : '修正浪';
+    const div = document.createElement('div');
+    div.className='wave-card';
+    div.style.borderTopColor = w.color;
+    div.innerHTML = `
+      <div class="wc-label" style="color:${w.color}">波浪 ${w.label}</div>
+      <div class="wc-type">${typeTxt}</div>
+      <div class="wc-range" style="color:${w.color}">${w.fromPrice.toFixed(1)} → ${w.toPrice.toFixed(1)}</div>
+      <div class="wc-change" style="color:${isUp?'var(--cup)':'var(--cdn)'}">
+        ${isUp?'▲':'▼'} ${Math.abs(w.toPrice-w.fromPrice).toFixed(1)} 元
+      </div>
+      <div class="wc-pct" style="color:${isUp?'var(--cup)':'var(--cdn)'}">${w.pct>=0?'+':''}${w.pct.toFixed(1)}%</div>
+      <div class="wc-days">⏱ ${w.days} 交易日</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SUMMARY PANEL
+// ═══════════════════════════════════════════════════════
+function updateSummaryPanel() {
+  const panel = document.getElementById('summaryPanel');
+
+  // Current wave position
+  const lastWave = WAVES[WAVES.length-1];
+  let wavePosHtml = '--';
+  if (lastWave) {
+    const dir = lastWave.toPrice>lastWave.fromPrice?'上升':'下降';
+    const tag = lastWave.isImpulse
+      ? `<span class="sb-tag ${lastWave.toPrice>lastWave.fromPrice?'tag-up':'tag-down'}">推動浪${lastWave.label}</span>`
+      : `<span class="sb-tag tag-neutral">修正浪${lastWave.label}</span>`;
+    wavePosHtml = `${tag} 目前可能位於${dir}的波浪 ${lastWave.label} 段，`+
+      `價格範圍 ${lastWave.fromPrice.toFixed(1)} → ${lastWave.toPrice.toFixed(1)} 元。`;
+
+    // Next wave hint
+    const nextLabel = { '1':'2','2':'3','3':'4','4':'5','5':'A','A':'B','B':'C','C':'1' };
+    const nl = nextLabel[lastWave.label];
+    if (nl) {
+      const nextIsImp = ['1','3','5','B'].includes(nl);
+      wavePosHtml += `<br>下一段預期波浪 ${nl}（${nextIsImp?'推動浪':'修正浪'}）。`;
+    }
+  }
+  document.getElementById('sbWavePosContent').innerHTML = wavePosHtml;
+
+  // Trend
+  const closes = DATA.map(d=>d.close);
+  const ma5  = closes.slice(-5).reduce((s,v)=>s+v,0)/5;
+  const ma20 = closes.slice(-20).reduce((s,v)=>s+v,0)/20;
+  const lastClose = closes[closes.length-1];
+  let trendTag='', trendDesc='';
+  if (lastClose>ma5 && ma5>ma20) {
+    trendTag='<span class="sb-tag tag-up">多頭排列</span>';
+    trendDesc='收盤 > MA5 > MA20，短中期均線多頭排列，趨勢偏多。';
+  } else if (lastClose<ma5 && ma5<ma20) {
+    trendTag='<span class="sb-tag tag-down">空頭排列</span>';
+    trendDesc='收盤 < MA5 < MA20，短中期均線空頭排列，趨勢偏空。';
+  } else {
+    trendTag='<span class="sb-tag tag-neutral">盤整</span>';
+    trendDesc='均線交叉或排列不明顯，短期方向待確認。';
+  }
+  document.getElementById('sbTrendContent').innerHTML = trendTag+' '+trendDesc;
+
+  // Fibonacci retracement
+  const allClose = DATA.map(d=>d.close);
+  const maxP = Math.max(...allClose);
+  const minP = Math.min(...allClose);
+  const diff = maxP - minP;
+  const fibs = [
+    {ratio:'23.6%', level:maxP-diff*.236, color:'#38bdf8'},
+    {ratio:'38.2%', level:maxP-diff*.382, color:'#00e676'},
+    {ratio:'50.0%', level:maxP-diff*.500, color:'#ffd600'},
+    {ratio:'61.8%', level:maxP-diff*.618, color:'#ff9a3c'},
+    {ratio:'78.6%', level:maxP-diff*.786, color:'#f44336'},
+  ];
+  document.getElementById('fibRow').innerHTML = fibs.map(f => {
+    const pct = ((f.level-minP)/diff*100);
+    return `<div class="fib-item">
+      <span class="fib-ratio">${f.ratio}</span>
+      <div class="fib-bar-wrap"><div class="fib-bar" style="width:${pct}%;background:${f.color}"></div></div>
+      <span class="fib-price">${f.level.toFixed(1)}</span>
+    </div>`;
+  }).join('');
+
+  // Stats
+  const n = DATA.length;
+  const periodMax = Math.max(...DATA.map(d=>d.high)).toFixed(1);
+  const periodMin = Math.min(...DATA.map(d=>d.low)).toFixed(1);
+  const avgVol    = Math.round(DATA.reduce((s,d)=>s+d.volume,0)/n/1000);
+  const upDays    = DATA.filter(d=>d.close>=d.open).length;
+  const downDays  = n-upDays;
+  document.getElementById('sbStatsContent').innerHTML =
+    `期間 ${n} 個交易日<br>`+
+    `最高 <span style="color:var(--cup)">${periodMax}</span>　最低 <span style="color:var(--cdn)">${periodMin}</span><br>`+
+    `平均量 <span style="color:var(--text)">${avgVol.toLocaleString()} 張</span><br>`+
+    `上漲 <span style="color:var(--cup)">${upDays}</span> 日　下跌 <span style="color:var(--cdn)">${downDays}</span> 日`;
+
+  panel.style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════
+// STATUS
+// ═══════════════════════════════════════════════════════
+function setStatus(html, cls) {
+  const bar = document.getElementById('statusBar');
+  bar.className = 'status-bar'+(cls?' '+cls:'');
+  bar.innerHTML = `<span class="status-dot${cls==='load'?' pulse':''}"></span><span>${html}</span>`;
+}
+function setDotPulse(on) {
+  const dot = document.querySelector('#statusBar .status-dot');
+  if (dot) dot.classList.toggle('pulse', on);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  initCanvas();
+  const params = new URLSearchParams(window.location.search);
+  const kw = params.get('stock') || params.get('keyword') || '';
+  if (kw) {
+    document.getElementById('stockInput').value = kw;
+    doSearch();
+  }
+});
+
+// Resize canvas to match displayed size
+window.addEventListener('resize', () => {
+  if (DATA.length) renderAll();
+});
+</script>
+</body>
+</html>

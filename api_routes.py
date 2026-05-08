@@ -341,6 +341,133 @@ def register_api(app):
 
         return jsonify(result)
 
+    # ── 波浪走勢分析頁面 ────────────────────────────────────────────────────────
+    @app.route("/stock_site/tools/wave_chart.html")
+    def page_wave_chart():
+        return send_from_directory('stock_site/tools', 'wave_chart.html')
+
+    # ── 波浪走勢資料 Proxy API ──────────────────────────────────────────────────
+    # 用法：/api/wave_data?keyword=2313&months=3
+    # 解決瀏覽器端 CORS 限制，由後端呼叫 TWSE 再回傳
+    @app.route("/api/wave_data")
+    def api_wave_data():
+        import requests as _req
+        import time as _time
+        import datetime as _dt
+        from zoneinfo import ZoneInfo as _ZI
+
+        keyword = request.args.get("keyword", "").strip()
+        months  = int(request.args.get("months", 2))
+        months  = max(1, min(12, months))
+
+        if not keyword:
+            return jsonify({"error": "請輸入股票代碼或名稱"}), 400
+
+        stock_no   = ""
+        stock_name = ""
+
+        if re.match(r"^\d{4,6}$", keyword):
+            stock_no = keyword
+        else:
+            stock_no   = keyword
+            stock_name = keyword
+
+        tz    = _ZI("Asia/Taipei")
+        now   = _dt.datetime.now(tz)
+        rows  = []
+        name_from_api = ""
+
+        hdrs = {
+            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
+            "Accept":          "application/json, text/plain, */*",
+            "Accept-Language": "zh-TW,zh;q=0.9",
+            "Referer":         "https://www.twse.com.tw/",
+        }
+
+        for i in range(months - 1, -1, -1):
+            d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
+            yyyymm = f"{d.year}{d.month:02d}"
+            url    = (
+                f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY"
+                f"?date={yyyymm}01&stockNo={stock_no}&response=json&_={int(_time.time()*1000)}"
+            )
+            try:
+                r = _req.get(url, headers=hdrs, timeout=12)
+                j = r.json()
+                if j.get("stat") == "OK" and j.get("data"):
+                    if not name_from_api and j.get("title"):
+                        import re as _re2
+                        m = _re2.search(r"\d{4}\s+(.+?)\s+個股", j["title"])
+                        if m:
+                            name_from_api = m.group(1).strip()
+                    for row in j["data"]:
+                        try:
+                            open_  = float(row[3].replace(",", ""))
+                            high   = float(row[4].replace(",", ""))
+                            low    = float(row[5].replace(",", ""))
+                            close  = float(row[6].replace(",", ""))
+                            vol    = int(row[1].replace(",", ""))
+                            if close > 0:
+                                rows.append({
+                                    "date":   row[0],
+                                    "open":   open_,
+                                    "high":   high,
+                                    "low":    low,
+                                    "close":  close,
+                                    "volume": vol,
+                                })
+                        except Exception:
+                            continue
+            except Exception as e:
+                print(f"[wave_data] {yyyymm} 抓取失敗: {e}")
+                continue
+
+        # OTC 備援
+        if not rows:
+            for i in range(months - 1, -1, -1):
+                d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
+                url = (
+                    f"https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php"
+                    f"?l=zh-tw&d={d.year-1911}/{d.month:02d}&stkno={stock_no}&_={int(_time.time()*1000)}"
+                )
+                try:
+                    r = _req.get(url, headers=hdrs, timeout=12)
+                    j = r.json()
+                    if j.get("iTotalRecords", 0) > 0:
+                        for row in j.get("aaData", []):
+                            try:
+                                close = float(row[6].replace(",", ""))
+                                open_ = float(row[3].replace(",", ""))
+                                high  = float(row[4].replace(",", ""))
+                                low   = float(row[5].replace(",", ""))
+                                vol   = int(row[1].replace(",", "").replace(" ", ""))
+                                if close > 0:
+                                    rows.append({
+                                        "date":   row[0],
+                                        "open":   open_,
+                                        "high":   high,
+                                        "low":    low,
+                                        "close":  close,
+                                        "volume": vol,
+                                    })
+                            except Exception:
+                                continue
+                except Exception as e:
+                    print(f"[wave_data/OTC] {d.year}/{d.month} 失敗: {e}")
+                    continue
+
+        if not rows:
+            return jsonify({"error": f"查無「{keyword}」的股價資料，請確認代碼正確"}), 200
+
+        final_name = name_from_api or stock_name or keyword
+        return jsonify({
+            "name":    final_name,
+            "stockNo": stock_no,
+            "months":  months,
+            "count":   len(rows),
+            "data":    rows,
+        })
+
     # ── 大盤資訊 API ───────────────────────────────────────────────────────────
     @app.route("/api/market")
     def api_market():
