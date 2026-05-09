@@ -443,7 +443,7 @@ def sync_all(today: str = None):
     now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour
     print(f"[sync_all] 開始全量同步 date={today} hour={now_hour}")
 
-    # ── 三大法人、處置股：只在下午跑（15:00~18:00）──────────────────────────
+    # ── 三大法人、處置股：只在下午跑（15:00~20:00）──────────────────────────
     # 晚上不重跑，避免 API 已關閉回傳空資料，把白天正確寫入的資料覆蓋掉
     if 15 <= now_hour < 20:
         sync_institutional(today)

@@ -388,8 +388,8 @@ def register_api(app):
             d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
             yyyymm = f"{d.year}{d.month:02d}"
             url    = (
-                f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY"
-                f"?date={yyyymm}01&stockNo={stock_no}&response=json&_={int(_time.time()*1000)}"
+                f"https://www.twse.com.tw/exchangeReport/STOCK_DAY"
+                f"?response=json&date={yyyymm}01&stockNo={stock_no}"
             )
             try:
                 r = _req.get(url, headers=hdrs, timeout=12)
