@@ -392,8 +392,12 @@ def register_api(app):
                 f"?response=json&date={yyyymm}01&stockNo={stock_no}"
             )
             try:
+                print(f"[wave_data] 請求 URL: {url}")
                 r = _req.get(url, headers=hdrs, timeout=12)
+                print(f"[wave_data] HTTP狀態碼: {r.status_code}")
+                print(f"[wave_data] 回應前200字: {r.text[:200]}")
                 j = r.json()
+                print(f"[wave_data] stat={j.get('stat')}, 資料筆數={len(j.get('data', []))}")
                 if j.get("stat") == "OK" and j.get("data"):
                     if not name_from_api and j.get("title"):
                         import re as _re2
