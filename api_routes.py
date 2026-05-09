@@ -13,13 +13,9 @@ def register_api(app):
     # ── HTTP 安全 Headers ──────────────────────────────────────────────────────
     @app.after_request
     def set_security_headers(response):
-        # 防止 iframe 嵌入（點擊劫持攻擊）
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        # 防止瀏覽器猜測 MIME 類型（內容注入攻擊）
         response.headers['X-Content-Type-Options'] = 'nosniff'
-        # 控制 Referer 資訊洩漏
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        # 防止 XSS 攻擊（限制資源來源）
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
@@ -39,7 +35,6 @@ def register_api(app):
             "media-src 'self'; "
             "frame-ancestors 'self';"
         )
-        # 強制 HTTPS（Render 部署後才有效）
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
         return response
 
@@ -48,8 +43,6 @@ def register_api(app):
     def index():
         return send_from_directory('.', 'index.html')
 
-    # ── 靜態資源（images、音樂等）─────────────────────────────────────────────
-    # 讓 Render 能正確提供 logo、背景圖等資源
     @app.route("/images/<path:filename>")
     def serve_images(filename):
         return send_from_directory('images', filename)
@@ -62,7 +55,7 @@ def register_api(app):
     def serve_fonts(filename):
         return send_from_directory('fonts', filename)
 
-    # ── Legal 頁面（stock_site/legal/）────────────────────────────────────────
+    # ── Legal 頁面 ─────────────────────────────────────────────────────────────
     @app.route("/stock_site/legal/about.html")
     def page_about():
         return send_from_directory('stock_site/legal', 'about.html')
@@ -116,7 +109,7 @@ def register_api(app):
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
 
-    # ── 公司重大訊息 API ──────────────────────────────────────────────────────────────
+    # ── 公司重大訊息 API ───────────────────────────────────────────────────────
     @app.route("/api/news")
     def api_news():
         import requests as _req
@@ -137,7 +130,6 @@ def register_api(app):
         }
 
         def parse_html(html, extract_skey=False):
-            """Parse MOPS HTML rows into list of dicts."""
             items = []
             rows = _re.findall(r"<tr[^>]*>(.*?)</tr>", html, _re.DOTALL)
             for row in rows:
@@ -174,8 +166,7 @@ def register_api(app):
                 })
             return items
 
-        # ── Step 1: ajax_index → 最新8筆，含正確 skey ─────────────────────────
-        skey_map = {}  # key: (code, time) -> skey
+        skey_map = {}
         try:
             r = _req.post(
                 "https://mopsov.twse.com.tw/mops/web/ajax_index",
@@ -190,7 +181,6 @@ def register_api(app):
         except Exception as e:
             print(f"[api/news] ajax_index 失敗: {e}")
 
-        # ── Step 2: ajax_t05sr01_1 → 完整當日列表 ─────────────────────────────
         items = []
         try:
             r = _req.post(
@@ -203,7 +193,6 @@ def register_api(app):
                 parsed = parse_html(r.text, extract_skey=False)
                 print(f"[api/news] ajax_t05sr01_1: {len(parsed)} rows")
                 for item in parsed:
-                    # 從 skey_map 補入 skey
                     skey = skey_map.get((item["code"], item["time"]), "")
                     item["skey"] = skey
                     item["link"] = f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={item['code']}"
@@ -211,7 +200,6 @@ def register_api(app):
         except Exception as e:
             print(f"[api/news] ajax_t05sr01_1 失敗: {e}")
 
-        # ── Fallback: 若完整列表失敗，用 ajax_index 的8筆 ──────────────────────
         if not items and skey_map:
             try:
                 r = _req.post(
@@ -228,17 +216,17 @@ def register_api(app):
 
         return jsonify({"date": today, "count": len(items), "data": items})
 
-    # ── 公司重大訊息頁 ───────────────────────────────────────────────────────────────
+    # ── 公司重大訊息頁 ─────────────────────────────────────────────────────────
     @app.route("/stock_site/news/news.html")
     def page_news():
         return send_from_directory('stock_site/news', 'news.html')
 
-    # ── 注意股查詢頁 ─────────────────────────────────────────────────────────────────
+    # ── 注意股查詢頁 ───────────────────────────────────────────────────────────
     @app.route("/stock_site/news/notice.html")
     def page_notice():
         return send_from_directory('stock_site/news', 'notice.html')
 
-    # ── 注意股 API proxy ──────────────────────────────────────────────────────────────
+    # ── 注意股 API proxy ───────────────────────────────────────────────────────
     @app.route("/api/notice")
     def api_notice():
         import requests as _req
@@ -268,7 +256,6 @@ def register_api(app):
         return jsonify(get_trading_status())
 
     # ── 手動觸發 Firebase 同步（測試用）────────────────────────────────────────
-    # 用法：瀏覽器打開 /api/sync_test?date=20260424&token=你設定的SECRET
     @app.route("/api/sync_test")
     def api_sync_test():
         token = request.args.get("token", "")
@@ -347,21 +334,7 @@ def register_api(app):
         return send_from_directory('stock_site/tools', 'wave_chart.html')
 
     # ── 波浪走勢資料 Proxy API（含 Firebase 快取）─────────────────────────────
-    # 用法：/api/wave_data?keyword=2313&months=3
-    #
-    # 快取策略：
-    #   Firebase 路徑 → wave_cache/{stockNo}/{months}m
-    #   ├── data:         完整 JSON 回傳物件（含 name/stockNo/months/count/data）
-    #   ├── cached_at:    ISO 時間字串（台北時區）
-    #   └── trading_date: 快取當下的交易日（YYYYMMDD），用來判斷快取是否過期
-    #
-    #   命中條件（直接回傳快取，不打 TWSE）：
-    #     A. 盤中（< 15:00）→ 今日收盤 K 棒尚未產生，快取永遠有效
-    #     B. 盤後（>= 15:00）且 trading_date == 今天 → 今日 K 棒已在快取內
-    #
-    #   未命中（重打 TWSE API，並在盤後存入快取）：
-    #     C. 盤後 且 trading_date < 今天（快取缺今日 K 棒）
-    #     D. 沒有快取
+    # ⚠️  測試版：任何時間都會寫入快取，測試完畢後改回 is_after_close 判斷
     # ──────────────────────────────────────────────────────────────────────────
     @app.route("/api/wave_data")
     def api_wave_data():
@@ -386,16 +359,14 @@ def register_api(app):
             stock_no   = keyword
             stock_name = keyword
 
-        tz    = _ZI("Asia/Taipei")
-        now   = _dt.datetime.now(tz)
-        today_str      = now.strftime("%Y%m%d")  # e.g. "20260115"
-        is_after_close = now.hour >= 15           # 15:00 後才會有當日收盤 K 棒
+        tz        = _ZI("Asia/Taipei")
+        now       = _dt.datetime.now(tz)
+        today_str = now.strftime("%Y%m%d")
 
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         # ── 1. 嘗試從 Firebase 讀快取 ─────────────────────────────────────────
-        # Firebase key 不能有小數點，months 用整數無問題
         cache_key = f"{months}m"
         cache_ref = firebase_db.reference(f"wave_cache/{stock_no}/{cache_key}")
 
@@ -407,17 +378,9 @@ def register_api(app):
 
         if cache and cache.get("data"):
             trading_date = cache.get("trading_date", "")
-
-            # 盤中：直接用快取（今日收盤 K 棒還不存在）
-            if not is_after_close:
-                print(f"[wave_data] cache hit（盤中）: {stock_no} {cache_key}")
-                return jsonify(cache["data"])
-
-            # 盤後：只有快取包含今日 K 棒才算有效
             if trading_date == today_str:
-                print(f"[wave_data] cache hit（盤後）: {stock_no} {cache_key} trading_date={trading_date}")
+                print(f"[wave_data] cache hit: {stock_no} {cache_key} trading_date={trading_date}")
                 return jsonify(cache["data"])
-
             print(f"[wave_data] cache miss（trading_date={trading_date} != today={today_str}），重抓資料")
 
         # ── 2. 快取 miss，打 TWSE / OTC API ──────────────────────────────────
@@ -431,7 +394,6 @@ def register_api(app):
             "Referer":         "https://www.twse.com.tw/",
         }
 
-        # ── TWSE（上市）────────────────────────────────────────────────────────
         for i in range(months - 1, -1, -1):
             d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
             yyyymm = f"{d.year}{d.month:02d}"
@@ -470,7 +432,7 @@ def register_api(app):
                 print(f"[wave_data] TWSE {yyyymm} 抓取失敗: {e}")
                 continue
 
-        # ── OTC（上櫃）備援 ────────────────────────────────────────────────────
+        # OTC 備援
         if not rows:
             for i in range(months - 1, -1, -1):
                 d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
@@ -516,20 +478,17 @@ def register_api(app):
             "data":    rows,
         }
 
-        # ── 3. 盤後才存快取（你的規則：15:00 後收盤 K 棒才完整）─────────────
-        if is_after_close:
-            try:
-                cache_ref.set({
-                    "data":         result,
-                    "cached_at":    now.isoformat(),
-                    "trading_date": today_str,
-                })
-                print(f"[wave_data] cache saved: {stock_no} {cache_key} trading_date={today_str}")
-            except Exception as e:
-                # 快取寫入失敗不影響主流程，只是下次還會再打 API
-                print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
-        else:
-            print(f"[wave_data] 盤中，不寫快取（今日 K 棒尚未收盤）")
+        # ── 3. ⚠️ 測試版：任何時間都存快取 ──────────────────────────────────
+        # TODO: 正式版改回 → if is_after_close:
+        try:
+            cache_ref.set({
+                "data":         result,
+                "cached_at":    now.isoformat(),
+                "trading_date": today_str,
+            })
+            print(f"[wave_data] cache saved（測試模式）: {stock_no} {cache_key} trading_date={today_str}")
+        except Exception as e:
+            print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
 
         return jsonify(result)
 
@@ -569,12 +528,10 @@ def register_api(app):
         today = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d')
 
         try:
-            # ── 1. 今日訪客數 +1 ──────────────────────────────────────────
             daily_ref   = firebase_db.reference(f"visitors/daily/{today}")
             today_count = (daily_ref.get() or 0) + 1
             daily_ref.set(today_count)
 
-            # ── 2. 累積總訪客數 +1 ────────────────────────────────────────
             total_ref = firebase_db.reference("visitors/total")
             new_total = (total_ref.get() or 0) + 1
             total_ref.set(new_total)
@@ -588,7 +545,6 @@ def register_api(app):
 
 # ── 工具函式 ──────────────────────────────────────────────────────────────────
 def _extract_val(line):
-    # 同時支援「張」和「股」
     m = re.search(r"：\s*([^\s]+)\s*[張股]", line)
     return m.group(1) if m else None
 
