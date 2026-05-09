@@ -4,5 +4,6 @@ apscheduler
 pytz
 pandas
 flask_cors
+flask-limiter
 python-dotenv
 firebase-admin

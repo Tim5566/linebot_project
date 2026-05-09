@@ -1,14 +1,39 @@
 from flask import jsonify, request, send_from_directory
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from post_Info import stock_info, market_pnfo, get_today, twse_top50, otc_top50
 from get_trading_holidays import get_trading_status
 import re
 import os
+import threading
 from firebase_admin import db as firebase_db
+
+
+# ── 防重複打 TWSE 的 in-memory 鎖（模組層級，全域共用）─────────────────────
+# 同一支股票同時只有一個請求去打 TWSE，其他等它存完快取再拿
+_wave_locks      = {}
+_wave_locks_meta = threading.Lock()
+
+def _get_stock_lock(stock_no, cache_key):
+    key = f"{stock_no}_{cache_key}"
+    with _wave_locks_meta:
+        if key not in _wave_locks:
+            _wave_locks[key] = threading.Lock()
+        return _wave_locks[key]
+
+
+# ── Rate Limiter（模組層級，register_api 裡面 init_app）──────────────────────
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[],       # 不設全站預設，只對 wave_data 套用
+    storage_uri="memory://", # 記憶體儲存，無需 Redis
+)
 
 
 def register_api(app):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+    limiter.init_app(app)
 
     # ── HTTP 安全 Headers ──────────────────────────────────────────────────────
     @app.after_request
@@ -37,6 +62,14 @@ def register_api(app):
         )
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
         return response
+
+    # ── 超過 Rate Limit 時回傳 JSON（前端好處理）─────────────────────────────
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify({
+            "error": "查詢太頻繁，請稍後再試",
+            "retry_after": str(e.description),
+        }), 429
 
     # ── 首頁 ───────────────────────────────────────────────────────────────────
     @app.route("/")
@@ -177,7 +210,6 @@ def register_api(app):
                 for item in parse_html(r.text, extract_skey=True):
                     if item["skey"]:
                         skey_map[(item["code"], item["time"])] = item["skey"]
-                print(f"[api/news] ajax_index skey_map: {len(skey_map)} entries")
         except Exception as e:
             print(f"[api/news] ajax_index 失敗: {e}")
 
@@ -191,10 +223,8 @@ def register_api(app):
             )
             if r.status_code == 200:
                 parsed = parse_html(r.text, extract_skey=False)
-                print(f"[api/news] ajax_t05sr01_1: {len(parsed)} rows")
                 for item in parsed:
-                    skey = skey_map.get((item["code"], item["time"]), "")
-                    item["skey"] = skey
+                    item["skey"] = skey_map.get((item["code"], item["time"]), "")
                     item["link"] = f"https://mops.twse.com.tw/mops/#/web/t05sr01_1?co_id={item['code']}"
                     items.append(item)
         except Exception as e:
@@ -234,7 +264,7 @@ def register_api(app):
         import urllib3 as _u3
         _u3.disable_warnings(_u3.exceptions.InsecureRequestWarning)
 
-        ts = int(_time.time() * 1000)
+        ts  = int(_time.time() * 1000)
         url = f"https://www.twse.com.tw/rwd/zh/announcement/notice?response=json&_={ts}"
         hdrs = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -258,7 +288,7 @@ def register_api(app):
     # ── 手動觸發 Firebase 同步（測試用）────────────────────────────────────────
     @app.route("/api/sync_test")
     def api_sync_test():
-        token = request.args.get("token", "")
+        token  = request.args.get("token", "")
         secret = os.environ.get("SYNC_SECRET", "")
         if not secret or token != secret:
             return jsonify({"error": "未授權"}), 403
@@ -277,7 +307,7 @@ def register_api(app):
                 print(f"[sync_test ERROR]\n{traceback.format_exc()}")
 
         threading.Thread(target=run, daemon=True).start()
-        return jsonify({"status": "started", "date": date, "message": f"{date} 同步已在背景執行，請看 Render Log"})
+        return jsonify({"status": "started", "date": date, "message": f"{date} 同步已在背景執行"})
 
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")
@@ -333,10 +363,19 @@ def register_api(app):
     def page_wave_chart():
         return send_from_directory('stock_site/tools', 'wave_chart.html')
 
-    # ── 波浪走勢資料 Proxy API（含 Firebase 快取）─────────────────────────────
-    # ⚠️  測試版：任何時間都會寫入快取，測試完畢後改回 is_after_close 判斷
+    # ── 波浪走勢資料 Proxy API ─────────────────────────────────────────────────
+    #
+    # 三層保護：
+    #   Layer 1｜Rate Limit    每個IP 每分鐘10次、每小時60次
+    #                          全站    每分鐘100次（防瞬間爆量打到 TWSE）
+    #   Layer 2｜Firebase快取  cache hit 直接回傳，不打 TWSE
+    #   Layer 3｜in-memory鎖   同一支股票 cache miss 時只允許一個請求打 TWSE
+    #                          其他請求等鎖釋放後二次確認快取，直接拿結果
     # ──────────────────────────────────────────────────────────────────────────
     @app.route("/api/wave_data")
+    @limiter.limit("10 per minute")
+    @limiter.limit("60 per hour")
+    @limiter.limit("100 per minute", key_func=lambda: "global_wave")
     def api_wave_data():
         import requests as _req
         import time as _time
@@ -350,107 +389,89 @@ def register_api(app):
         if not keyword:
             return jsonify({"error": "請輸入股票代碼或名稱"}), 400
 
-        stock_no   = ""
-        stock_name = ""
+        is_code    = re.match(r"^\d{4,6}$", keyword)
+        stock_no   = keyword
+        stock_name = "" if is_code else keyword
 
-        if re.match(r"^\d{4,6}$", keyword):
-            stock_no = keyword
-        else:
-            stock_no   = keyword
-            stock_name = keyword
-
-        tz        = _ZI("Asia/Taipei")
-        now       = _dt.datetime.now(tz)
-        today_str = now.strftime("%Y%m%d")
+        tz             = _ZI("Asia/Taipei")
+        now            = _dt.datetime.now(tz)
+        today_str      = now.strftime("%Y%m%d")
+        is_after_close = now.hour >= 15
 
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        # ── 1. 嘗試從 Firebase 讀快取 ─────────────────────────────────────────
         cache_key = f"{months}m"
         cache_ref = firebase_db.reference(f"wave_cache/{stock_no}/{cache_key}")
 
-        try:
-            cache = cache_ref.get()
-        except Exception as e:
-            print(f"[wave_data] Firebase 讀取失敗，直接打 API: {e}")
-            cache = None
-
-        if cache and cache.get("data"):
-            trading_date = cache.get("trading_date", "")
-            if trading_date == today_str:
-                print(f"[wave_data] cache hit: {stock_no} {cache_key} trading_date={trading_date}")
-                return jsonify(cache["data"])
-            print(f"[wave_data] cache miss（trading_date={trading_date} != today={today_str}），重抓資料")
-
-        # ── 2. 快取 miss，打 TWSE / OTC API ──────────────────────────────────
-        rows          = []
-        name_from_api = ""
-
-        hdrs = {
-            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
-            "Accept":          "application/json, text/plain, */*",
-            "Accept-Language": "zh-TW,zh;q=0.9",
-            "Referer":         "https://www.twse.com.tw/",
-        }
-
-        for i in range(months - 1, -1, -1):
-            d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
-            yyyymm = f"{d.year}{d.month:02d}"
-            url    = (
-                f"https://www.twse.com.tw/exchangeReport/STOCK_DAY"
-                f"?response=json&date={yyyymm}01&stockNo={stock_no}"
-            )
+        # ── Layer 2：快取讀取輔助函式 ─────────────────────────────────────────
+        def _read_cache():
             try:
-                r = _req.get(url, headers=hdrs, timeout=12, verify=False)
-                j = r.json()
-                if j.get("stat") == "OK" and j.get("data"):
-                    if not name_from_api and j.get("title"):
-                        import re as _re2
-                        m = _re2.search(r"\d{4}\s+(.+?)\s+個股", j["title"])
-                        if m:
-                            name_from_api = m.group(1).strip()
-                    for row in j["data"]:
-                        try:
-                            open_  = float(row[3].replace(",", ""))
-                            high   = float(row[4].replace(",", ""))
-                            low    = float(row[5].replace(",", ""))
-                            close  = float(row[6].replace(",", ""))
-                            vol    = int(row[1].replace(",", ""))
-                            if close > 0:
-                                rows.append({
-                                    "date":   row[0],
-                                    "open":   open_,
-                                    "high":   high,
-                                    "low":    low,
-                                    "close":  close,
-                                    "volume": vol,
-                                })
-                        except Exception:
-                            continue
+                return cache_ref.get()
             except Exception as e:
-                print(f"[wave_data] TWSE {yyyymm} 抓取失敗: {e}")
-                continue
+                print(f"[wave_data] Firebase 讀取失敗: {e}")
+                return None
 
-        # OTC 備援
-        if not rows:
+        def _cache_valid(c):
+            if not c or not c.get("data"):
+                return False
+            if not is_after_close:
+                return True                              # 盤中：快取永遠有效
+            return c.get("trading_date", "") == today_str  # 盤後：需要今日快取
+
+        # ── 先在鎖外檢查快取（命中直接回傳，不需要進鎖）────────────────────
+        cache = _read_cache()
+        if _cache_valid(cache):
+            print(f"[wave_data] cache hit（鎖外）: {stock_no} {cache_key}")
+            return jsonify(cache["data"])
+
+        # ── Layer 3：in-memory 鎖，同一股票只打一次 TWSE ─────────────────────
+        stock_lock = _get_stock_lock(stock_no, cache_key)
+
+        if not stock_lock.acquire(timeout=20):
+            return jsonify({"error": "伺服器忙碌中，請稍後再試"}), 503
+
+        try:
+            # 拿到鎖後二次確認（前一個請求可能已幫我們存好快取）
+            cache = _read_cache()
+            if _cache_valid(cache):
+                print(f"[wave_data] cache hit（鎖內）: {stock_no} {cache_key}")
+                return jsonify(cache["data"])
+
+            # ── 打 TWSE API（上市）────────────────────────────────────────────
+            rows          = []
+            name_from_api = ""
+
+            hdrs = {
+                "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
+                "Accept":          "application/json, text/plain, */*",
+                "Accept-Language": "zh-TW,zh;q=0.9",
+                "Referer":         "https://www.twse.com.tw/",
+            }
+
             for i in range(months - 1, -1, -1):
-                d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
-                url = (
-                    f"https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php"
-                    f"?l=zh-tw&d={d.year-1911}/{d.month:02d}&stkno={stock_no}&_={int(_time.time()*1000)}"
+                d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
+                yyyymm = f"{d.year}{d.month:02d}"
+                url    = (
+                    f"https://www.twse.com.tw/exchangeReport/STOCK_DAY"
+                    f"?response=json&date={yyyymm}01&stockNo={stock_no}"
                 )
                 try:
                     r = _req.get(url, headers=hdrs, timeout=12, verify=False)
                     j = r.json()
-                    if j.get("iTotalRecords", 0) > 0:
-                        for row in j.get("aaData", []):
+                    if j.get("stat") == "OK" and j.get("data"):
+                        if not name_from_api and j.get("title"):
+                            import re as _re2
+                            m = _re2.search(r"\d{4}\s+(.+?)\s+個股", j["title"])
+                            if m:
+                                name_from_api = m.group(1).strip()
+                        for row in j["data"]:
                             try:
-                                close = float(row[6].replace(",", ""))
-                                open_ = float(row[3].replace(",", ""))
-                                high  = float(row[4].replace(",", ""))
-                                low   = float(row[5].replace(",", ""))
-                                vol   = int(row[1].replace(",", "").replace(" ", ""))
+                                open_  = float(row[3].replace(",", ""))
+                                high   = float(row[4].replace(",", ""))
+                                low    = float(row[5].replace(",", ""))
+                                close  = float(row[6].replace(",", ""))
+                                vol    = int(row[1].replace(",", ""))
                                 if close > 0:
                                     rows.append({
                                         "date":   row[0],
@@ -463,34 +484,73 @@ def register_api(app):
                             except Exception:
                                 continue
                 except Exception as e:
-                    print(f"[wave_data/OTC] {d.year}/{d.month} 失敗: {e}")
+                    print(f"[wave_data] TWSE {yyyymm} 抓取失敗: {e}")
                     continue
 
-        if not rows:
-            return jsonify({"error": f"查無「{keyword}」的股價資料，請確認代碼正確"}), 200
+            # ── OTC（上櫃）備援 ────────────────────────────────────────────────
+            if not rows:
+                for i in range(months - 1, -1, -1):
+                    d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
+                    url = (
+                        f"https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php"
+                        f"?l=zh-tw&d={d.year-1911}/{d.month:02d}&stkno={stock_no}&_={int(_time.time()*1000)}"
+                    )
+                    try:
+                        r = _req.get(url, headers=hdrs, timeout=12, verify=False)
+                        j = r.json()
+                        if j.get("iTotalRecords", 0) > 0:
+                            for row in j.get("aaData", []):
+                                try:
+                                    close = float(row[6].replace(",", ""))
+                                    open_ = float(row[3].replace(",", ""))
+                                    high  = float(row[4].replace(",", ""))
+                                    low   = float(row[5].replace(",", ""))
+                                    vol   = int(row[1].replace(",", "").replace(" ", ""))
+                                    if close > 0:
+                                        rows.append({
+                                            "date":   row[0],
+                                            "open":   open_,
+                                            "high":   high,
+                                            "low":    low,
+                                            "close":  close,
+                                            "volume": vol,
+                                        })
+                                except Exception:
+                                    continue
+                    except Exception as e:
+                        print(f"[wave_data/OTC] {d.year}/{d.month} 失敗: {e}")
+                        continue
 
-        final_name = name_from_api or stock_name or keyword
-        result = {
-            "name":    final_name,
-            "stockNo": stock_no,
-            "months":  months,
-            "count":   len(rows),
-            "data":    rows,
-        }
+            if not rows:
+                return jsonify({"error": f"查無「{keyword}」的股價資料，請確認代碼正確"}), 200
 
-        # ── 3. ⚠️ 測試版：任何時間都存快取 ──────────────────────────────────
-        # TODO: 正式版改回 → if is_after_close:
-        try:
-            cache_ref.set({
-                "data":         result,
-                "cached_at":    now.isoformat(),
-                "trading_date": today_str,
-            })
-            print(f"[wave_data] cache saved（測試模式）: {stock_no} {cache_key} trading_date={today_str}")
-        except Exception as e:
-            print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
+            final_name = name_from_api or stock_name or keyword
+            result = {
+                "name":    final_name,
+                "stockNo": stock_no,
+                "months":  months,
+                "count":   len(rows),
+                "data":    rows,
+            }
 
-        return jsonify(result)
+            # ── 盤後才寫快取（今日 K 棒 15:00 後才完整）─────────────────────
+            if is_after_close:
+                try:
+                    cache_ref.set({
+                        "data":         result,
+                        "cached_at":    now.isoformat(),
+                        "trading_date": today_str,
+                    })
+                    print(f"[wave_data] cache saved: {stock_no} {cache_key} trading_date={today_str}")
+                except Exception as e:
+                    print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
+            else:
+                print(f"[wave_data] 盤中，不寫快取")
+
+            return jsonify(result)
+
+        finally:
+            stock_lock.release()   # 無論成功失敗都要釋放鎖
 
     # ── 大盤資訊 API ───────────────────────────────────────────────────────────
     @app.route("/api/market")
