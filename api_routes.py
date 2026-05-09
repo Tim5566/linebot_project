@@ -360,8 +360,6 @@ def register_api(app):
         months  = int(request.args.get("months", 2))
         months  = max(1, min(12, months))
 
-        print(f"[wave_data] ▶ 開始查詢 keyword={keyword}, months={months}", flush=True)
-
         if not keyword:
             return jsonify({"error": "請輸入股票代碼或名稱"}), 400
 
@@ -374,12 +372,13 @@ def register_api(app):
             stock_no   = keyword
             stock_name = keyword
 
-        print(f"[wave_data] stock_no={stock_no}", flush=True)
-
         tz    = _ZI("Asia/Taipei")
         now   = _dt.datetime.now(tz)
         rows  = []
         name_from_api = ""
+
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         hdrs = {
             "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
@@ -396,11 +395,8 @@ def register_api(app):
                 f"?response=json&date={yyyymm}01&stockNo={stock_no}"
             )
             try:
-                print(f"[wave_data] 請求: {url}", flush=True)
-                r = _req.get(url, headers=hdrs, timeout=12)
-                print(f"[wave_data] 狀態碼: {r.status_code}, 回應: {r.text[:300]}", flush=True)
+                r = _req.get(url, headers=hdrs, timeout=12, verify=False)
                 j = r.json()
-                print(f"[wave_data] stat={j.get('stat')}, 筆數={len(j.get('data', []))}", flush=True)
                 if j.get("stat") == "OK" and j.get("data"):
                     if not name_from_api and j.get("title"):
                         import re as _re2
@@ -438,7 +434,7 @@ def register_api(app):
                     f"?l=zh-tw&d={d.year-1911}/{d.month:02d}&stkno={stock_no}&_={int(_time.time()*1000)}"
                 )
                 try:
-                    r = _req.get(url, headers=hdrs, timeout=12)
+                    r = _req.get(url, headers=hdrs, timeout=12, verify=False)
                     j = r.json()
                     if j.get("iTotalRecords", 0) > 0:
                         for row in j.get("aaData", []):
