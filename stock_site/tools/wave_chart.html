@@ -73,56 +73,75 @@
     /* ══ HEADER ══ */
     header {
       position: sticky; top: 0; z-index: 200;
-      height: 58px;
+      height: 60px;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 24px;
-      background: rgba(2,5,14,.95);
-      border-bottom: 1px solid rgba(0,229,255,.1);
-      backdrop-filter: blur(24px) saturate(180%);
+      padding: 0 28px 0 16px;
+      background: linear-gradient(90deg, rgba(3,6,14,.97), rgba(4,8,16,.97));
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      backdrop-filter: blur(24px) saturate(1.4);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
     }
     header::after {
       content: '';
       position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.8) 20%, rgba(0,180,255,1) 50%, rgba(0,229,255,.8) 80%, transparent 100%);
-      background-size: 300% 100%;
-      animation: scanline 5s linear infinite;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.7) 20%, rgba(0,170,255,.9) 50%, rgba(0,229,255,.7) 80%, transparent 100%);
+      background-size: 200% 100%;
+      animation: scanline 4s linear infinite;
     }
-    @keyframes scanline { 0%{background-position:-100% 0} 100%{background-position:300% 0} }
+    @keyframes scanline { from{background-position:-100% 0} to{background-position:200% 0} }
 
-    .hd-left  { display:flex; align-items:center; gap:14px }
-    .hd-right { display:flex; align-items:center; gap:10px }
+    .hd-left  { display:flex; align-items:center; gap:0 }
+    .hd-right { display:flex; align-items:center; gap:12px }
 
-    .btn-back {
-      display:flex; align-items:center; gap:5px;
-      color: var(--text-dim); font-size:.76rem; text-decoration:none;
-      padding:5px 12px; border-radius:8px;
-      border:1px solid rgba(0,229,255,.12);
-      font-family:'JetBrains Mono',monospace;
-      transition: all .2s;
+    /* Logo group */
+    .hd-logo { display:flex; align-items:center; gap:14px; margin-left:6px; }
+    .hd-logo-icon {
+      width:44px; height:44px; border-radius:10px;
+      display:grid; place-items:center;
+      position:relative; flex-shrink:0; overflow:visible;
     }
-    .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.4); background:rgba(0,229,255,.05) }
-    .btn-back svg  { width:13px; height:13px }
-
-    .hd-brand {
-      display:flex; flex-direction:column; gap:1px;
+    .hd-logo-icon img {
+      width:58px; height:58px; object-fit:contain; border-radius:10px;
+      filter:drop-shadow(0 0 8px rgba(0,229,255,.4));
+      position:relative; top:-6px; left:-6px;
     }
+
+    .hd-brand { display:flex; flex-direction:column; gap:1px; }
     .hd-title {
       font-family:'Orbitron',monospace;
-      font-size:.84rem; font-weight:700;
+      font-size:.88rem; font-weight:700;
       color:#fff; letter-spacing:.08em;
       text-shadow: 0 0 20px rgba(0,229,255,.4);
     }
     .hd-sub {
       font-family:'JetBrains Mono',monospace;
-      font-size:.54rem; color:var(--accent); opacity:.55;
+      font-size:.54rem; color:var(--accent); opacity:.65;
       letter-spacing:.22em;
     }
-    .hd-pill {
-      font-size:.62rem; padding:3px 10px; border-radius:20px;
-      background:rgba(0,229,255,.07); border:1px solid rgba(0,229,255,.2);
-      color:rgba(0,229,255,.8); font-family:'JetBrains Mono',monospace;
-      letter-spacing:.04em;
+
+    /* Clock pill — matches index.html #clock style */
+    .hd-clock {
+      font-family:'JetBrains Mono',monospace;
+      font-size:.78rem; color:var(--accent);
+      letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px; padding:5px 14px;
+      white-space:nowrap;
     }
+
+    .btn-back {
+      display:flex; align-items:center; gap:7px;
+      padding:6px 14px; border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      background:rgba(0,229,255,.05);
+      color:var(--text-dim); font-family:'JetBrains Mono',monospace;
+      font-size:.68rem; letter-spacing:.08em; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.35); background:rgba(0,229,255,.1); }
+    .btn-back svg  { width:14px; height:14px; }
 
     /* ══ LAYOUT ══ */
     .app { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:18px 16px 60px }
@@ -211,6 +230,36 @@
       background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.25);
       color:var(--text);
     }
+
+    /* MA toggle buttons */
+    .ma-toggle-group { display:flex; gap:4px }
+    .ma-btn {
+      padding:5px 11px; border-radius:8px; border:1.5px solid transparent;
+      background:transparent; color:var(--text-dim);
+      font-size:.7rem; font-weight:700; cursor:pointer;
+      font-family:'JetBrains Mono',monospace;
+      transition:all .18s; position:relative;
+    }
+    .ma-btn[data-ma="5"]  { border-color:rgba(255,154,60,.25); }
+    .ma-btn[data-ma="10"] { border-color:rgba(192,132,252,.25); }
+    .ma-btn[data-ma="20"] { border-color:rgba(56,189,248,.25); }
+    .ma-btn[data-ma="5"].active  { background:rgba(255,154,60,.15);  color:#ff9a3c; border-color:rgba(255,154,60,.6);  box-shadow:0 0 8px rgba(255,154,60,.2); }
+    .ma-btn[data-ma="10"].active { background:rgba(192,132,252,.15); color:#c084fc; border-color:rgba(192,132,252,.6); box-shadow:0 0 8px rgba(192,132,252,.2); }
+    .ma-btn[data-ma="20"].active { background:rgba(56,189,248,.15);  color:#38bdf8; border-color:rgba(56,189,248,.6);  box-shadow:0 0 8px rgba(56,189,248,.2); }
+    .ma-btn:not(.active) { opacity:.45; }
+    .ma-btn:hover { opacity:1; }
+
+    /* K-bar count badge */
+    .kbar-badge {
+      font-family:'JetBrains Mono',monospace; font-size:.62rem;
+      padding:2px 9px; border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      color:rgba(0,229,255,.6);
+      background:rgba(0,229,255,.04);
+      letter-spacing:.04em;
+    }
+    .kbar-badge.warn { border-color:rgba(255,214,0,.3); color:rgba(255,214,0,.8); background:rgba(255,214,0,.04); }
+    .kbar-badge.ok   { border-color:rgba(0,230,118,.25); color:rgba(0,230,118,.7); background:rgba(0,230,118,.04); }
 
     /* ══ STATUS BAR ══ */
     .status-bar {
@@ -337,6 +386,15 @@
     .empty-icon { font-size:30px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) }
     .empty-text { color:var(--muted); font-size:.82rem; text-align:center; line-height:1.8 }
     .empty-hint { font-size:.7rem; color:var(--text-dark); font-family:'JetBrains Mono',monospace }
+    .empty-tip {
+      margin-top:10px; padding:8px 18px; border-radius:8px;
+      background:rgba(255,214,0,.05); border:1px solid rgba(255,214,0,.18);
+      font-size:.72rem; color:rgba(255,214,0,.7);
+      font-family:'JetBrains Mono',monospace; letter-spacing:.02em;
+      display:flex; align-items:center; gap:7px; line-height:1.6;
+    }
+    .empty-tip strong { color:rgba(255,214,0,.95); }
+    .empty-tip-icon { font-size:1rem; flex-shrink:0; }
 
     /* ══ WAVE SECTION ══ */
     .wave-section { margin-bottom:12px }
@@ -411,8 +469,7 @@
       background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.18);
       color:var(--accent); font-family:'JetBrains Mono',monospace;
     }
-    .wg-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px }
-    .wg-block {
+    .wg-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px }    .wg-block {
       background:var(--bg2); border:1px solid var(--border);
       border-radius:10px; padding:12px;
     }
@@ -479,8 +536,10 @@
       .stats-grid { grid-template-columns:repeat(2,1fr) }
       .summary-grid { grid-template-columns:1fr }
       .wg-grid { grid-template-columns:1fr }
-      .hd-pill, .hd-sub { display:none }
+      .hd-sub { display:none }
       .wave-cards { grid-template-columns:repeat(auto-fill, minmax(110px,1fr)) }
+      .ma-toggle-group { display:none }
+      .ctrl-label { display:none }
     }
 
     /* ══ SCROLL BAR ══ */
@@ -492,6 +551,161 @@
     /* ══ FADE IN ══ */
     .fade-in { animation: fadeUp .4s ease both }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+    /* ══ 白天主題 ══ */
+    body.theme-day {
+      --bg:#b8d4ec; --bg2:#d0e8f8; --surface:rgba(255,255,255,.96); --surface2:rgba(232,246,255,.94);
+      --surface3:rgba(218,240,255,.92);
+      --border:rgba(10,60,120,.13); --border2:rgba(10,60,120,.18);
+      --accent:#0a52a0; --accent2:#0a7ec8;
+      --green:#0d6e2a; --green2:#0a5820;
+      --red:#a02818; --red2:#7a1a10;
+      --yellow:#8a6800; --orange:#a05000;
+      --purple:#5a20b0;
+      --muted:#3a7090;
+      --text:#071628; --text-dim:#1a3a5c; --text-dark:#3a5570;
+      --cup:#0d6e2a; --cdn:#a02818;
+      background: linear-gradient(170deg,#5aaee0 0%,#7dcaf5 22%,#a8dcfc 45%,#c8eefa 65%,#daf4f0 85%,#e6f8ec 100%);
+    }
+    body.theme-day::before {
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 20%, rgba(255,255,255,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 90% 80%, rgba(200,230,255,.1) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 30% at 50% 50%, rgba(150,210,255,.04) 0%, transparent 70%);
+    }
+    body.theme-day header {
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(24px) saturate(2);
+      border-bottom:1px solid rgba(10,80,160,.14);
+      box-shadow:0 2px 24px rgba(10,60,140,.12);
+    }
+    body.theme-day header::after {
+      background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.7),rgba(26,123,191,.5),transparent);
+      background-size:200% 100%;
+    }
+    body.theme-day .hd-title { color:#050f1e; text-shadow:none; }
+    body.theme-day .hd-sub   { color:#0a52a0; opacity:.9; }
+    body.theme-day .hd-clock {
+      color:#0a3a7a; text-shadow:none;
+      background:rgba(10,60,160,.05);
+      border-color:rgba(10,60,160,.16);
+    }
+    body.theme-day .btn-back { color:#0a3060; border-color:rgba(10,80,160,.22); background:rgba(10,80,160,.08); }
+    body.theme-day .btn-back:hover { color:#061830; border-color:rgba(10,80,160,.42); background:rgba(10,80,160,.16); }
+
+    body.theme-day .search-panel {
+      background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.16);
+    }
+    body.theme-day .input-wrap {
+      background:rgba(230,244,255,.85); border-color:rgba(10,80,160,.2);
+    }
+    body.theme-day .input-wrap:focus-within {
+      border-color:rgba(10,80,160,.5);
+      box-shadow:0 0 0 3px rgba(10,80,160,.08);
+    }
+    body.theme-day .input-wrap input { color:#071628; }
+    body.theme-day .input-wrap input::placeholder { color:#6090b8; }
+    body.theme-day .btn-primary {
+      background:linear-gradient(135deg,rgba(10,82,160,.15),rgba(10,120,200,.1));
+      border-color:rgba(10,82,160,.4); color:#0a52a0;
+    }
+    body.theme-day .btn-primary:hover:not(:disabled) {
+      background:rgba(10,82,160,.22);
+      box-shadow:0 0 20px rgba(10,82,160,.2),0 4px 12px rgba(0,0,0,.1);
+    }
+    body.theme-day .btn-ghost { background:rgba(10,60,120,.05); border-color:rgba(10,60,120,.18); color:#2a5070; }
+    body.theme-day .btn-ghost:hover { background:rgba(10,60,120,.1); color:#071628; }
+    body.theme-day .tab-btn { color:#2a5070; border-color:rgba(10,60,120,.18); }
+    body.theme-day .tab-btn:hover { border-color:rgba(10,60,120,.35); color:#071628; }
+    body.theme-day .tab-btn.active { background:rgba(10,82,160,.14); border-color:rgba(10,82,160,.5); color:#0a52a0; box-shadow:0 0 10px rgba(10,82,160,.12); }
+    body.theme-day .ct-btn { color:#2a5070; border-color:rgba(10,60,120,.15); }
+    body.theme-day .ct-btn:hover { border-color:rgba(10,60,120,.3); color:#071628; }
+    body.theme-day .ct-btn.active { background:rgba(10,60,120,.08); border-color:rgba(10,60,120,.28); color:#071628; }
+    body.theme-day .ma-btn { color:#3a6080; }
+    body.theme-day .ma-btn[data-ma="5"]  { border-color:rgba(180,80,0,.25); }
+    body.theme-day .ma-btn[data-ma="10"] { border-color:rgba(100,30,160,.2); }
+    body.theme-day .ma-btn[data-ma="20"] { border-color:rgba(10,100,180,.25); }
+    body.theme-day .ma-btn[data-ma="5"].active  { background:rgba(180,80,0,.1);   color:#b85000; border-color:rgba(180,80,0,.55); }
+    body.theme-day .ma-btn[data-ma="10"].active { background:rgba(100,30,160,.08);color:#6414a0; border-color:rgba(100,30,160,.5); }
+    body.theme-day .ma-btn[data-ma="20"].active { background:rgba(10,100,180,.1);  color:#0a64b4; border-color:rgba(10,100,180,.55); }
+    body.theme-day .empty-tip {
+      background:rgba(138,104,0,.06); border-color:rgba(138,104,0,.2);
+      color:rgba(100,74,0,.85);
+    }
+    body.theme-day .empty-tip strong { color:rgba(100,74,0,1); }
+    body.theme-day .kbar-badge { border-color:rgba(10,82,160,.2); color:rgba(10,82,160,.7); }
+    body.theme-day .kbar-badge.warn { border-color:rgba(138,104,0,.3); color:rgba(138,104,0,.85); background:rgba(138,104,0,.04); }
+    body.theme-day .kbar-badge.ok   { border-color:rgba(13,110,42,.25); color:rgba(13,110,42,.75); background:rgba(13,110,42,.04); }
+
+    body.theme-day .status-bar { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.16); color:#2a5070; }
+    body.theme-day .status-bar.ok   { border-color:rgba(13,110,42,.3); color:#0d6e2a; }
+    body.theme-day .status-bar.err  { border-color:rgba(160,40,24,.25); color:#a02818; }
+    body.theme-day .status-bar.warn { border-color:rgba(138,104,0,.25); color:#8a6800; }
+    body.theme-day .status-bar.load { border-color:rgba(10,82,160,.3); color:#0a52a0; }
+
+    body.theme-day .stock-info-bar { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.16); }
+    body.theme-day .sib-name { color:#050f1e; }
+    body.theme-day .sib-code { color:#1a3a5c; background:rgba(10,60,120,.07); border-color:rgba(10,60,120,.16); }
+    body.theme-day .sib-date { color:#3a6080; }
+    body.theme-day .sib-stat-label { color:#3a6080; }
+
+    body.theme-day .chart-wrap { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.16); }
+    body.theme-day .chart-toolbar { border-bottom-color:rgba(10,60,120,.1); }
+    body.theme-day .chart-label { color:#0a52a0; }
+    body.theme-day .chart-main-area { background:#e8f4ff; }
+    body.theme-day .vol-area { background:#ddf0ff; border-top-color:rgba(10,60,120,.1); }
+    body.theme-day .chart-empty { background:#e8f4ff; }
+    body.theme-day .empty-text { color:#3a6080; }
+    body.theme-day .empty-hint { color:#5a80a0; }
+    body.theme-day .empty-rings::before { border-top-color:rgba(10,82,160,.3); }
+    body.theme-day .empty-rings::after  { border-top-color:rgba(10,82,160,.15); }
+    body.theme-day .chart-tooltip {
+      background:rgba(240,250,255,.97); border-color:rgba(10,82,160,.3);
+      box-shadow:0 8px 32px rgba(10,40,100,.15);
+    }
+    body.theme-day .tooltip-date { color:#0a52a0; }
+    body.theme-day .tooltip-ohlc { color:#071628; }
+    body.theme-day .tooltip-vol  { color:#3a6080; }
+    body.theme-day .xhair-h, body.theme-day .xhair-v { background:rgba(10,82,160,.2); }
+
+    body.theme-day .wave-section .section-title { color:#2a5070; }
+    body.theme-day .wave-section .section-title::after { background:linear-gradient(90deg,rgba(10,60,120,.18),transparent); }
+    body.theme-day .wave-card { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.16); }
+    body.theme-day .wave-card:hover { box-shadow:0 8px 24px rgba(10,40,100,.12); }
+    body.theme-day .wc-type  { color:#3a6080; }
+    body.theme-day .wc-pct   { color:#3a6080; }
+    body.theme-day .wc-days  { color:#3a6080; }
+
+    body.theme-day .stats-grid .stat-card { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.14); }
+    body.theme-day .stat-label { color:#3a6080; }
+    body.theme-day .stat-value { color:#071628; }
+
+    body.theme-day .wave-guide { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.14); }
+    body.theme-day .wg-title { color:#071628; }
+    body.theme-day .wg-title-badge { color:#0a52a0; background:rgba(10,82,160,.08); border-color:rgba(10,82,160,.2); }
+    body.theme-day .wg-block { background:rgba(210,238,255,.6); border-color:rgba(10,60,120,.12); }
+    body.theme-day .wg-block-title { color:#071628; }
+    body.theme-day .wg-rule { color:#2a5070; }
+
+    body.theme-day .summary-panel { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.14); }
+    body.theme-day .summary-title { color:#071628; }
+    body.theme-day .summary-block { background:rgba(210,238,255,.6); border-color:rgba(10,60,120,.12); }
+    body.theme-day .sb-title   { color:#3a6080; }
+    body.theme-day .sb-content { color:#071628; }
+    body.theme-day .tag-up      { background:rgba(13,110,42,.1); color:#0d6e2a; border-color:rgba(13,110,42,.2); }
+    body.theme-day .tag-down    { background:rgba(160,40,24,.08); color:#a02818; border-color:rgba(160,40,24,.18); }
+    body.theme-day .tag-neutral { background:rgba(138,104,0,.07); color:#8a6800; border-color:rgba(138,104,0,.18); }
+
+    body.theme-day .fib-ratio { color:#3a6080; }
+    body.theme-day .fib-bar-wrap { background:rgba(10,60,120,.08); }
+    body.theme-day .fib-price { color:#071628; }
+
+    body.theme-day .disclaimer { color:#5a80a0; border-top-color:rgba(10,60,120,.12); }
+    body.theme-day ::-webkit-scrollbar-track { background:rgba(200,230,255,.3); }
+    body.theme-day ::-webkit-scrollbar-thumb { background:rgba(10,60,120,.2); }
+    body.theme-day ::-webkit-scrollbar-thumb:hover { background:rgba(10,60,120,.35); }
+
+    body.theme-day .leg-item { color:#2a5070; }
   </style>
 </head>
 <body>
@@ -499,18 +713,22 @@
 <!-- ── HEADER ── -->
 <header>
   <div class="hd-left">
-    <a class="btn-back" href="/">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      返回
-    </a>
-    <div class="hd-brand">
-      <div class="hd-title">WAVE ANALYSIS</div>
-      <div class="hd-sub">ELLIOTT WAVE · 艾略特波浪理論</div>
+    <div class="hd-logo">
+      <div class="hd-logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'"/>
+      </div>
+      <div class="hd-brand">
+        <div class="hd-title">JellyStock</div>
+        <div class="hd-sub">波浪走勢查詢</div>
+      </div>
     </div>
-    <span class="hd-pill">台股技術分析</span>
   </div>
   <div class="hd-right">
-    <span id="hdTime" style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-dark)"></span>
+    <span id="hdTime" class="hd-clock"></span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
   </div>
 </header>
 
@@ -531,19 +749,13 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         分析走勢
       </button>
-      <button class="btn btn-ghost" onclick="loadDemo()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        示範
-      </button>
     </div>
     <div class="controls-row">
       <span class="ctrl-label">資料期間</span>
       <div class="tab-group" id="periodGroup">
-        <button class="tab-btn" data-m="1" onclick="setPeriod(1)">1M</button>
-        <button class="tab-btn active" data-m="3" onclick="setPeriod(3)">3M</button>
-        <button class="tab-btn" data-m="6" onclick="setPeriod(6)">6M</button>
-        <button class="tab-btn" data-m="9" onclick="setPeriod(9)">9M</button>
-        <button class="tab-btn" data-m="12" onclick="setPeriod(12)">12M</button>
+        <button class="tab-btn active" data-m="6"  onclick="setPeriod(6)">6M</button>
+        <button class="tab-btn"        data-m="9"  onclick="setPeriod(9)">9M</button>
+        <button class="tab-btn"        data-m="12" onclick="setPeriod(12)">12M</button>
       </div>
       <span class="ctrl-label" style="margin-left:8px">圖表類型</span>
       <div class="chart-type-group" id="chartTypeGroup">
@@ -551,13 +763,19 @@
         <button class="ct-btn" data-type="line"   onclick="setChartType('line')">折線</button>
         <button class="ct-btn" data-type="area"   onclick="setChartType('area')">面積</button>
       </div>
+      <span class="ctrl-label" style="margin-left:8px">均線顯示</span>
+      <div class="ma-toggle-group" id="maToggleGroup">
+        <button class="ma-btn active" data-ma="5"  onclick="toggleMA(5)"  title="5日均線">MA5</button>
+        <button class="ma-btn active" data-ma="10" onclick="toggleMA(10)" title="10日均線">MA10</button>
+        <button class="ma-btn active" data-ma="20" onclick="toggleMA(20)" title="20日均線">MA20</button>
+      </div>
     </div>
   </div>
 
   <!-- STATUS BAR -->
   <div class="status-bar" id="statusBar">
     <span class="status-dot"></span>
-    <span id="statusText">輸入股票代碼後按「分析走勢」，或點「示範」查看效果</span>
+    <span id="statusText">輸入股票代碼或名稱後按「分析走勢」開始查詢</span>
   </div>
 
   <!-- STOCK INFO BAR -->
@@ -596,13 +814,16 @@
   <!-- CHART -->
   <div class="chart-wrap fade-in" id="chartWrap">
     <div class="chart-toolbar">
-      <span class="chart-label">▸ PRICE · K-LINE CHART</span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="chart-label">▸ PRICE · K-LINE CHART</span>
+        <span class="kbar-badge" id="kbarBadge" style="display:none"></span>
+      </div>
       <div class="legend" id="chartLegend" style="display:none">
         <div class="leg-item"><div class="leg-sq" style="background:var(--cup)"></div>收漲</div>
         <div class="leg-item"><div class="leg-sq" style="background:var(--cdn)"></div>收跌</div>
-        <div class="leg-item"><div class="leg-line" style="background:var(--ma5)"></div>MA5</div>
-        <div class="leg-item"><div class="leg-line" style="background:var(--ma10)"></div>MA10</div>
-        <div class="leg-item"><div class="leg-line" style="background:var(--ma20)"></div>MA20</div>
+        <div class="leg-item leg-ma" id="leg-ma5"><div class="leg-line" style="background:var(--ma5)"></div>MA5</div>
+        <div class="leg-item leg-ma" id="leg-ma10"><div class="leg-line" style="background:var(--ma10)"></div>MA10</div>
+        <div class="leg-item leg-ma" id="leg-ma20"><div class="leg-line" style="background:var(--ma20)"></div>MA20</div>
         <div class="leg-item"><div class="leg-dash" style="border-color:var(--yellow)"></div>波浪</div>
       </div>
     </div>
@@ -610,6 +831,10 @@
       <div class="chart-empty" id="chartEmpty">
         <div class="empty-rings"><span class="empty-icon">📈</span></div>
         <div class="empty-text">請輸入股票代碼開始分析<br><span class="empty-hint">支援上市・上櫃 全市場個股</span></div>
+        <div class="empty-tip">
+          <span class="empty-tip-icon">💡</span>
+          波浪理論建議：至少 <strong>100～200 根</strong> K棒才具參考性，建議選擇 <strong>6M 以上</strong> 期間
+        </div>
       </div>
       <canvas id="mainCanvas" width="1020" height="440" style="display:none"></canvas>
       <div class="chart-tooltip" id="tooltip">
@@ -688,6 +913,24 @@
           </div>
         </div>
       </div>
+      <div class="wg-block">
+        <div class="wg-block-title" style="color:var(--yellow)">📊 資料品質建議</div>
+        <div class="wg-rules">
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--green)"></div><span><strong style="color:var(--green)">200根以上（理想）</strong>：能看到完整的 5浪＋ABC 修正結構</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--accent)"></div><span><strong style="color:var(--accent)">100～200根（尚可）</strong>：可辨識主要轉折，參考性較高</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--red)"></div><span><strong style="color:var(--red)">100根以下（不建議）</strong>：樣本過短，容易只看到局部波動</span></div>
+          <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--yellow)"></div>建議使用 <strong style="color:var(--yellow)">6M ～ 12M</strong> 以確保充足的K棒數量</div>
+        </div>
+      </div>
+      <div class="wg-block">
+        <div class="wg-block-title" style="color:var(--purple)">📐 均線參考說明</div>
+        <div class="wg-rules">
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma5)"></div><strong style="color:var(--ma5)">MA5</strong>：5日均線，反映短線動能</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma10)"></div><strong style="color:var(--ma10)">MA10</strong>：10日均線，週線趨勢參考</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma20)"></div><strong style="color:var(--ma20)">MA20</strong>：20日均線，月線支撐壓力</div>
+          <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--text-dim)"></div>三線多頭排列（MA5＞MA10＞MA20）為強勢訊號；空頭排列反之</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -733,12 +976,12 @@ const C = {
 // ═══════════════════════════════════════════════════════
 let DATA      = [];
 let WAVES     = [];
-let MONTHS    = 3;
+let MONTHS    = 6;
 let KEYWORD   = '';
 let STOCK_NO  = '';
 let STOCK_NAME= '';
-let IS_DEMO   = false;
 let CHART_TYPE= 'candle'; // candle | line | area
+let MA_VISIBLE= { 5:true, 10:true, 20:true };
 let HOVER_IDX = -1;
 let CAM       = { start:0, end:1 }; // viewport ratio
 
@@ -767,13 +1010,23 @@ function setPeriod(m) {
     b.classList.toggle('active', +b.dataset.m === m);
   });
   if (KEYWORD) doSearch(true);
-  else if (IS_DEMO) loadDemo();
 }
 function setChartType(t) {
   CHART_TYPE = t;
   document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.type === t);
   });
+  if (DATA.length) renderAll();
+}
+
+function toggleMA(period) {
+  MA_VISIBLE[period] = !MA_VISIBLE[period];
+  // Update button
+  const btn = document.querySelector(`.ma-btn[data-ma="${period}"]`);
+  if (btn) btn.classList.toggle('active', MA_VISIBLE[period]);
+  // Update legend
+  const legEl = document.getElementById(`leg-ma${period}`);
+  if (legEl) legEl.style.opacity = MA_VISIBLE[period] ? '1' : '0.3';
   if (DATA.length) renderAll();
 }
 
@@ -798,7 +1051,6 @@ async function doSearch(silent=false) {
 
     STOCK_NAME = json.name    || KEYWORD;
     STOCK_NO   = json.stockNo || KEYWORD;
-    IS_DEMO    = false;
     DATA       = json.data;
 
     const n = DATA.length;
@@ -807,7 +1059,7 @@ async function doSearch(silent=false) {
     // CORS fallback
     const r = await fetchTWSEFallback(KEYWORD);
     if (r) {
-      STOCK_NAME = r.name; STOCK_NO = r.stockNo; IS_DEMO = false; DATA = r.data;
+      STOCK_NAME = r.name; STOCK_NO = r.stockNo; DATA = r.data;
       setStatus(`✔ 資料已取得 ｜ ${DATA.length} 筆`, 'ok');
     } else {
       setStatus(`✖ 無法取得「${KEYWORD}」資料：${e.message}`, 'err');
@@ -839,43 +1091,6 @@ async function fetchTWSEFallback(keyword) {
   return rows.length ? { name:keyword, stockNo:keyword, data:rows } : null;
 }
 
-function loadDemo() {
-  IS_DEMO=true; STOCK_NAME='台積電'; STOCK_NO='2330'; KEYWORD='2330';
-  document.getElementById('stockInput').value='2330';
-  DATA = buildDemoData(MONTHS);
-  setStatus(`◈ 示範模式 ｜ 台積電（2330）模擬走勢 ｜ ${DATA.length} 筆`, 'warn');
-  renderAll();
-}
-
-function buildDemoData(months) {
-  const total = months * 21;
-  let price = 780; let dayOff = 0;
-  const base = new Date(2025, 0, 2);
-  const out = [];
-  for (let i=0; i<total; i++) {
-    const ph = i/total;
-    let drift = 0;
-    if      (ph<.2)  drift =  1.2 + Math.random()*.8;
-    else if (ph<.38) drift = -1.5 + Math.random()*.6;
-    else if (ph<.62) drift =  2.0 + Math.random()*1.0;
-    else if (ph<.75) drift = -0.9 + Math.random()*.4;
-    else             drift =  1.3 + Math.random()*.7;
-    price += drift + (Math.random()-.5)*6;
-    price = Math.max(700, Math.min(1050, price));
-    const d = new Date(base); d.setDate(base.getDate()+dayOff);
-    while(d.getDay()===0||d.getDay()===6){d.setDate(d.getDate()+1);dayOff++;}
-    dayOff++;
-    const yr = d.getFullYear()-1911;
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    const close = +price.toFixed(1);
-    const open  = +(close+(Math.random()-.5)*12).toFixed(1);
-    const high  = +(Math.max(open,close)+Math.random()*10).toFixed(1);
-    const low   = +(Math.min(open,close)-Math.random()*10).toFixed(1);
-    out.push({date:`${yr}/${mm}/${dd}`,open,high,low,close,volume:Math.floor(Math.random()*25000+8000)*1000});
-  }
-  return out;
-}
 
 // ═══════════════════════════════════════════════════════
 // WAVE DETECTION — improved pivot algorithm
@@ -1036,6 +1251,7 @@ function drawMain(data, waves) {
 
   // ── MA lines
   [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
+    if (!MA_VISIBLE[p2]) return;
     const ma = calcMA(data,p2);
     ctx.strokeStyle=col; ctx.lineWidth=1.4; ctx.beginPath(); let started=false;
     ma.forEach((v,i)=>{
@@ -1245,6 +1461,23 @@ function renderAll() {
   document.getElementById('volCanvas').style.display='block';
   document.getElementById('chartLegend').style.display='flex';
 
+  // K-bar count badge
+  const badge = document.getElementById('kbarBadge');
+  const n = DATA.length;
+  if (badge) {
+    badge.style.display = 'inline-block';
+    if (n >= 200) {
+      badge.textContent = `${n} 根K棒 ✔ 資料充足`;
+      badge.className = 'kbar-badge ok';
+    } else if (n >= 100) {
+      badge.textContent = `${n} 根K棒 ▲ 資料尚可`;
+      badge.className = 'kbar-badge';
+    } else {
+      badge.textContent = `${n} 根K棒 ⚠ 建議增加期間`;
+      badge.className = 'kbar-badge warn';
+    }
+  }
+
   drawMain(DATA, WAVES);
   drawVolume(DATA);
 
@@ -1426,6 +1659,38 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('resize', () => {
   if (DATA.length) renderAll();
 });
+</script>
+
+<!-- ── 主題同步（與主站、news 頁共用同一機制）──────────────────── -->
+<script>
+(function() {
+  function applyTheme(theme) {
+    if (theme === 'day') {
+      document.body.classList.add('theme-day');
+    } else {
+      document.body.classList.remove('theme-day');
+    }
+  }
+
+  // 讀取全域主題（與主頁共用 key）
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+
+  // 監聽其他分頁的主題切換（BroadcastChannel）
+  try {
+    var _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = function(e) {
+      if (e.data && e.data.theme) applyTheme(e.data.theme);
+    };
+  } catch(e) {}
+
+  // storage 事件：同 session 其他頁更改主題時同步
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme') {
+      applyTheme(e.newValue || 'space');
+    }
+  });
+})();
 </script>
 </body>
 </html>

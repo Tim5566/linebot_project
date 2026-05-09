@@ -83,35 +83,35 @@ def register_api(app):
     @app.route("/stock_site/features/chapter2.html")
     def page_chapter2():
         return send_from_directory('stock_site/features', 'chapter2.html')
-    
+
     @app.route("/stock_site/features/chapter3.html")
     def page_chapter3():
         return send_from_directory('stock_site/features', 'chapter3.html')
-    
+
     @app.route("/stock_site/features/chapter4.html")
     def page_chapter4():
         return send_from_directory('stock_site/features', 'chapter4.html')
-    
+
     @app.route("/stock_site/features/chapter5.html")
     def page_chapter5():
         return send_from_directory('stock_site/features', 'chapter5.html')
-    
+
     @app.route("/stock_site/features/chapter6.html")
     def page_chapter6():
         return send_from_directory('stock_site/features', 'chapter6.html')
-    
+
     @app.route("/stock_site/features/chapter7.html")
     def page_chapter7():
         return send_from_directory('stock_site/features', 'chapter7.html')
-    
+
     @app.route("/stock_site/features/chapter8.html")
     def page_chapter8():
         return send_from_directory('stock_site/features', 'chapter8.html')
-    
+
     @app.route("/stock_site/features/chapter9.html")
     def page_chapter9():
         return send_from_directory('stock_site/features', 'chapter9.html')
-    
+
     @app.route("/stock_site/features/chapter10.html")
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
@@ -346,9 +346,23 @@ def register_api(app):
     def page_wave_chart():
         return send_from_directory('stock_site/tools', 'wave_chart.html')
 
-    # ── 波浪走勢資料 Proxy API ──────────────────────────────────────────────────
+    # ── 波浪走勢資料 Proxy API（含 Firebase 快取）─────────────────────────────
     # 用法：/api/wave_data?keyword=2313&months=3
-    # 解決瀏覽器端 CORS 限制，由後端呼叫 TWSE 再回傳
+    #
+    # 快取策略：
+    #   Firebase 路徑 → wave_cache/{stockNo}/{months}m
+    #   ├── data:         完整 JSON 回傳物件（含 name/stockNo/months/count/data）
+    #   ├── cached_at:    ISO 時間字串（台北時區）
+    #   └── trading_date: 快取當下的交易日（YYYYMMDD），用來判斷快取是否過期
+    #
+    #   命中條件（直接回傳快取，不打 TWSE）：
+    #     A. 盤中（< 15:00）→ 今日收盤 K 棒尚未產生，快取永遠有效
+    #     B. 盤後（>= 15:00）且 trading_date == 今天 → 今日 K 棒已在快取內
+    #
+    #   未命中（重打 TWSE API，並在盤後存入快取）：
+    #     C. 盤後 且 trading_date < 今天（快取缺今日 K 棒）
+    #     D. 沒有快取
+    # ──────────────────────────────────────────────────────────────────────────
     @app.route("/api/wave_data")
     def api_wave_data():
         import requests as _req
@@ -374,11 +388,41 @@ def register_api(app):
 
         tz    = _ZI("Asia/Taipei")
         now   = _dt.datetime.now(tz)
-        rows  = []
-        name_from_api = ""
+        today_str      = now.strftime("%Y%m%d")  # e.g. "20260115"
+        is_after_close = now.hour >= 15           # 15:00 後才會有當日收盤 K 棒
 
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        # ── 1. 嘗試從 Firebase 讀快取 ─────────────────────────────────────────
+        # Firebase key 不能有小數點，months 用整數無問題
+        cache_key = f"{months}m"
+        cache_ref = firebase_db.reference(f"wave_cache/{stock_no}/{cache_key}")
+
+        try:
+            cache = cache_ref.get()
+        except Exception as e:
+            print(f"[wave_data] Firebase 讀取失敗，直接打 API: {e}")
+            cache = None
+
+        if cache and cache.get("data"):
+            trading_date = cache.get("trading_date", "")
+
+            # 盤中：直接用快取（今日收盤 K 棒還不存在）
+            if not is_after_close:
+                print(f"[wave_data] cache hit（盤中）: {stock_no} {cache_key}")
+                return jsonify(cache["data"])
+
+            # 盤後：只有快取包含今日 K 棒才算有效
+            if trading_date == today_str:
+                print(f"[wave_data] cache hit（盤後）: {stock_no} {cache_key} trading_date={trading_date}")
+                return jsonify(cache["data"])
+
+            print(f"[wave_data] cache miss（trading_date={trading_date} != today={today_str}），重抓資料")
+
+        # ── 2. 快取 miss，打 TWSE / OTC API ──────────────────────────────────
+        rows          = []
+        name_from_api = ""
 
         hdrs = {
             "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
@@ -387,6 +431,7 @@ def register_api(app):
             "Referer":         "https://www.twse.com.tw/",
         }
 
+        # ── TWSE（上市）────────────────────────────────────────────────────────
         for i in range(months - 1, -1, -1):
             d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
             yyyymm = f"{d.year}{d.month:02d}"
@@ -422,10 +467,10 @@ def register_api(app):
                         except Exception:
                             continue
             except Exception as e:
-                print(f"[wave_data] {yyyymm} 抓取失敗: {e}")
+                print(f"[wave_data] TWSE {yyyymm} 抓取失敗: {e}")
                 continue
 
-        # OTC 備援
+        # ── OTC（上櫃）備援 ────────────────────────────────────────────────────
         if not rows:
             for i in range(months - 1, -1, -1):
                 d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
@@ -463,13 +508,30 @@ def register_api(app):
             return jsonify({"error": f"查無「{keyword}」的股價資料，請確認代碼正確"}), 200
 
         final_name = name_from_api or stock_name or keyword
-        return jsonify({
+        result = {
             "name":    final_name,
             "stockNo": stock_no,
             "months":  months,
             "count":   len(rows),
             "data":    rows,
-        })
+        }
+
+        # ── 3. 盤後才存快取（你的規則：15:00 後收盤 K 棒才完整）─────────────
+        if is_after_close:
+            try:
+                cache_ref.set({
+                    "data":         result,
+                    "cached_at":    now.isoformat(),
+                    "trading_date": today_str,
+                })
+                print(f"[wave_data] cache saved: {stock_no} {cache_key} trading_date={today_str}")
+            except Exception as e:
+                # 快取寫入失敗不影響主流程，只是下次還會再打 API
+                print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
+        else:
+            print(f"[wave_data] 盤中，不寫快取（今日 K 棒尚未收盤）")
+
+        return jsonify(result)
 
     # ── 大盤資訊 API ───────────────────────────────────────────────────────────
     @app.route("/api/market")

@@ -6417,7 +6417,7 @@ function openWaveChart() {
   const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
   const base = '/stock_site/tools/wave_chart.html';
   const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
-  window.open(url, '_blank', 'noopener,noreferrer');
+  window.location.href = url;
 }
 
 function closeWatchlistModal() {
