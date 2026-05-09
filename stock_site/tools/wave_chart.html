@@ -30,9 +30,9 @@
       --text-dim:  #5a7890;
       --text-dark: #3a5568;
 
-      /* Candle */
-      --cup:   #00c896;
-      --cdn:   #f44336;
+      /* Candle（台灣慣例：紅漲綠跌）*/
+      --cup:   #f44336;
+      --cdn:   #00c896;
 
       /* MA */
       --ma5:  #ff9a3c;
@@ -533,13 +533,90 @@
 
     /* ══ RESPONSIVE ══ */
     @media(max-width:600px) {
-      .stats-grid { grid-template-columns:repeat(2,1fr) }
-      .summary-grid { grid-template-columns:1fr }
-      .wg-grid { grid-template-columns:1fr }
+      /* Header */
+      header { padding:0 12px 0 8px; height:52px; }
       .hd-sub { display:none }
-      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(110px,1fr)) }
-      .ma-toggle-group { display:none }
+      .hd-logo-icon { width:36px; height:36px; }
+      .hd-logo-icon img { width:46px; height:46px; top:-4px; left:-4px; }
+      .hd-title { font-size:.76rem; }
+      .hd-clock { font-size:.65rem; padding:4px 10px; }
+      .btn-back { padding:5px 10px; font-size:.62rem; gap:5px; }
+      .btn-back svg { width:12px; height:12px; }
+
+      /* Layout */
+      .app { padding:10px 10px 48px; }
+
+      /* Search panel */
+      .search-panel { padding:12px; margin-bottom:10px; border-radius:12px; }
+      .search-row { gap:6px; margin-bottom:10px; flex-wrap:nowrap; }
+      .input-wrap { min-width:0; padding:0 10px; border-radius:8px; }
+      .input-wrap input { font-size:.85rem; padding:10px 0; }
+      .btn { padding:10px 14px; font-size:.78rem; border-radius:8px; }
+
+      /* Controls row — 讓兩排各自換行對齊 */
+      .controls-row { gap:8px; flex-wrap:wrap; }
       .ctrl-label { display:none }
+      .tab-group { gap:3px; }
+      .tab-btn { padding:4px 11px; font-size:.7rem; }
+      .chart-type-group { gap:3px; }
+      .ct-btn { padding:4px 9px; font-size:.68rem; }
+      .ma-toggle-group { gap:3px; }
+      .ma-btn { padding:4px 9px; font-size:.66rem; }
+
+      /* Status bar */
+      .status-bar { font-size:.68rem; padding:7px 10px; }
+
+      /* Stock info bar */
+      .stock-info-bar { padding:10px 12px; gap:10px; border-radius:12px; }
+      .sib-name { font-size:1.05rem; }
+      .sib-price { font-size:1.5rem; }
+      .sib-mid { gap:12px; }
+      .sib-stats { gap:12px; justify-content:flex-start; }
+      .sib-stat-val { font-size:.76rem; }
+
+      /* Chart area */
+      .chart-wrap { border-radius:12px; margin-bottom:10px; }
+      .chart-toolbar { padding:8px 10px; gap:6px; }
+      .legend { gap:8px; }
+      .leg-item { font-size:.62rem; gap:3px; }
+
+      /* Wave cards */
+      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:6px; }
+      .wave-card { padding:10px; border-radius:10px; }
+      .wc-label { font-size:.85rem; }
+      .wc-range { font-size:.7rem; }
+
+      /* Stats grid */
+      .stats-grid { grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:10px; }
+      .stat-card { padding:10px 12px; border-radius:8px; }
+      .stat-label { font-size:.6rem; }
+      .stat-value { font-size:.82rem; }
+
+      /* Summary */
+      .summary-grid { grid-template-columns:1fr; gap:8px; }
+      .summary-panel { padding:14px; border-radius:12px; }
+      .summary-block { padding:12px; }
+      .sb-content { font-size:.74rem; line-height:1.7; }
+
+      /* Wave guide */
+      .wg-grid { grid-template-columns:1fr; gap:8px; }
+      .wave-guide { padding:14px; border-radius:12px; }
+      .wg-rule { font-size:.67rem; }
+
+      /* Fibonacci */
+      .fib-item { font-size:.68rem; gap:6px; }
+      .fib-price { width:46px; }
+
+      /* Disclaimer */
+      .disclaimer { font-size:.6rem; }
+    }
+
+    /* 極小螢幕（320px 以下）追加微調 */
+    @media(max-width:360px) {
+      .hd-title { font-size:.68rem; }
+      .hd-clock { display:none; }
+      .tab-btn { padding:4px 8px; font-size:.65rem; }
+      .wave-cards { grid-template-columns:repeat(2,1fr); }
     }
 
     /* ══ SCROLL BAR ══ */
@@ -564,7 +641,7 @@
       --purple:#5a20b0;
       --muted:#3a7090;
       --text:#071628; --text-dim:#1a3a5c; --text-dark:#3a5570;
-      --cup:#0d6e2a; --cdn:#a02818;
+      --cup:#a02818; --cdn:#0d6e2a;
       background: linear-gradient(170deg,#5aaee0 0%,#7dcaf5 22%,#a8dcfc 45%,#c8eefa 65%,#daf4f0 85%,#e6f8ec 100%);
     }
     body.theme-day::before {
@@ -956,11 +1033,11 @@ const C = {
   bg:     '#070e1a',
   grid:   '#0e1c2e',
   grid2:  '#0c1828',
-  cup:    '#00c896',
-  cdn:    '#f44336',
-  wick:   { up:'#009e75', dn:'#c62828' },
+  cup:    '#f44336',   // 台灣慣例：紅色=上漲
+  cdn:    '#00c896',   // 台灣慣例：綠色=下跌
+  wick:   { up:'#c62828', dn:'#009e75' },
   ma:     { 5:'#ff9a3c', 10:'#c084fc', 20:'#38bdf8' },
-  vol:    { up:'rgba(0,200,150,.45)', dn:'rgba(244,67,54,.45)' },
+  vol:    { up:'rgba(244,67,54,.45)', dn:'rgba(0,200,150,.45)' },
   wave:   {
     '1':'#00e5ff','2':'#ff6b6b','3':'#00e676',
     '4':'#ffd600','5':'#e040fb',
@@ -1062,7 +1139,9 @@ async function doSearch(silent=false) {
       STOCK_NAME = r.name; STOCK_NO = r.stockNo; DATA = r.data;
       setStatus(`✔ 資料已取得 ｜ ${DATA.length} 筆`, 'ok');
     } else {
-      setStatus(`✖ 無法取得「${KEYWORD}」資料：${e.message}`, 'err');
+      const isLocal = window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1';
+      const hint = isLocal ? '（本機開發：可能是 TWSE 暫時封鎖你的 IP，等 30 分鐘後再試，或改用 Render 測試）' : '';
+      setStatus(`✖ 無法取得「${KEYWORD}」資料：${e.message}${hint}`, 'err');
       document.getElementById('searchBtn').disabled = false;
       setDotPulse(false);
       return;
