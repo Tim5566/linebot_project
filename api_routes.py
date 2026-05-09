@@ -360,6 +360,8 @@ def register_api(app):
         months  = int(request.args.get("months", 2))
         months  = max(1, min(12, months))
 
+        print(f"[wave_data] ▶ 開始查詢 keyword={keyword}, months={months}", flush=True)
+
         if not keyword:
             return jsonify({"error": "請輸入股票代碼或名稱"}), 400
 
@@ -371,6 +373,8 @@ def register_api(app):
         else:
             stock_no   = keyword
             stock_name = keyword
+
+        print(f"[wave_data] stock_no={stock_no}", flush=True)
 
         tz    = _ZI("Asia/Taipei")
         now   = _dt.datetime.now(tz)
@@ -392,12 +396,11 @@ def register_api(app):
                 f"?response=json&date={yyyymm}01&stockNo={stock_no}"
             )
             try:
-                print(f"[wave_data] 請求 URL: {url}")
+                print(f"[wave_data] 請求: {url}", flush=True)
                 r = _req.get(url, headers=hdrs, timeout=12)
-                print(f"[wave_data] HTTP狀態碼: {r.status_code}")
-                print(f"[wave_data] 回應前200字: {r.text[:200]}")
+                print(f"[wave_data] 狀態碼: {r.status_code}, 回應: {r.text[:300]}", flush=True)
                 j = r.json()
-                print(f"[wave_data] stat={j.get('stat')}, 資料筆數={len(j.get('data', []))}")
+                print(f"[wave_data] stat={j.get('stat')}, 筆數={len(j.get('data', []))}", flush=True)
                 if j.get("stat") == "OK" and j.get("data"):
                     if not name_from_api and j.get("title"):
                         import re as _re2
