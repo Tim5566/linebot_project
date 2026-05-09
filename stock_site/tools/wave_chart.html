@@ -336,7 +336,24 @@
     .leg-line { width:18px; height:2px; border-radius:2px; flex-shrink:0 }
     .leg-dash { width:18px; height:0; border-top:2px dashed; flex-shrink:0 }
 
-    .chart-main-area { background:#070e1a; position:relative }
+    .zoom-btn {
+      background:rgba(0,229,255,.12); border:1px solid rgba(0,229,255,.28);
+      color:var(--accent); border-radius:6px; padding:3px 10px; font-size:.8rem;
+      cursor:pointer; font-family:'JetBrains Mono',monospace; font-weight:700;
+      transition:background .15s,transform .1s; user-select:none; line-height:1.5;
+    }
+    .zoom-btn:hover { background:rgba(0,229,255,.22); transform:scale(1.08) }
+    .zoom-btn:active { transform:scale(.95) }
+    .zoom-hint {
+      font-size:.65rem; color:var(--accent); opacity:.55;
+      font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
+    }
+    body.theme-day .zoom-btn {
+      background:rgba(10,60,180,.08); border-color:rgba(10,60,180,.22); color:#0a3c8c;
+    }
+    body.theme-day .zoom-hint { color:#0a3c8c }
+    .chart-main-area { background:#070e1a; position:relative; cursor:crosshair }
+    .chart-main-area.is-dragging { cursor:grabbing }
     canvas { display:block; width:100%; height:auto }
 
     .chart-tooltip {
@@ -531,6 +548,19 @@
       line-height:1.8;
     }
 
+    /* ══ STOCK INFO BAR ACCORDION (mobile) ══ */
+    .sib-toggle {
+      display: none;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); font-size: .75rem;
+      padding: 4px 8px; border-radius: 6px;
+      border: 1px solid var(--border2);
+      font-family: 'JetBrains Mono', monospace;
+      transition: all .2s;
+    }
+    .sib-toggle:hover { color: var(--text); border-color: var(--border2); }
+    .sib-extra { transition: max-height .3s ease, opacity .3s ease; overflow: hidden; }
+
     /* ══ RESPONSIVE ══ */
     @media(max-width:600px) {
       /* Header */
@@ -553,32 +583,96 @@
       .input-wrap input { font-size:.85rem; padding:10px 0; }
       .btn { padding:10px 14px; font-size:.78rem; border-radius:8px; }
 
-      /* Controls row — 讓兩排各自換行對齊 */
-      .controls-row { gap:8px; flex-wrap:wrap; }
+      /* Controls row — 手機三行排列 */
+      .controls-row {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        align-items: flex-start;
+      }
       .ctrl-label { display:none }
+
+      /* Row 1: 期間 + 圖表類型 */
+      #periodGroup, #chartTypeGroup { display: inline-flex; }
+      .controls-row > #periodGroup  { order: 1; }
+      .controls-row > #chartTypeGroup { order: 2; }
+
+      /* 把 period、chartType 放同一行 */
+      .controls-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      #periodGroup    { order: 1; }
+      #chartTypeGroup { order: 2; }
+      #maToggleGroup  { order: 3; width: 100%; }
+      /* 波浪 + 比較按鈕同行 */
+      #btnWaveToggle  { order: 4; }
+      #btnCmpToggle   { order: 5; }
+
       .tab-group { gap:3px; }
-      .tab-btn { padding:4px 11px; font-size:.7rem; }
+      .tab-btn { padding:5px 12px; font-size:.7rem; }
       .chart-type-group { gap:3px; }
-      .ct-btn { padding:4px 9px; font-size:.68rem; }
+      .ct-btn { padding:5px 10px; font-size:.68rem; }
       .ma-toggle-group { gap:3px; }
-      .ma-btn { padding:4px 9px; font-size:.66rem; }
+      .ma-btn { padding:5px 10px; font-size:.68rem; }
+      .btn-wave-toggle { padding:5px 12px; font-size:.68rem; }
+      .btn-cmp-toggle  { padding:5px 12px; font-size:.68rem; }
 
       /* Status bar */
       .status-bar { font-size:.68rem; padding:7px 10px; }
 
-      /* Stock info bar */
-      .stock-info-bar { padding:10px 12px; gap:10px; border-radius:12px; }
+      /* Stock info bar — accordion on mobile */
+      .stock-info-bar { padding:10px 12px; gap:10px; border-radius:12px; flex-wrap:wrap; }
       .sib-name { font-size:1.05rem; }
       .sib-price { font-size:1.5rem; }
       .sib-mid { gap:12px; }
+      .sib-toggle { display:inline-flex; align-items:center; gap:4px; }
+      .sib-extra { max-height: 0; opacity: 0; }
+      .sib-extra.open { max-height: 100px; opacity: 1; }
       .sib-stats { gap:12px; justify-content:flex-start; }
       .sib-stat-val { font-size:.76rem; }
 
-      /* Chart area */
+      /* Chart area — canvas height capped for mobile */
       .chart-wrap { border-radius:12px; margin-bottom:10px; }
-      .chart-toolbar { padding:8px 10px; gap:6px; }
-      .legend { gap:8px; }
+      .chart-toolbar {
+        padding:8px 10px; gap:6px; flex-wrap:wrap;
+        flex-direction: row; align-items: center;
+      }
+      .chart-toolbar > div:first-child { order:1; width:100%; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+      .chart-toolbar > div:nth-child(2) { order:2; margin-left:0 !important; }
+      .chart-toolbar > .legend { order:3; width:100%; }
+      .legend { gap:6px; flex-wrap:wrap; }
       .leg-item { font-size:.62rem; gap:3px; }
+      .zoom-btn { padding:3px 8px; font-size:.75rem; }
+      .zoom-hint { font-size:.6rem; }
+
+      /* Tooltip — 手機版縮小避免超出螢幕 */
+      .chart-tooltip {
+        font-size:.68rem;
+        padding:8px 11px;
+        max-width: calc(100vw - 32px);
+      }
+      .tooltip-date { font-size:.7rem; }
+
+      /* Compare panel */
+      .compare-panel { padding:12px 14px; border-radius:12px; }
+      .compare-header { gap:8px; margin-bottom:8px; }
+      .compare-title { font-size:.68rem; }
+      .compare-input-wrap { flex-wrap:wrap; gap:6px; }
+      .compare-input { font-size:.78rem; padding:7px 10px; min-width:0; flex:1 1 120px; }
+      .btn-compare { font-size:.72rem; padding:7px 12px; }
+      .btn-compare-clear { font-size:.72rem; padding:7px 10px; }
+      .cmp-status { font-size:.64rem; }
+
+      /* Similarity card — 手機版垂直排列 */
+      .sim-card { padding:12px 14px; }
+      .sim-score-wrap { flex-direction:column; align-items:flex-start; gap:12px; }
+      .sim-details { min-width:0; width:100%; }
+      .sim-gauge { width:70px; height:70px; }
+      .sim-row-label { font-size:.64rem; }
+      .sim-row-val { font-size:.68rem; }
+      .sim-verdict { font-size:.68rem; }
 
       /* Wave cards */
       .wave-cards { grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:6px; }
@@ -611,15 +705,301 @@
       .disclaimer { font-size:.6rem; }
     }
 
-    /* 極小螢幕（320px 以下）追加微調 */
+    /* 極小螢幕（360px 以下）追加微調 */
     @media(max-width:360px) {
       .hd-title { font-size:.68rem; }
       .hd-clock { display:none; }
-      .tab-btn { padding:4px 8px; font-size:.65rem; }
+      .tab-btn { padding:4px 9px; font-size:.65rem; }
+      .ct-btn  { padding:4px 8px; font-size:.64rem; }
+      .ma-btn  { padding:4px 8px; font-size:.64rem; }
       .wave-cards { grid-template-columns:repeat(2,1fr); }
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
     }
 
-    /* ══ SCROLL BAR ══ */
+    /* ══ ACTIVE WAVE CARD ══ */
+    .wave-card-active {
+      position: relative;
+      animation: waveCardPulse 2s ease-in-out infinite;
+    }
+    @keyframes waveCardPulse {
+      0%, 100% { box-shadow: 0 0 0 0 transparent, 0 4px 16px rgba(0,0,0,.3); }
+      50% { box-shadow: 0 0 0 3px var(--wave-active-color, rgba(0,229,255,.4)), 0 4px 20px rgba(0,0,0,.4); }
+    }
+    .wc-active-badge {
+      display: inline-block;
+      font-size: .52rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(0,229,255,.12);
+      border: 1px solid rgba(0,229,255,.35);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: badgeBlink 1.6s ease-in-out infinite;
+    }
+    @keyframes badgeBlink {
+      0%, 100% { opacity: 1; } 50% { opacity: .5; }
+    }
+
+    /* ══ SKELETON EMPTY STATE ══ */
+    .skeleton-wrap {
+      display: flex; flex-direction: column;
+      gap: 10px; width: 100%; padding: 20px;
+    }
+    .skeleton-bar {
+      border-radius: 6px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.04) 0%,
+        rgba(255,255,255,.1) 40%,
+        rgba(255,255,255,.04) 80%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s linear infinite;
+    }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+    .sk-title { height: 16px; width: 160px; margin-bottom: 6px; }
+    .sk-chart  { height: 240px; width: 100%; }
+    .sk-row { display: flex; gap: 8px; }
+    .sk-stat { height: 40px; flex: 1; border-radius: 6px; }
+    .skeleton-hint {
+      text-align: center; color: var(--text-dim);
+      font-size: .72rem; font-family: 'JetBrains Mono', monospace;
+      margin-top: 10px; letter-spacing: .04em;
+    }
+    body.theme-day .skeleton-bar {
+      background: linear-gradient(90deg,
+        rgba(10,60,120,.05) 0%,
+        rgba(10,60,120,.14) 40%,
+        rgba(10,60,120,.05) 80%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s linear infinite;
+    }
+    body.theme-day .skeleton-hint { color: #3a6080; }
+
+    /* ══ X-AXIS DATE BUBBLE ══ */
+    .xhair-date-bubble {
+      position: absolute; bottom: 0;
+      transform: translateX(-50%);
+      background: rgba(0,229,255,.92); color: #020810;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .62rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+      pointer-events: none; white-space: nowrap; z-index: 45; display: none;
+    }
+    body.theme-day .xhair-date-bubble { background: rgba(10,82,160,.9); color: #fff; }
+
+    /* ══ WAVE CARD CLICKABLE ══ */
+    .wave-card { cursor: pointer; }
+    .wave-card.wave-card-focused {
+      outline: 2px solid var(--wave-active-color, var(--accent));
+      outline-offset: 2px;
+    }
+
+    /* ══ COMPARE PANEL ══ */
+    .compare-panel {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 14px 18px; margin-bottom: 12px; display: none;
+    }
+    .compare-panel.open { display: block; }
+    .compare-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .compare-title { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--purple); letter-spacing: .08em; }
+    .compare-input-wrap { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 180px; }
+    .compare-input {
+      flex: 1; background: var(--bg2);
+      border: 1.5px solid rgba(156,106,255,.25); border-radius: 8px;
+      color: var(--text); font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem; padding: 7px 12px; outline: none; transition: border-color .2s;
+    }
+    .compare-input:focus { border-color: rgba(156,106,255,.6); }
+    .compare-input::placeholder { color: var(--muted); }
+    .btn-compare {
+      padding: 7px 14px; border-radius: 8px; border: 1.5px solid rgba(156,106,255,.35);
+      background: rgba(156,106,255,.1); color: var(--purple);
+      font-size: .76rem; font-weight: 600; cursor: pointer;
+      font-family: 'Noto Sans TC', sans-serif; transition: all .2s; white-space: nowrap;
+    }
+    .btn-compare:hover:not(:disabled) { background: rgba(156,106,255,.2); }
+    .btn-compare:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-compare-clear {
+      padding: 7px 12px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.1);
+      background: transparent; color: var(--text-dim); font-size: .76rem; cursor: pointer; transition: all .2s;
+    }
+    .btn-compare-clear:hover { background: rgba(255,255,255,.07); color: var(--text); }
+    .cmp-status { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--text-dim); margin-top: 4px; }
+    .cmp-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    .cmp-leg-item { display: flex; align-items: center; gap: 5px; font-size: .67rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+    .cmp-leg-line { width: 18px; height: 2px; border-radius: 2px; flex-shrink: 0; }
+    .btn-cmp-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 8px;
+      border: 1.5px solid rgba(156,106,255,.3); background: rgba(156,106,255,.07); color: var(--purple);
+      font-size: .72rem; font-weight: 600; cursor: pointer;
+      font-family: 'JetBrains Mono', monospace; transition: all .2s; white-space: nowrap;
+    }
+    .btn-cmp-toggle:hover { background: rgba(156,106,255,.15); }
+    .btn-cmp-toggle.active { background: rgba(156,106,255,.18); border-color: rgba(156,106,255,.6); }
+
+    /* Wave visibility toggle button */
+    .btn-wave-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 8px;
+      border: 1.5px solid rgba(255,214,0,.3); background: rgba(255,214,0,.07); color: var(--yellow);
+      font-size: .72rem; font-weight: 600; cursor: pointer;
+      font-family: 'JetBrains Mono', monospace; transition: all .2s; white-space: nowrap;
+    }
+    .btn-wave-toggle:hover { background: rgba(255,214,0,.15); }
+    .btn-wave-toggle.active { background: rgba(255,214,0,.18); border-color: rgba(255,214,0,.6); }
+    .btn-wave-toggle.hidden-wave {
+      opacity: .45; border-color: rgba(255,214,0,.18); background: transparent;
+    }
+    body.theme-day .btn-wave-toggle { border-color: rgba(138,104,0,.3); background: rgba(138,104,0,.06); color: #8a6800; }
+    body.theme-day .btn-wave-toggle.active { background: rgba(138,104,0,.14); border-color: rgba(138,104,0,.55); }
+
+    /* Similarity score card */
+    .sim-card {
+      margin-top: 10px;
+      background: linear-gradient(135deg, rgba(156,106,255,.08), rgba(0,229,255,.05));
+      border: 1px solid rgba(156,106,255,.25);
+      border-radius: 12px; padding: 14px 18px;
+      display: none;
+    }
+    .sim-card.show { display: block; }
+    .sim-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .sim-title { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--purple); letter-spacing: .08em; }
+    .sim-score-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .sim-gauge {
+      position: relative; width: 80px; height: 80px;
+    }
+    .sim-gauge canvas { display: block; }
+    .sim-pct {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; line-height: 1;
+    }
+    .sim-pct-label { font-size: .5rem; color: var(--text-dim); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+    .sim-details { flex: 1; min-width: 180px; }
+    .sim-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+    .sim-row:last-child { border-bottom: none; }
+    .sim-row-label { font-size: .68rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+    .sim-row-val { font-size: .72rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── 指標說明 tooltip ── */
+    .sim-hint {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: default;
+    }
+    .sim-hint-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: rgba(156,106,255,.18); border: 1px solid rgba(156,106,255,.35);
+      color: var(--purple); font-size: .55rem; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0; line-height: 1;
+      transition: background .15s, border-color .15s;
+      cursor: help;
+    }
+    .sim-hint:hover .sim-hint-icon,
+    .sim-hint:focus-within .sim-hint-icon {
+      background: rgba(156,106,255,.32); border-color: rgba(156,106,255,.7);
+    }
+    .sim-hint-bubble {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      width: 220px;
+      background: rgba(8,14,28,.97);
+      border: 1px solid rgba(156,106,255,.35);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: .67rem;
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      line-height: 1.65;
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 8px 28px rgba(0,0,0,.6);
+    }
+    /* 小三角 */
+    .sim-hint-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 14px;
+      border: 5px solid transparent;
+      border-top-color: rgba(156,106,255,.35);
+    }
+    .sim-hint-bubble::before {
+      content: '';
+      position: absolute;
+      top: calc(100% + 1px); left: 14px;
+      border: 5px solid transparent;
+      border-top-color: rgba(8,14,28,.97);
+      z-index: 1;
+    }
+    .sim-hint-bubble strong {
+      color: var(--purple); font-weight: 600;
+      display: block; margin-bottom: 4px; font-size: .68rem;
+    }
+    .sim-hint-bubble .hint-scale {
+      margin-top: 6px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sim-hint-bubble .hint-scale-row {
+      display: flex; gap: 6px; align-items: baseline;
+    }
+    .hint-val { font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 32px; font-size: .65rem; }
+    .hint-desc { color: var(--text-dim); font-size: .64rem; }
+    /* hover / touch 顯示 */
+    .sim-hint:hover .sim-hint-bubble,
+    .sim-hint:focus-within .sim-hint-bubble,
+    .sim-hint-bubble:hover { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    /* 手機：靠右對齊避免超出螢幕 */
+    @media(max-width:600px) {
+      .sim-hint-bubble { left: auto; right: 0; }
+      .sim-hint-bubble::after  { left: auto; right: 14px; }
+      .sim-hint-bubble::before { left: auto; right: 14px; }
+    }
+    body.theme-day .sim-hint-icon {
+      background: rgba(90,32,176,.1); border-color: rgba(90,32,176,.3); color: #5a20b0;
+    }
+    body.theme-day .sim-hint-bubble {
+      background: rgba(255,255,255,.98); border-color: rgba(90,32,176,.25);
+      color: #071628; box-shadow: 0 8px 28px rgba(10,40,100,.15);
+    }
+    body.theme-day .sim-hint-bubble::after  { border-top-color: rgba(90,32,176,.25); }
+    body.theme-day .sim-hint-bubble::before { border-top-color: rgba(255,255,255,.98); }
+    body.theme-day .sim-hint-bubble strong  { color: #5a20b0; }
+    body.theme-day .hint-desc { color: #3a5568; }
+    .sim-verdict {
+      margin-top: 8px; padding: 8px 12px; border-radius: 8px;
+      font-size: .72rem; font-family: 'JetBrains Mono', monospace; line-height: 1.5;
+    }
+    .sim-verdict.high  { background: rgba(0,230,118,.08); border: 1px solid rgba(0,230,118,.25); color: var(--green); }
+    .sim-verdict.mid   { background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.25); color: var(--yellow); }
+    .sim-verdict.low   { background: rgba(255,61,90,.07); border: 1px solid rgba(255,61,90,.2); color: var(--red); }
+    .sim-verdict.same  { background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.3); color: var(--accent); }
+    body.theme-day .sim-card { background: rgba(240,230,255,.5); border-color: rgba(90,32,176,.2); }
+    body.theme-day .sim-row { border-bottom-color: rgba(10,60,120,.07); }
+    body.theme-day .sim-verdict.high  { background: rgba(13,110,42,.07); border-color: rgba(13,110,42,.25); color: #0d6e2a; }
+    body.theme-day .sim-verdict.mid   { background: rgba(138,104,0,.07); border-color: rgba(138,104,0,.25); color: #8a6800; }
+    body.theme-day .sim-verdict.low   { background: rgba(160,40,24,.06); border-color: rgba(160,40,24,.2); color: #a02818; }
+    body.theme-day .sim-verdict.same  { background: rgba(10,82,160,.07); border-color: rgba(10,82,160,.25); color: #0a52a0; }
+    body.theme-day .compare-panel { background: rgba(255,255,255,.92); border-color: rgba(10,60,120,.16); }
+    body.theme-day .compare-title { color: #5a20b0; }
+    body.theme-day .compare-input { background: rgba(230,220,255,.5); border-color: rgba(90,32,176,.22); color: #071628; }
+    body.theme-day .compare-input:focus { border-color: rgba(90,32,176,.55); }
+    body.theme-day .btn-compare { border-color: rgba(90,32,176,.35); background: rgba(90,32,176,.08); color: #5a20b0; }
+    body.theme-day .btn-cmp-toggle { border-color: rgba(90,32,176,.3); background: rgba(90,32,176,.06); color: #5a20b0; }
+    body.theme-day .btn-cmp-toggle.active { background: rgba(90,32,176,.14); border-color: rgba(90,32,176,.55); }
+
     ::-webkit-scrollbar { width:6px; height:6px }
     ::-webkit-scrollbar-track { background:var(--bg) }
     ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px }
@@ -820,6 +1200,7 @@
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="text" id="stockInput" placeholder="股票代碼或名稱  例：2313 / 華通 / 台積電" maxlength="20"
+               autocomplete="off"
                onkeydown="if(event.key==='Enter') doSearch()"/>
       </div>
       <button class="btn btn-primary" id="searchBtn" onclick="doSearch()">
@@ -846,6 +1227,12 @@
         <button class="ma-btn active" data-ma="10" onclick="toggleMA(10)" title="10日均線">MA10</button>
         <button class="ma-btn active" data-ma="20" onclick="toggleMA(20)" title="20日均線">MA20</button>
       </div>
+      <button class="btn-wave-toggle active" id="btnWaveToggle" onclick="toggleWaveVisible()" title="顯示/隱藏波浪線">
+        〰 波浪
+      </button>
+      <button class="btn-cmp-toggle" id="btnCmpToggle" onclick="toggleComparePanel()" title="比較模式">
+        ⚖ 比較
+      </button>
     </div>
   </div>
 
@@ -853,6 +1240,97 @@
   <div class="status-bar" id="statusBar">
     <span class="status-dot"></span>
     <span id="statusText">輸入股票代碼或名稱後按「分析走勢」開始查詢</span>
+  </div>
+
+  <!-- COMPARE PANEL -->
+  <div class="compare-panel" id="comparePanel">
+    <div class="compare-header">
+      <span class="compare-title">⚖ 比較模式 — 雙股走勢比較（各自真實價格）</span>
+    </div>
+    <div class="compare-input-wrap">
+      <input class="compare-input" id="cmpInput" type="text" maxlength="20"
+             autocomplete="off"
+             placeholder="輸入第二支股票代碼或名稱"
+             onkeydown="if(event.key==='Enter') doCompare()"/>
+      <button class="btn-compare" id="btnCmpSearch" onclick="doCompare()">載入比較</button>
+      <button class="btn-compare-clear" id="btnCmpClear" onclick="clearCompare()" style="display:none">✕ 清除</button>
+    </div>
+    <div class="cmp-status" id="cmpStatus">輸入第二支股票後按「載入比較」，兩股以各自真實價格疊加在圖表上</div>
+    <div class="cmp-legend" id="cmpLegend" style="display:none">
+      <div class="cmp-leg-item"><div class="cmp-leg-line" style="background:#00e5ff"></div><span id="cmpLeg1">主股票</span></div>
+      <div class="cmp-leg-item"><div class="cmp-leg-line" style="background:#c084fc"></div><span id="cmpLeg2">比較股票</span></div>
+      <div class="cmp-leg-item" style="color:var(--text-dim);font-size:.62rem">左軸=主股價格 · 右軸=比較股價格</div>
+    </div>
+    <!-- SIMILARITY SCORE CARD -->
+    <div class="sim-card" id="simCard">
+      <div class="sim-header">
+        <span class="sim-title">📊 K棒走勢相似度分析</span>
+      </div>
+      <div class="sim-score-wrap">
+        <div class="sim-gauge">
+          <canvas id="simGaugeCanvas" width="80" height="80"></canvas>
+          <div class="sim-pct" id="simPctDisplay">
+            <span id="simPctVal" style="color:var(--accent)">--%</span>
+            <span class="sim-pct-label">相似度</span>
+          </div>
+        </div>
+        <div class="sim-details">
+          <div class="sim-row">
+            <span class="sim-row-label sim-hint">
+              收益率相關係數 (Pearson)
+              <span class="sim-hint-icon">i</span>
+              <span class="sim-hint-bubble">
+                <strong>收益率相關係數（Pearson）</strong>
+                計算兩股每日漲跌幅的線性相關程度。數值愈接近 +1，代表兩股每天的漲跌幅方向與幅度愈同步。
+                <span class="hint-scale">
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#00e676">+0.8↑</span><span class="hint-desc">極高度同步，幾乎同進退</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ffd600">+0.5</span><span class="hint-desc">中度相關，有共同趨勢</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ff3d5a">0 以下</span><span class="hint-desc">走勢無關或相反</span></span>
+                </span>
+              </span>
+            </span>
+            <span class="sim-row-val" id="simPearson">--</span>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label sim-hint">
+              漲跌方向一致率
+              <span class="sim-hint-icon">i</span>
+              <span class="sim-hint-bubble">
+                <strong>漲跌方向一致率</strong>
+                在共同交易日中，兩股「同漲或同跌」的天數占比。例如 70% 代表十天有七天方向相同，不論幅度大小。
+                <span class="hint-scale">
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#00e676">75%↑</span><span class="hint-desc">高度同步，漲跌節奏一致</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ffd600">60%</span><span class="hint-desc">略有同步，方向偶有分歧</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ff3d5a">50%↓</span><span class="hint-desc">接近隨機，兩股獨立運行</span></span>
+                </span>
+              </span>
+            </span>
+            <span class="sim-row-val" id="simDirection">--</span>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label sim-hint">
+              波動幅度相似度
+              <span class="sim-hint-icon">i</span>
+              <span class="sim-hint-bubble">
+                <strong>波動幅度相似度</strong>
+                比較兩股的日均波動率（標準差）是否接近。兩股波動率愈相近，值愈高；一股劇烈、另一股穩定則值偏低。
+                <span class="hint-scale">
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#00e676">80%↑</span><span class="hint-desc">波動節奏非常接近</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ffd600">60%</span><span class="hint-desc">幅度有差異但尚可</span></span>
+                  <span class="hint-scale-row"><span class="hint-val" style="color:#ff3d5a">40%↓</span><span class="hint-desc">一穩一烈，性質差異大</span></span>
+                </span>
+              </span>
+            </span>
+            <span class="sim-row-val" id="simVolatility">--</span>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label">共同交易日數</span>
+            <span class="sim-row-val" id="simDays">--</span>
+          </div>
+        </div>
+      </div>
+      <div class="sim-verdict" id="simVerdict"></div>
+    </div>
   </div>
 
   <!-- STOCK INFO BAR -->
@@ -866,6 +1344,11 @@
         <div class="sib-price" id="sibPrice">--</div>
         <div class="sib-chg"   id="sibChg"></div>
       </div>
+      <button class="sib-toggle" id="sibToggle" onclick="toggleSibExtra()" aria-label="展開成交量資訊">
+        <span id="sibToggleIcon">▼</span> 詳情
+      </button>
+    </div>
+    <div class="sib-extra" id="sibExtra">
       <div class="sib-stats">
         <div class="sib-stat">
           <span class="sib-stat-label">開盤</span>
@@ -894,6 +1377,12 @@
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span class="chart-label">▸ PRICE · K-LINE CHART</span>
         <span class="kbar-badge" id="kbarBadge" style="display:none"></span>
+        <span class="zoom-hint" id="zoomHint" style="display:none"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto;padding-right:8px">
+        <button class="zoom-btn" id="btnZoomIn"  onclick="zoomChart(-0.25)" title="放大">＋</button>
+        <button class="zoom-btn" id="btnZoomOut" onclick="zoomChart(+0.25)" title="縮小">－</button>
+        <button class="zoom-btn" id="btnZoomReset" onclick="zoomReset()" title="還原全覽">⟳</button>
       </div>
       <div class="legend" id="chartLegend" style="display:none">
         <div class="leg-item"><div class="leg-sq" style="background:var(--cup)"></div>收漲</div>
@@ -906,12 +1395,17 @@
     </div>
     <div class="chart-main-area" id="chartMainArea" style="position:relative">
       <div class="chart-empty" id="chartEmpty">
-        <div class="empty-rings"><span class="empty-icon">📈</span></div>
-        <div class="empty-text">請輸入股票代碼開始分析<br><span class="empty-hint">支援上市・上櫃 全市場個股</span></div>
-        <div class="empty-tip">
-          <span class="empty-tip-icon">💡</span>
-          波浪理論建議：至少 <strong>100～200 根</strong> K棒才具參考性，建議選擇 <strong>6M 以上</strong> 期間
+        <div class="skeleton-wrap">
+          <div class="skeleton-bar sk-title"></div>
+          <div class="skeleton-bar sk-chart"></div>
+          <div class="sk-row">
+            <div class="skeleton-bar sk-stat"></div>
+            <div class="skeleton-bar sk-stat"></div>
+            <div class="skeleton-bar sk-stat"></div>
+            <div class="skeleton-bar sk-stat"></div>
+          </div>
         </div>
+        <div class="skeleton-hint">輸入股票代碼或名稱後按「分析走勢」開始查詢</div>
       </div>
       <canvas id="mainCanvas" width="1020" height="440" style="display:none"></canvas>
       <div class="chart-tooltip" id="tooltip">
@@ -924,6 +1418,7 @@
         <div class="xhair-h" id="xhairH"></div>
         <div class="xhair-v" id="xhairV"></div>
       </div>
+      <div class="xhair-date-bubble" id="xhairDateBubble"></div>
     </div>
     <div class="vol-area">
       <canvas id="volCanvas" width="1020" height="80" style="display:none; width:100%"></canvas>
@@ -1062,6 +1557,23 @@ let MA_VISIBLE= { 5:true, 10:true, 20:true };
 let HOVER_IDX = -1;
 let CAM       = { start:0, end:1 }; // viewport ratio
 
+// ── Zoom / Pan state ──────────────────────────────────────────────────────────
+let ZOOM = { start: 0, end: 1 };   // fraction of DATA visible [0..1]
+let DRAG = { active: false, startX: 0, startZoom: null };
+let PINCH = { active: false, startDist: 0, startZoom: null };
+
+// ── Wave highlight state ───────────────────────────────────────────────────────
+let HIGHLIGHT_WAVE = null;  // { fromIdx, toIdx, color } | null
+
+// ── Compare mode state ─────────────────────────────────────────────────────────
+let CMP_DATA      = [];      // indexed price data for second stock
+let CMP_NAME      = '';
+let CMP_ACTIVE    = false;   // compare overlay on/off
+let CMP_PREV_STATE= null;    // stores chart settings before compare activated
+
+// ── Wave visibility state ──────────────────────────────────────────────────────
+let WAVE_VISIBLE  = true;    // show/hide wave lines & labels
+
 // canvas refs
 let mainCvs, mainCtx, volCvs, volCtx;
 // layout
@@ -1089,6 +1601,8 @@ function setPeriod(m) {
   if (KEYWORD) doSearch(true);
 }
 function setChartType(t) {
+  // 比較模式啟用中，不允許手動切換圖表類型
+  if (CMP_ACTIVE) return;
   CHART_TYPE = t;
   document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.type === t);
@@ -1097,6 +1611,8 @@ function setChartType(t) {
 }
 
 function toggleMA(period) {
+  // 比較模式啟用中，不允許手動切換均線
+  if (CMP_ACTIVE) return;
   MA_VISIBLE[period] = !MA_VISIBLE[period];
   // Update button
   const btn = document.querySelector(`.ma-btn[data-ma="${period}"]`);
@@ -1105,6 +1621,22 @@ function toggleMA(period) {
   const legEl = document.getElementById(`leg-ma${period}`);
   if (legEl) legEl.style.opacity = MA_VISIBLE[period] ? '1' : '0.3';
   if (DATA.length) renderAll();
+}
+
+function toggleWaveVisible() {
+  // 比較模式啟用中，不允許手動切換波浪顯示
+  if (CMP_ACTIVE) return;
+  WAVE_VISIBLE = !WAVE_VISIBLE;
+  const btn = document.getElementById('btnWaveToggle');
+  if (btn) {
+    btn.classList.toggle('active', WAVE_VISIBLE);
+    btn.classList.toggle('hidden-wave', !WAVE_VISIBLE);
+    btn.textContent = WAVE_VISIBLE ? '〰 波浪' : '〰 波浪（隱藏）';
+  }
+  // Toggle legend wave item
+  const legWave = document.querySelector('.leg-item .leg-dash');
+  if (legWave) legWave.closest('.leg-item').style.opacity = WAVE_VISIBLE ? '1' : '0.3';
+  if (DATA.length) { drawMain(DATA, WAVES); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1150,6 +1682,8 @@ async function doSearch(silent=false) {
 
   document.getElementById('searchBtn').disabled = false;
   setDotPulse(false);
+  ZOOM.start = 0; ZOOM.end = 1; // reset zoom on new data
+  HIGHLIGHT_WAVE = null;        // clear wave highlight on new search
   renderAll();
 }
 
@@ -1245,11 +1779,141 @@ function initCanvas() {
   // Mouse events
   mainCvs.addEventListener('mousemove', onMouseMove);
   mainCvs.addEventListener('mouseleave', onMouseLeave);
+
+  // ── Zoom via mouse wheel ────────────────────────────────────────────────────
+  mainCvs.addEventListener('wheel', (e) => {
+    if (!DATA.length) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.12 : -0.12;
+    const rect = mainCvs.getBoundingClientRect();
+    const frac = (e.clientX - rect.left) / rect.width; // anchor fraction
+    zoomAround(delta, frac);
+  }, { passive: false });
+
+  // ── Pan via mouse drag ──────────────────────────────────────────────────────
+  mainCvs.addEventListener('mousedown', (e) => {
+    if (!DATA.length) return;
+    DRAG.active = true;
+    DRAG.startX = e.clientX;
+    DRAG.startZoom = { start: ZOOM.start, end: ZOOM.end };
+    document.getElementById('chartMainArea').classList.add('is-dragging');
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!DRAG.active) return;
+    const rect = mainCvs.getBoundingClientRect();
+    const dx = (DRAG.startX - e.clientX) / rect.width;
+    const span = DRAG.startZoom.end - DRAG.startZoom.start;
+    let ns = DRAG.startZoom.start + dx * span;
+    let ne = DRAG.startZoom.end   + dx * span;
+    if (ns < 0) { ne -= ns; ns = 0; }
+    if (ne > 1) { ns -= (ne-1); ne = 1; }
+    ZOOM.start = Math.max(0, ns);
+    ZOOM.end   = Math.min(1, ne);
+    updateZoomHint();
+    drawMain(DATA, WAVES);
+    drawVolume(DATA);
+  });
+  window.addEventListener('mouseup', () => {
+    if (DRAG.active) {
+      DRAG.active = false;
+      document.getElementById('chartMainArea').classList.remove('is-dragging');
+    }
+  });
+
+  // ── Pinch-to-zoom (touch) ───────────────────────────────────────────────────
+  mainCvs.addEventListener('touchstart', (e) => {
+    if (!DATA.length) return;
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      PINCH.active = true;
+      PINCH.startDist = Math.hypot(
+        e.touches[1].clientX - e.touches[0].clientX,
+        e.touches[1].clientY - e.touches[0].clientY
+      );
+      PINCH.startZoom = { start: ZOOM.start, end: ZOOM.end };
+    } else if (e.touches.length === 1) {
+      DRAG.active = true;
+      DRAG.startX = e.touches[0].clientX;
+      DRAG.startZoom = { start: ZOOM.start, end: ZOOM.end };
+    }
+  }, { passive: false });
+  mainCvs.addEventListener('touchmove', (e) => {
+    if (!DATA.length) return;
+    e.preventDefault();
+    if (PINCH.active && e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[1].clientX - e.touches[0].clientX,
+        e.touches[1].clientY - e.touches[0].clientY
+      );
+      const ratio = PINCH.startDist / dist;
+      const span = PINCH.startZoom.end - PINCH.startZoom.start;
+      const center = (PINCH.startZoom.start + PINCH.startZoom.end) / 2;
+      const newSpan = Math.min(1, Math.max(0.05, span * ratio));
+      ZOOM.start = Math.max(0, center - newSpan / 2);
+      ZOOM.end   = Math.min(1, center + newSpan / 2);
+      updateZoomHint();
+      drawMain(DATA, WAVES);
+      drawVolume(DATA);
+    } else if (DRAG.active && e.touches.length === 1) {
+      const rect = mainCvs.getBoundingClientRect();
+      const dx = (DRAG.startX - e.touches[0].clientX) / rect.width;
+      const span = DRAG.startZoom.end - DRAG.startZoom.start;
+      let ns = DRAG.startZoom.start + dx * span;
+      let ne = DRAG.startZoom.end   + dx * span;
+      if (ns < 0) { ne -= ns; ns = 0; }
+      if (ne > 1) { ns -= (ne-1); ne = 1; }
+      ZOOM.start = Math.max(0, ns);
+      ZOOM.end   = Math.min(1, ne);
+      updateZoomHint();
+      drawMain(DATA, WAVES);
+      drawVolume(DATA);
+    }
+  }, { passive: false });
+  mainCvs.addEventListener('touchend', () => {
+    PINCH.active = false;
+    DRAG.active  = false;
+  });
 }
 
 function getScaleFactors() {
   const rect = mainCvs.getBoundingClientRect();
   return { sx: mainCvs.width/rect.width, sy: mainCvs.height/rect.height };
+}
+
+// ── Zoom helpers ──────────────────────────────────────────────────────────────
+function zoomAround(delta, anchorFrac) {
+  const span = ZOOM.end - ZOOM.start;
+  const newSpan = Math.min(1, Math.max(0.05, span * (1 + delta)));
+  const anchor = ZOOM.start + anchorFrac * span;
+  ZOOM.start = Math.max(0, anchor - anchorFrac * newSpan);
+  ZOOM.end   = Math.min(1, ZOOM.start + newSpan);
+  if (ZOOM.end > 1) { ZOOM.start = 1 - newSpan; ZOOM.end = 1; }
+  updateZoomHint();
+  if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+}
+
+function zoomChart(delta) {
+  zoomAround(delta, 0.5);
+}
+
+function zoomReset() {
+  ZOOM.start = 0; ZOOM.end = 1;
+  updateZoomHint();
+  if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+}
+
+function updateZoomHint() {
+  const hint = document.getElementById('zoomHint');
+  if (!hint) return;
+  const span = ZOOM.end - ZOOM.start;
+  if (span >= 0.99) {
+    hint.style.display = 'none';
+  } else {
+    const n = DATA.length;
+    const visible = Math.round(span * n);
+    hint.textContent = `顯示 ${visible}/${n} 根 K棒 ｜ 滾輪縮放 · 拖曳移動`;
+    hint.style.display = '';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1259,11 +1923,26 @@ function drawMain(data, waves) {
   if (!mainCvs) initCanvas();
   const W = mainCvs.width, H = mainCvs.height;
   const ctx = mainCtx;
-  const p = PAD;
+  const p = { ...PAD };   // always use standard padding — compare uses same Y axis now
   const cW = W-p.l-p.r, cH = H-p.t-p.b;
 
+  // ── Apply ZOOM viewport ────────────────────────────────────────────────────
+  const totalN = data.length;
+  const viStart = Math.max(0, Math.floor(ZOOM.start * totalN));
+  const viEnd   = Math.min(totalN, Math.ceil(ZOOM.end * totalN));
+  data = data.slice(viStart, viEnd);
+  // Re-index waves to visible slice
+  waves = waves
+    .filter(w => w.toIdx > viStart && w.fromIdx < viEnd)
+    .map(w => ({
+      ...w,
+      fromIdx: Math.max(0, w.fromIdx - viStart),
+      toIdx:   Math.min(data.length - 1, w.toIdx - viStart),
+    }));
+
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle = C.bg; ctx.fillRect(0,0,W,H);
+  const _isDayMain = document.body.classList.contains('theme-day');
+  ctx.fillStyle = _isDayMain ? '#e8f4ff' : C.bg; ctx.fillRect(0,0,W,H);
 
   // ── price range (with padding)
   const allP  = data.flatMap(d=>[d.high,d.low]);
@@ -1283,10 +1962,11 @@ function drawMain(data, waves) {
     const yy = p.t + (i/gridCount)*cH;
     const pv = maxP - (i/gridCount)*range;
     // Horizontal grid
-    ctx.strokeStyle = C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
+    ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
     ctx.beginPath(); ctx.moveTo(p.l,yy); ctx.lineTo(W-p.r,yy); ctx.stroke();
-    // Price label
-    ctx.fillStyle = '#3a5570'; ctx.font = '10px "JetBrains Mono",monospace';
+    // Price label — use theme-aware color
+    const isDayTheme = document.body.classList.contains('theme-day');
+    ctx.fillStyle = isDayTheme ? '#1a3a5c' : '#3a5570'; ctx.font = '10px "JetBrains Mono",monospace';
     ctx.textAlign = 'right'; ctx.fillText(pv.toFixed(1), p.l-6, yy+4);
   }
 
@@ -1294,6 +1974,9 @@ function drawMain(data, waves) {
   const cw = Math.max(2, Math.min(16, cW/data.length*.7));
 
   // ── draw chart by type
+  // In compare mode, the overlay draws both stocks as clean lines.
+  // We skip the main price drawing so there's no visual clutter underneath.
+  if (!CMP_ACTIVE) {
   if (CHART_TYPE==='area' || CHART_TYPE==='line') {
     // area fill
     if (CHART_TYPE==='area') {
@@ -1319,14 +2002,19 @@ function drawMain(data, waves) {
       const bodyBtm = yS(Math.min(d.open,d.close));
       const bodyH   = Math.max(1, bodyBtm-bodyTop);
       const x = xS(i);
-      // wick
-      ctx.strokeStyle = isUp ? C.wick.up : C.wick.dn; ctx.lineWidth = 1;
+      // wick — opacity reduces as candles get dense
+      const wickAlpha = Math.min(1, Math.max(0.15, cw / 6));
+      const wickUpColor = isUp ? C.wick.up : C.wick.dn;
+      ctx.globalAlpha = wickAlpha;
+      ctx.strokeStyle = wickUpColor; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x,yS(d.high)); ctx.lineTo(x,yS(d.low)); ctx.stroke();
+      ctx.globalAlpha = 1;
       // body
       ctx.fillStyle = isUp ? C.cup : C.cdn;
       ctx.fillRect(x-cw/2, bodyTop, cw, bodyH);
     });
   }
+  } // end !CMP_ACTIVE
 
   // ── MA lines
   [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
@@ -1341,8 +2029,11 @@ function drawMain(data, waves) {
     ctx.stroke();
   });
 
+  // ── Wave highlight overlay (drawn before wave lines so lines appear on top)
+  drawWaveHighlight(ctx, waves, xS, yS, p, H, viStart);
+
   // ── Wave lines
-  waves.forEach(w => {
+  if (WAVE_VISIBLE) waves.forEach(w => {
     const x1=xS(w.fromIdx), y1=yS(w.fromPrice), x2=xS(w.toIdx), y2=yS(w.toPrice);
     const col = w.color;
 
@@ -1384,23 +2075,24 @@ function drawMain(data, waves) {
     ctx.restore();
   });
 
-  // ── hover crosshair candle
-  if (HOVER_IDX>=0 && HOVER_IDX<data.length) {
-    const x = xS(HOVER_IDX);
+  // ── hover crosshair candle (convert global HOVER_IDX to local)
+  const localHoverMain = HOVER_IDX - viStart;
+  if (localHoverMain>=0 && localHoverMain<data.length) {
+    const x = xS(localHoverMain);
     // vertical line
     ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
     ctx.beginPath(); ctx.moveTo(x,p.t); ctx.lineTo(x,H-p.b); ctx.stroke();
     ctx.setLineDash([]);
     // highlight candle ring
-    const d = data[HOVER_IDX];
+    const d = data[localHoverMain];
     const isUp = d.close>=d.open;
     ctx.strokeStyle = isUp ? C.cup : C.cdn; ctx.lineWidth=1.5;
     const bt=yS(Math.max(d.open,d.close)), bb=yS(Math.min(d.open,d.close));
-    ctx.strokeRect(xS(HOVER_IDX)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
+    ctx.strokeRect(xS(localHoverMain)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
   }
 
   // ── X-axis dates
-  ctx.fillStyle='#2e4460'; ctx.font='9px "JetBrains Mono",monospace'; ctx.textAlign='center';
+  ctx.fillStyle = _isDayMain ? '#3a6080' : '#2e4460'; ctx.font='9px "JetBrains Mono",monospace'; ctx.textAlign='center';
   const step = Math.max(1, Math.ceil(data.length/10));
   data.forEach((d,i)=>{
     if (i%step===0) {
@@ -1417,7 +2109,8 @@ function drawMain(data, waves) {
     ctx.fillText('K-LINE', p.l+48, 22);
   }
 
-  // ── current price line
+  // ── current price line (hidden in compare mode — overlay handles labels)
+  if (!CMP_ACTIVE) {
   const lastClose = data[data.length-1].close;
   const yLast = yS(lastClose);
   ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
@@ -1427,6 +2120,10 @@ function drawMain(data, waves) {
   ctx.fillStyle='rgba(0,229,255,.8)'; ctx.font='bold 10px "JetBrains Mono",monospace';
   ctx.textAlign='left';
   ctx.fillText(lastClose.toFixed(1), W-p.r+2, yLast+4);
+  }
+
+  // ── Compare mode overlay
+  drawCompareOverlay(ctx, data, viStart, viEnd, xS, yS, p, W, H, _isDayMain);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1434,13 +2131,22 @@ function drawMain(data, waves) {
 // ═══════════════════════════════════════════════════════
 function drawVolume(data) {
   if (!volCvs) return;
+  // Apply ZOOM viewport
+  const totalN = data.length;
+  const viStart = Math.max(0, Math.floor(ZOOM.start * totalN));
+  const viEnd   = Math.min(totalN, Math.ceil(ZOOM.end * totalN));
+  data = data.slice(viStart, viEnd);
+  // Adjust HOVER_IDX for volume highlight
+  const localHover = HOVER_IDX - viStart;
+
   const W=volCvs.width, H=volCvs.height;
   const ctx=volCtx;
   const p=VOL_PAD;
   const cW=W-p.l-p.r, cH=H-p.t-p.b;
 
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#050b16'; ctx.fillRect(0,0,W,H);
+  const _isDayVol = document.body.classList.contains('theme-day');
+  ctx.fillStyle = _isDayVol ? '#ddf0ff' : '#050b16'; ctx.fillRect(0,0,W,H);
 
   const maxVol = Math.max(...data.map(d=>d.volume));
   const xS = i => p.l+(i/(data.length-1||1))*cW;
@@ -1450,8 +2156,12 @@ function drawVolume(data) {
     const isUp = d.close>=d.open;
     const bh = (d.volume/maxVol)*cH;
     const x  = xS(i);
-    ctx.fillStyle = isUp ? C.vol.up : C.vol.dn;
-    if (HOVER_IDX===i) ctx.fillStyle = isUp ? 'rgba(0,200,150,.8)' : 'rgba(244,67,54,.8)';
+    if (localHover===i) {
+      // hover 同色系加亮：上漲更亮紅、下跌更亮綠，不換色
+      ctx.fillStyle = isUp ? 'rgba(244,67,54,.95)' : 'rgba(0,200,150,.95)';
+    } else {
+      ctx.fillStyle = isUp ? C.vol.up : C.vol.dn;
+    }
     ctx.fillRect(x-bw/2, H-p.b-bh, bw, bh);
   });
 
@@ -1465,15 +2175,21 @@ function drawVolume(data) {
 // ═══════════════════════════════════════════════════════
 function onMouseMove(e) {
   if (!DATA.length) return;
+  if (DRAG.active) return; // while dragging, don't update tooltip
   const rect = mainCvs.getBoundingClientRect();
   const {sx,sy} = getScaleFactors();
   const mx = (e.clientX-rect.left)*sx;
   const my = (e.clientY-rect.top)*sy;
 
-  // find closest candle index
+  // Map cursor to zoomed visible slice, then back to global DATA index
   const cW = mainCvs.width-PAD.l-PAD.r;
-  const rawIdx = Math.round((mx-PAD.l)/cW*(DATA.length-1));
-  const idx = Math.max(0,Math.min(DATA.length-1,rawIdx));
+  const totalN = DATA.length;
+  const viStart = Math.max(0, Math.floor(ZOOM.start * totalN));
+  const viEnd   = Math.min(totalN, Math.ceil(ZOOM.end * totalN));
+  const visLen  = viEnd - viStart;
+  const localRaw = Math.round((mx-PAD.l)/cW*(visLen-1));
+  const localIdx = Math.max(0, Math.min(visLen-1, localRaw));
+  const idx = viStart + localIdx;
 
   if (HOVER_IDX !== idx) {
     HOVER_IDX = idx;
@@ -1484,12 +2200,17 @@ function onMouseMove(e) {
 
   // Update tooltip
   updateTooltip(idx, e.clientX-rect.left, e.clientY-rect.top, rect.width, rect.height);
+
+  // ── X-axis date bubble ─────────────────────────────────────────────────────
+  updateDateBubble(idx, rect);
 }
 
 function onMouseLeave() {
   HOVER_IDX = -1;
   document.getElementById('tooltip').style.display='none';
   document.getElementById('crosshair').style.display='none';
+  const bubble = document.getElementById('xhairDateBubble');
+  if (bubble) bubble.style.display = 'none';
   if (DATA.length) { drawMain(DATA,WAVES); drawVolume(DATA); }
 }
 
@@ -1504,12 +2225,15 @@ function updateTooltip(idx, cx, cy, rw, rh) {
   const wLabel = WAVES.filter(w => idx>=w.fromIdx && idx<=w.toIdx).map(w=>`W${w.label}`).join(' ');
 
   document.getElementById('tt-date').textContent = `📅 ${d.date}`;
+  // 台灣慣例：紅色=上漲、綠色=下跌
+  const upCol  = '#f44336';  // 紅
+  const dnCol  = '#00c896';  // 綠
   document.getElementById('tt-ohlc').innerHTML =
-    `開 <span style="color:${isUp?'#00c896':'#f44336'}">${d.open}</span>　`+
-    `高 <span style="color:#00c896">${d.high}</span>　`+
-    `低 <span style="color:#f44336">${d.low}</span>　`+
-    `收 <span style="color:${isUp?'#00c896':'#f44336'};font-weight:700">${d.close}</span>　`+
-    `<span style="color:${chg>=0?'#00c896':'#f44336'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)} (${chg>=0?'+':''}${pct}%)</span>`;
+    `開 <span style="color:${isUp?upCol:dnCol}">${d.open}</span>　`+
+    `高 <span style="color:${upCol}">${d.high}</span>　`+
+    `低 <span style="color:${dnCol}">${d.low}</span>　`+
+    `收 <span style="color:${isUp?upCol:dnCol};font-weight:700">${d.close}</span>　`+
+    `<span style="color:${chg>=0?upCol:dnCol}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)} (${chg>=0?'+':''}${pct}%)</span>`;
   document.getElementById('tt-vol').textContent = `成交量 ${parseInt(vol).toLocaleString()} 張`;
   document.getElementById('tt-wave').textContent = wLabel ? `波段：${wLabel}` : '';
   document.getElementById('tt-wave').style.display = wLabel ? '' : 'none';
@@ -1531,6 +2255,9 @@ function updateTooltip(idx, cx, cy, rw, rh) {
 function renderAll() {
   if (!DATA.length) return;
   if (!mainCvs) initCanvas();
+
+  // Reset zoom on fresh data load
+  if (ZOOM.start === 0 && ZOOM.end === 1) updateZoomHint();
 
   WAVES = detectWaves(DATA);
 
@@ -1606,15 +2333,17 @@ function updateWaveCards() {
   }
   document.getElementById('waveSection').style.display='block';
 
-  WAVES.forEach(w => {
+  WAVES.forEach((w, idx) => {
     const isUp  = w.toPrice > w.fromPrice;
     const isImp = w.isImpulse;
+    const isLast = idx === WAVES.length - 1;
     const typeTxt = isImp ? '推動浪' : '修正浪';
     const div = document.createElement('div');
-    div.className='wave-card';
+    div.className = 'wave-card' + (isLast ? ' wave-card-active' : '');
     div.style.borderTopColor = w.color;
+    if (isLast) div.style.setProperty('--wave-active-color', w.color);
     div.innerHTML = `
-      <div class="wc-label" style="color:${w.color}">波浪 ${w.label}</div>
+      <div class="wc-label" style="color:${w.color}">波浪 ${w.label}${isLast ? ' <span class="wc-active-badge">進行中</span>' : ''}</div>
       <div class="wc-type">${typeTxt}</div>
       <div class="wc-range" style="color:${w.color}">${w.fromPrice.toFixed(1)} → ${w.toPrice.toFixed(1)}</div>
       <div class="wc-change" style="color:${isUp?'var(--cup)':'var(--cdn)'}">
@@ -1622,6 +2351,7 @@ function updateWaveCards() {
       </div>
       <div class="wc-pct" style="color:${isUp?'var(--cup)':'var(--cdn)'}">${w.pct>=0?'+':''}${w.pct.toFixed(1)}%</div>
       <div class="wc-days">⏱ ${w.days} 交易日</div>`;
+    div.addEventListener('click', () => highlightWave(w, div));
     wrap.appendChild(div);
   });
 }
@@ -1709,6 +2439,545 @@ function updateSummaryPanel() {
 }
 
 // ═══════════════════════════════════════════════════════
+// X-AXIS DATE BUBBLE
+// ═══════════════════════════════════════════════════════
+function updateDateBubble(idx, rect) {
+  const bubble = document.getElementById('xhairDateBubble');
+  if (!bubble || !DATA[idx]) return;
+  const d = DATA[idx];
+
+  // Compute X position in canvas-pixel space, then convert to CSS % of container
+  const totalN = DATA.length;
+  const viStart = Math.max(0, Math.floor(ZOOM.start * totalN));
+  const viEnd   = Math.min(totalN, Math.ceil(ZOOM.end * totalN));
+  const visLen  = viEnd - viStart;
+  const localIdx = idx - viStart;
+
+  const cW = mainCvs.width - PAD.l - PAD.r;
+  const xCanvas = PAD.l + (localIdx / (visLen - 1 || 1)) * cW;
+  // Convert canvas coords to CSS pixel within the chartMainArea
+  const scaleX = rect.width / mainCvs.width;
+  const xCss = xCanvas * scaleX;
+
+  bubble.style.left = xCss + 'px';
+  bubble.style.display = 'block';
+  bubble.textContent = d.date.slice(0, 8);
+}
+
+// ═══════════════════════════════════════════════════════
+// WAVE CARD HIGHLIGHT
+// ═══════════════════════════════════════════════════════
+function highlightWave(waveObj, cardEl) {
+  // If clicking the already-focused card, clear highlight
+  const prevFocused = document.querySelector('.wave-card-focused');
+  if (prevFocused === cardEl) {
+    prevFocused.classList.remove('wave-card-focused');
+    HIGHLIGHT_WAVE = null;
+    ZOOM.start = 0; ZOOM.end = 1;
+    if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+    return;
+  }
+  // Remove old focus
+  if (prevFocused) prevFocused.classList.remove('wave-card-focused');
+  cardEl.classList.add('wave-card-focused');
+  cardEl.style.setProperty('--wave-active-color', waveObj.color);
+
+  HIGHLIGHT_WAVE = waveObj;
+
+  // Zoom to wave segment with padding
+  const n = DATA.length;
+  const pad = Math.max(3, Math.round((waveObj.toIdx - waveObj.fromIdx) * 0.2));
+  const s = Math.max(0, waveObj.fromIdx - pad) / n;
+  const e = Math.min(1, (waveObj.toIdx + pad) / n);
+  ZOOM.start = s; ZOOM.end = e;
+  updateZoomHint();
+  if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+}
+
+function drawWaveHighlight(ctx, waves, xS, yS, p, H, viStart) {
+  if (!HIGHLIGHT_WAVE) return;
+  const hw = HIGHLIGHT_WAVE;
+  const fromLocal = hw.fromIdx - viStart;
+  const toLocal   = hw.toIdx   - viStart;
+
+  const x1 = xS(Math.max(0, fromLocal));
+  const x2 = xS(Math.max(0, toLocal));
+  const rectX = Math.min(x1, x2);
+  const rectW = Math.abs(x2 - x1);
+  if (rectW < 2) return;
+
+  ctx.save();
+  // Semi-transparent fill using wave color
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = hw.color;
+  ctx.fillRect(rectX, p.t, rectW, H - p.t - p.b);
+  // Border lines at wave start/end
+  ctx.globalAlpha = 0.5;
+  ctx.strokeStyle = hw.color;
+  ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(x1, p.t); ctx.lineTo(x1, H - p.b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x2, p.t); ctx.lineTo(x2, H - p.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPARE MODE
+// ═══════════════════════════════════════════════════════
+function toggleComparePanel() {
+  const panel = document.getElementById('comparePanel');
+  const btn   = document.getElementById('btnCmpToggle');
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('active', isOpen);
+}
+
+async function doCompare() {
+  const kw = document.getElementById('cmpInput').value.trim();
+  if (!kw) return;
+  if (!DATA.length) { document.getElementById('cmpStatus').textContent = '⚠ 請先載入主要股票'; return; }
+  document.getElementById('btnCmpSearch').disabled = true;
+  document.getElementById('cmpStatus').textContent = '⏳ 載入比較股票資料…';
+
+  try {
+    const url = `${API_BASE}/api/wave_data?keyword=${encodeURIComponent(kw)}&months=${MONTHS}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    if (!json.data?.length) throw new Error('查無資料');
+    applyCmpData(json.data, json.name || kw);
+  } catch(e) {
+    // TWSE direct fallback
+    const r = await fetchTWSEFallback(kw);
+    if (r && r.data.length) {
+      applyCmpData(r.data, r.name);
+    } else {
+      document.getElementById('cmpStatus').textContent = `✖ 無法取得「${kw}」資料：${e.message}`;
+    }
+  }
+  document.getElementById('btnCmpSearch').disabled = false;
+}
+
+function applyCmpData(rawData, name) {
+  CMP_NAME = name;
+  // Align dates with main DATA — build a date→close map
+  const mainMap = new Map(DATA.map(d => [d.date, d.close]));
+  const cmpMap  = new Map(rawData.map(d => [d.date, d.close]));
+
+  // Find overlapping dates
+  const sharedDates = DATA.map(d => d.date).filter(dt => cmpMap.has(dt));
+  if (sharedDates.length < 5) {
+    document.getElementById('cmpStatus').textContent = '⚠ 兩支股票日期重疊不足，請選擇相同期間';
+    return;
+  }
+
+  // Detect if same ticker entered
+  const kw1 = document.getElementById('stockInput').value.trim().toUpperCase();
+  const kw2 = document.getElementById('cmpInput').value.trim().toUpperCase();
+  const isSame = kw1 === kw2;
+
+  // Build price series aligned to DATA（存真實價格，比較模式直接用各自 Y 軸）
+  CMP_DATA = DATA.map(d => {
+    const c2 = cmpMap.get(d.date);
+    return {
+      date:   d.date,
+      price1: d.close,
+      price2: c2 != null ? c2 : null,
+    };
+  });
+
+  CMP_ACTIVE = true;
+
+  // 比較模式下加寬右側 PAD 以容納比較股 Y 軸刻度
+  PAD = { l:72, r:56, t:48, b:36 };
+
+  // ── Auto-switch to compare-friendly view ──────────────────────────────────
+  // Save current state so we can restore on clear (only once per compare session)
+  if (!CMP_PREV_STATE) {
+    CMP_PREV_STATE = {
+      chartType:  CHART_TYPE,
+      maVisible:  { ...MA_VISIBLE },
+      waveVisible: WAVE_VISIBLE,
+    };
+    // Switch to line chart
+    CHART_TYPE = 'line';
+    document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.type === 'line'));
+    // Hide all MAs
+    [5, 10, 20].forEach(m => {
+      MA_VISIBLE[m] = false;
+      const btn = document.querySelector(`.ma-btn[data-ma="${m}"]`);
+      if (btn) btn.classList.remove('active');
+      const leg = document.getElementById(`leg-ma${m}`);
+      if (leg) leg.style.opacity = '0.3';
+    });
+    // Hide wave
+    WAVE_VISIBLE = false;
+    const wBtn = document.getElementById('btnWaveToggle');
+    if (wBtn) {
+      wBtn.classList.remove('active');
+      wBtn.classList.add('hidden-wave');
+      wBtn.textContent = '〰 波浪（隱藏）';
+    }
+    const legWave = document.querySelector('.leg-item .leg-dash');
+    if (legWave) legWave.closest('.leg-item').style.opacity = '0.3';
+
+    // ── 視覺鎖定：比較模式中，MA / 圖表類型 / 波浪按鈕顯示鎖定提示
+    document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b => {
+      b.style.opacity = '0.35';
+      b.style.cursor  = 'not-allowed';
+      b.title = '比較模式中無法切換（請關閉比較模式後再操作）';
+    });
+    document.querySelectorAll('.ma-btn').forEach(b => {
+      b.style.opacity = '0.25';
+      b.style.cursor  = 'not-allowed';
+      b.title = '比較模式中無法切換（請關閉比較模式後再操作）';
+    });
+    if (wBtn) {
+      wBtn.style.opacity = '0.35';
+      wBtn.style.cursor  = 'not-allowed';
+      wBtn.title = '比較模式中無法切換（請關閉比較模式後再操作）';
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const sameNote = isSame ? ' ｜ ⚠ 相同代碼，走勢將完全重合' : '';
+  document.getElementById('cmpStatus').textContent =
+    `✔ 已載入 ${name}（${sharedDates.length} 個共同交易日）${sameNote}`;
+  document.getElementById('btnCmpClear').style.display = '';
+  document.getElementById('cmpLegend').style.display = 'flex';
+  document.getElementById('cmpLeg1').textContent = STOCK_NAME || KEYWORD;
+  document.getElementById('cmpLeg2').textContent = name;
+
+  // Calculate and render similarity
+  const sim = calcSimilarity(DATA, rawData, sharedDates);
+  if (sim) sim.isSameTicker = isSame;
+  renderSimilarityCard(sim);
+
+  if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+}
+
+function clearCompare() {
+  CMP_DATA = []; CMP_ACTIVE = false; CMP_NAME = '';
+
+  // 恢復原本的右側 PAD
+  PAD = { l:72, r:20, t:48, b:36 };
+
+  // ── Restore pre-compare settings ─────────────────────────────────────────
+  if (CMP_PREV_STATE) {
+    CHART_TYPE = CMP_PREV_STATE.chartType;
+    document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.type === CHART_TYPE));
+
+    MA_VISIBLE = { ...CMP_PREV_STATE.maVisible };
+    [5, 10, 20].forEach(m => {
+      const btn = document.querySelector(`.ma-btn[data-ma="${m}"]`);
+      if (btn) btn.classList.toggle('active', MA_VISIBLE[m]);
+      const leg = document.getElementById(`leg-ma${m}`);
+      if (leg) leg.style.opacity = MA_VISIBLE[m] ? '1' : '0.3';
+    });
+
+    WAVE_VISIBLE = CMP_PREV_STATE.waveVisible;
+    const wBtn = document.getElementById('btnWaveToggle');
+    if (wBtn) {
+      wBtn.classList.toggle('active', WAVE_VISIBLE);
+      wBtn.classList.toggle('hidden-wave', !WAVE_VISIBLE);
+      wBtn.textContent = WAVE_VISIBLE ? '〰 波浪' : '〰 波浪（隱藏）';
+    }
+    const legWave = document.querySelector('.leg-item .leg-dash');
+    if (legWave) legWave.closest('.leg-item').style.opacity = WAVE_VISIBLE ? '1' : '0.3';
+
+    // ── 解除視覺鎖定
+    document.querySelectorAll('#chartTypeGroup .ct-btn').forEach(b => {
+      b.style.opacity = '';
+      b.style.cursor  = '';
+      b.title = '';
+    });
+    document.querySelectorAll('.ma-btn').forEach(b => {
+      b.style.opacity = '';
+      b.style.cursor  = '';
+      b.title = '';
+    });
+    if (wBtn) {
+      wBtn.style.opacity = '';
+      wBtn.style.cursor  = '';
+      wBtn.title = '顯示/隱藏波浪線';
+    }
+
+    CMP_PREV_STATE = null;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  document.getElementById('cmpInput').value = '';
+  document.getElementById('cmpStatus').textContent = '輸入第二支股票後按「載入比較」，兩股以各自真實價格疊加在圖表上';
+  document.getElementById('btnCmpClear').style.display = 'none';
+  document.getElementById('cmpLegend').style.display = 'none';
+  document.getElementById('simCard').classList.remove('show');
+  if (DATA.length) { drawMain(DATA, WAVES); drawVolume(DATA); }
+}
+
+// ═══════════════════════════════════════════════════════
+// SIMILARITY CALCULATION
+// ═══════════════════════════════════════════════════════
+function calcSimilarity(rawData1, rawData2, sharedDates) {
+  // Build maps
+  const map1 = new Map(rawData1.map(d => [d.date, d]));
+  const map2 = new Map(rawData2.map(d => [d.date, d]));
+
+  // Only dates where both have data AND a previous day in the same set
+  const sorted = sharedDates.slice().sort();
+  const returns1 = [], returns2 = [];
+  for (let i = 1; i < sorted.length; i++) {
+    const d = sorted[i], pd = sorted[i-1];
+    const a = map1.get(d), ap = map1.get(pd);
+    const b = map2.get(d), bp = map2.get(pd);
+    if (!a || !ap || !b || !bp) continue;
+    const r1 = (a.close - ap.close) / ap.close;
+    const r2 = (b.close - bp.close) / bp.close;
+    returns1.push(r1);
+    returns2.push(r2);
+  }
+
+  if (returns1.length < 5) return null;
+
+  // Pearson correlation
+  const mean1 = returns1.reduce((s,v)=>s+v,0)/returns1.length;
+  const mean2 = returns2.reduce((s,v)=>s+v,0)/returns2.length;
+  let cov=0, std1=0, std2=0;
+  for (let i=0; i<returns1.length; i++) {
+    const d1=returns1[i]-mean1, d2=returns2[i]-mean2;
+    cov += d1*d2; std1 += d1*d1; std2 += d2*d2;
+  }
+  const pearson = std1*std2>0 ? cov/Math.sqrt(std1*std2) : 0;
+
+  // Direction match rate (both up or both down on the same day)
+  let dirMatch = 0;
+  for (let i=0; i<returns1.length; i++) {
+    if ((returns1[i]>=0 && returns2[i]>=0)||(returns1[i]<0 && returns2[i]<0)) dirMatch++;
+  }
+  const dirRate = dirMatch / returns1.length;
+
+  // Volatility similarity (1 - |σ1-σ2|/max(σ1,σ2))
+  const vol1 = Math.sqrt(returns1.reduce((s,v)=>s+(v-mean1)**2,0)/returns1.length);
+  const vol2 = Math.sqrt(returns2.reduce((s,v)=>s+(v-mean2)**2,0)/returns2.length);
+  const volSim = vol1&&vol2 ? 1 - Math.abs(vol1-vol2)/Math.max(vol1,vol2) : 0;
+
+  // Combined score: weighted average
+  // Pearson (normalized 0-1): 40%, direction: 35%, volatility: 25%
+  const pearsonNorm = (pearson + 1) / 2; // -1~1 → 0~1
+  const score = pearsonNorm * 0.40 + dirRate * 0.35 + volSim * 0.25;
+
+  return {
+    score: Math.round(score * 100),
+    pearson: pearson,
+    dirRate: dirRate,
+    volSim: volSim,
+    n: returns1.length,
+    isSameTicker: CMP_NAME === (STOCK_NAME || KEYWORD) ||
+                  document.getElementById('cmpInput').value.trim().toUpperCase() ===
+                  document.getElementById('stockInput').value.trim().toUpperCase(),
+  };
+}
+
+function drawSimGauge(pct, color) {
+  const cvs = document.getElementById('simGaugeCanvas');
+  if (!cvs) return;
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const cx = W/2, cy = H/2, r = 32, lw = 7;
+  ctx.clearRect(0,0,W,H);
+  // background ring
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=lw; ctx.stroke();
+  // colored arc
+  const start = -Math.PI/2;
+  const end   = start + (pct/100)*Math.PI*2;
+  ctx.beginPath(); ctx.arc(cx,cy,r,start,end);
+  ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.lineCap='round'; ctx.stroke();
+}
+
+function renderSimilarityCard(sim) {
+  const card = document.getElementById('simCard');
+  if (!sim) { card.classList.remove('show'); return; }
+  card.classList.add('show');
+
+  const pct = sim.score;
+  let color, verdictClass, verdictText;
+
+  if (sim.isSameTicker) {
+    color = 'var(--accent)';
+    verdictClass = 'same';
+    verdictText = '🔄 兩支股票代碼相同，走勢理論上完全一致（相似度 100%）。可用此模式驗證圖表對齊是否正確。';
+    document.getElementById('simPctVal').textContent = '100%';
+    document.getElementById('simPctVal').style.color = 'var(--accent)';
+    drawSimGauge(100, '#00e5ff');
+  } else {
+    if (pct >= 75) {
+      color='#00e676'; verdictClass='high';
+      verdictText=`✅ 相似度極高（${pct}%），兩股走勢高度同步。可能屬同一族群、概念股或受相同產業鏈驅動，值得進一步研究關聯性。`;
+    } else if (pct >= 55) {
+      color='#ffd600'; verdictClass='mid';
+      verdictText=`⚠ 相似度中等（${pct}%），具有一定程度的共同走勢，但仍有顯著差異。可能有部分重疊的產業題材或市場敏感度。`;
+    } else {
+      color='#ff3d5a'; verdictClass='low';
+      verdictText=`❌ 相似度偏低（${pct}%），兩股走勢差異較大，較不像同概念股或同族群。可能受不同產業週期或個股題材影響。`;
+    }
+    document.getElementById('simPctVal').textContent = pct + '%';
+    document.getElementById('simPctVal').style.color = color;
+    drawSimGauge(sim.isSameTicker ? 100 : pct, color);
+  }
+
+  document.getElementById('simPearson').textContent = sim.isSameTicker ? '1.000' : sim.pearson.toFixed(3);
+  document.getElementById('simPearson').style.color = color;
+  document.getElementById('simDirection').textContent = sim.isSameTicker ? '100%' : (sim.dirRate*100).toFixed(1)+'%';
+  document.getElementById('simDirection').style.color = color;
+  document.getElementById('simVolatility').textContent = sim.isSameTicker ? '100%' : (sim.volSim*100).toFixed(1)+'%';
+  document.getElementById('simVolatility').style.color = color;
+  document.getElementById('simDays').textContent = sim.isSameTicker ? (sim.n||'--')+' 天' : sim.n+' 天';
+
+  const verdict = document.getElementById('simVerdict');
+  verdict.className = `sim-verdict ${verdictClass}`;
+  verdict.textContent = verdictText;
+}
+
+// Draw compare overlay — called at end of drawMain
+// 比較模式：直接使用真實價格，疊加在主圖的 Y 軸上。
+// 主股以主圖的 yS 直接繪製（close 價），比較股則另外計算一套價格 Y 軸。
+function drawCompareOverlay(ctx, data, viStart, viEnd, xS, yS, p, W, H, _isDayMain) {
+  if (!CMP_ACTIVE || !CMP_DATA.length) return;
+
+  // Slice CMP_DATA to same visible window
+  const cmpSlice = CMP_DATA.slice(viStart, viEnd);
+  if (!cmpSlice.length) return;
+
+  // 取主股可見區間的 close 價，以及比較股的 price2（真實價格）
+  // CMP_DATA 內存的 idx1/idx2 是指數化的，我們另外存真實價格 price2
+  // 但目前 CMP_DATA 只有 idx1/idx2，需改為存真實 close 價
+  // → 透過 CMP_RAW_PRICES（在 applyCmpData 建立）取得
+
+  // 主股：直接用 data[i].close，搭配主圖的 yS
+  // 比較股：用獨立的 Y 軸，讓兩條線都能在圖內完整顯示
+
+  // 計算比較股在可見範圍內的價格 min/max
+  const cmpPrices = cmpSlice.map(d => d.price2).filter(v => v != null);
+  if (!cmpPrices.length) return;
+
+  const chartTop    = p.t;
+  const chartBottom = H - p.b;
+  const chartH      = chartBottom - chartTop;
+
+  const cmpMin = Math.min(...cmpPrices);
+  const cmpMax = Math.max(...cmpPrices);
+  const cmpMargin = (cmpMax - cmpMin) * 0.06 || 1;
+  const cmpMinP = cmpMin - cmpMargin;
+  const cmpMaxP = cmpMax + cmpMargin;
+  const cmpRange = cmpMaxP - cmpMinP || 1;
+
+  // 比較股的 Y 映射（使用同一圖高，但獨立刻度）
+  const yC = v => chartTop + (1 - (v - cmpMinP) / cmpRange) * chartH;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(p.l, p.t, W - p.l - p.r, chartH);
+  ctx.clip();
+
+  // ── 主股折線（使用主圖 yS，cyan）
+  const col1 = _isDayMain ? 'rgba(10,82,160,.85)' : '#00e5ff';
+  ctx.strokeStyle = col1;
+  ctx.lineWidth = 2; ctx.setLineDash([]);
+  ctx.beginPath();
+  let started = false;
+  data.forEach((d, i) => {
+    const x = xS(i), y = yS(d.close);
+    if (!started) { ctx.moveTo(x, y); started = true; }
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // ── 比較股折線（使用獨立 yC，purple）
+  const col2 = _isDayMain ? '#5a20b0' : '#c084fc';
+  ctx.strokeStyle = col2;
+  ctx.lineWidth = 2; ctx.setLineDash([]);
+  ctx.beginPath(); started = false;
+  cmpSlice.forEach((d, i) => {
+    if (d.price2 == null) return;
+    const x = xS(i), y = yC(d.price2);
+    if (!started) { ctx.moveTo(x, y); started = true; }
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.restore();
+
+  // ── 比較股右側 Y 軸刻度（顯示比較股的真實價格）
+  ctx.save();
+  ctx.font = '9px "JetBrains Mono",monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = col2;
+  ctx.globalAlpha = 0.7;
+  const cmpGridCount = 4;
+  for (let i = 0; i <= cmpGridCount; i++) {
+    const yy = chartTop + (i / cmpGridCount) * chartH;
+    const pv = cmpMaxP - (i / cmpGridCount) * cmpRange;
+    ctx.fillText(pv.toFixed(1), W - p.r + 2, yy + 3);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // ── 結尾標籤：顯示各自最新收盤價（不顯示股票代碼）
+  ctx.save();
+  ctx.font = 'bold 10px "JetBrains Mono",monospace';
+  const lastData = data[data.length - 1];
+  const lastCmp  = cmpSlice[cmpSlice.length - 1];
+  const xEnd = Math.min(xS(data.length - 1), W - p.r - 4);
+
+  if (lastCmp && lastCmp.price2 != null) {
+    const y2 = yC(lastCmp.price2);
+    ctx.fillStyle = col2;
+    ctx.textAlign = 'right';
+    // 顯示比較股最新收盤價
+    ctx.fillText(lastCmp.price2.toFixed(1), xEnd, y2 - 6);
+  }
+  if (lastData) {
+    const y1 = yS(lastData.close);
+    ctx.fillStyle = col1;
+    ctx.textAlign = 'right';
+    // 顯示主股最新收盤價
+    ctx.fillText(lastData.close.toFixed(1), xEnd, y1 + 14);
+  }
+
+  // ── 左上角標示「比較模式」
+  ctx.font = '8px "JetBrains Mono",monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = _isDayMain ? 'rgba(10,82,160,.5)' : 'rgba(0,229,255,.4)';
+  ctx.fillText('比較模式（各自真實價格）', p.l + 4, p.t + 12);
+
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════
+// STOCK INFO BAR ACCORDION (mobile)
+// ═══════════════════════════════════════════════════════
+function toggleSibExtra() {
+  const extra = document.getElementById('sibExtra');
+  const icon  = document.getElementById('sibToggleIcon');
+  if (!extra) return;
+  const isOpen = extra.classList.toggle('open');
+  if (icon) icon.textContent = isOpen ? '▲' : '▼';
+}
+
+// ═══════════════════════════════════════════════════════
+// CANVAS HEIGHT — cap to <300px on mobile
+// ═══════════════════════════════════════════════════════
+function adjustCanvasHeight() {
+  const cvs = document.getElementById('mainCanvas');
+  if (!cvs) return;
+  const isMobile = window.innerWidth <= 600;
+  const h = isMobile ? 260 : 440;
+  cvs.height = h;
+}
+
+// ═══════════════════════════════════════════════════════
 // STATUS
 // ═══════════════════════════════════════════════════════
 function setStatus(html, cls) {
@@ -1725,6 +2994,7 @@ function setDotPulse(on) {
 // INIT
 // ═══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  adjustCanvasHeight();
   initCanvas();
   const params = new URLSearchParams(window.location.search);
   const kw = params.get('stock') || params.get('keyword') || '';
@@ -1736,6 +3006,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Resize canvas to match displayed size
 window.addEventListener('resize', () => {
+  adjustCanvasHeight();
   if (DATA.length) renderAll();
 });
 </script>

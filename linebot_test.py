@@ -1,15 +1,15 @@
+from dotenv import load_dotenv
+load_dotenv()  # ✅ 第一件事就載入，之後所有 import 都能讀到環境變數
+
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler  # 使用舊版 API，避免 v3 ImportError
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
-from dotenv import load_dotenv
 
 from push_service import start_scheduler
 from post_Info import stock_info
 from api_routes import register_api
-
-load_dotenv()  # .env 本地端載入環境變數
 
 app = Flask(__name__)
 
