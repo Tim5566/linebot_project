@@ -591,143 +591,136 @@
     /* ══ RESPONSIVE ══ */
     @media(max-width:600px) {
       /* Header */
-      header { padding:0 12px 0 8px; height:52px; }
+      header { padding:0 10px 0 6px; height:50px; }
       .hd-sub { display:none }
-      .hd-logo-icon { width:36px; height:36px; }
-      .hd-logo-icon img { width:46px; height:46px; top:-4px; left:-4px; }
-      .hd-title { font-size:.76rem; }
-      .hd-clock { font-size:.65rem; padding:4px 10px; }
-      .btn-back { padding:5px 10px; font-size:.62rem; gap:5px; }
-      .btn-back svg { width:12px; height:12px; }
+      .hd-logo-icon { width:34px; height:34px; }
+      .hd-logo-icon img { width:44px; height:44px; top:-4px; left:-4px; }
+      .hd-title { font-size:.74rem; }
+      .hd-clock { font-size:.62rem; padding:3px 8px; letter-spacing:.06em; }
+      .btn-back { padding:4px 9px; font-size:.6rem; gap:4px; }
+      .btn-back svg { width:11px; height:11px; }
 
       /* Layout */
-      .app { padding:10px 10px 48px; }
+      .app { padding:8px 8px 48px; }
 
       /* Search panel */
-      .search-panel { padding:12px; margin-bottom:10px; border-radius:12px; }
-      .search-row { gap:6px; margin-bottom:10px; flex-wrap:nowrap; }
-      .input-wrap { min-width:0; padding:0 10px; border-radius:8px; }
-      .input-wrap input { font-size:.85rem; padding:10px 0; }
-      .btn { padding:10px 14px; font-size:.78rem; border-radius:8px; }
+      .search-panel { padding:10px; margin-bottom:8px; border-radius:12px; }
+      .search-row { gap:6px; margin-bottom:8px; flex-wrap:nowrap; }
+      .input-wrap { min-width:0; padding:0 9px; border-radius:8px; }
+      .input-wrap input { font-size:.82rem; padding:9px 0; }
+      .btn { padding:9px 12px; font-size:.76rem; border-radius:8px; }
 
-      /* Controls row — 手機三行排列 */
-      .controls-row {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
-        align-items: flex-start;
-      }
+      /* Controls row */
+      .controls-row { flex-direction:row; flex-wrap:wrap; gap:5px; align-items:flex-start; }
       .ctrl-label { display:none }
-      .ctrl-group { padding:4px 8px; gap:4px; }
-      .ctrl-group-label { font-size:.55rem; padding-right:6px; margin-right:0; }
+      .ctrl-group { padding:3px 7px; gap:3px; }
+      .ctrl-group-label { font-size:.52rem; padding-right:5px; margin-right:0; }
 
-      /* Row 1: 期間 + 圖表類型 */
       #periodGroup, #chartTypeGroup { display: inline-flex; }
 
-      /* 把 period、chartType 放同一行 */
-      .controls-row {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .tab-group { gap:3px; }
-      .tab-btn { padding:5px 12px; font-size:.7rem; }
-      .chart-type-group { gap:3px; }
-      .ct-btn { padding:5px 10px; font-size:.68rem; }
-      .ma-toggle-group { gap:3px; }
-      .ma-btn { padding:5px 10px; font-size:.68rem; }
-      .btn-wave-toggle { padding:5px 12px; font-size:.68rem; }
-      .btn-cmp-toggle  { padding:5px 12px; font-size:.68rem; }
+      .tab-group { gap:2px; }
+      .tab-btn { padding:4px 10px; font-size:.66rem; }
+      .chart-type-group { gap:2px; }
+      .ct-btn { padding:4px 9px; font-size:.65rem; }
+      .ma-toggle-group { gap:2px; }
+      .ma-btn { padding:4px 9px; font-size:.65rem; }
+      .btn-wave-toggle { padding:4px 10px; font-size:.65rem; }
+      .btn-cmp-toggle  { padding:4px 10px; font-size:.65rem; }
 
       /* Status bar */
-      .status-bar { font-size:.68rem; padding:7px 10px; }
+      .status-bar { font-size:.65rem; padding:6px 9px; min-height:32px; }
 
-      /* Stock info bar — accordion on mobile */
-      .stock-info-bar { padding:10px 12px; gap:10px; border-radius:12px; flex-wrap:wrap; }
-      .sib-name { font-size:1.05rem; }
-      .sib-price { font-size:1.5rem; }
-      .sib-mid { gap:12px; }
+      /* Stock info bar */
+      .stock-info-bar { padding:9px 11px; gap:8px; border-radius:12px; flex-wrap:wrap; }
+      .sib-name { font-size:1rem; }
+      .sib-price { font-size:1.45rem; }
+      .sib-mid { gap:10px; }
       .sib-toggle { display:inline-flex; align-items:center; gap:4px; }
       .sib-extra { max-height: 0; opacity: 0; }
       .sib-extra.open { max-height: 100px; opacity: 1; }
-      .sib-stats { gap:12px; justify-content:flex-start; }
-      .sib-stat-val { font-size:.76rem; }
+      .sib-stats { gap:10px; justify-content:flex-start; }
+      .sib-stat-val { font-size:.74rem; }
 
-      /* Chart area — canvas height capped for mobile */
-      .chart-wrap { border-radius:12px; margin-bottom:10px; }
+      /* Chart area */
+      .chart-wrap { border-radius:12px; margin-bottom:8px; }
       .chart-toolbar {
-        padding:8px 10px; gap:6px; flex-wrap:wrap;
+        padding:6px 8px; gap:4px; flex-wrap:wrap;
         flex-direction: row; align-items: center;
       }
-      .chart-toolbar > div:first-child { order:1; width:100%; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+      /* Chart label + kbar badge on same row */
+      .chart-toolbar > div:first-child {
+        order:1; width:100%;
+        display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+      }
       .chart-toolbar > div:nth-child(2) { order:2; margin-left:0 !important; }
       .chart-toolbar > .legend { order:3; width:100%; }
-      .legend { gap:6px; flex-wrap:wrap; }
-      .leg-item { font-size:.62rem; gap:3px; }
-      .zoom-btn { padding:3px 8px; font-size:.75rem; }
-      .zoom-hint { font-size:.6rem; }
+      .chart-label { font-size:.64rem; }
+      .kbar-badge  { font-size:.58rem; padding:1px 7px; }
+      /* Legend — compact single row with tiny items */
+      .legend { gap:5px; flex-wrap:wrap; }
+      .leg-item { font-size:.58rem; gap:2px; }
+      .leg-sq   { width:7px; height:7px; }
+      .leg-line { width:14px; height:2px; }
+      .leg-dash { width:14px; }
+      /* Zoom buttons */
+      .zoom-btn { padding:2px 8px; font-size:.72rem; border-radius:5px; }
+      .zoom-hint { font-size:.56rem; }
 
-      /* Tooltip — 手機版縮小避免超出螢幕 */
-      .chart-tooltip {
-        font-size:.68rem;
-        padding:8px 11px;
-        max-width: calc(100vw - 32px);
-      }
-      .tooltip-date { font-size:.7rem; }
+      /* Tooltip */
+      .chart-tooltip { font-size:.66rem; padding:7px 10px; max-width:calc(100vw - 24px); border-radius:8px; }
+      .tooltip-date { font-size:.68rem; }
 
       /* Compare panel */
-      .compare-panel { padding:12px 14px; border-radius:12px; }
-      .compare-header { gap:8px; margin-bottom:8px; }
-      .compare-title { font-size:.68rem; }
-      .compare-input-wrap { flex-wrap:wrap; gap:6px; }
-      .compare-input { font-size:.78rem; padding:7px 10px; min-width:0; flex:1 1 120px; }
-      .btn-compare { font-size:.72rem; padding:7px 12px; }
-      .btn-compare-clear { font-size:.72rem; padding:7px 10px; }
-      .cmp-status { font-size:.64rem; }
+      .compare-panel { padding:10px 12px; border-radius:12px; }
+      .compare-title { font-size:.66rem; }
+      .compare-input-wrap { flex-wrap:wrap; gap:5px; }
+      .compare-input { font-size:.76rem; padding:6px 9px; min-width:0; flex:1 1 110px; }
+      .btn-compare { font-size:.7rem; padding:6px 10px; }
+      .btn-compare-clear { font-size:.7rem; padding:6px 9px; }
+      .cmp-status { font-size:.62rem; }
 
-      /* Similarity card — 手機版垂直排列 */
-      .sim-card { padding:12px 14px; }
-      .sim-score-wrap { flex-direction:column; align-items:flex-start; gap:12px; }
+      /* Similarity card */
+      .sim-card { padding:10px 12px; }
+      .sim-score-wrap { flex-direction:column; align-items:flex-start; gap:10px; }
       .sim-details { min-width:0; width:100%; }
-      .sim-gauge { width:70px; height:70px; }
-      .sim-row-label { font-size:.64rem; }
-      .sim-row-val { font-size:.68rem; }
-      .sim-verdict { font-size:.68rem; }
+      .sim-gauge { width:68px; height:68px; }
+      .sim-row-label { font-size:.62rem; }
+      .sim-row-val { font-size:.66rem; }
+      .sim-verdict { font-size:.66rem; }
 
       /* Wave cards */
-      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:6px; }
-      .wave-card { padding:10px; border-radius:10px; }
-      .wc-label { font-size:.85rem; }
-      .wc-range { font-size:.7rem; }
+      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:5px; }
+      .wave-card { padding:9px; border-radius:10px; }
+      .wc-label { font-size:.82rem; }
+      .wc-range { font-size:.67rem; }
 
       /* Stats grid */
-      .stats-grid { grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:10px; }
-      .stat-card { padding:10px 12px; border-radius:8px; }
-      .stat-label { font-size:.6rem; }
-      .stat-value { font-size:.82rem; }
+      .stats-grid { grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:8px; }
+      .stat-card { padding:9px 10px; border-radius:8px; }
+      .stat-label { font-size:.58rem; }
+      .stat-value { font-size:.78rem; }
 
       /* Summary */
-      .summary-grid { grid-template-columns:1fr; gap:8px; }
-      .summary-panel { padding:14px; border-radius:12px; }
-      .summary-block { padding:12px; }
-      .sb-content { font-size:.74rem; line-height:1.7; }
+      .summary-grid { grid-template-columns:1fr; gap:7px; }
+      .summary-panel { padding:12px; border-radius:12px; }
+      .summary-block { padding:10px; }
+      .sb-content { font-size:.72rem; line-height:1.65; }
 
       /* Wave guide */
-      .wg-grid { grid-template-columns:1fr; gap:8px; }
-      .wave-guide { padding:14px; border-radius:12px; }
-      .wg-rule { font-size:.67rem; }
+      .wg-grid { grid-template-columns:1fr; gap:7px; }
+      .wave-guide { padding:12px; border-radius:12px; }
+      .wg-rule { font-size:.65rem; }
 
       /* Fibonacci */
-      .fib-item { font-size:.68rem; gap:6px; }
-      .fib-price { width:46px; }
+      .fib-item { font-size:.66rem; gap:5px; }
+      .fib-price { width:44px; }
 
       /* Disclaimer */
-      .disclaimer { font-size:.6rem; }
+      .disclaimer { font-size:.58rem; }
     }
 
     @media(max-width:600px) {
-      #mainCanvas { height: 400px !important; }
+      #mainCanvas { height: 360px !important; }
     }
 
     @media(max-width:360px) {
@@ -1648,9 +1641,21 @@ let WAVE_VISIBLE  = true;    // show/hide wave lines & labels
 
 // canvas refs
 let mainCvs, mainCtx, volCvs, volCtx;
-// layout
-let PAD = { l:72, r:20, t:48, b:36 };
-let VOL_PAD = { l:72, r:20, t:6, b:18 };
+// layout — mobile uses tighter left padding so chart fills to the edge
+function getMobilePad() {
+  const isMob = window.innerWidth <= 600;
+  return isMob
+    ? { l:46, r:10, t:40, b:32 }
+    : { l:72, r:20, t:48, b:36 };
+}
+function getMobileVolPad() {
+  const isMob = window.innerWidth <= 600;
+  return isMob
+    ? { l:46, r:10, t:4, b:16 }
+    : { l:72, r:20, t:6, b:18 };
+}
+let PAD = getMobilePad();
+let VOL_PAD = getMobileVolPad();
 
 // ═══════════════════════════════════════════════════════
 // CLOCK
@@ -2080,17 +2085,21 @@ function drawMain(data, waves) {
   const yS = v => p.t + (1-(v-minP)/range)*cH;
 
   // ── grid lines + price axis
-  const gridCount = 6;
+  const gridCount = isMobile ? 5 : 6;
   for (let i=0; i<=gridCount; i++) {
     const yy = p.t + (i/gridCount)*cH;
     const pv = maxP - (i/gridCount)*range;
     // Horizontal grid
     ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
     ctx.beginPath(); ctx.moveTo(p.l,yy); ctx.lineTo(W-p.r,yy); ctx.stroke();
-    // Price label — use theme-aware color
+    // Price label — smaller on mobile to avoid crowding
     const isDayTheme = document.body.classList.contains('theme-day');
-    ctx.fillStyle = isDayTheme ? '#1a5090' : '#48aadf'; ctx.font = '10px "JetBrains Mono",monospace';
-    ctx.textAlign = 'right'; ctx.fillText(pv.toFixed(1), p.l-6, yy+4);
+    const priceFont  = isMobile ? '8px "JetBrains Mono",monospace' : '10px "JetBrains Mono",monospace';
+    const labelGap   = isMobile ? 4 : 6;
+    ctx.fillStyle = isDayTheme ? '#1a5090' : '#3a7aaa';
+    ctx.font = priceFont;
+    ctx.textAlign = 'right';
+    ctx.fillText(pv.toFixed(1), p.l - labelGap, yy + 3);
   }
 
     // ── candle width
@@ -2150,7 +2159,8 @@ function drawMain(data, waves) {
   [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
     if (!MA_VISIBLE[p2]) return;
     const ma = calcMA(data,p2);
-    ctx.strokeStyle=col; ctx.lineWidth=1.4; ctx.beginPath(); let started=false;
+    const maLW = isMobile ? 1.6 : 1.4;
+    ctx.strokeStyle=col; ctx.lineWidth=maLW; ctx.beginPath(); let started=false;
     ma.forEach((v,i)=>{
       if (!v) return;
       if (!started){ctx.moveTo(xS(i),yS(v));started=true;}
@@ -2166,9 +2176,9 @@ function drawMain(data, waves) {
   if (WAVE_VISIBLE) waves.forEach(w => {
     const x1=xS(w.fromIdx), y1=yS(w.fromPrice), x2=xS(w.toIdx), y2=yS(w.toPrice);
     const col = w.color;
-    const wLineW = isMobile ? 1.5 : 2.5;
-    const wDotR  = isMobile ? 3   : 5;
-    const wArrL  = isMobile ? 7   : 11;
+    const wLineW = isMobile ? 2.0 : 2.5;
+    const wDotR  = isMobile ? 3.5 : 5;
+    const wArrL  = isMobile ? 8   : 11;
 
     // shadow for depth
     ctx.save();
@@ -2196,7 +2206,7 @@ function drawMain(data, waves) {
     const mx=(x1+x2)/2+4, my=(y1+y2)/2-14;
     ctx.save();
     // label bg
-    const lblFont = isMobile ? 'bold 9px "Orbitron",monospace' : 'bold 11px "Orbitron",monospace';
+    const lblFont = isMobile ? 'bold 10px "Orbitron",monospace' : 'bold 11px "Orbitron",monospace';
     ctx.font = lblFont;
     const tw = ctx.measureText(`W${w.label}`).width + (isMobile ? 6 : 10);
     const lblH = isMobile ? 14 : 18;
@@ -2227,12 +2237,30 @@ function drawMain(data, waves) {
     ctx.strokeRect(xS(localHoverMain)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
   }
 
-  // ── X-axis dates
-  ctx.fillStyle = _isDayMain ? '#3a6080' : '#2e4460'; ctx.font='9px "JetBrains Mono",monospace'; ctx.textAlign='center';
-  const step = Math.max(1, Math.ceil(data.length/10));
-  data.forEach((d,i)=>{
-    if (i%step===0) {
-      ctx.fillText(d.date.slice(0,8), xS(i), H-10);
+  // ── X-axis dates — mobile: fewer labels, shorter format, no overlap
+  const dateFont = isMobile ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
+  ctx.fillStyle = _isDayMain ? '#3a6080' : '#3a5878';
+  ctx.font = dateFont;
+  ctx.textAlign = 'center';
+  // Compute max labels that fit without overlap (each label ~44px wide on mobile)
+  const labelWidth = isMobile ? 46 : 56;
+  const maxLabels  = Math.max(3, Math.floor(cW / labelWidth));
+  const step = Math.max(1, Math.ceil(data.length / maxLabels));
+  data.forEach((d, i) => {
+    if (i % step === 0) {
+      // Mobile: show MM/DD only (e.g. "05/08"), Desktop: MM/DD + year prefix stripped
+      let label;
+      if (isMobile) {
+        // d.date format is "115/05/08" (ROC) or "2025-05-08"
+        const raw = d.date || '';
+        const parts = raw.replace(/-/g, '/').split('/');
+        label = parts.length >= 3 ? `${parts[1]}/${parts[2]}` : raw.slice(-5);
+      } else {
+        label = d.date.slice(0, 8);
+      }
+      const x = xS(i);
+      // Only draw if far enough from left edge
+      if (x > p.l + 10) ctx.fillText(label, x, H - (isMobile ? 8 : 10));
     }
   });
 
@@ -2252,8 +2280,9 @@ function drawMain(data, waves) {
   ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
   ctx.beginPath(); ctx.moveTo(p.l,yLast); ctx.lineTo(W-p.r,yLast); ctx.stroke();
   ctx.setLineDash([]);
-  // price tag
-  ctx.fillStyle='rgba(0,229,255,.8)'; ctx.font='bold 10px "JetBrains Mono",monospace';
+  // price tag — on mobile show inside chart to avoid clipping on narrow right margin
+  const tagFont = isMobile ? 'bold 8px "JetBrains Mono",monospace' : 'bold 10px "JetBrains Mono",monospace';
+  ctx.fillStyle='rgba(0,229,255,.85)'; ctx.font=tagFont;
   ctx.textAlign='left';
   ctx.fillText(lastClose.toFixed(1), W-p.r+2, yLast+4);
   }
@@ -2303,7 +2332,8 @@ function drawVolume(data) {
   });
 
   // Vol label
-  ctx.fillStyle='rgba(90,120,150,.6)'; ctx.font='9px "JetBrains Mono",monospace';
+  const isMobVol = W < 520;
+  ctx.fillStyle='rgba(90,120,150,.6)'; ctx.font= isMobVol ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
   ctx.textAlign='left'; ctx.fillText('VOL', p.l+2, p.t+10);
 }
 
@@ -3125,6 +3155,10 @@ function toggleSibExtra() {
 // CANVAS RESIZE — 動態根據容器和裝置設定正確解析度
 // ═══════════════════════════════════════════════════════
 function adjustCanvasHeight() {
+  // 每次 resize 重新計算 padding（手機 / 桌機不同）
+  PAD     = getMobilePad();
+  VOL_PAD = getMobileVolPad();
+
   const mainEl = document.getElementById('mainCanvas');
   const volEl  = document.getElementById('volCanvas');
   const wrap   = document.getElementById('chartMainArea');
@@ -3137,8 +3171,8 @@ function adjustCanvasHeight() {
   const cssW = wrap.clientWidth || window.innerWidth;
 
   // 主圖和成交量 CSS 高度（手機明顯拉高）
-  const mainCssH = isMobile ? 320 : 440;
-  const volCssH  = isMobile ? 90  : 80;
+  const mainCssH = isMobile ? 360 : 440;
+  const volCssH  = isMobile ? 80  : 80;
 
   // 用 style 固定 CSS 顯示尺寸
   mainEl.style.width  = '100%';
