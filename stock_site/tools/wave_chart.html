@@ -615,9 +615,7 @@
       .ctrl-label { display:none }
       .ctrl-group { padding:3px 7px; gap:3px; }
       .ctrl-group-label { font-size:.52rem; padding-right:5px; margin-right:0; }
-
       #periodGroup, #chartTypeGroup { display: inline-flex; }
-
       .tab-group { gap:2px; }
       .tab-btn { padding:4px 10px; font-size:.66rem; }
       .chart-type-group { gap:2px; }
@@ -636,33 +634,24 @@
       .sib-price { font-size:1.45rem; }
       .sib-mid { gap:10px; }
       .sib-toggle { display:inline-flex; align-items:center; gap:4px; }
-      .sib-extra { max-height: 0; opacity: 0; }
-      .sib-extra.open { max-height: 100px; opacity: 1; }
+      .sib-extra { max-height:0; opacity:0; }
+      .sib-extra.open { max-height:100px; opacity:1; }
       .sib-stats { gap:10px; justify-content:flex-start; }
       .sib-stat-val { font-size:.74rem; }
 
       /* Chart area */
       .chart-wrap { border-radius:12px; margin-bottom:8px; }
-      .chart-toolbar {
-        padding:6px 8px; gap:4px; flex-wrap:wrap;
-        flex-direction: row; align-items: center;
-      }
-      /* Chart label + kbar badge on same row */
-      .chart-toolbar > div:first-child {
-        order:1; width:100%;
-        display:flex; align-items:center; gap:5px; flex-wrap:wrap;
-      }
+      .chart-toolbar { padding:6px 8px; gap:4px; flex-wrap:wrap; flex-direction:row; align-items:center; }
+      .chart-toolbar > div:first-child { order:1; width:100%; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
       .chart-toolbar > div:nth-child(2) { order:2; margin-left:0 !important; }
       .chart-toolbar > .legend { order:3; width:100%; }
       .chart-label { font-size:.64rem; }
       .kbar-badge  { font-size:.58rem; padding:1px 7px; }
-      /* Legend — compact single row with tiny items */
       .legend { gap:5px; flex-wrap:wrap; }
       .leg-item { font-size:.58rem; gap:2px; }
       .leg-sq   { width:7px; height:7px; }
       .leg-line { width:14px; height:2px; }
       .leg-dash { width:14px; }
-      /* Zoom buttons */
       .zoom-btn { padding:2px 8px; font-size:.72rem; border-radius:5px; }
       .zoom-hint { font-size:.56rem; }
 
@@ -672,6 +661,7 @@
 
       /* Compare panel */
       .compare-panel { padding:10px 12px; border-radius:12px; }
+      .compare-header { gap:8px; margin-bottom:8px; }
       .compare-title { font-size:.66rem; }
       .compare-input-wrap { flex-wrap:wrap; gap:5px; }
       .compare-input { font-size:.76rem; padding:6px 9px; min-width:0; flex:1 1 110px; }
@@ -1641,21 +1631,9 @@ let WAVE_VISIBLE  = true;    // show/hide wave lines & labels
 
 // canvas refs
 let mainCvs, mainCtx, volCvs, volCtx;
-// layout — mobile uses tighter left padding so chart fills to the edge
-function getMobilePad() {
-  const isMob = window.innerWidth <= 600;
-  return isMob
-    ? { l:46, r:10, t:40, b:32 }
-    : { l:72, r:20, t:48, b:36 };
-}
-function getMobileVolPad() {
-  const isMob = window.innerWidth <= 600;
-  return isMob
-    ? { l:46, r:10, t:4, b:16 }
-    : { l:72, r:20, t:6, b:18 };
-}
-let PAD = getMobilePad();
-let VOL_PAD = getMobileVolPad();
+// layout
+let PAD = { l:72, r:20, t:48, b:36 };
+let VOL_PAD = { l:72, r:20, t:6, b:18 };
 
 // ═══════════════════════════════════════════════════════
 // CLOCK
@@ -2047,11 +2025,14 @@ function updateZoomHint() {
 // ═══════════════════════════════════════════════════════
 function drawMain(data, waves) {
   if (!mainCvs) initCanvas();
-  // 使用 CSS 尺寸（已由 adjustCanvasHeight 設定），確保 DPR 縮放後座標正確
   const W = mainCvs._cssW || mainCvs.width;
   const H = mainCvs._cssH || mainCvs.height;
   const ctx = mainCtx;
-  const p = { ...PAD };   // always use standard padding — compare uses same Y axis now
+  // ── Mobile: use tighter left/right padding so chart fills to the edge
+  const isMobile = W < 520;
+  const p = isMobile
+    ? { l:46, r:10, t:PAD.t, b:PAD.b }
+    : { ...PAD };
   const cW = W-p.l-p.r, cH = H-p.t-p.b;
 
   // ── Apply ZOOM viewport ────────────────────────────────────────────────────
@@ -2085,28 +2066,25 @@ function drawMain(data, waves) {
   const yS = v => p.t + (1-(v-minP)/range)*cH;
 
   // ── grid lines + price axis
-  const gridCount = isMobile ? 5 : 6;
+  // mobile: fewer grid lines, smaller font, tighter gap to left edge
+  const gridCount  = isMobile ? 5 : 6;
+  const priceFont  = isMobile ? '8px "JetBrains Mono",monospace' : '10px "JetBrains Mono",monospace';
+  const priceLabelX = isMobile ? p.l - 4 : p.l - 6;
   for (let i=0; i<=gridCount; i++) {
     const yy = p.t + (i/gridCount)*cH;
     const pv = maxP - (i/gridCount)*range;
-    // Horizontal grid
-    ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
+    ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid;
+    ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
     ctx.beginPath(); ctx.moveTo(p.l,yy); ctx.lineTo(W-p.r,yy); ctx.stroke();
-    // Price label — smaller on mobile to avoid crowding
     const isDayTheme = document.body.classList.contains('theme-day');
-    const priceFont  = isMobile ? '8px "JetBrains Mono",monospace' : '10px "JetBrains Mono",monospace';
-    const labelGap   = isMobile ? 4 : 6;
-    ctx.fillStyle = isDayTheme ? '#1a5090' : '#3a7aaa';
+    ctx.fillStyle = isDayTheme ? '#1a5090' : (isMobile ? '#3a7aaa' : '#48aadf');
     ctx.font = priceFont;
     ctx.textAlign = 'right';
-    ctx.fillText(pv.toFixed(1), p.l - labelGap, yy + 3);
+    ctx.fillText(pv.toFixed(1), priceLabelX, yy + 3);
   }
 
     // ── candle width
   const cw = Math.max(2, Math.min(16, cW/data.length*.7));
-
-  // ── Is mobile? (CSS pixel width)
-  const isMobile = W < 520;
 
   // ── Candle opacity: reduce when wave is visible so labels/lines aren't buried
   const candleBodyAlpha = (WAVE_VISIBLE && waves.length > 0) ? (isMobile ? 0.6 : 0.75) : 1.0;
@@ -2159,8 +2137,7 @@ function drawMain(data, waves) {
   [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
     if (!MA_VISIBLE[p2]) return;
     const ma = calcMA(data,p2);
-    const maLW = isMobile ? 1.6 : 1.4;
-    ctx.strokeStyle=col; ctx.lineWidth=maLW; ctx.beginPath(); let started=false;
+    ctx.strokeStyle=col; ctx.lineWidth= isMobile ? 1.6 : 1.4; ctx.beginPath(); let started=false;
     ma.forEach((v,i)=>{
       if (!v) return;
       if (!started){ctx.moveTo(xS(i),yS(v));started=true;}
@@ -2237,31 +2214,28 @@ function drawMain(data, waves) {
     ctx.strokeRect(xS(localHoverMain)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
   }
 
-  // ── X-axis dates — mobile: fewer labels, shorter format, no overlap
-  const dateFont = isMobile ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
+  // ── X-axis dates — mobile: fewer labels, MM/DD only, no overlap
   ctx.fillStyle = _isDayMain ? '#3a6080' : '#3a5878';
-  ctx.font = dateFont;
+  ctx.font = isMobile ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
   ctx.textAlign = 'center';
-  // Compute max labels that fit without overlap (each label ~44px wide on mobile)
-  const labelWidth = isMobile ? 46 : 56;
-  const maxLabels  = Math.max(3, Math.floor(cW / labelWidth));
-  const step = Math.max(1, Math.ceil(data.length / maxLabels));
+  // fit as many labels as space allows (each ~46px on mobile, ~56px desktop)
+  const labelSlotW = isMobile ? 48 : 58;
+  const maxLabels  = Math.max(3, Math.floor(cW / labelSlotW));
+  const dateStep   = Math.max(1, Math.ceil(data.length / maxLabels));
   data.forEach((d, i) => {
-    if (i % step === 0) {
-      // Mobile: show MM/DD only (e.g. "05/08"), Desktop: MM/DD + year prefix stripped
-      let label;
-      if (isMobile) {
-        // d.date format is "115/05/08" (ROC) or "2025-05-08"
-        const raw = d.date || '';
-        const parts = raw.replace(/-/g, '/').split('/');
-        label = parts.length >= 3 ? `${parts[1]}/${parts[2]}` : raw.slice(-5);
-      } else {
-        label = d.date.slice(0, 8);
-      }
-      const x = xS(i);
-      // Only draw if far enough from left edge
-      if (x > p.l + 10) ctx.fillText(label, x, H - (isMobile ? 8 : 10));
+    if (i % dateStep !== 0) return;
+    const x = xS(i);
+    if (x < p.l + 12) return; // skip if too close to left edge
+    let label;
+    if (isMobile) {
+      // show MM/DD only (works for both "115/05/08" and "2025-05-08" formats)
+      const raw = (d.date || '').replace(/-/g, '/');
+      const pts = raw.split('/');
+      label = pts.length >= 3 ? `${pts[pts.length-2]}/${pts[pts.length-1]}` : raw.slice(-5);
+    } else {
+      label = d.date.slice(0, 8);
     }
+    ctx.fillText(label, x, H - (isMobile ? 7 : 10));
   });
 
   // ── top label
@@ -2280,9 +2254,8 @@ function drawMain(data, waves) {
   ctx.strokeStyle='rgba(0,229,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
   ctx.beginPath(); ctx.moveTo(p.l,yLast); ctx.lineTo(W-p.r,yLast); ctx.stroke();
   ctx.setLineDash([]);
-  // price tag — on mobile show inside chart to avoid clipping on narrow right margin
-  const tagFont = isMobile ? 'bold 8px "JetBrains Mono",monospace' : 'bold 10px "JetBrains Mono",monospace';
-  ctx.fillStyle='rgba(0,229,255,.85)'; ctx.font=tagFont;
+  // price tag
+  ctx.fillStyle='rgba(0,229,255,.8)'; ctx.font='bold 10px "JetBrains Mono",monospace';
   ctx.textAlign='left';
   ctx.fillText(lastClose.toFixed(1), W-p.r+2, yLast+4);
   }
@@ -2307,7 +2280,11 @@ function drawVolume(data) {
   const W = volCvs._cssW || volCvs.width;
   const H = volCvs._cssH || volCvs.height;
   const ctx=volCtx;
-  const p=VOL_PAD;
+  const isMobVol = W < 520;
+  // mobile: match the tighter left padding used in drawMain
+  const p = isMobVol
+    ? { l:46, r:10, t:VOL_PAD.t, b:VOL_PAD.b }
+    : { ...VOL_PAD };
   const cW=W-p.l-p.r, cH=H-p.t-p.b;
 
   ctx.clearRect(0,0,W*2,H*2); // 清除整個 buffer（含 DPR 倍數）
@@ -2332,8 +2309,8 @@ function drawVolume(data) {
   });
 
   // Vol label
-  const isMobVol = W < 520;
-  ctx.fillStyle='rgba(90,120,150,.6)'; ctx.font= isMobVol ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
+  ctx.fillStyle='rgba(90,120,150,.6)';
+  ctx.font = isMobVol ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
   ctx.textAlign='left'; ctx.fillText('VOL', p.l+2, p.t+10);
 }
 
@@ -3155,10 +3132,6 @@ function toggleSibExtra() {
 // CANVAS RESIZE — 動態根據容器和裝置設定正確解析度
 // ═══════════════════════════════════════════════════════
 function adjustCanvasHeight() {
-  // 每次 resize 重新計算 padding（手機 / 桌機不同）
-  PAD     = getMobilePad();
-  VOL_PAD = getMobileVolPad();
-
   const mainEl = document.getElementById('mainCanvas');
   const volEl  = document.getElementById('volCanvas');
   const wrap   = document.getElementById('chartMainArea');
