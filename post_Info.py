@@ -158,6 +158,36 @@ def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
 
 
 def _load_stock_list():
+    """
+    代碼清單載入：優先從 Firebase stock_list 讀取（毫秒級），
+    Firebase 無資料才 fallback 打 API，並自動回寫 Firebase。
+    """
+    def _firebase_to_maps(market: str):
+        """從 Firebase stock_list/{market} 讀取並回傳 (code2name, name2code)"""
+        try:
+            ref  = firebase_db.reference(f"stock_list/{market}")
+            data = ref.get()   # {代碼: 名稱}
+            if data and len(data) > 10:
+                c2n = {str(k): str(v) for k, v in data.items()}
+                n2c = {str(v): str(k) for k, v in data.items()}
+                print(f"[stock_list] Firebase 讀取 {market} {len(c2n)} 筆 ✅")
+                return c2n, n2c
+        except Exception as e:
+            print(f"[stock_list] Firebase 讀取 {market} 失敗: {e}")
+        return None, None
+
+    # ── 嘗試從 Firebase 讀取 ──────────────────────────────────────────────────
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        ft = pool.submit(_firebase_to_maps, "twse")
+        fo = pool.submit(_firebase_to_maps, "otc")
+        twse_c2n, twse_n2c = ft.result(timeout=15)
+        otc_c2n,  otc_n2c  = fo.result(timeout=15)
+
+    if twse_c2n and otc_c2n:
+        return twse_c2n, twse_n2c, otc_c2n, otc_n2c
+
+    # ── Firebase 無資料 → fallback 打 API，並回寫 Firebase ────────────────────
+    print("[stock_list] Firebase 無資料，fallback 打 API 並回寫...")
     from datetime import date, timedelta
 
     def _fetch_twse():
@@ -216,6 +246,28 @@ def _load_stock_list():
             otc_c2n, otc_n2c = fo.result(timeout=25)
         except concurrent.futures.TimeoutError:
             otc_c2n, otc_n2c = {}, {}
+
+    # 回寫 Firebase（背景執行，不阻塞主流程）
+    def _write_to_firebase():
+        try:
+            import firebase_sync as _fs
+            if twse_c2n:
+                _fs._write_batch("stock_list/twse", twse_c2n)
+                print(f"[stock_list] 上市 {len(twse_c2n)} 筆已回寫 Firebase ✅")
+            if otc_c2n:
+                _fs._write_batch("stock_list/otc", otc_c2n)
+                print(f"[stock_list] 上櫃 {len(otc_c2n)} 筆已回寫 Firebase ✅")
+            import datetime as _dt
+            firebase_db.reference("stock_list/meta").set({
+                "updated_at": _dt.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
+                "twse_count": len(twse_c2n),
+                "otc_count":  len(otc_c2n),
+            })
+        except Exception as e:
+            print(f"[stock_list] 回寫 Firebase 失敗: {e}")
+
+    import threading
+    threading.Thread(target=_write_to_firebase, daemon=True).start()
 
     return twse_c2n, twse_n2c, otc_c2n, otc_n2c
 
@@ -421,7 +473,12 @@ def _stock_id_from_keyword(keyword: str):
     """
     keyword 可能是代碼或名稱，回傳 (stock_id, market)。
     market: "twse" | "otc" | None
+
+    查詢順序：
+    1. 記憶體清單（TWSE_CODE2NAME / OTC_CODE2NAME）
+    2. 若未找到 → 打 API 重新抓完整清單，自動補寫 Firebase（新掛牌公司）
     """
+    # ── 先查記憶體 ──
     if keyword in TWSE_CODE2NAME:
         return keyword, "twse"
     if keyword in TWSE_NAME2CODE:
@@ -430,7 +487,120 @@ def _stock_id_from_keyword(keyword: str):
         return keyword, "otc"
     if keyword in OTC_NAME2CODE:
         return OTC_NAME2CODE[keyword], "otc"
+
+    # ── 找不到 → 嘗試 API 補查（可能是新掛牌公司）──────────────────────────
+    print(f"[stock_id] 記憶體找不到「{keyword}」，嘗試 API 補查...")
+    _refresh_stock_list_from_api(keyword)
+
+    if keyword in TWSE_CODE2NAME:
+        return keyword, "twse"
+    if keyword in TWSE_NAME2CODE:
+        return TWSE_NAME2CODE[keyword], "twse"
+    if keyword in OTC_CODE2NAME:
+        return keyword, "otc"
+    if keyword in OTC_NAME2CODE:
+        return OTC_NAME2CODE[keyword], "otc"
+
     return None, None
+
+
+def _refresh_stock_list_from_api(trigger_keyword: str = ""):
+    """
+    重新從 API 抓最新代碼清單，並把新公司補寫進 Firebase。
+    只在 _stock_id_from_keyword 找不到時才呼叫，不影響正常查詢效能。
+    """
+    global TWSE_CODE2NAME, TWSE_NAME2CODE, OTC_CODE2NAME, OTC_NAME2CODE
+    global TWSE_data_code, TWSE_data_name, OTC_data_code, OTC_data_name
+
+    from datetime import date, timedelta
+
+    def _fetch_twse():
+        d = date.today()
+        for _ in range(12):
+            d -= timedelta(days=1)
+            if d.weekday() >= 5:
+                continue
+            ds = d.strftime("%Y%m%d")
+            try:
+                r = requests.get(
+                    f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={ds}",
+                    headers=headers, verify=False, timeout=10)
+                raw = r.json()
+                if raw.get("stat") == "OK" and raw.get("data"):
+                    out = {}
+                    for row in raw["data"]:
+                        out[row[0].strip()] = row[1].strip()
+                    return out
+            except Exception as e:
+                print(f"[refresh_list] 上市 {ds} 失敗: {e}")
+        return {}
+
+    def _fetch_otc():
+        d = date.today()
+        for _ in range(12):
+            d -= timedelta(days=1)
+            if d.weekday() >= 5:
+                continue
+            ds = d.strftime("%Y%m%d")
+            try:
+                r = requests.get(
+                    f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={ds}",
+                    headers=headers, verify=False, timeout=10)
+                raw = r.json()
+                tables = raw.get("tables") or []
+                if tables and tables[0].get("data"):
+                    out = {}
+                    for row in tables[0]["data"]:
+                        out[row[0].strip()] = row[1].strip()
+                    return out
+            except Exception as e:
+                print(f"[refresh_list] 上櫃 {ds} 失敗: {e}")
+        return {}
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            ft = pool.submit(_fetch_twse)
+            fo = pool.submit(_fetch_otc)
+            new_twse = ft.result(timeout=20)
+            new_otc  = fo.result(timeout=20)
+    except Exception as e:
+        print(f"[refresh_list] API 補查失敗: {e}")
+        return
+
+    # 找出新增的公司（不在原清單的）
+    new_twse_entries = {k: v for k, v in new_twse.items() if k not in TWSE_CODE2NAME}
+    new_otc_entries  = {k: v for k, v in new_otc.items()  if k not in OTC_CODE2NAME}
+
+    if new_twse_entries or new_otc_entries:
+        print(f"[refresh_list] 發現新公司：上市 {len(new_twse_entries)} 筆、上櫃 {len(new_otc_entries)} 筆")
+        # 背景補寫 Firebase
+        def _write():
+            try:
+                import firebase_sync as _fs
+                if new_twse_entries:
+                    _fs._write_batch("stock_list/twse", new_twse_entries)
+                    print(f"[refresh_list] 上市新公司已補寫 Firebase: {list(new_twse_entries.keys())}")
+                if new_otc_entries:
+                    _fs._write_batch("stock_list/otc", new_otc_entries)
+                    print(f"[refresh_list] 上櫃新公司已補寫 Firebase: {list(new_otc_entries.keys())}")
+            except Exception as e:
+                print(f"[refresh_list] Firebase 補寫失敗: {e}")
+        import threading
+        threading.Thread(target=_write, daemon=True).start()
+    else:
+        print(f"[refresh_list] 無新公司（trigger={trigger_keyword}），代碼清單最新 ✅")
+
+    # 更新記憶體清單（不管有無新公司都更新）
+    if new_twse:
+        TWSE_CODE2NAME.update(new_twse)
+        TWSE_NAME2CODE.update({v: k for k, v in new_twse.items()})
+        TWSE_data_code = list(TWSE_CODE2NAME.keys())
+        TWSE_data_name = list(TWSE_CODE2NAME.values())
+    if new_otc:
+        OTC_CODE2NAME.update(new_otc)
+        OTC_NAME2CODE.update({v: k for k, v in new_otc.items()})
+        OTC_data_code = list(OTC_CODE2NAME.keys())
+        OTC_data_name = list(OTC_CODE2NAME.values())
 
 
 def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: str) -> str | None:

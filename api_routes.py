@@ -358,6 +358,19 @@ def register_api(app):
 
         return jsonify(result)
 
+    # ── 股票代碼→中文名稱查詢（wave_chart 前端補查用）─────────────────────────
+    @app.route("/api/stock_name")
+    def api_stock_name():
+        code = request.args.get("code", "").strip()
+        if not code:
+            return jsonify({"name": ""}), 200
+        try:
+            from post_Info import TWSE_CODE2NAME, OTC_CODE2NAME
+            name = TWSE_CODE2NAME.get(code) or OTC_CODE2NAME.get(code) or ""
+        except Exception:
+            name = ""
+        return jsonify({"code": code, "name": name})
+
     # ── 波浪走勢分析頁面 ────────────────────────────────────────────────────────
     @app.route("/stock_site/tools/wave_chart.html")
     def page_wave_chart():
@@ -392,6 +405,20 @@ def register_api(app):
         is_code    = re.match(r"^\d{4,6}$", keyword)
         stock_no   = keyword
         stock_name = "" if is_code else keyword
+
+        # ── 名稱 → 代碼轉換（輸入中文名稱時查 NAME2CODE）────────────────────
+        if not is_code:
+            try:
+                from post_Info import TWSE_NAME2CODE, OTC_NAME2CODE
+                resolved = TWSE_NAME2CODE.get(keyword) or OTC_NAME2CODE.get(keyword)
+                if resolved:
+                    stock_no   = resolved
+                    stock_name = keyword
+                else:
+                    return jsonify({"error": f"查無「{keyword}」，請確認名稱正確或改用股票代碼"}), 200
+            except Exception as e:
+                print(f"[wave_data] 名稱查代碼失敗: {e}")
+                return jsonify({"error": "代碼清單載入失敗，請改用股票代碼查詢"}), 200
 
         tz             = _ZI("Asia/Taipei")
         now            = _dt.datetime.now(tz)
@@ -524,7 +551,22 @@ def register_api(app):
             if not rows:
                 return jsonify({"error": f"查無「{keyword}」的股價資料，請確認代碼正確"}), 200
 
-            final_name = name_from_api or stock_name or keyword
+            # 中文名稱解析：優先用 API 回傳，其次查記憶體代碼清單（上櫃常沒有 title）
+            final_name = name_from_api or stock_name or ""
+            # 中文名稱：API 有給用 API，沒給從記憶體代碼清單補（上櫃 OTC 常沒有 title）
+            final_name = name_from_api or stock_name or ""
+            if not final_name or final_name == stock_no or final_name == keyword:
+                try:
+                    from post_Info import TWSE_CODE2NAME, OTC_CODE2NAME
+                    final_name = (
+                        TWSE_CODE2NAME.get(stock_no)
+                        or OTC_CODE2NAME.get(stock_no)
+                        or name_from_api
+                        or stock_name
+                        or keyword
+                    )
+                except Exception:
+                    final_name = name_from_api or stock_name or keyword
             result = {
                 "name":    final_name,
                 "stockNo": stock_no,

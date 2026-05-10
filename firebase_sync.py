@@ -438,6 +438,105 @@ def sync_market(today: str = None):
     else:
         print("[sync] 大盤無資料，略過 ⚠️")
 
+def sync_stock_list():
+    """
+    把 TWSE + TPEX 所有上市/上櫃公司的 代碼→名稱 寫入 Firebase。
+    路徑：stock_list/twse/{代碼} = 名稱
+          stock_list/otc/{代碼}  = 名稱
+    平常只需執行一次（或定期每週執行一次）。
+    新公司找不到時，post_Info 會自動呼叫此函式補寫。
+    """
+    from datetime import date, timedelta
+
+    def _fetch_twse_list() -> dict:
+        """抓上市代碼清單，回傳 {代碼: 名稱}"""
+        d = date.today()
+        for _ in range(12):
+            d -= timedelta(days=1)
+            if d.weekday() >= 5:
+                continue
+            ds = d.strftime("%Y%m%d")
+            try:
+                r   = requests.get(
+                    f"https://www.twse.com.tw/rwd/zh/afterTrading/BWIBBU_d?response=json&date={ds}",
+                    headers=HEADERS, verify=False, timeout=10)
+                raw = r.json()
+                if raw.get("stat") == "OK" and raw.get("data"):
+                    out = {}
+                    for row in raw["data"]:
+                        code = row[0].strip()
+                        name = row[1].strip()
+                        if code:
+                            out[code] = name
+                    print(f"[stock_list] 上市抓到 {len(out)} 筆 (date={ds}) ✅")
+                    return out
+            except Exception as e:
+                print(f"[stock_list] 上市 {ds} 失敗: {e}")
+        return {}
+
+    def _fetch_otc_list() -> dict:
+        """抓上櫃代碼清單，回傳 {代碼: 名稱}"""
+        d = date.today()
+        for _ in range(12):
+            d -= timedelta(days=1)
+            if d.weekday() >= 5:
+                continue
+            ds = d.strftime("%Y%m%d")
+            try:
+                r   = requests.get(
+                    f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json&date={ds}",
+                    headers=HEADERS, verify=False, timeout=10)
+                raw = r.json()
+                tables = raw.get("tables") or []
+                if tables and tables[0].get("data"):
+                    out = {}
+                    for row in tables[0]["data"]:
+                        code = row[0].strip()
+                        name = row[1].strip()
+                        if code:
+                            out[code] = name
+                    print(f"[stock_list] 上櫃抓到 {len(out)} 筆 (date={ds}) ✅")
+                    return out
+            except Exception as e:
+                print(f"[stock_list] 上櫃 {ds} 失敗: {e}")
+        return {}
+
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        ft = pool.submit(_fetch_twse_list)
+        fo = pool.submit(_fetch_otc_list)
+        try:
+            twse_map = ft.result(timeout=30)
+        except Exception:
+            twse_map = {}
+        try:
+            otc_map = fo.result(timeout=30)
+        except Exception:
+            otc_map = {}
+
+    _init_firebase()
+    if twse_map:
+        _write_batch("stock_list/twse", twse_map)
+        print(f"[stock_list] 上市 {len(twse_map)} 筆已寫入 Firebase ✅")
+    else:
+        print("[stock_list] 上市清單為空，略過 ⚠️")
+
+    if otc_map:
+        _write_batch("stock_list/otc", otc_map)
+        print(f"[stock_list] 上櫃 {len(otc_map)} 筆已寫入 Firebase ✅")
+    else:
+        print("[stock_list] 上櫃清單為空，略過 ⚠️")
+
+    # 記錄更新時間
+    firebase_db.reference("stock_list/meta").set({
+        "updated_at":  datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
+        "twse_count":  len(twse_map),
+        "otc_count":   len(otc_map),
+    })
+    print(f"[stock_list] 全部完成：上市 {len(twse_map)} + 上櫃 {len(otc_map)} 筆")
+    return twse_map, otc_map
+
+
 def sync_all(today: str = None):
     if today is None: today = get_today()
     now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour

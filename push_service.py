@@ -43,6 +43,31 @@ SCHEDULE = [
     (8, 21, 30, "借券賣出 (TWSE、OTC)"),
 ]
 
+# ── 代碼清單每週日同步（不廣播，背景執行）─────────────────────────────────
+def _sync_stock_list_weekly():
+    """每週日 08:00 更新 Firebase 代碼清單（stock_list/twse + otc）"""
+    base_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+    token    = os.environ.get("SYNC_SECRET", "")
+
+    if not base_url or not token:
+        # 直接 import 跑（不透過 HTTP）
+        try:
+            import firebase_sync
+            firebase_sync.sync_stock_list()
+            print("[stock_list_weekly] 直接執行完成 ✅")
+        except Exception as e:
+            print(f"[stock_list_weekly] 執行失敗: {e}")
+        return
+
+    url = f"{base_url}/api/sync_stock_list?token={token}"
+    print(f"[stock_list_weekly] 呼叫: {url}")
+    try:
+        res = requests.get(url, timeout=30)
+        print(f"[stock_list_weekly] 回應: {res.status_code} {res.text}")
+    except Exception as e:
+        print(f"[stock_list_weekly] 失敗: {e}")
+
+
 # ── 今日盤後更新時間表（15:00 廣播）─────────────────────────────────────────
 SCHEDULE_MESSAGE = """📋 今日盤後更新時間表
 ─────────────────
@@ -138,6 +163,16 @@ def start_scheduler(line_bot_api):
             hour=hour, minute=minute,
             timezone=taiwan,
         )
+
+    # ── 每週日 08:00 更新代碼清單（stock_list/twse + otc）────────────────────
+    # 平常只有新公司上市才會差異，每週補一次即可
+    scheduler.add_job(
+        _sync_stock_list_weekly,
+        'cron',
+        day_of_week='sun',
+        hour=8, minute=0,
+        timezone=taiwan,
+    )
 
     scheduler.start()
     print("[scheduler] 排程已啟動 ✅")
