@@ -590,7 +590,6 @@
 
     /* ══ RESPONSIVE ══ */
     @media(max-width:600px) {
-      /* Header */
       header { padding:0 10px 0 6px; height:50px; }
       .hd-sub { display:none }
       .hd-logo-icon { width:34px; height:34px; }
@@ -599,18 +598,12 @@
       .hd-clock { font-size:.62rem; padding:3px 8px; letter-spacing:.06em; }
       .btn-back { padding:4px 9px; font-size:.6rem; gap:4px; }
       .btn-back svg { width:11px; height:11px; }
-
-      /* Layout */
       .app { padding:8px 8px 48px; }
-
-      /* Search panel */
       .search-panel { padding:10px; margin-bottom:8px; border-radius:12px; }
       .search-row { gap:6px; margin-bottom:8px; flex-wrap:nowrap; }
       .input-wrap { min-width:0; padding:0 9px; border-radius:8px; }
       .input-wrap input { font-size:.82rem; padding:9px 0; }
       .btn { padding:9px 12px; font-size:.76rem; border-radius:8px; }
-
-      /* Controls row */
       .controls-row { flex-direction:row; flex-wrap:wrap; gap:5px; align-items:flex-start; }
       .ctrl-label { display:none }
       .ctrl-group { padding:3px 7px; gap:3px; }
@@ -624,11 +617,7 @@
       .ma-btn { padding:4px 9px; font-size:.65rem; }
       .btn-wave-toggle { padding:4px 10px; font-size:.65rem; }
       .btn-cmp-toggle  { padding:4px 10px; font-size:.65rem; }
-
-      /* Status bar */
       .status-bar { font-size:.65rem; padding:6px 9px; min-height:32px; }
-
-      /* Stock info bar */
       .stock-info-bar { padding:9px 11px; gap:8px; border-radius:12px; flex-wrap:wrap; }
       .sib-name { font-size:1rem; }
       .sib-price { font-size:1.45rem; }
@@ -638,8 +627,6 @@
       .sib-extra.open { max-height:100px; opacity:1; }
       .sib-stats { gap:10px; justify-content:flex-start; }
       .sib-stat-val { font-size:.74rem; }
-
-      /* Chart area */
       .chart-wrap { border-radius:12px; margin-bottom:8px; }
       .chart-toolbar { padding:6px 8px; gap:4px; flex-wrap:wrap; flex-direction:row; align-items:center; }
       .chart-toolbar > div:first-child { order:1; width:100%; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
@@ -654,12 +641,8 @@
       .leg-dash { width:14px; }
       .zoom-btn { padding:2px 8px; font-size:.72rem; border-radius:5px; }
       .zoom-hint { font-size:.56rem; }
-
-      /* Tooltip */
       .chart-tooltip { font-size:.66rem; padding:7px 10px; max-width:calc(100vw - 24px); border-radius:8px; }
       .tooltip-date { font-size:.68rem; }
-
-      /* Compare panel */
       .compare-panel { padding:10px 12px; border-radius:12px; }
       .compare-header { gap:8px; margin-bottom:8px; }
       .compare-title { font-size:.66rem; }
@@ -668,8 +651,6 @@
       .btn-compare { font-size:.7rem; padding:6px 10px; }
       .btn-compare-clear { font-size:.7rem; padding:6px 9px; }
       .cmp-status { font-size:.62rem; }
-
-      /* Similarity card */
       .sim-card { padding:10px 12px; }
       .sim-score-wrap { flex-direction:column; align-items:flex-start; gap:10px; }
       .sim-details { min-width:0; width:100%; }
@@ -677,35 +658,23 @@
       .sim-row-label { font-size:.62rem; }
       .sim-row-val { font-size:.66rem; }
       .sim-verdict { font-size:.66rem; }
-
-      /* Wave cards */
       .wave-cards { grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:5px; }
       .wave-card { padding:9px; border-radius:10px; }
       .wc-label { font-size:.82rem; }
       .wc-range { font-size:.67rem; }
-
-      /* Stats grid */
       .stats-grid { grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:8px; }
       .stat-card { padding:9px 10px; border-radius:8px; }
       .stat-label { font-size:.58rem; }
       .stat-value { font-size:.78rem; }
-
-      /* Summary */
       .summary-grid { grid-template-columns:1fr; gap:7px; }
       .summary-panel { padding:12px; border-radius:12px; }
       .summary-block { padding:10px; }
       .sb-content { font-size:.72rem; line-height:1.65; }
-
-      /* Wave guide */
       .wg-grid { grid-template-columns:1fr; gap:7px; }
       .wave-guide { padding:12px; border-radius:12px; }
       .wg-rule { font-size:.65rem; }
-
-      /* Fibonacci */
       .fib-item { font-size:.66rem; gap:5px; }
       .fib-price { width:44px; }
-
-      /* Disclaimer */
       .disclaimer { font-size:.58rem; }
     }
 
@@ -2028,7 +1997,7 @@ function drawMain(data, waves) {
   const W = mainCvs._cssW || mainCvs.width;
   const H = mainCvs._cssH || mainCvs.height;
   const ctx = mainCtx;
-  // ── Mobile: use tighter left/right padding so chart fills to the edge
+  // ── Mobile: tighter padding so chart fills to the edge
   const isMobile = W < 520;
   const p = isMobile
     ? { l:46, r:10, t:PAD.t, b:PAD.b }
@@ -2066,15 +2035,13 @@ function drawMain(data, waves) {
   const yS = v => p.t + (1-(v-minP)/range)*cH;
 
   // ── grid lines + price axis
-  // mobile: fewer grid lines, smaller font, tighter gap to left edge
   const gridCount  = isMobile ? 5 : 6;
   const priceFont  = isMobile ? '8px "JetBrains Mono",monospace' : '10px "JetBrains Mono",monospace';
   const priceLabelX = isMobile ? p.l - 4 : p.l - 6;
   for (let i=0; i<=gridCount; i++) {
     const yy = p.t + (i/gridCount)*cH;
     const pv = maxP - (i/gridCount)*range;
-    ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid;
-    ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
+    ctx.strokeStyle = _isDayMain ? 'rgba(10,60,120,.1)' : C.grid; ctx.lineWidth = i===0||i===gridCount ? .8 : .5;
     ctx.beginPath(); ctx.moveTo(p.l,yy); ctx.lineTo(W-p.r,yy); ctx.stroke();
     const isDayTheme = document.body.classList.contains('theme-day');
     ctx.fillStyle = isDayTheme ? '#1a5090' : (isMobile ? '#3a7aaa' : '#48aadf');
@@ -2137,7 +2104,7 @@ function drawMain(data, waves) {
   [[5,C.ma[5]],[10,C.ma[10]],[20,C.ma[20]]].forEach(([p2,col])=>{
     if (!MA_VISIBLE[p2]) return;
     const ma = calcMA(data,p2);
-    ctx.strokeStyle=col; ctx.lineWidth= isMobile ? 1.6 : 1.4; ctx.beginPath(); let started=false;
+    ctx.strokeStyle=col; ctx.lineWidth=1.4; ctx.beginPath(); let started=false;
     ma.forEach((v,i)=>{
       if (!v) return;
       if (!started){ctx.moveTo(xS(i),yS(v));started=true;}
@@ -2151,11 +2118,16 @@ function drawMain(data, waves) {
 
   // ── Wave lines
   if (WAVE_VISIBLE) waves.forEach(w => {
-    const x1=xS(w.fromIdx), y1=yS(w.fromPrice), x2=xS(w.toIdx), y2=yS(w.toPrice);
+    // 用切片後 data 裡的實際收盤價重新算 Y，避免放大時 price range 縮小導致座標跑版
+    const fromD = data[w.fromIdx];
+    const toD   = data[w.toIdx];
+    if (!fromD || !toD) return;
+    const x1=xS(w.fromIdx), y1=yS(fromD.close);
+    const x2=xS(w.toIdx),   y2=yS(toD.close);
     const col = w.color;
-    const wLineW = isMobile ? 2.0 : 2.5;
-    const wDotR  = isMobile ? 3.5 : 5;
-    const wArrL  = isMobile ? 8   : 11;
+    const wLineW = isMobile ? 1.5 : 2.5;
+    const wDotR  = isMobile ? 3   : 5;
+    const wArrL  = isMobile ? 7   : 11;
 
     // shadow for depth
     ctx.save();
@@ -2183,7 +2155,7 @@ function drawMain(data, waves) {
     const mx=(x1+x2)/2+4, my=(y1+y2)/2-14;
     ctx.save();
     // label bg
-    const lblFont = isMobile ? 'bold 10px "Orbitron",monospace' : 'bold 11px "Orbitron",monospace';
+    const lblFont = isMobile ? 'bold 9px "Orbitron",monospace' : 'bold 11px "Orbitron",monospace';
     ctx.font = lblFont;
     const tw = ctx.measureText(`W${w.label}`).width + (isMobile ? 6 : 10);
     const lblH = isMobile ? 14 : 18;
@@ -2214,21 +2186,19 @@ function drawMain(data, waves) {
     ctx.strokeRect(xS(localHoverMain)-cw/2-1, bt-1, cw+2, Math.max(2,bb-bt+2));
   }
 
-  // ── X-axis dates — mobile: fewer labels, MM/DD only, no overlap
+  // ── X-axis dates — mobile: MM/DD only, auto step to prevent overlap
   ctx.fillStyle = _isDayMain ? '#3a6080' : '#3a5878';
   ctx.font = isMobile ? '8px "JetBrains Mono",monospace' : '9px "JetBrains Mono",monospace';
   ctx.textAlign = 'center';
-  // fit as many labels as space allows (each ~46px on mobile, ~56px desktop)
   const labelSlotW = isMobile ? 48 : 58;
   const maxLabels  = Math.max(3, Math.floor(cW / labelSlotW));
   const dateStep   = Math.max(1, Math.ceil(data.length / maxLabels));
   data.forEach((d, i) => {
     if (i % dateStep !== 0) return;
     const x = xS(i);
-    if (x < p.l + 12) return; // skip if too close to left edge
+    if (x < p.l + 12) return;
     let label;
     if (isMobile) {
-      // show MM/DD only (works for both "115/05/08" and "2025-05-08" formats)
       const raw = (d.date || '').replace(/-/g, '/');
       const pts = raw.split('/');
       label = pts.length >= 3 ? `${pts[pts.length-2]}/${pts[pts.length-1]}` : raw.slice(-5);
@@ -2281,7 +2251,6 @@ function drawVolume(data) {
   const H = volCvs._cssH || volCvs.height;
   const ctx=volCtx;
   const isMobVol = W < 520;
-  // mobile: match the tighter left padding used in drawMain
   const p = isMobVol
     ? { l:46, r:10, t:VOL_PAD.t, b:VOL_PAD.b }
     : { ...VOL_PAD };
@@ -2321,18 +2290,24 @@ function onMouseMove(e) {
   if (!DATA.length) return;
   if (DRAG.active) return; // while dragging, don't update tooltip
   const rect = mainCvs.getBoundingClientRect();
-  const {sx,sy} = getScaleFactors();
-  const mx = (e.clientX-rect.left)*sx;
-  const my = (e.clientY-rect.top)*sy;
+
+  // ── 用 CSS px 做座標計算（rect 已是 CSS px，不需要乘 DPR）
+  const cssW = mainCvs._cssW || rect.width;
+  const mx = (e.clientX - rect.left) * (cssW / rect.width);
+
+  // ── 使用與 drawMain 完全一致的 padding（含 mobile 覆蓋）
+  const isMob = cssW < 520;
+  const padL  = isMob ? 46 : PAD.l;
+  const padR  = isMob ? 10 : PAD.r;
+  const chartW = cssW - padL - padR;
 
   // Map cursor to zoomed visible slice, then back to global DATA index
-  const cW = mainCvs.width-PAD.l-PAD.r;
   const totalN = DATA.length;
   const viStart = Math.max(0, Math.floor(ZOOM.start * totalN));
   const viEnd   = Math.min(totalN, Math.ceil(ZOOM.end * totalN));
   const visLen  = viEnd - viStart;
-  const localRaw = Math.round((mx-PAD.l)/cW*(visLen-1));
-  const localIdx = Math.max(0, Math.min(visLen-1, localRaw));
+  const localRaw = Math.round((mx - padL) / chartW * (visLen - 1));
+  const localIdx = Math.max(0, Math.min(visLen - 1, localRaw));
   const idx = viStart + localIdx;
 
   if (HOVER_IDX !== idx) {
