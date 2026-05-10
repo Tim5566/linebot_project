@@ -1776,54 +1776,363 @@ async function fetchTWSEFallback(keyword) {
 
 
 // ═══════════════════════════════════════════════════════
-// WAVE DETECTION — improved pivot algorithm
+// WAVE ENGINE v2 — 三層融合演算法
+// Layer 1: ZigZag 振幅濾波（去雜訊）
+// Layer 2: 艾略特規則驗證器（只畫成形波浪）
+// Layer 3: 費波那契延伸預測（向右預測目標）
 // ═══════════════════════════════════════════════════════
-function detectWaves(data) {
-  if (!data || data.length < 14) return [];
-  const closes = data.map(d=>d.close);
-  const n = closes.length;
-  // Adaptive window: bigger dataset = wider lookback
-  const win = Math.max(3, Math.min(8, Math.floor(n/16)));
 
-  // Find local extrema
-  const pivots = [];
-  for (let i=win; i<n-win; i++) {
-    const v = closes[i];
-    const lo = closes.slice(i-win, i+win+1);
-    if (lo.every(x=>x<=v)) pivots.push({idx:i, price:v, type:'H'});
-    else if (lo.every(x=>x>=v)) pivots.push({idx:i, price:v, type:'L'});
+// ── RSI 輔助（用於背離確認）────────────────────────────
+function calcRSI(closes, period=14) {
+  if (closes.length < period+1) return closes.map(()=>50);
+  const rsi = new Array(closes.length).fill(50);
+  let gains=0, losses=0;
+  for (let i=1; i<=period; i++) {
+    const d = closes[i]-closes[i-1];
+    if (d>0) gains+=d; else losses+=Math.abs(d);
+  }
+  let avgG=gains/period, avgL=losses/period;
+  rsi[period] = avgL===0 ? 100 : 100-100/(1+avgG/avgL);
+  for (let i=period+1; i<closes.length; i++) {
+    const d = closes[i]-closes[i-1];
+    avgG = (avgG*(period-1)+(d>0?d:0))/period;
+    avgL = (avgL*(period-1)+(d<0?Math.abs(d):0))/period;
+    rsi[i] = avgL===0 ? 100 : 100-100/(1+avgG/avgL);
+  }
+  return rsi;
+}
+
+// ── Layer 1: ZigZag 振幅濾波 ───────────────────────────
+// minPct: 最小振幅門檻（預設 3%），自動依資料量調整
+function zigzagFilter(data, minPct) {
+  const closes = data.map(d=>d.close);
+  const highs  = data.map(d=>d.high);
+  const lows   = data.map(d=>d.low);
+  const n = closes.length;
+  if (n < 5) return [];
+
+  // 自適應門檻：資料少用小門檻，資料多用大門檻
+  if (minPct === undefined) {
+    const range = (Math.max(...closes)-Math.min(...closes))/Math.min(...closes);
+    minPct = Math.max(0.02, Math.min(0.08, range*0.18));
   }
 
-  // Remove consecutive same-type, keep extreme
+  const pts = [];
+  let lastDir = 0; // 1=up, -1=down
+  let lastPt  = { idx:0, price:closes[0], high:highs[0], low:lows[0], type:'?' };
+
+  for (let i=1; i<n; i++) {
+    const chgFromLast = (closes[i]-lastPt.price)/lastPt.price;
+    if (lastDir === 0) {
+      if (chgFromLast >= minPct)       { lastDir=1; lastPt={idx:i,price:closes[i],high:highs[i],low:lows[i],type:'H'}; }
+      else if (chgFromLast <= -minPct) { lastDir=-1; lastPt={idx:i,price:closes[i],high:highs[i],low:lows[i],type:'L'}; }
+    } else if (lastDir === 1) {
+      if (closes[i] > lastPt.price) {
+        lastPt = {idx:i,price:closes[i],high:highs[i],low:lows[i],type:'H'};
+      } else if ((lastPt.price-closes[i])/lastPt.price >= minPct) {
+        pts.push({...lastPt});
+        lastDir=-1; lastPt={idx:i,price:closes[i],high:highs[i],low:lows[i],type:'L'};
+      }
+    } else {
+      if (closes[i] < lastPt.price) {
+        lastPt = {idx:i,price:closes[i],high:highs[i],low:lows[i],type:'L'};
+      } else if ((closes[i]-lastPt.price)/lastPt.price >= minPct) {
+        pts.push({...lastPt});
+        lastDir=1; lastPt={idx:i,price:closes[i],high:highs[i],low:lows[i],type:'H'};
+      }
+    }
+  }
+  pts.push({...lastPt}); // 最後一個轉折
+
+  // 確保 H/L 交替（去重）
   const alt = [];
-  for (const p of pivots) {
-    if (alt.length && alt[alt.length-1].type === p.type) {
-      const last = alt[alt.length-1];
-      if ((p.type==='H' && p.price>last.price)||(p.type==='L' && p.price<last.price))
-        alt[alt.length-1] = p;
+  for (const p of pts) {
+    if (alt.length && alt[alt.length-1].type===p.type) {
+      const last=alt[alt.length-1];
+      if ((p.type==='H'&&p.price>last.price)||(p.type==='L'&&p.price<last.price))
+        alt[alt.length-1]=p;
     } else alt.push(p);
   }
+  return alt;
+}
 
-  // Take last 9 pivots for labeling
-  const pts = alt.slice(Math.max(0, alt.length-9));
-  if (pts.length < 2) return [];
+// ── Layer 2: 艾略特規則驗證器 ──────────────────────────
+// 輸入：連續 6 個轉折點（5段波浪起點）
+// 回傳：{ valid: bool, score: 0~100, violations: [] }
+function validateElliott5Wave(pts) {
+  if (pts.length < 6) return { valid:false, score:0, violations:['轉折點不足'] };
+  const [p0,p1,p2,p3,p4,p5] = pts;
+  const violations = [];
+  let score = 100;
 
-  const waveLabels = ['1','2','3','4','5','A','B','C'];
-  const result = [];
-  for (let i=0; i<pts.length-1 && i<8; i++) {
-    const f=pts[i], t=pts[i+1];
-    const label = waveLabels[i] || `W${i+1}`;
-    const isImpulse = ['1','3','5','B'].includes(label);
-    const pct = ((t.price-f.price)/f.price*100);
-    result.push({
-      fromIdx:f.idx, toIdx:t.idx,
-      fromPrice:f.price, toPrice:t.price,
-      label, isImpulse,
-      pct: pct,
-      days: t.idx - f.idx,
-      color: C.wave[label] || C.waveDefault,
+  // 判斷方向（多頭：p0=L, p1=H, p2=L, p3=H, p4=L, p5=H）
+  const isBull = p1.price > p0.price;
+
+  const w1 = Math.abs(p1.price-p0.price);
+  const w2 = Math.abs(p2.price-p1.price);
+  const w3 = Math.abs(p3.price-p2.price);
+  const w4 = Math.abs(p4.price-p3.price);
+  const w5 = Math.abs(p5.price-p4.price);
+
+  // 規則 1: Wave2 不回補 Wave1 起點（回撤不超過 100%）
+  if (isBull) {
+    if (p2.price <= p0.price) {
+      violations.push('W2回補W1起點'); score -= 35;
+    }
+  } else {
+    if (p2.price >= p0.price) {
+      violations.push('W2回補W1起點'); score -= 35;
+    }
+  }
+
+  // 規則 2: Wave3 不能是最短（必須比 W1 或 W5 長）
+  if (w3 < w1 && w3 < w5) {
+    violations.push('W3最短(違規)'); score -= 35;
+  }
+
+  // 規則 3: Wave4 不進入 Wave1 的價格區間
+  if (isBull) {
+    if (p4.price <= p1.price) {
+      violations.push('W4穿越W1區間'); score -= 30;
+    }
+  } else {
+    if (p4.price >= p1.price) {
+      violations.push('W4穿越W1區間'); score -= 30;
+    }
+  }
+
+  // 加分項：Wave3 是最長浪（理想情況）
+  if (w3 >= w1 && w3 >= w5) score += 10;
+
+  // 加分項：Wave2 回撤在 38.2%~61.8%（黃金回撤）
+  const w2ret = w2/w1;
+  if (w2ret >= 0.382 && w2ret <= 0.618) score += 8;
+
+  // 加分項：Wave4 回撤在 23.6%~38.2%
+  const w4ret = w4/w3;
+  if (w4ret >= 0.236 && w4ret <= 0.382) score += 7;
+
+  // 加分項：Wave5 與 Wave1 比值合理（0.618~1.618）
+  const w5ratio = w5/w1;
+  if (w5ratio >= 0.618 && w5ratio <= 1.618) score += 5;
+
+  score = Math.max(0, Math.min(100, score));
+  return { valid: violations.length===0, score, violations, isBull };
+}
+
+// ABC 修正浪驗證
+function validateABC(pts) {
+  if (pts.length < 4) return { valid:false, score:0, violations:['點不足'] };
+  const [p0,p1,p2,p3] = pts;
+  const violations = [];
+  let score = 70; // 修正浪天生信心較低
+
+  const isBearCorrection = p1.price < p0.price; // A浪下跌
+
+  // B浪不應超過衝浪高點（多頭修正）
+  if (isBearCorrection && p2.price >= p0.price) {
+    violations.push('B浪超越A起點'); score -= 20;
+  }
+
+  // C浪通常比A浪長或等長
+  const wA = Math.abs(p1.price-p0.price);
+  const wB = Math.abs(p2.price-p1.price);
+  const wC = Math.abs(p3.price-p2.price);
+
+  // B浪回撤合理（38.2%~61.8% of A）
+  const bRet = wB/wA;
+  if (bRet >= 0.382 && bRet <= 0.618) score += 10;
+
+  // C浪延伸合理（0.618~1.618 of A）
+  const cRatio = wC/wA;
+  if (cRatio >= 0.618 && cRatio <= 1.618) score += 10;
+
+  score = Math.max(0, Math.min(100, score));
+  return { valid: violations.length===0, score, violations };
+}
+
+// ── Layer 3: 費波那契目標預測 ──────────────────────────
+function calcFibTargets(fromPrice, toPrice, isImpulse) {
+  const diff = Math.abs(toPrice - fromPrice);
+  const isUp = toPrice > fromPrice;
+  const targets = [];
+
+  if (isImpulse) {
+    // 推動浪：向延伸方向計算
+    const ext = [1.0, 1.272, 1.618, 2.0, 2.618];
+    ext.forEach(r => {
+      targets.push({
+        ratio: r,
+        price: isUp ? fromPrice + diff*r : fromPrice - diff*r,
+        label: `${r}x 延伸`
+      });
+    });
+  } else {
+    // 修正浪：計算回撤支撐/壓力
+    const ret = [0.236, 0.382, 0.5, 0.618, 0.786];
+    ret.forEach(r => {
+      targets.push({
+        ratio: r,
+        price: isUp ? toPrice - diff*r : toPrice + diff*r,
+        label: `${(r*100).toFixed(1)}% 回撤`
+      });
     });
   }
+  return targets;
+}
+
+// ── 主函式：detectWaves ────────────────────────────────
+// 回傳：{ waves, forecast, confidence, status, zigzagPts }
+let WAVE_ENGINE_RESULT = { waves:[], forecast:[], confidence:0, status:'', zigzagPts:[] };
+
+function detectWaves(data) {
+  if (!data || data.length < 20) {
+    WAVE_ENGINE_RESULT = { waves:[], forecast:[], confidence:0, status:'資料不足（需20根以上K棒）', zigzagPts:[] };
+    return [];
+  }
+
+  // ── Layer 1: ZigZag 取轉折點
+  const zigzag = zigzagFilter(data);
+  WAVE_ENGINE_RESULT.zigzagPts = zigzag;
+
+  if (zigzag.length < 4) {
+    WAVE_ENGINE_RESULT = { waves:[], forecast:[], confidence:0, status:'趨勢太平緩，轉折點不足，波浪未成形', zigzagPts:zigzag };
+    return [];
+  }
+
+  // ── 嘗試辨識最後一組 5 浪（滑動視窗，從最新往回找）
+  let best5 = null, best5Score = 0, best5Start = -1;
+  for (let start = Math.max(0, zigzag.length-10); start <= zigzag.length-6; start++) {
+    const pts6 = zigzag.slice(start, start+6);
+    const res  = validateElliott5Wave(pts6);
+    if (res.score > best5Score) {
+      best5Score = res.score;
+      best5 = { pts:pts6, ...res };
+      best5Start = start;
+    }
+  }
+
+  // ── 嘗試辨識最後一組 ABC 修正浪
+  let bestABC = null, bestABCScore = 0;
+  for (let start = Math.max(0, zigzag.length-6); start <= zigzag.length-4; start++) {
+    const pts4 = zigzag.slice(start, start+4);
+    const res  = validateABC(pts4);
+    if (res.score > bestABCScore) {
+      bestABCScore = res.score;
+      bestABC = { pts:pts4, ...res };
+    }
+  }
+
+  const waveLabels = ['1','2','3','4','5'];
+  const abcLabels  = ['A','B','C'];
+  const CONFIDENCE_THRESHOLD = 55; // 低於此分數不畫波浪
+
+  let result = [];
+  let forecast = [];
+  let confidence = 0;
+  let status = '';
+
+  // ── 決定要畫哪種波浪
+  const use5 = best5 && best5.score >= CONFIDENCE_THRESHOLD;
+  const useABC = bestABC && bestABC.score >= CONFIDENCE_THRESHOLD;
+
+  if (use5) {
+    // 畫 5 浪衝浪
+    confidence = best5.score;
+    const pts = best5.pts;
+
+    for (let i=0; i<5; i++) {
+      const f=pts[i], t=pts[i+1];
+      const label = waveLabels[i];
+      const isImpulse = ['1','3','5'].includes(label);
+      const pct = (t.price-f.price)/f.price*100;
+      result.push({
+        fromIdx: f.idx, toIdx: t.idx,
+        fromPrice: f.price, toPrice: t.price,
+        label, isImpulse, pct,
+        days: t.idx-f.idx,
+        color: C.wave[label]||C.waveDefault,
+        score: confidence
+      });
+    }
+
+    // 如果後面還有更多 zigzag 點，嘗試接 ABC
+    const remainPts = zigzag.slice(best5Start+5);
+    if (remainPts.length >= 4) {
+      const abcRes = validateABC(remainPts.slice(0,4));
+      if (abcRes.score >= CONFIDENCE_THRESHOLD) {
+        abcLabels.forEach((label,i) => {
+          const f=remainPts[i], t=remainPts[i+1];
+          if (!f||!t) return;
+          const isImpulse = label==='B';
+          const pct=(t.price-f.price)/f.price*100;
+          result.push({
+            fromIdx:f.idx,toIdx:t.idx,
+            fromPrice:f.price,toPrice:t.price,
+            label,isImpulse,pct,
+            days:t.idx-f.idx,
+            color:C.wave[label]||C.waveDefault,
+            score:abcRes.score
+          });
+        });
+      }
+    }
+
+    // Layer 3: 預測下一波目標（接在最後一個波浪後）
+    const lastWv = result[result.length-1];
+    if (lastWv) {
+      const targets = calcFibTargets(lastWv.fromPrice, lastWv.toPrice, !lastWv.isImpulse);
+      forecast = targets.slice(0,3).map(t=>({
+        price: t.price, label: t.label, ratio: t.ratio,
+        fromIdx: lastWv.toIdx
+      }));
+    }
+
+    const violations = best5.violations||[];
+    if (violations.length===0) {
+      status = `✅ 5浪結構成形（信心 ${confidence}分）`;
+    } else {
+      status = `⚠ 5浪偵測（信心 ${confidence}分）｜疑慮：${violations.join('、')}`;
+    }
+
+  } else if (useABC) {
+    // 只畫 ABC 修正浪
+    confidence = bestABC.score;
+    const pts = bestABC.pts;
+
+    abcLabels.forEach((label,i) => {
+      const f=pts[i], t=pts[i+1];
+      if (!f||!t) return;
+      const isImpulse = label==='B';
+      const pct=(t.price-f.price)/f.price*100;
+      result.push({
+        fromIdx:f.idx,toIdx:t.idx,
+        fromPrice:f.price,toPrice:t.price,
+        label,isImpulse,pct,
+        days:t.idx-f.idx,
+        color:C.wave[label]||C.waveDefault,
+        score:confidence
+      });
+    });
+
+    const lastWv = result[result.length-1];
+    if (lastWv) {
+      const targets = calcFibTargets(lastWv.fromPrice, lastWv.toPrice, false);
+      forecast = targets.slice(0,3).map(t=>({
+        price:t.price, label:t.label, ratio:t.ratio,
+        fromIdx:lastWv.toIdx
+      }));
+    }
+    status = `📐 ABC修正浪（信心 ${confidence}分）`;
+
+  } else {
+    // 沒有通過驗證的波浪
+    const best = Math.max(best5Score, bestABCScore);
+    status = `❌ 波浪尚未成形（最高信心僅 ${Math.round(best)}分，門檻需≥${CONFIDENCE_THRESHOLD}分）`;
+    confidence = 0;
+  }
+
+  WAVE_ENGINE_RESULT = { waves:result, forecast, confidence, status, zigzagPts:zigzag };
   return result;
 }
 
@@ -2170,6 +2479,106 @@ function drawMain(data, waves) {
     ctx.restore();
   });
 
+  // ── ZigZag 轉折點小圓點（灰色，半透明，輔助參考）
+  if (WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.zigzagPts) {
+    const zpts = WAVE_ENGINE_RESULT.zigzagPts;
+    zpts.forEach(pt => {
+      const localIdx = pt.idx - viStart;
+      if (localIdx < 0 || localIdx >= data.length) return;
+      const zx = xS(localIdx), zy = yS(pt.price);
+      ctx.beginPath(); ctx.arc(zx, zy, isMobile?2:3, 0, Math.PI*2);
+      ctx.fillStyle = pt.type==='H' ? 'rgba(244,67,54,0.35)' : 'rgba(0,200,150,0.35)';
+      ctx.fill();
+    });
+  }
+
+  // ── 波浪預測延伸線（虛線向右）
+  if (WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.forecast && WAVE_ENGINE_RESULT.forecast.length) {
+    const lastDataIdx = data.length-1;
+    const lastX = xS(lastDataIdx);
+    const forecastXOffset = isMobile ? 36 : 60; // 向右延伸的像素距離
+    const forecastX = Math.min(lastX + forecastXOffset, W - p.r - 4);
+
+    WAVE_ENGINE_RESULT.forecast.forEach((fc, fi) => {
+      const localFrom = fc.fromIdx - viStart;
+      if (localFrom < 0 || localFrom >= data.length) return;
+      const fy = yS(fc.price);
+      const fxStart = xS(Math.min(localFrom, lastDataIdx));
+
+      // 水平虛線延伸
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,214,0,0.5)';
+      ctx.lineWidth = isMobile ? 0.8 : 1;
+      ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      ctx.moveTo(fxStart, fy);
+      ctx.lineTo(forecastX, fy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 小三角標籤
+      const arrowSize = isMobile ? 4 : 6;
+      ctx.fillStyle = 'rgba(255,214,0,0.7)';
+      ctx.beginPath();
+      ctx.moveTo(forecastX, fy);
+      ctx.lineTo(forecastX-arrowSize, fy-arrowSize);
+      ctx.lineTo(forecastX-arrowSize, fy+arrowSize);
+      ctx.closePath();
+      ctx.fill();
+
+      // 預測目標價格標籤
+      if (!isMobile || fi===0) {
+        ctx.fillStyle = 'rgba(255,214,0,0.85)';
+        ctx.font = `${isMobile?'7px':'9px'} "JetBrains Mono",monospace`;
+        ctx.textAlign = 'left';
+        ctx.fillText(`${fc.price.toFixed(1)}`, forecastX+4, fy-2);
+        if (!isMobile) {
+          ctx.fillStyle = 'rgba(255,214,0,0.5)';
+          ctx.font = '8px "JetBrains Mono",monospace';
+          ctx.fillText(fc.label, forecastX+4, fy+10);
+        }
+      }
+      ctx.restore();
+    });
+
+    // 預測區域半透明背景
+    if (!isMobile && lastX < W-p.r-8) {
+      ctx.save();
+      ctx.globalAlpha = 0.04;
+      ctx.fillStyle = '#ffd600';
+      ctx.fillRect(lastX, p.t, forecastX-lastX, H-p.t-p.b);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+  }
+
+  // ── 波浪狀態標籤（左上角）
+  if (WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.status) {
+    const statusStr = WAVE_ENGINE_RESULT.status;
+    const isOk = statusStr.startsWith('✅');
+    const isWarn = statusStr.startsWith('⚠');
+    const isABC = statusStr.startsWith('📐');
+    const statusColor = isOk ? 'rgba(0,230,118,0.75)' : isWarn ? 'rgba(255,214,0,0.75)' : isABC ? 'rgba(0,229,255,0.65)' : 'rgba(255,61,90,0.65)';
+    ctx.save();
+    ctx.font = `${isMobile?'7px':'9px'} "JetBrains Mono",monospace`;
+    ctx.fillStyle = statusColor;
+    ctx.textAlign = 'left';
+    // 截短以防超出
+    const maxLen = isMobile ? 32 : 60;
+    const display = statusStr.length>maxLen ? statusStr.slice(0,maxLen)+'…' : statusStr;
+    ctx.fillText(display, p.l+2, p.t+14);
+    // 信心度小條
+    if (WAVE_ENGINE_RESULT.confidence > 0) {
+      const barW = isMobile ? 40 : 70;
+      const barX = p.l+2, barY = p.t+18;
+      ctx.fillStyle='rgba(255,255,255,0.1)';
+      ctx.fillRect(barX, barY, barW, 3);
+      ctx.fillStyle = statusColor;
+      ctx.fillRect(barX, barY, barW*WAVE_ENGINE_RESULT.confidence/100, 3);
+    }
+    ctx.restore();
+  }
+
   // ── hover crosshair candle (convert global HOVER_IDX to local)
   const localHoverMain = HOVER_IDX - viStart;
   if (localHoverMain>=0 && localHoverMain<data.length) {
@@ -2338,7 +2747,7 @@ function updateTooltip(idx, cx, cy, rw, rh) {
   const isUp = d.close >= d.open;
   const chg = idx>0 ? d.close-DATA[idx-1].close : 0;
   const pct = idx>0 ? (chg/DATA[idx-1].close*100).toFixed(2) : '0.00';
-  const vol = (d.volume/1000).toFixed(0);
+  const vol = d.volume;
 
   // find overlapping wave
   const wLabel = WAVES.filter(w => idx>=w.fromIdx && idx<=w.toIdx).map(w=>`W${w.label}`).join(' ');
@@ -2353,7 +2762,7 @@ function updateTooltip(idx, cx, cy, rw, rh) {
     `低 <span style="color:${dnCol}">${d.low}</span>　`+
     `收 <span style="color:${isUp?upCol:dnCol};font-weight:700">${d.close}</span>　`+
     `<span style="color:${chg>=0?upCol:dnCol}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)} (${chg>=0?'+':''}${pct}%)</span>`;
-  document.getElementById('tt-vol').textContent = `成交量 ${parseInt(vol).toLocaleString()} 張`;
+  document.getElementById('tt-vol').textContent = `成交量 ${vol.toLocaleString()} 張`;
   document.getElementById('tt-wave').textContent = wLabel ? `波段：${wLabel}` : '';
   document.getElementById('tt-wave').style.display = wLabel ? '' : 'none';
 
@@ -2440,7 +2849,7 @@ function updateStockInfoBar() {
   document.getElementById('sibOpen').textContent  = last.open.toFixed(1);
   document.getElementById('sibHigh').textContent  = last.high.toFixed(1);
   document.getElementById('sibLow').textContent   = last.low.toFixed(1);
-  document.getElementById('sibVol').textContent   = Math.round(last.volume/1000).toLocaleString();
+  document.getElementById('sibVol').textContent   = last.volume.toLocaleString();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2449,10 +2858,38 @@ function updateStockInfoBar() {
 function updateWaveCards() {
   const wrap = document.getElementById('waveCards');
   wrap.innerHTML = '';
+
+  const engineResult = WAVE_ENGINE_RESULT || {};
+  const status = engineResult.status || '';
+  const confidence = engineResult.confidence || 0;
+  const forecast = engineResult.forecast || [];
+
   if (!WAVES.length) {
-    document.getElementById('waveSection').style.display='none'; return;
+    // 沒有成形波浪：顯示狀態說明
+    const isNoForm = status.includes('未成形') || status.includes('不足');
+    document.getElementById('waveSection').style.display='block';
+    wrap.innerHTML = `
+      <div style="grid-column:1/-1;background:rgba(255,61,90,0.06);border:1px solid rgba(255,61,90,0.2);
+        border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:.74rem;">
+        <div style="color:var(--red);font-weight:700;margin-bottom:6px;">${isNoForm?'波浪尚未成形':'資料不足'}</div>
+        <div style="color:var(--text-dim);line-height:1.8;">${status||'需更多資料或更明顯的趨勢轉折'}</div>
+        ${confidence>0?`<div style="margin-top:8px;color:var(--text-dim);">最高信心：${confidence}分（門檻≥55）</div>`:''}
+      </div>`;
+    return;
   }
   document.getElementById('waveSection').style.display='block';
+
+  // 狀態欄
+  const statusColor = confidence>=80?'var(--green)':confidence>=60?'var(--yellow)':'var(--orange)';
+  wrap.innerHTML = `
+    <div style="grid-column:1/-1;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.12);
+      border-radius:10px;padding:10px 14px;margin-bottom:4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:${statusColor}">${status}</span>
+      <div style="flex:1;min-width:80px;background:rgba(255,255,255,0.08);border-radius:4px;height:4px;overflow:hidden;">
+        <div style="width:${confidence}%;height:100%;background:${statusColor};border-radius:4px;transition:width .5s;"></div>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:${statusColor}">${confidence}分</span>
+    </div>`;
 
   WAVES.forEach((w, idx) => {
     const isUp  = w.toPrice > w.fromPrice;
@@ -2475,6 +2912,28 @@ function updateWaveCards() {
     div.addEventListener('click', () => highlightWave(w, div));
     wrap.appendChild(div);
   });
+
+  // 預測目標卡（費波那契延伸）
+  if (forecast.length > 0) {
+    const lastClose = DATA[DATA.length-1].close;
+    const fcDiv = document.createElement('div');
+    fcDiv.className = 'wave-card';
+    fcDiv.style.borderTopColor = '#ffd600';
+    fcDiv.style.background = 'rgba(255,214,0,0.04)';
+    fcDiv.innerHTML = `
+      <div class="wc-label" style="color:#ffd600">📡 預測目標</div>
+      <div class="wc-type">費波那契延伸</div>
+      ${forecast.map(fc=>{
+        const diff = fc.price-lastClose;
+        const pct = (diff/lastClose*100).toFixed(1);
+        const isUp = diff>0;
+        return `<div style="display:flex;justify-content:space-between;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:.68rem;">
+          <span style="color:var(--text-dim)">${fc.label}</span>
+          <span style="color:${isUp?'var(--cup)':'var(--cdn)'}">${fc.price.toFixed(1)} (${isUp?'+':''}${pct}%)</span>
+        </div>`;
+      }).join('')}`;
+    wrap.appendChild(fcDiv);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2485,14 +2944,33 @@ function updateSummaryPanel() {
 
   // Current wave position
   const lastWave = WAVES[WAVES.length-1];
+  const engineResult = WAVE_ENGINE_RESULT || {};
+  const confidence = engineResult.confidence || 0;
+  const forecast = engineResult.forecast || [];
   let wavePosHtml = '--';
   if (lastWave) {
     const dir = lastWave.toPrice>lastWave.fromPrice?'上升':'下降';
     const tag = lastWave.isImpulse
       ? `<span class="sb-tag ${lastWave.toPrice>lastWave.fromPrice?'tag-up':'tag-down'}">推動浪${lastWave.label}</span>`
       : `<span class="sb-tag tag-neutral">修正浪${lastWave.label}</span>`;
-    wavePosHtml = `${tag} 目前可能位於${dir}的波浪 ${lastWave.label} 段，`+
-      `價格範圍 ${lastWave.fromPrice.toFixed(1)} → ${lastWave.toPrice.toFixed(1)} 元。`;
+    wavePosHtml = `${tag} 目前位於${dir}的波浪 ${lastWave.label}，`+
+      `區間 ${lastWave.fromPrice.toFixed(1)} → ${lastWave.toPrice.toFixed(1)} 元。`;
+
+    // 信心度
+    const confColor = confidence>=80?'var(--green)':confidence>=60?'var(--yellow)':'var(--orange)';
+    wavePosHtml += `<br><span style="color:${confColor}">波浪信心分數：${confidence} / 100</span>`;
+
+    // 費波那契預測目標
+    if (forecast.length>0) {
+      const lastClose = DATA[DATA.length-1].close;
+      wavePosHtml += `<br><span style="color:var(--yellow);font-size:.7rem">📡 費波那契預測目標：`;
+      wavePosHtml += forecast.map(fc=>{
+        const diff=fc.price-lastClose;
+        const pct=(diff/lastClose*100).toFixed(1);
+        return `${fc.price.toFixed(1)}（${pct}%）`;
+      }).join('　');
+      wavePosHtml += `</span>`;
+    }
 
     // Next wave hint
     const nextLabel = { '1':'2','2':'3','3':'4','4':'5','5':'A','A':'B','B':'C','C':'1' };
@@ -2501,6 +2979,8 @@ function updateSummaryPanel() {
       const nextIsImp = ['1','3','5','B'].includes(nl);
       wavePosHtml += `<br>下一段預期波浪 ${nl}（${nextIsImp?'推動浪':'修正浪'}）。`;
     }
+  } else if (engineResult.status) {
+    wavePosHtml = `<span style="color:var(--red)">${engineResult.status}</span>`;
   }
   document.getElementById('sbWavePosContent').innerHTML = wavePosHtml;
 
@@ -2547,7 +3027,7 @@ function updateSummaryPanel() {
   const n = DATA.length;
   const periodMax = Math.max(...DATA.map(d=>d.high)).toFixed(1);
   const periodMin = Math.min(...DATA.map(d=>d.low)).toFixed(1);
-  const avgVol    = Math.round(DATA.reduce((s,d)=>s+d.volume,0)/n/1000);
+  const avgVol    = Math.round(DATA.reduce((s,d)=>s+d.volume,0)/n);
   const upDays    = DATA.filter(d=>d.close>=d.open).length;
   const downDays  = n-upDays;
   document.getElementById('sbStatsContent').innerHTML =
