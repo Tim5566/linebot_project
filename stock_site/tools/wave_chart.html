@@ -407,7 +407,7 @@
     .vol-area:has(canvas[style*="display:none"]) { display: none; }
     .vol-area canvas { display: block; width: 100% !important; }
     @media(max-width:600px) {
-      .vol-area canvas { height: 90px !important; }
+      .vol-area canvas { height: 72px !important; }
     }
 
     /* chart empty */
@@ -727,11 +727,11 @@
     }
 
     @media(max-width:600px) {
-      #mainCanvas { height: 320px !important; }
+      #mainCanvas { height: 400px !important; }
     }
 
     @media(max-width:360px) {
-      #mainCanvas { height: 280px !important; }
+      #mainCanvas { height: 340px !important; }
       .hd-title { font-size:.68rem; }
       .hd-clock { display:none; }
       .tab-btn { padding:4px 9px; font-size:.65rem; }
@@ -1773,8 +1773,11 @@ async function doSearch(silent=false) {
 }
 
 async function fetchTWSEFallback(keyword) {
+  // 僅支援純數字代碼（中文名稱需後端 API 查代碼，前端無法直接打外部 API）
   if (!/^\d+$/.test(keyword)) return null;
   const now = new Date(); const rows = [];
+
+  // ── 先試上市 TWSE ──────────────────────────────────────────────────────────
   for (let m = MONTHS-1; m >= 0; m--) {
     const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
     const yyyymm = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -1785,6 +1788,36 @@ async function fetchTWSEFallback(keyword) {
         if (c>0) rows.push({ date:row[0], open:+row[3].replace(/,/g,''), high:+row[4].replace(/,/g,''), low:+row[5].replace(/,/g,''), close:c, volume:+row[1].replace(/,/g,'') });
       });
     } catch {}
+  }
+  if (rows.length) return { name:keyword, stockNo:keyword, data:rows };
+
+  // ── 上市查無資料 → 改試上櫃 tpex tradingStock JSON ──────────────────────
+  // 改用 response=json：比 CSV 穩定，無 BIG5 編碼問題
+  // JSON 結構：{"tables":[{"data":[["民國日期","張數","千元","開","高","低","收","漲跌","筆數"],...]}]}
+  for (let m = MONTHS-1; m >= 0; m--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
+    const dateQ = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/01`;
+    const otcUrl = `https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?code=${keyword}&date=${encodeURIComponent(dateQ)}&id=&response=json`;
+    try {
+      const j = await (await fetch(otcUrl)).json();
+      const tables = j?.tables || [];
+      tables.forEach(table => {
+        (table.data || []).forEach(row => {
+          if (!row || row.length < 7) return;
+          if (!row[0] || !/^\d/.test(String(row[0]))) return; // 跳過標題/空行
+          const close = parseFloat(String(row[6]).replace(/,/g,''));
+          const open_ = parseFloat(String(row[3]).replace(/,/g,''));
+          const high  = parseFloat(String(row[4]).replace(/,/g,''));
+          const low   = parseFloat(String(row[5]).replace(/,/g,''));
+          const vol   = parseInt(String(row[1]).replace(/,/g,'')) || 0;
+          const date  = String(row[0]).trim(); // 民國 "115/05/04"
+          if (close > 0 && date) rows.push({ date, open:open_, high, low, close, volume:vol });
+        });
+      });
+    } catch(e) {
+      // CORS 環境下 fetch 會直接丟 TypeError，靜默忽略
+      console.warn(`[OTC fallback] ${dateQ} 失敗:`, e.message);
+    }
   }
   return rows.length ? { name:keyword, stockNo:keyword, data:rows } : null;
 }
@@ -2060,8 +2093,14 @@ function drawMain(data, waves) {
     ctx.textAlign = 'right'; ctx.fillText(pv.toFixed(1), p.l-6, yy+4);
   }
 
-  // ── candle width
+    // ── candle width
   const cw = Math.max(2, Math.min(16, cW/data.length*.7));
+
+  // ── Is mobile? (CSS pixel width)
+  const isMobile = W < 520;
+
+  // ── Candle opacity: reduce when wave is visible so labels/lines aren't buried
+  const candleBodyAlpha = (WAVE_VISIBLE && waves.length > 0) ? (isMobile ? 0.6 : 0.75) : 1.0;
 
   // ── draw chart by type
   // In compare mode, the overlay draws both stocks as clean lines.
@@ -2093,15 +2132,16 @@ function drawMain(data, waves) {
       const bodyH   = Math.max(1, bodyBtm-bodyTop);
       const x = xS(i);
       // wick — opacity reduces as candles get dense
-      const wickAlpha = Math.min(1, Math.max(0.15, cw / 6));
+      const wickAlpha = Math.min(candleBodyAlpha, Math.max(0.15, cw / 6));
       const wickUpColor = isUp ? C.wick.up : C.wick.dn;
       ctx.globalAlpha = wickAlpha;
       ctx.strokeStyle = wickUpColor; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x,yS(d.high)); ctx.lineTo(x,yS(d.low)); ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = candleBodyAlpha;
       // body
       ctx.fillStyle = isUp ? C.cup : C.cdn;
       ctx.fillRect(x-cw/2, bodyTop, cw, bodyH);
+      ctx.globalAlpha = 1;
     });
   }
   } // end !CMP_ACTIVE
@@ -2126,17 +2166,20 @@ function drawMain(data, waves) {
   if (WAVE_VISIBLE) waves.forEach(w => {
     const x1=xS(w.fromIdx), y1=yS(w.fromPrice), x2=xS(w.toIdx), y2=yS(w.toPrice);
     const col = w.color;
+    const wLineW = isMobile ? 1.5 : 2.5;
+    const wDotR  = isMobile ? 3   : 5;
+    const wArrL  = isMobile ? 7   : 11;
 
     // shadow for depth
     ctx.save();
-    ctx.shadowColor = col; ctx.shadowBlur = 8;
-    ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.setLineDash([8,4]);
+    ctx.shadowColor = col; ctx.shadowBlur = isMobile ? 4 : 8;
+    ctx.strokeStyle = col; ctx.lineWidth = wLineW; ctx.setLineDash([8,4]);
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
 
     // Arrow at end
-    const ang = Math.atan2(y2-y1,x2-x1), L=11;
+    const ang = Math.atan2(y2-y1,x2-x1), L=wArrL;
     ctx.fillStyle = col; ctx.beginPath();
     ctx.moveTo(x2,y2);
     ctx.lineTo(x2-L*Math.cos(ang-.45), y2-L*Math.sin(ang-.45));
@@ -2144,24 +2187,27 @@ function drawMain(data, waves) {
     ctx.closePath(); ctx.fill();
 
     // Dot at start
-    ctx.beginPath(); ctx.arc(x1,y1,5,0,Math.PI*2);
+    ctx.beginPath(); ctx.arc(x1,y1,wDotR,0,Math.PI*2);
     ctx.fillStyle=col; ctx.fill();
-    ctx.beginPath(); ctx.arc(x1,y1,5,0,Math.PI*2);
-    ctx.strokeStyle=C.bg; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x1,y1,wDotR,0,Math.PI*2);
+    ctx.strokeStyle=C.bg; ctx.lineWidth=isMobile?1.5:2; ctx.stroke();
 
     // Label
     const mx=(x1+x2)/2+4, my=(y1+y2)/2-14;
     ctx.save();
     // label bg
-    ctx.font='bold 11px "Orbitron",monospace';
-    const tw = ctx.measureText(`W${w.label}`).width + 10;
-    ctx.fillStyle='rgba(5,10,20,.7)';
+    const lblFont = isMobile ? 'bold 9px "Orbitron",monospace' : 'bold 11px "Orbitron",monospace';
+    ctx.font = lblFont;
+    const tw = ctx.measureText(`W${w.label}`).width + (isMobile ? 6 : 10);
+    const lblH = isMobile ? 14 : 18;
+    const lblY = isMobile ? -10 : -12;
+    ctx.fillStyle='rgba(5,10,20,.75)';
     ctx.beginPath();
-    ctx.roundRect(mx-tw/2,my-12,tw,18,4);
+    ctx.roundRect(mx-tw/2, my+lblY, tw, lblH, 3);
     ctx.fill();
     // label text
     ctx.fillStyle=col; ctx.textAlign='center';
-    ctx.fillText(`W${w.label}`, mx, my+2);
+    ctx.fillText(`W${w.label}`, mx, my+(isMobile?0:2));
     ctx.restore();
   });
 

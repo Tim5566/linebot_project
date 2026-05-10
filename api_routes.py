@@ -514,36 +514,78 @@ def register_api(app):
                     print(f"[wave_data] TWSE {yyyymm} 抓取失敗: {e}")
                     continue
 
-            # ── OTC（上櫃）備援 ────────────────────────────────────────────────
+            # ── OTC（上櫃）備援：tpex tradingStock JSON ───────────────────────
+            # 端點：/www/zh-tw/afterTrading/tradingStock
+            # 參數：code=代碼, date=YYYY/MM/DD（西元）, response=json
+            # 回傳：{"tables":[{"data":[["民國日期","張數","金額","開","高","低","收","漲跌","筆數"],...],...}]}
+            # 改用 JSON 格式：避免 BIG5/UTF-8 編碼不確定性，也不受 gzip 壓縮影響
             if not rows:
+                otc_hdrs = {
+                    "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36",
+                    "Accept":          "application/json, text/plain, */*",
+                    "Accept-Language": "zh-TW,zh;q=0.9",
+                    "Referer":         "https://www.tpex.org.tw/",
+                }
                 for i in range(months - 1, -1, -1):
-                    d   = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
-                    url = (
-                        f"https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php"
-                        f"?l=zh-tw&d={d.year-1911}/{d.month:02d}&stkno={stock_no}&_={int(_time.time()*1000)}"
-                    )
+                    d      = _dt.date(now.year, now.month, 1) - _dt.timedelta(days=i*28)
+                    date_q = f"{d.year}/{d.month:02d}/01"
+                    url    = "https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock"
+                    params = {"code": stock_no, "date": date_q, "id": "", "response": "json"}
                     try:
-                        r = _req.get(url, headers=hdrs, timeout=12, verify=False)
-                        j = r.json()
-                        if j.get("iTotalRecords", 0) > 0:
-                            for row in j.get("aaData", []):
+                        r = _req.get(url, params=params, headers=otc_hdrs, timeout=15, verify=False)
+
+                        # 確認 HTTP 狀態
+                        if r.status_code != 200:
+                            print(f"[wave_data/OTC] {d.year}/{d.month} HTTP {r.status_code}")
+                            continue
+
+                        # 嘗試解析 JSON（比 CSV 編碼問題穩定）
+                        try:
+                            j = r.json()
+                        except Exception as je:
+                            # JSON 解析失敗：印出前 200 bytes 幫助診斷
+                            print(f"[wave_data/OTC] {d.year}/{d.month} JSON 解析失敗: {je} | 前200: {r.content[:200]}")
+                            continue
+
+                        # tpex JSON 結構：{"tables":[{"data":[row, ...]}]}
+                        tables = j.get("tables", [])
+                        if not tables:
+                            print(f"[wave_data/OTC] {d.year}/{d.month} 無 tables 欄位")
+                            continue
+
+                        month_rows = []
+                        for table in tables:
+                            for row in table.get("data", []):
+                                # 欄位順序：[0]民國日期 [1]成交張數 [2]成交千元 [3]開盤 [4]最高 [5]最低 [6]收盤 [7]漲跌 [8]筆數
+                                if not row or len(row) < 7:
+                                    continue
+                                if not str(row[0]).strip() or not str(row[0])[0].isdigit():
+                                    continue
                                 try:
-                                    close = float(row[6].replace(",", ""))
-                                    open_ = float(row[3].replace(",", ""))
-                                    high  = float(row[4].replace(",", ""))
-                                    low   = float(row[5].replace(",", ""))
-                                    vol   = int(row[1].replace(",", "").replace(" ", ""))
-                                    if close > 0:
-                                        rows.append({
-                                            "date":   row[0],
+                                    close = float(str(row[6]).replace(",", "").strip())
+                                    open_ = float(str(row[3]).replace(",", "").strip())
+                                    high  = float(str(row[4]).replace(",", "").strip())
+                                    low   = float(str(row[5]).replace(",", "").strip())
+                                    vol   = int(str(row[1]).replace(",", "").strip())
+                                    # 日期：民國格式 "115/05/04"，與 TWSE 格式一致
+                                    date_str = str(row[0]).strip()
+                                    if close > 0 and date_str:
+                                        month_rows.append({
+                                            "date":   date_str,
                                             "open":   open_,
                                             "high":   high,
                                             "low":    low,
                                             "close":  close,
                                             "volume": vol,
                                         })
-                                except Exception:
+                                except (ValueError, IndexError):
                                     continue
+
+                        if month_rows:
+                            rows.extend(month_rows)
+                            print(f"[wave_data/OTC] {stock_no} {d.year}/{d.month} 取得 {len(month_rows)} 筆 ✅")
+                        else:
+                            print(f"[wave_data/OTC] {d.year}/{d.month} JSON 解析無資料，tables keys: {[list(t.keys()) for t in tables]}")
                     except Exception as e:
                         print(f"[wave_data/OTC] {d.year}/{d.month} 失敗: {e}")
                         continue
