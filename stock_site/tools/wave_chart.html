@@ -5775,7 +5775,7 @@ window.addEventListener('resize', () => {
     };
   } catch(e) {}
 
-  // storage 事件：同 session 其他頁更改主題時同步
+  // storage 事件：同 session 其他頁更改主題時同步.
   window.addEventListener('storage', function(e) {
     if (e.key === 'jelly_global_theme') {
       applyTheme(e.newValue || 'space');
