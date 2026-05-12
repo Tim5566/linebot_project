@@ -304,8 +304,16 @@ def _fetch_otc_disposal(today: str) -> dict:
 
 def _fetch_market(today: str) -> dict:
     result = {}
+
+    # ── 法人買賣淨額 ──────────────────────────────────────────────────────────
+    print(f"[market_debug] 開始抓法人資料 date={today}")
     url_net = f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json&date={today}"
-    data    = _check_twse_stat(_fetch_with_date_check(url_net, today, "大盤法人"), today, "大盤法人")
+    raw_net = _fetch_with_date_check(url_net, today, "大盤法人")
+    print(f"[market_debug] 法人 raw_net is None: {raw_net is None}")
+    if raw_net is not None:
+        print(f"[market_debug] 法人 stat={raw_net.get('stat')} date={raw_net.get('date')}")
+    data = _check_twse_stat(raw_net, today, "大盤法人")
+    print(f"[market_debug] 法人 _check_twse_stat 結果 is None: {data is None}")
     if data:
         try:
             net_total = 0
@@ -319,20 +327,32 @@ def _fetch_market(today: str) -> dict:
                 else:
                     result[label] = round(net_amount, 2)
             result["合計金額"] = round(net_total, 2)
+            print(f"[market_debug] 法人寫入完成 keys={list(result.keys())} ✅")
         except Exception as e:
-            print(f"[market_net] 解析失敗: {e}")
+            print(f"[market_debug] 法人解析失敗: {e}")
 
+    # ── 融資金額 ──────────────────────────────────────────────────────────────
+    print(f"[market_debug] 開始抓融資資料 date={today}")
     url_margin = f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={today}"
-    data       = _check_twse_stat(_fetch_with_date_check(url_margin, today, "大盤融資"), today, "大盤融資")
+    raw_margin = _fetch_with_date_check(url_margin, today, "大盤融資")
+    print(f"[market_debug] 融資 raw_margin is None: {raw_margin is None}")
+    if raw_margin is not None:
+        print(f"[market_debug] 融資 stat={raw_margin.get('stat')} date={raw_margin.get('date')} keys={list(raw_margin.keys())}")
+    data = _check_twse_stat(raw_margin, today, "大盤融資")
+    print(f"[market_debug] 融資 _check_twse_stat 結果 is None: {data is None}")
     if data:
         try:
             row = data["tables"][0]["data"]
+            print(f"[market_debug] 融資 row[2]={row[2]}")
             prev_margin  = int(row[2][4].replace(',', '')) / 1e5
             today_margin = int(row[2][5].replace(',', '')) / 1e5
             result["融資金額增減"] = round(today_margin - prev_margin, 2)
             result["融資額金水位"] = round(today_margin, 2)
+            print(f"[market_debug] 融資寫入完成 水位={today_margin:.2f}億 增減={today_margin - prev_margin:.2f}億 ✅")
         except Exception as e:
-            print(f"[market_margin] 解析失敗: {e}")
+            print(f"[market_debug] 融資解析失敗: {e}")
+
+    print(f"[market_debug] _fetch_market 完成 result keys={list(result.keys())}")
     return result
 
 def _write_batch(ref_path: str, data: dict, chunk_size: int = 500):

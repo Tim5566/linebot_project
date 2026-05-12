@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>處置股查詢 — JellyStock 盤後雷達</title>
+  <meta name="description" content="台灣股市當日處置股清單，資料來源 TWSE / TPEx 官方，每日 17:30 更新。"/>
+  <link rel="icon" type="image/png" href="/images/jelly.png"/>
+  <link rel="apple-touch-icon" href="/images/jelly.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#03060d; --surface:#070d1a; --surface2:#0b1220;
+      --border:rgba(0,229,255,.1); --accent:#00e5ff; --green:#00e676;
+      --red:#ff3d5a; --yellow:#ffd600; --orange:#ff9800;
+      --text:#d4e4f7; --text-dim:#9ab8d4; --text-faint:#5a7a98;
+      --muted:#3a5070;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar { width: 5px; }
+    body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); border-radius: 4px; }
+
+    /* ── BACKGROUND ── */
+    #galaxyCanvas2 { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .bg-nebula2 {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%, transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%, rgba(0,60,140,.18) 0%, transparent 55%);
+      animation: nebulaFloat 28s ease-in-out infinite alternate;
+    }
+    @keyframes nebulaFloat { 0%{opacity:.7;transform:scale(1)} 100%{opacity:1;transform:scale(1.02)} }
+    .bg-scanlines2 {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+    .bg-day2 {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+      transition: opacity .8s ease;
+      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 78%,#e8f8f0 100%);
+    }
+    body.theme-day .bg-day2 { opacity: 1; }
+    body.theme-day #galaxyCanvas2 { opacity: 0; transition: opacity .8s; }
+    body.theme-day .bg-nebula2 { opacity: 0; transition: opacity .8s; }
+    body.theme-day .bg-scanlines2 { opacity: 0; }
+    body.theme-day {
+      --bg:#c8dff2; --surface:rgba(255,255,255,.96); --surface2:rgba(232,246,255,.94);
+      --border:rgba(10,60,120,.18); --accent:#0a52a0; --green:#0d6e2a;
+      --red:#a02818; --yellow:#8a6000; --orange:#b05000;
+      --text:#071628; --text-dim:#1a3a5c; --text-faint:#3a6080;
+      --muted:#4a7090;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 16px; height: 58px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: rgba(3,6,14,.97);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg,transparent 0%,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent 100%);
+      background-size: 200% 100%;
+      animation: headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep { from{background-position:-100% 0} to{background-position:200% 0} }
+    .header-left { display:flex; align-items:center; }
+    .header-right { display:flex; align-items:center; gap:12px; }
+    .logo { display:flex; align-items:center; gap:14px; margin-left:6px; }
+    .logo-icon { width:40px; height:40px; border-radius:9px; display:grid; place-items:center; position:relative; flex-shrink:0; overflow:visible; }
+    .logo-icon img { width:52px; height:52px; object-fit:contain; border-radius:9px; filter:drop-shadow(0 0 8px rgba(0,229,255,.4)); position:relative; top:-5px; left:-5px; }
+    .logo-text { font-family:'Orbitron',monospace; font-size:.88rem; font-weight:700; letter-spacing:.08em; color:#fff; text-shadow:0 0 20px rgba(0,229,255,.4); }
+    .logo-sub  { font-family:'Share Tech Mono',monospace; font-size:.5rem; color:var(--accent); letter-spacing:.22em; opacity:.65; margin-top:2px; }
+    .btn-back {
+      display:flex; align-items:center; gap:7px;
+      padding:6px 14px; border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      background:rgba(0,229,255,.05);
+      color:var(--text-dim); font-family:'Share Tech Mono',monospace;
+      font-size:.68rem; letter-spacing:.08em; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.35); background:rgba(0,229,255,.1); }
+    .btn-back svg { width:14px; height:14px; }
+
+    #subClock {
+      font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      color:var(--accent); letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px; padding:5px 14px;
+      white-space:nowrap;
+    }
+    body.theme-day #subClock {
+      color:#0a3a7a; text-shadow:none;
+      background:rgba(10,60,160,.05);
+      border-color:rgba(10,60,160,.16);
+    }
+    body.theme-day header { background:rgba(255,255,255,.88); backdrop-filter:blur(24px) saturate(2); border-bottom:1px solid rgba(10,80,160,.14); box-shadow:0 2px 24px rgba(10,60,140,.12); }
+    body.theme-day header::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.7),rgba(26,123,191,.5),transparent); background-size:200% 100%; }
+    body.theme-day .logo-text { color:#050f1e; text-shadow:none; }
+    body.theme-day .logo-sub  { color:#0a52a0; opacity:.9; }
+    body.theme-day .btn-back  { background:rgba(10,80,160,.08); border-color:rgba(10,80,160,.22); color:#0a3060; }
+    body.theme-day .btn-back:hover { background:rgba(10,80,160,.16); border-color:rgba(10,80,160,.42); color:#061830; }
+
+    /* ── MAIN ── */
+    main { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:28px 16px 80px; }
+
+    /* ── PAGE TITLE ── */
+    .page-title-wrap { margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(0,229,255,.12); }
+    .page-tag  { font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--accent); letter-spacing:.3em; opacity:.85; margin-bottom:6px; }
+    .page-title{ font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); margin-bottom:6px; }
+    .page-desc { font-size:.74rem; color:var(--text-faint); line-height:1.6; font-family:'Share Tech Mono',monospace; letter-spacing:.03em; }
+    .page-desc .sep { margin:0 6px; opacity:.4; }
+
+    body.theme-day .page-title-wrap { border-bottom-color:rgba(10,60,120,.16); }
+    body.theme-day .page-tag   { color:#0a3a70; font-weight:700; }
+    body.theme-day .page-title { color:#040e1c; text-shadow:none; }
+    body.theme-day .page-desc  { color:#3a6080; }
+
+    /* ── META ROW ── */
+    .meta-row {
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+      margin-bottom:14px; padding:10px 16px;
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.07);
+      border-radius:10px;
+      font-family:'Share Tech Mono',monospace; font-size:.62rem;
+      color:var(--text-faint); letter-spacing:.05em;
+    }
+    .meta-date { color:var(--accent); font-size:.65rem; font-weight:700; letter-spacing:.08em; }
+    .meta-count { color:var(--text-dim); }
+    .meta-count strong { color:var(--accent); font-size:.72rem; }
+    body.theme-day .meta-row { background:rgba(10,60,120,.04); border-color:rgba(10,60,120,.12); color:#2a5070; }
+    body.theme-day .meta-date { color:#0a3a7a; }
+    body.theme-day .meta-count strong { color:#0a3a7a; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      display:flex; align-items:flex-start; gap:11px; padding:12px 16px;
+      margin-bottom:14px;
+      border-radius:8px; border:1px solid rgba(255,152,0,.2);
+      background:rgba(255,152,0,.03);
+      font-size:.75rem; color:var(--text-dim); line-height:1.65;
+    }
+    .info-box-icon { flex-shrink:0; color:var(--orange); margin-top:1px; opacity:.9; }
+    .info-highlight { color:var(--orange); font-weight:700; font-family:'Share Tech Mono',monospace; }
+    body.theme-day .info-box { border-color:rgba(176,80,0,.22); background:rgba(176,80,0,.04); color:#1a3a5c; }
+    body.theme-day .info-highlight { color:#b05000; }
+
+    /* ── STATE BOXES ── */
+    .state-wrap {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:14px; padding:56px 24px; text-align:center;
+      border:1px solid rgba(0,229,255,.07); border-radius:12px;
+      background:var(--surface);
+    }
+    .state-icon  { font-size:2.2rem; }
+    .state-title { font-family:'Orbitron',monospace; font-size:.85rem; color:var(--text-dim); letter-spacing:.08em; }
+    .state-sub   { font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--text-faint); letter-spacing:.05em; line-height:1.8; }
+    .state-timer { font-family:'Share Tech Mono',monospace; font-size:1.15rem; color:var(--yellow); letter-spacing:.12em; text-shadow:0 0 12px rgba(255,214,0,.4); }
+    .spinner2 { width:30px; height:30px; border:2px solid rgba(0,229,255,.13); border-top-color:var(--accent); border-radius:50%; animation:spin2 .85s linear infinite; }
+    @keyframes spin2 { to{transform:rotate(360deg)} }
+    body.theme-day .state-wrap { background:rgba(255,255,255,.94); border-color:rgba(10,60,120,.12); }
+    body.theme-day .state-title { color:#1a3a5c; }
+    body.theme-day .state-sub   { color:#3a6080; }
+    body.theme-day .state-timer { color:#8a6000; text-shadow:none; }
+
+    /* ── DISPOSAL LIST ── */
+    .disposal-list { display:flex; flex-direction:column; gap:5px; }
+
+    .disposal-card {
+      display:flex; align-items:stretch;
+      border-radius:9px;
+      background:var(--surface); border:1px solid rgba(0,229,255,.06);
+      position:relative; overflow:hidden;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    .disposal-card::before {
+      content:''; flex-shrink:0; width:3px; align-self:stretch;
+      background:linear-gradient(180deg, #ffb347 0%, #ff7800 100%);
+    }
+    .disposal-card:hover {
+      border-color:rgba(255,152,0,.15);
+      box-shadow:0 2px 12px rgba(255,120,0,.05);
+    }
+
+    .disposal-card-left {
+      flex-shrink:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:5px; width:78px; padding:14px 8px;
+      border-right:1px solid rgba(255,152,0,.12);
+      background:rgba(255,100,0,.04);
+    }
+    .disposal-code {
+      font-family:'Share Tech Mono',monospace; font-size:.88rem;
+      font-weight:700; color:#fff; letter-spacing:.04em;
+      text-shadow:0 0 12px rgba(255,140,0,.3);
+    }
+    .disposal-badge {
+      font-family:'Share Tech Mono',monospace; font-size:.44rem;
+      letter-spacing:.12em; padding:1px 5px; border-radius:3px;
+      white-space:nowrap;
+    }
+    .disposal-badge.twse { color:#ff9800; background:rgba(255,152,0,.1); border:1px solid rgba(255,152,0,.28); }
+    .disposal-badge.otc  { color:#ff9800; background:rgba(255,152,0,.1); border:1px solid rgba(255,152,0,.28); }
+
+    /* 第幾次處置 badge */
+    .disposal-measure {
+      font-family:'Share Tech Mono',monospace; font-size:.44rem;
+      color:var(--orange); border:1px solid rgba(255,152,0,.3);
+      background:rgba(255,152,0,.06); border-radius:3px;
+      padding:1px 5px; letter-spacing:.04em; white-space:nowrap;
+      text-align:center;
+    }
+
+    .disposal-card-body {
+      flex:1; min-width:0; padding:13px 16px;
+      display:flex; flex-direction:column; justify-content:center; gap:5px;
+    }
+    .disposal-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .disposal-name { font-size:.86rem; font-weight:700; color:#fff; letter-spacing:.02em; }
+    .disposal-period {
+      display:inline-flex; align-items:center; gap:3px;
+      font-family:'Share Tech Mono',monospace; font-size:.6rem; font-weight:700;
+      color:#fff;
+      background:linear-gradient(135deg, rgba(255,130,0,.82), rgba(255,70,0,.72));
+      border:1px solid rgba(255,152,0,.45);
+      border-radius:5px; padding:2px 7px;
+      letter-spacing:.04em;
+      box-shadow:0 0 8px rgba(255,100,0,.22), inset 0 1px 0 rgba(255,255,255,.1);
+      white-space:nowrap;
+    }
+    .disposal-period::before { content:'處置期間'; font-size:.48rem; opacity:.75; letter-spacing:.04em; font-weight:400; margin-right:3px; }
+
+    /* 公布日期 / 累計 / 條件 這排 */
+    .disposal-meta-row {
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      margin-top:2px;
+    }
+    .disposal-meta-item {
+      font-family:'Share Tech Mono',monospace; font-size:.6rem;
+      color:var(--text-faint); letter-spacing:.03em;
+    }
+    .disposal-meta-item.highlight { color:var(--orange); }
+
+    /* 處置條件（長字串） */
+    .disposal-condition {
+      font-size:.72rem; color:var(--text-dim); line-height:1.62;
+    }
+
+    body.theme-day .disposal-card { background:rgba(255,255,255,.97); border-color:rgba(10,60,120,.1); box-shadow:0 1px 4px rgba(10,40,100,.06); }
+    body.theme-day .disposal-card:hover { border-color:rgba(176,80,0,.3); box-shadow:0 3px 18px rgba(176,80,0,.1); }
+    body.theme-day .disposal-card-left { border-right-color:rgba(176,80,0,.12); background:rgba(176,80,0,.03); }
+    body.theme-day .disposal-code  { color:#071628; text-shadow:none; font-weight:800; }
+    body.theme-day .disposal-badge.twse { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .disposal-badge.otc  { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .disposal-measure    { color:#b05000; border-color:rgba(176,80,0,.28); background:rgba(176,80,0,.06); }
+    body.theme-day .disposal-name  { color:#040e1c; }
+    body.theme-day .disposal-condition { color:#1a3a5c; }
+    body.theme-day .disposal-meta-item { color:#3a6080; }
+    body.theme-day .disposal-meta-item.highlight { color:#b05000; }
+    body.theme-day .disposal-period { background:linear-gradient(135deg, rgba(176,80,0,.82), rgba(140,45,0,.72)); border-color:rgba(176,80,0,.45); box-shadow:0 0 8px rgba(176,80,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      margin-top:24px; padding:12px 16px;
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.08);
+      border-radius:8px; font-family:'Share Tech Mono',monospace;
+      font-size:.6rem; color:var(--text-faint); letter-spacing:.04em; line-height:1.75;
+    }
+    body.theme-day .footer-note { background:rgba(255,255,255,.45); border-color:rgba(10,60,120,.12); color:#3a6080; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:600px){
+      header { padding:0 12px; height:54px; }
+      .logo-text { font-size:.72rem; }
+      .logo-sub  { display:none; }
+      .btn-back  { font-size:.62rem; padding:5px 10px; }
+      main { padding:16px 12px 64px; }
+      .page-title { font-size:1.05rem; }
+      .disposal-card-left { width:64px; padding:12px 6px; }
+      .disposal-code { font-size:.82rem; }
+      .disposal-card-body { padding:10px 12px; }
+      .disposal-name { font-size:.82rem; }
+      .disposal-condition { font-size:.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BACKGROUND LAYERS -->
+<canvas id="galaxyCanvas2"></canvas>
+<div class="bg-nebula2"></div>
+<div class="bg-scanlines2"></div>
+<div class="bg-day2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">處置股查詢</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="page-title-wrap">
+    <div class="page-tag">DISPOSAL STOCKS · 處置股</div>
+    <div class="page-title">今日處置股查詢</div>
+    <div class="page-desc">
+      資料來源：TWSE 臺灣證券交易所 ＆ TPEx 證券櫃買中心官方公告
+      <span class="sep">·</span>
+      盤後約 17:30 更新
+      <span class="sep">·</span>
+      上市 ＋ 上櫃同步顯示
+    </div>
+  </div>
+
+  <div class="info-box">
+    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span>
+      處置股為交易所依規定對異常交易股票採取的管制措施，處置期間內採<span class="info-highlight">人工管制措施</span>，限制每筆委託申報數量及委託次數。被列為處置股的股票<span class="info-highlight">交易受到限制</span>，投資人應特別注意。
+    </span>
+  </div>
+
+  <div class="meta-row" id="metaRow">
+    <span class="meta-date" id="metaDate">載入中...</span>
+    <span class="meta-count">共 <strong id="disposalCount">--</strong> 檔處置股</span>
+  </div>
+
+  <div id="disposalContent">
+    <div class="state-wrap">
+      <div class="spinner2"></div>
+      <div class="state-title">LOADING</div>
+      <div class="state-sub">正在取得今日處置股資料...</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    資料來源為臺灣證券交易所（TWSE）及證券櫃買中心（TPEx）官方公告，僅供參考，不構成任何投資建議。本站不保證資料之即時性，投資人應自行承擔決策風險。
+  </div>
+</main>
+
+<script>
+// ── 主題同步 ──────────────────────────────────────────────────────────────────
+(function() {
+  function applyTheme(theme) {
+    if (theme === 'day') document.body.classList.add('theme-day');
+    else document.body.classList.remove('theme-day');
+  }
+  const t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+  try {
+    const _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = e => { if (e.data?.theme) applyTheme(e.data.theme); };
+  } catch(e) {}
+  window.addEventListener('storage', e => {
+    if (e.key === 'jelly_global_theme') applyTheme(e.newValue || 'space');
+  });
+})();
+
+// ── 星空背景 ──────────────────────────────────────────────────────────────────
+(function() {
+  const cv = document.getElementById('galaxyCanvas2');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, stars = [], meteors = [];
+
+  function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; initStars(); }
+  window.addEventListener('resize', resize);
+
+  function mkStar() {
+    return { x:Math.random()*W, y:Math.random()*H, r:.3+Math.random()*1.1,
+      a:.3+Math.random()*.65, phase:Math.random()*Math.PI*2, spd:.008+Math.random()*.02 };
+  }
+  function initStars() { stars = Array.from({length:150}, mkStar); }
+
+  function mkMeteor() {
+    return { x:Math.random()*W, y:-20, vx:.8+Math.random()*1.5, vy:1.2+Math.random()*2.2,
+      len:60+Math.random()*120, a:.5+Math.random()*.4, w:.4+Math.random()*.8, life:0, max:50+Math.random()*40 };
+  }
+  setInterval(() => { if (meteors.length < 3 && Math.random() > .6) meteors.push(mkMeteor()); }, 2400);
+
+  resize();
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    if (document.body.classList.contains('theme-day')) { requestAnimationFrame(draw); return; }
+    stars.forEach(s => {
+      s.phase += s.spd;
+      const tw = .6 + Math.sin(s.phase) * .4;
+      ctx.fillStyle = `rgba(255,255,255,${s.a*tw})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+    });
+    meteors = meteors.filter(m => m.life < m.max);
+    meteors.forEach(m => {
+      m.x += m.vx; m.y += m.vy; m.life++;
+      const prog = m.life / m.max;
+      const alpha = m.a * Math.sin(prog * Math.PI);
+      const spd = Math.sqrt(m.vx*m.vx+m.vy*m.vy);
+      const g = ctx.createLinearGradient(m.x-m.vx/spd*m.len,m.y-m.vy/spd*m.len,m.x,m.y);
+      g.addColorStop(0,'rgba(255,255,255,0)');
+      g.addColorStop(.6,`rgba(255,255,255,${alpha*.5})`);
+      g.addColorStop(1,`rgba(255,255,255,${alpha})`);
+      ctx.strokeStyle=g; ctx.lineWidth=m.w;
+      ctx.beginPath(); ctx.moveTo(m.x-m.vx/spd*m.len,m.y-m.vy/spd*m.len); ctx.lineTo(m.x,m.y); ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── 核心邏輯 ──────────────────────────────────────────────────────────────────
+function getTWTime() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+}
+function isTradingWeekday() {
+  const d = getTWTime().getDay();
+  return d >= 1 && d <= 5;
+}
+function isDataReady() {
+  const tw = getTWTime();
+  return tw.getHours() > 17 || (tw.getHours() === 17 && tw.getMinutes() >= 30);
+}
+function secsTo1730() {
+  const tw = getTWTime();
+  const target = new Date(tw);
+  target.setHours(17, 30, 0, 0);
+  return Math.max(0, Math.floor((target - tw) / 1000));
+}
+function formatCountdown(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const pad = n => String(n).padStart(2,'0');
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+let _countdownTimer = null;
+
+function showPendingState() {
+  clearInterval(_countdownTimer);
+  document.getElementById('disposalContent').innerHTML = `
+    <div class="state-wrap">
+      <div class="state-icon">⏳</div>
+      <div class="state-title">等待今日資料更新</div>
+      <div class="state-sub">
+        處置股資料每日盤後約 <strong style="color:var(--orange)">17:30</strong> 更新<br>
+        距離更新時間還有
+      </div>
+      <div class="state-timer" id="pendingCountdown">--:--</div>
+      <div class="state-sub" style="margin-top:4px;font-size:.6rem">
+        目前顯示的為前一個交易日資料，或尚無資料
+      </div>
+    </div>`;
+  document.getElementById('disposalCount').textContent = '--';
+
+  function tick() {
+    const secs = secsTo1730();
+    const el = document.getElementById('pendingCountdown');
+    if (el) el.textContent = formatCountdown(secs);
+    if (secs <= 0) { clearInterval(_countdownTimer); setTimeout(loadDisposal, 2000); }
+  }
+  tick();
+  _countdownTimer = setInterval(tick, 1000);
+}
+
+function showClosedState() {
+  const tw = getTWTime();
+  const dow = tw.getDay();
+  const dayNames = ['日','一','二','三','四','五','六'];
+  let next = new Date(tw);
+  do { next.setDate(next.getDate()+1); } while (next.getDay() === 0 || next.getDay() === 6);
+  const nextStr = `${next.getMonth()+1}/${next.getDate()} (週${dayNames[next.getDay()]})`;
+  document.getElementById('disposalContent').innerHTML = `
+    <div class="state-wrap">
+      <div class="state-icon">🏖️</div>
+      <div class="state-title">${dow === 0 || dow === 6 ? '週末休市' : '今日非交易日'}</div>
+      <div class="state-sub">
+        今日（週${dayNames[dow]}）交易所休市，無處置股資料<br>
+        下一個交易日：<strong style="color:var(--accent)">${nextStr}</strong>
+      </div>
+    </div>`;
+  document.getElementById('disposalCount').textContent = '0';
+}
+
+function showEmptyState() {
+  document.getElementById('disposalContent').innerHTML = `
+    <div class="state-wrap">
+      <div class="state-icon">✅</div>
+      <div class="state-title">今日無處置股</div>
+      <div class="state-sub">今日盤後尚無處置股公告，或資料尚未更新完成</div>
+    </div>`;
+  document.getElementById('disposalCount').textContent = '0';
+}
+
+function renderDisposal(items, date) {
+  if (!items || items.length === 0) { showEmptyState(); return; }
+
+  const html = items.map(item => {
+    const code      = (item.code      || '--').trim();
+    const name      = (item.name      || '--').trim();
+    const market    = (item.market    || '').trim();
+    const pub_date  = (item.pub_date  || '').trim();
+    const count     = (item.count     || '').trim();
+    const condition = (item.condition || '').trim();
+    const start     = (item.start     || '').trim();
+    const end       = (item.end       || '').trim();
+    const measure   = (item.measure   || '').trim();
+    const period    = start && end ? `${start} ～ ${end}` : (start || end || '');
+    const badgeCls  = market === '上櫃' ? 'otc' : 'twse';
+
+    return `
+      <div class="disposal-card">
+        <div class="disposal-card-left">
+          <span class="disposal-code">${code}</span>
+          <span class="disposal-badge ${badgeCls}">${market || '上市'}</span>
+          ${measure ? `<span class="disposal-measure">${measure}</span>` : ''}
+        </div>
+        <div class="disposal-card-body">
+          <div class="disposal-name-row">
+            <span class="disposal-name">${name}</span>
+            ${period ? `<span class="disposal-period">${period}</span>` : ''}
+          </div>
+          <div class="disposal-meta-row">
+            ${pub_date ? `<span class="disposal-meta-item">📅 公布：${pub_date}</span>` : ''}
+            ${count    ? `<span class="disposal-meta-item highlight">🔢 累計 ${count} 次</span>` : ''}
+          </div>
+          ${condition ? `<div class="disposal-condition">${condition}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('disposalContent').innerHTML = `<div class="disposal-list">${html}</div>`;
+  document.getElementById('disposalCount').textContent = items.length;
+
+  const tw = getTWTime();
+  const dateEl = document.getElementById('metaDate');
+  if (dateEl) dateEl.textContent = `日期：${date || tw.toLocaleDateString('zh-TW')}`;
+}
+
+async function loadDisposal() {
+  clearInterval(_countdownTimer);
+
+  if (!isTradingWeekday()) {
+    showClosedState();
+    return;
+  }
+
+  document.getElementById('disposalContent').innerHTML = `
+    <div class="state-wrap">
+      <div class="spinner2"></div>
+      <div class="state-title">LOADING</div>
+      <div class="state-sub">正在取得今日處置股資料...</div>
+    </div>`;
+  document.getElementById('disposalCount').textContent = '--';
+
+  try {
+    const res = await fetch(`/api/disposal?_=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    // 若尚無今日資料且未到 17:30，顯示倒數
+    if ((!data.data || data.data.length === 0) && !isDataReady()) {
+      showPendingState();
+      return;
+    }
+
+    renderDisposal(data.data, data.date);
+  } catch(e) {
+    console.error('[disposal] 錯誤:', e);
+    if (!isDataReady()) {
+      showPendingState();
+    } else {
+      document.getElementById('disposalContent').innerHTML = `
+        <div class="state-wrap">
+          <div class="state-icon">⚠️</div>
+          <div class="state-title">資料載入失敗</div>
+          <div class="state-sub">無法取得處置股資料，請稍後重試<br>
+            <span style="font-size:.58rem;color:var(--text-faint)">${e.message}</span>
+          </div>
+          <button onclick="loadDisposal()" style="
+            margin-top:8px;padding:8px 20px;border-radius:20px;cursor:pointer;
+            font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.08em;
+            color:var(--accent);border:1px solid rgba(0,229,255,.3);
+            background:rgba(0,229,255,.06);transition:all .2s;
+          ">重新載入</button>
+        </div>`;
+    }
+  }
+}
+
+loadDisposal();
+</script>
+<script>
+(function() {
+  function tick() {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const pad = n => String(n).padStart(2, '0');
+    const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>

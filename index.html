@@ -4274,6 +4274,14 @@
         </svg>
         注意股查詢
       </a>
+
+      <a class="nav-item nav-item-news" href="/stock_site/news/disposal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+        </svg>
+        處置股查詢
+      </a>
     </div>
 
     <div class="drawer-divider"></div>
@@ -5970,11 +5978,6 @@ function renderStock(d) {
         ${metricCell('投信買賣超',   d.trust,        ICON_TRUST)}
         ${metricCell('自營商買賣超', d.proprietary,  ICON_PROP)}
         ${metricCell('借券賣出差額', d.short_sale,   ICON_SHORT)}
-        <div class="metric-cell">
-          <div class="metric-label">處置狀態</div>
-          <div class="metric-value ${disposalCc}">${disposalDisplay}</div>
-          ${ICON_DISPOSAL}
-        </div>
       </div>
     </div>`;
 }

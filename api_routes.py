@@ -280,6 +280,105 @@ def register_api(app):
             print(f"[api/notice] 失敗: {e}")
             return jsonify({"stat": "error", "error": str(e), "data": []}), 200
 
+    # ── 處置股 API ─────────────────────────────────────────────────────────────
+    @app.route("/api/disposal")
+    def api_disposal():
+        import requests as _req
+        import re as _re
+        import urllib3 as _u3
+        import datetime as _dt
+        from zoneinfo import ZoneInfo as _ZI
+        _u3.disable_warnings(_u3.exceptions.InsecureRequestWarning)
+
+        def s(v):
+            """安全轉字串並去空白，避免 int.strip() 錯誤"""
+            return str(v).strip() if v is not None else ""
+
+        today = _dt.datetime.now(_ZI("Asia/Taipei")).strftime("%Y%m%d")
+        hdrs = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-TW,zh;q=0.9",
+            "Referer": "https://www.twse.com.tw/",
+        }
+        results = []
+
+        # ── TWSE 上市處置股 ──────────────────────────────────────────────────────
+        # 欄位：[0]編號 [1]公布日期 [2]證券代號 [3]證券名稱 [4]累計
+        #        [5]處置條件 [6]處置起迄時間 [7]處置措施 [8]處置內容 [9]備註
+        try:
+            url = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
+            r = _req.get(url, headers=hdrs, timeout=10, verify=False)
+            data = r.json()
+            seen_twse = set()
+            for row in data.get("data", []):
+                if len(row) < 8: continue
+                sid = s(row[2])
+                if not sid: continue
+                period_raw = s(row[6])
+                parts = period_raw.replace('～', '~').split('~')
+                start = parts[0].strip() if parts else ""
+                end   = parts[1].strip() if len(parts) > 1 else ""
+                key = (sid, start)
+                if key in seen_twse: continue
+                seen_twse.add(key)
+                results.append({
+                    "code":      sid,
+                    "name":      s(row[3]),
+                    "market":    "上市",
+                    "pub_date":  s(row[1]),
+                    "count":     s(row[4]),
+                    "condition": s(row[5]),
+                    "start":     start,
+                    "end":       end,
+                    "measure":   s(row[7]),
+                })
+        except Exception as e:
+            print(f"[api/disposal] TWSE 失敗: {e}")
+
+        # ── OTC 上櫃處置股 ───────────────────────────────────────────────────────
+        # 欄位：[0]編號 [1]公布日期 [2]證券代號 [3]證券名稱(含href) [4]累計
+        #        [5]處置起訖時間 [6]處置原因 [7]處置內容 [8]收盤價 [9]本益比 [10]連結
+        try:
+            url = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
+            r = _req.get(url, headers=hdrs, timeout=10, verify=False)
+            data = r.json()
+            seen_otc = set()
+            for table in data.get("tables", []):
+                for row in table.get("data", []):
+                    if len(row) < 7: continue
+                    sid = s(row[2])
+                    if not sid: continue
+                    name = _re.sub(r'\([^)]*\)', '', s(row[3])).strip()
+                    period_raw = s(row[5])
+                    parts = period_raw.replace('～', '~').split('~')
+                    start = parts[0].strip() if parts else ""
+                    end   = parts[1].strip() if len(parts) > 1 else ""
+                    key = (sid, start)
+                    if key in seen_otc: continue
+                    seen_otc.add(key)
+                    results.append({
+                        "code":      sid,
+                        "name":      name,
+                        "market":    "上櫃",
+                        "pub_date":  s(row[1]),
+                        "count":     s(row[4]),
+                        "condition": s(row[6]),
+                        "start":     start,
+                        "end":       end,
+                        "measure":   "",
+                    })
+        except Exception as e:
+            print(f"[api/disposal] OTC 失敗: {e}")
+
+        results.sort(key=lambda x: x.get("pub_date", ""), reverse=True)
+        return jsonify({"date": today, "count": len(results), "data": results})
+
+    # ── 處置股頁面 ─────────────────────────────────────────────────────────────
+    @app.route("/stock_site/news/disposal.html")
+    def page_disposal():
+        return send_from_directory('stock_site/news', 'disposal.html')
+
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
     def api_trading_status():
