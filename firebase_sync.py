@@ -565,10 +565,10 @@ def sync_all(today: str = None, label: int = None):
             now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour
             print(f"[sync_all] 全量模式 hour={now_hour}")
 
+            sync_market(today)
+
             sync_institutional(today)
             sync_otc_institutional(today)
-
-            sync_market(today)
 
             sync_short_sale(today)
 
