@@ -4572,6 +4572,7 @@
           <span class="tooltip" style="max-width:280px">
             <b style="color:#ff3d5a;display:block;margin-bottom:5px">♥ 我的最愛</b>
             收藏常追蹤的個股，快速查看當日盤後三大法人買賣超資料。<br><br>
+            買賣超數值採用「<b style="color:var(--accent)">張</b>」為單位統計（1張＝1000股）。<br><br>
             <b style="color:var(--text);font-size:.73rem">如何使用：</b><br>
             查詢個股後，點擊結果右上角 ♥ 加入收藏<br><br>
             <b style="color:var(--text);font-size:.73rem">⚠ 裝置同步說明：</b><br>
@@ -4870,7 +4871,7 @@
         <div class="footer-brand-sub">© 2026 JellyStock</div>
       </div>
     </div>
-    <p class="footer-disclaimer-text">本網站資料來源為臺灣證券交易所（TWSE）、櫃買中心（TPEx）等官方公開資訊，資料僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <p class="footer-disclaimer-text">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
     <div class="footer-legal-links">
       <a href="/stock_site/legal/about.html">關於本站</a>
       <span class="footer-sep">·</span>
@@ -6520,7 +6521,7 @@ async function _fetchWlCard(code) {
       el.className = 'wl-row-val neu';
       el.innerHTML = labelHtml + '🚫 未更新';
     } else {
-      const n = parseInt(String(val).replace(/,/g, ''));
+      const n = parseInt(String(val).replace(/,/g, '').replace('張', ''));
       el.className = `wl-row-val ${isNaN(n) ? 'neu' : n > 0 ? 'pos' : n < 0 ? 'neg' : 'neu'}`;
       el.innerHTML = labelHtml + val;
     }
@@ -6532,10 +6533,16 @@ async function _fetchWlCard(code) {
       ['f','t','p','s'].forEach(k => set(`wl_${k}_${code}`, null));
       return;
     }
-    set(`wl_f_${code}`, data.foreign);
-    set(`wl_t_${code}`, data.trust);
-    set(`wl_p_${code}`, data.proprietary);
-    set(`wl_s_${code}`, data.short_sale);
+    const _toZhangWl = v => {
+      if (v == null) return null;
+      const n = parseInt(String(v).replace(/,/g, ''), 10);
+      if (isNaN(n)) return null;
+      return Math.round(n / 1000).toLocaleString() + '張';
+    };
+    set(`wl_f_${code}`, _toZhangWl(data.foreign));
+    set(`wl_t_${code}`, _toZhangWl(data.trust));
+    set(`wl_p_${code}`, _toZhangWl(data.proprietary));
+    set(`wl_s_${code}`, _toZhangWl(data.short_sale));
   } catch {
     ['f','t','p','s'].forEach(k => set(`wl_${k}_${code}`, null));
   }

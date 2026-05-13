@@ -80,6 +80,7 @@
     footer { position: relative; z-index: 1; border-top: 1px solid rgba(0,229,255,.06); background: rgba(4,8,15,.95); padding: 20px 40px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
     .footer-brand { font-family: 'Orbitron', monospace; font-size: .62rem; color: var(--accent); letter-spacing: .14em; opacity: .5; margin-bottom: 3px; }
     .footer-copy { font-size: .68rem; color: var(--text-faint); }
+    .footer-unofficial { font-size: .62rem; color: var(--text-faint); opacity: .7; margin-top: 5px; line-height: 1.6; }
     .footer-nav { display: flex; gap: 18px; flex-wrap: wrap; }
     .footer-nav a { font-family: 'Share Tech Mono', monospace; font-size: .64rem; color: var(--text-faint); text-decoration: none; letter-spacing: .06em; transition: color .2s; }
     .footer-nav a:hover, .footer-nav a.active { color: var(--accent); }
@@ -154,6 +155,7 @@
     body.theme-day footer { background:rgba(240,247,255,.97) !important; border-top-color:rgba(26,123,191,.14) !important; box-shadow:0 -2px 16px rgba(26,100,180,.07) !important; }
     body.theme-day .footer-brand { color:#1a7bbf !important; opacity:.85; }
     body.theme-day .footer-copy { color:#4a7090 !important; }
+    body.theme-day .footer-unofficial { color:#4a7090 !important; }
     body.theme-day .footer-nav a { color:#4a7090 !important; }
     body.theme-day .footer-nav a:hover,
     body.theme-day .footer-nav a.active { color:#1a7bbf !important; }
@@ -355,6 +357,7 @@
   <div>
     <div class="footer-brand">盤後雷達 · JELLYSTOCK</div>
     <div class="footer-copy">© 2026 JellyStock. All rights reserved.</div>
+    <div class="footer-unofficial">⚠️ 本站為獨立開發之非官方網站，與 TWSE、TPEx 及任何官方機構無任何關聯或授權。</div>
   </div>
   <nav class="footer-nav">
     <a href="/">首頁</a>

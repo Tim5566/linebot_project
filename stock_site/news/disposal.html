@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>處置股查詢 — JellyStock 盤後雷達</title>
-  <meta name="description" content="台灣股市當日處置股清單，資料來源 TWSE / TPEx 官方，每日 17:30 更新。"/>
+  <meta name="description" content="台灣股市當日處置股清單，資料來源 TWSE / TPEx 官方，上市約 17:45、上櫃約 18:00 更新。"/>
   <link rel="icon" type="image/png" href="/images/jelly.png"/>
   <link rel="apple-touch-icon" href="/images/jelly.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -370,7 +370,7 @@
     <div class="page-desc">
       資料來源：TWSE 臺灣證券交易所 ＆ TPEx 證券櫃買中心官方公告
       <span class="sep">·</span>
-      盤後約 17:30 更新
+      上市約 17:45 更新 ／ 上櫃約 18:00 更新
       <span class="sep">·</span>
       上市 ＋ 上櫃同步顯示
     </div>
@@ -383,6 +383,8 @@
     </svg>
     <span>
       處置股為交易所依規定對異常交易股票採取的管制措施，處置期間內採<span class="info-highlight">人工管制措施</span>，限制每筆委託申報數量及委託次數。被列為處置股的股票<span class="info-highlight">交易受到限制</span>，投資人應特別注意。
+      <br><br>
+      📌 資料更新時間參考：<span class="info-highlight">上市（TWSE）約 17:45</span> 更新 ／ <span class="info-highlight">上櫃（TPEx）約 18:00</span> 更新，若資料尚未顯示請稍候片刻再重新整理。
     </span>
   </div>
 
@@ -407,7 +409,7 @@
   </div>
 
   <div class="footer-note">
-    資料來源為臺灣證券交易所（TWSE）及證券櫃買中心（TPEx）官方公告，僅供參考，不構成任何投資建議。本站不保證資料之即時性，投資人應自行承擔決策風險。
+    ⚠️ 本站為非官方獨立網站，與 TWSE、TPEx 無任何關聯。資料來源為臺灣證券交易所（TWSE）及證券櫃買中心（TPEx）官方公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性，投資人應自行承擔決策風險。
   </div>
 </main>
 
@@ -489,12 +491,12 @@ function isTradingWeekday() {
 }
 function isDataReady() {
   const tw = getTWTime();
-  return tw.getHours() > 17 || (tw.getHours() === 17 && tw.getMinutes() >= 30);
+  return tw.getHours() > 17 || (tw.getHours() === 17 && tw.getMinutes() >= 45);
 }
 function secsTo1730() {
   const tw = getTWTime();
   const target = new Date(tw);
-  target.setHours(17, 30, 0, 0);
+  target.setHours(17, 45, 0, 0);
   return Math.max(0, Math.floor((target - tw) / 1000));
 }
 function formatCountdown(secs) {
@@ -514,7 +516,7 @@ function showPendingState() {
       <div class="state-icon">⏳</div>
       <div class="state-title">等待今日資料更新</div>
       <div class="state-sub">
-        處置股資料每日盤後約 <strong style="color:var(--orange)">17:30</strong> 更新<br>
+        每日盤後資料更新時間：<strong style="color:var(--accent)">上市約 17:45</strong> ／ <strong style="color:var(--orange)">上櫃約 18:00</strong><br>
         距離更新時間還有
       </div>
       <div class="state-timer" id="pendingCountdown">--:--</div>
@@ -667,7 +669,7 @@ async function loadDisposal() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    // 若尚無今日資料且未到 17:30，顯示倒數
+    // 若尚無今日資料且未到 17:45，顯示倒數
     if ((!data.data || data.data.length === 0) && !isDataReady()) {
       showPendingState();
       return;
