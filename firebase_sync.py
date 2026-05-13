@@ -201,21 +201,6 @@ def _fetch_twse_short_sale(today: str) -> dict:
     print(f"[twse_short] 共 {len(out)} 筆 ✅")
     return out
 
-def _fetch_twse_disposal(today: str) -> dict:
-    url  = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
-    data = _fetch(url)
-    if not data: return {}
-    out = {}
-    try:
-        for row in data.get("data", []):
-            sid = row[2].strip()
-            if not sid: continue  # 過濾空字串
-            out[sid] = f"處置：⭕ 至 {row[6][10:] if len(row)>6 else ''}"
-    except Exception as e:
-        print(f"[twse_disposal] 解析失敗: {e}")
-    print(f"[twse_disposal] 共 {len(out)} 筆 ✅")
-    return out
-
 def _fetch_otc_institutional(today: str) -> dict:
     url = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
     for attempt in range(1, MAX_DATE_RETRIES + 1):
@@ -286,21 +271,6 @@ def _fetch_otc_short_sale(today: str) -> dict:
         print(f"[otc_short] 共 {len(out)} 筆 ✅")
         return out
     print("[otc_short] 超過最大重試次數 ⚠️"); return {}
-
-def _fetch_otc_disposal(today: str) -> dict:
-    url  = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
-    data = _fetch(url)
-    if not data: return {}
-    out = {}
-    try:
-        for row in data["tables"][0]["data"]:
-            sid = row[2].strip()
-            if not sid: continue  # 過濾空字串
-            out[sid] = f"處置：⭕ 至 {row[5][10:] if len(row)>5 else ''}"
-    except Exception as e:
-        print(f"[otc_disposal] 解析失敗: {e}")
-    print(f"[otc_disposal] 共 {len(out)} 筆 ✅")
-    return out
 
 def _fetch_market(today: str) -> dict:
     result = {}
@@ -422,28 +392,6 @@ def sync_short_sale(today: str = None):
         "short_sale_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
     })
 
-def sync_disposal(today: str = None):
-    if today is None: today = get_today()
-    print(f"[sync] 開始同步處置股 date={today}")
-    twse_disp = _fetch_twse_disposal(today)
-    otc_disp  = _fetch_otc_disposal(today)
-    _init_firebase()
-    if twse_disp:
-        ref = firebase_db.reference(f"stock_data/{today}/twse")
-        for sid, val in twse_disp.items():
-            if not sid: continue
-            ref.child(sid).update({"disposal": val})
-        print(f"[sync] 上市處置 {len(twse_disp)} 筆 ✅")
-    if otc_disp:
-        ref = firebase_db.reference(f"stock_data/{today}/otc")
-        for sid, val in otc_disp.items():
-            if not sid: continue
-            ref.child(sid).update({"disposal": val})
-        print(f"[sync] 上櫃處置 {len(otc_disp)} 筆 ✅")
-    firebase_db.reference(f"stock_data/{today}/meta").update({
-        "disposal_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
-    })
-
 def sync_market(today: str = None):
     if today is None: today = get_today()
     print(f"[sync] 開始同步大盤 date={today}")
@@ -557,23 +505,76 @@ def sync_stock_list():
     return twse_map, otc_map
 
 
-def sync_all(today: str = None):
-    if today is None: today = get_today()
-    now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour
-    print(f"[sync_all] 開始全量同步 date={today} hour={now_hour}")
 
-    # ── 三大法人、處置股：只在下午跑（15:00~20:00）──────────────────────────
-    # 晚上不重跑，避免 API 已關閉回傳空資料，把白天正確寫入的資料覆蓋掉
-    if 15 <= now_hour < 21:
-        sync_institutional(today)
-        sync_otc_institutional(today)
-        sync_disposal(today)
+# ── 防重疊執行鎖（同一時間只允許一個 sync_all 在跑）────────────────────────
+import threading as _threading
+_sync_lock = _threading.Lock()
 
-    # ── 大盤：下午和晚上都跑（15:10 法人買賣、21:10 融資更新）──────────────
-    sync_market(today)
 
-    # ── 借券賣出：只在晚上跑（21:30 才有資料）───────────────────────────────
-    if now_hour >= 21:
-        sync_short_sale(today)
+def sync_all(today: str = None, label: int = None):
+    """
+    依 label 精確執行對應同步任務，避免每次全跑造成重疊與多餘 API 呼叫。
 
-    print(f"[sync_all] 全部完成 date={today}")
+    label 對照排程：
+      None / 手動 → 全量同步（向下相容手動觸發）
+      2  = 15:00  投信 TWSE（sync_institutional，只有投信先出）
+      1  = 15:10  大盤法人（sync_market）
+      9  = 15:30  OTC 三大法人（sync_otc_institutional）
+      3  = 16:10  重跑 TWSE 三大法人（補外資 + 自營商）
+      7  = 21:10  大盤融資（sync_market）
+      8  = 21:30  借券賣出（sync_short_sale）
+    """
+    if today is None:
+        today = get_today()
+
+    # ── 防重疊：已有同步在跑就跳過，避免 thread 競爭 ──────────────────────
+    if not _sync_lock.acquire(blocking=False):
+        print(f"[sync_all] 上一次同步尚未完成，跳過此次觸發 label={label} ⚠️")
+        return
+
+    try:
+        tag = f"label={label}" if label is not None else "全量"
+        print(f"[sync_all] 開始同步 date={today} {tag}")
+
+        if label == 2:
+            # 15:00 — 投信 TWSE（外資/自營商此時尚未出爐，但先同步有資料的）
+            sync_institutional(today)
+
+        elif label == 1:
+            # 15:10 — 大盤法人買賣金額
+            sync_market(today)
+
+        elif label == 9:
+            # 15:30 — OTC 三大法人
+            sync_otc_institutional(today)
+
+        elif label == 3:
+            # 16:10 — 重跑 TWSE 三大法人（補外資 + 自營商）
+            sync_institutional(today)
+
+        elif label == 7:
+            # 21:10 — 大盤融資金額（重跑 market，融資資料此時才出）
+            sync_market(today)
+
+        elif label == 8:
+            # 21:30 — 借券賣出
+            sync_short_sale(today)
+
+        else:
+            # label=None 或未知 → 全量同步（手動觸發向下相容）
+            now_hour = datetime.datetime.now(ZoneInfo("Asia/Taipei")).hour
+            print(f"[sync_all] 全量模式 hour={now_hour}")
+
+            if 15 <= now_hour < 21:
+                sync_institutional(today)
+                sync_otc_institutional(today)
+
+            sync_market(today)
+
+            if now_hour >= 21:
+                sync_short_sale(today)
+
+        print(f"[sync_all] 完成 date={today} {tag}")
+
+    finally:
+        _sync_lock.release()

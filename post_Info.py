@@ -317,18 +317,6 @@ def _ensure_stock_list_fresh():
 # Fallback：Firebase 無資料時，直接打 TWSE API（和舊版一樣）
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _twse_disposal(keyword, api_url):
-    try:
-        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-        data = res.json()
-        for row in data["data"]:
-            stock_id, stock_name = row[2], row[3]
-            if keyword in stock_id or keyword in stock_name:
-                return f"處置：⭕ 至 {row[6][10:]}"
-        return "處置：❌"
-    except Exception:
-        return None
-
 def _twse_foreign(keyword, api_url, today):
     try:
         data = fetch_with_retry(api_url, today)
@@ -382,18 +370,6 @@ def _twse_short_sale(keyword, api_url, today):
                 continue
             if keyword in stock_id or keyword in stock_name:
                 return f"借卷賣出：{int(row[9].replace(',', '')) - int(row[10].replace(',', '')):,} 股"
-    except Exception:
-        return None
-
-def _otc_disposal(keyword, api_url):
-    try:
-        res  = requests.get(api_url, headers=headers, verify=False, timeout=10)
-        data = res.json()
-        for row in data["tables"][0]["data"]:
-            stock_id, stock_name = row[2], row[3].split("(")[0]
-            if keyword in stock_id or keyword in stock_name:
-                return f"處置：⭕ 至 {row[5][10:]}"
-        return "處置：❌"
     except Exception:
         return None
 
@@ -617,7 +593,6 @@ def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: 
     trust    = data.get("trust")
     prop     = data.get("proprietary")
     short    = data.get("short_sale")
-    disposal = data.get("disposal")
 
     # 若三大法人都沒有，也走 fallback（可能 15:10 尚未同步）
     if foreign is None and trust is None and prop is None:
@@ -634,7 +609,6 @@ def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: 
             return f"{label}：{val} {unit}"
 
     reply  = f"{name}({stock_id}) (今盤後買賣超)\n"
-    reply += (disposal + "\n") if disposal else "處置：❌\n"
     reply += _fmt(foreign,  "外資") + "\n"
     reply += _fmt(trust,    "投信") + "\n"
     reply += _fmt(prop,     "自營商") + "\n"
@@ -645,22 +619,19 @@ def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: 
 
 def _fallback_twse(keyword: str, today: str) -> str:
     """Firebase 無資料時，直接打上市 API（舊版邏輯）。"""
-    API_Disposal    = f"https://www.twse.com.tw/rwd/zh/announcement/punish?startDate={today}&endDate={today}&queryType=3&response=json"
     API_Foreign     = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
     API_Trust       = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
     API_Proprietary = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
     API_Short_Sale  = f"https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={today}"
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
-        fd = ex.submit(_twse_disposal,    keyword, API_Disposal)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
         ff = ex.submit(_twse_foreign,     keyword, API_Foreign,     today)
         ft = ex.submit(_twse_trust,       keyword, API_Trust,       today)
         fp = ex.submit(_twse_proprietary, keyword, API_Proprietary, today)
         fs = ex.submit(_twse_short_sale,  keyword, API_Short_Sale,  today)
-        D, F, T, P, S = fd.result(), ff.result(), ft.result(), fp.result(), fs.result()
+        F, T, P, S = ff.result(), ft.result(), fp.result(), fs.result()
 
     reply  = f"{keyword} (今盤後買賣超)\n"
-    reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
     reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
     reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
     reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"
@@ -671,19 +642,15 @@ def _fallback_twse(keyword: str, today: str) -> str:
 def _fallback_otc(keyword: str, today: str) -> str:
     """Firebase 無資料時，直接打上櫃 API（舊版邏輯）。"""
     API_inst       = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
-    API_Disposal   = "https://www.tpex.org.tw/www/zh-tw/bulletin/disposal?response=json"
     API_Short_Sale = "https://www.tpex.org.tw/www/zh-tw/margin/sbl?response=json"
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
-        fd = ex.submit(_otc_disposal,      keyword, API_Disposal)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
         fi = ex.submit(_otc_institutional, keyword, API_inst,       today)
         fs = ex.submit(_otc_short_sale,    keyword, API_Short_Sale, today)
-        D        = fd.result()
         F, T, P  = fi.result()
         S        = fs.result()
 
     reply  = f"{keyword} (今盤後買賣超)\n"
-    reply += (D + "\n") if D else "處置：🚫 暫未更新\n"
     reply += (F + "\n") if F else "外資：🚫 暫未更新\n"
     reply += (T + "\n") if T else "投信：🚫 暫未更新\n"
     reply += (P + "\n") if P else "自營商：🚫 暫未更新\n"

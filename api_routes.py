@@ -384,7 +384,7 @@ def register_api(app):
     def api_trading_status():
         return jsonify(get_trading_status())
 
-    # ── 手動觸發 Firebase 同步（測試用）────────────────────────────────────────
+    # ── 手動觸發 Firebase 同步（支援 label 精確同步）──────────────────────────
     @app.route("/api/sync_test")
     def api_sync_test():
         token  = request.args.get("token", "")
@@ -392,21 +392,30 @@ def register_api(app):
         if not secret or token != secret:
             return jsonify({"error": "未授權"}), 403
 
-        date = request.args.get("date", get_today())
+        date  = request.args.get("date", get_today())
+        label = request.args.get("label", None)   # 排程 label；None = 手動全量同步
+        if label is not None:
+            try:
+                label = int(label)
+            except ValueError:
+                label = None
 
         import threading
         import firebase_sync
 
         def run():
             try:
-                firebase_sync.sync_all(date)
-                print(f"[sync_test] {date} 同步完成 ✅")
+                firebase_sync.sync_all(date, label=label)
+                tag = f"label={label}" if label is not None else "全量"
+                print(f"[sync_test] {date} {tag} 同步完成 ✅")
             except Exception as e:
                 import traceback
                 print(f"[sync_test ERROR]\n{traceback.format_exc()}")
 
         threading.Thread(target=run, daemon=True).start()
-        return jsonify({"status": "started", "date": date, "message": f"{date} 同步已在背景執行"})
+        tag = f"label={label}" if label is not None else "全量"
+        return jsonify({"status": "started", "date": date, "label": label,
+                        "message": f"{date} {tag} 同步已在背景執行"})
 
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
     @app.route("/api/top50")
@@ -440,7 +449,6 @@ def register_api(app):
             "trust":       None,
             "proprietary": None,
             "short_sale":  None,
-            "disposal":    None,
         }
 
         for line in lines[1:]:
@@ -452,8 +460,6 @@ def register_api(app):
                 result["proprietary"] = _extract_val(line)
             elif line.startswith("借卷賣出"):
                 result["short_sale"]  = _extract_val(line)
-            elif line.startswith("處置"):
-                result["disposal"]    = line
 
         return jsonify(result)
 

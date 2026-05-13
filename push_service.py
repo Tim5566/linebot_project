@@ -2,8 +2,8 @@
 push_service.py（Firebase 同步版）
 ────────────────────────────────────────────────────────────────────────────
 修正重點：
-  1. 所有排程時間點（除了 label=0 休市通知）都自動呼叫 /api/sync_test
-  2. 同時段的 label 合併為一個，避免重複呼叫 sync_test
+  1. 各排程時間點依 label 呼叫 /api/sync_test?label=N，只跑對應任務
+  2. sync_all 依 label 精確執行，不再用時間範圍判斷，避免重疊與多餘呼叫
   3. 廣播簡化：
      - 15:00 發送今日盤後更新時間表
      - 15:10 發送法人總買賣金額更新提示 + 大盤數據（同一則）
@@ -25,20 +25,18 @@ from zoneinfo import ZoneInfo
 # ── 排程設定 ──────────────────────────────────────────────────────────────────
 # label 說明：
 #   0  = 09:00 休市通知
-#   2  = 15:00 廣播更新時間表
-#   1  = 15:10 廣播法人總買賣金額 + 大盤數據
-#   9  = 15:30 OTC 三大法人（背景同步，不廣播）
-#   3  = 16:10 外資、自營商（背景同步，不廣播）
-#   5  = 17:30 處置股、注意股（背景同步，不廣播）
-#   7  = 21:10 廣播大盤融資金額數據
-#   8  = 21:30 借券賣出（背景同步，不廣播）
+#   2  = 15:00 廣播更新時間表      → sync: 投信 (TWSE)
+#   1  = 15:10 廣播法人總買賣金額  → sync: 大盤法人
+#   9  = 15:30 OTC 三大法人        → sync: OTC 三大法人
+#   3  = 16:10 外資、自營商        → sync: 重跑 TWSE 三大法人（補外資+自營商）
+#   7  = 21:10 廣播大盤融資金額    → sync: 大盤融資
+#   8  = 21:30 借券賣出            → sync: 借券賣出 TWSE + OTC
 SCHEDULE = [
     (0, 9,  0,  "休市通知"),
     (2, 15, 0,  "投信買賣超 (TWSE)"),
     (1, 15, 10, "法人總買賣金額 (TWSE)"),
     (9, 15, 30, "三大法人 (OTC)"),
     (3, 16, 10, "外資、自營商 (TWSE)"),
-    (5, 17, 30, "處置股、注意股 (TWSE、OTC)"),
     (7, 21, 10, "大盤融資金額 (TWSE)"),
     (8, 21, 30, "借券賣出 (TWSE、OTC)"),
 ]
@@ -74,16 +72,15 @@ SCHEDULE_MESSAGE = """📋 今日盤後更新時間表
 15:00 投信買賣超 (TWSE)
 15:30 三大法人買賣超 (OTC)
 16:10 外資、自營商 (TWSE)
-17:30 處置股 (TWSE、OTC)
 21:30 借券賣出 (TWSE、OTC)
 ─────────────────
 以上資料更新後可至機器人查詢個股"""
 
 
 # ── 自動呼叫 sync_test API ────────────────────────────────────────────────────
-def _call_sync_test():
+def _call_sync_test(label: int):
     """
-    直接呼叫自己的 /api/sync_test，與手動觸發完全相同。
+    呼叫 /api/sync_test?label=N，讓 sync_all 只跑該 label 對應的任務。
     需要在 Render 環境變數設定：
       RENDER_EXTERNAL_URL = https://linebot-project-oxnw.onrender.com
       SYNC_SECRET = 你設定的 token
@@ -96,8 +93,8 @@ def _call_sync_test():
         print("[sync_test] ⚠️ 缺少 RENDER_EXTERNAL_URL 或 SYNC_SECRET 環境變數，跳過")
         return
 
-    url = f"{base_url}/api/sync_test?date={today}&token={token}"
-    print(f"[sync_test] 自動觸發: {url}")
+    url = f"{base_url}/api/sync_test?date={today}&label={label}&token={token}"
+    print(f"[sync_test] 自動觸發 label={label}: {url}")
 
     try:
         res = requests.get(url, timeout=30)
@@ -111,8 +108,8 @@ def _run_sync(label: int):
     if label == 0:
         return  # 休市通知，不需要同步
 
-    # 其他所有時間點都呼叫 sync_test 全量更新
-    _call_sync_test()
+    # 依 label 傳入，讓 sync_all 只跑對應任務
+    _call_sync_test(label)
 
 
 # ── 廣播執行 ──────────────────────────────────────────────────────────────────
