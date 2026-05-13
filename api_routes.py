@@ -256,29 +256,119 @@ def register_api(app):
     def page_notice():
         return send_from_directory('stock_site/news', 'notice.html')
 
-    # ── 注意股 API proxy ───────────────────────────────────────────────────────
+    # ── 注意股 API proxy（上市 TWSE + 上櫃 TPEX 合併）─────────────────────────
     @app.route("/api/notice")
     def api_notice():
         import requests as _req
         import time as _time
         import urllib3 as _u3
+        import concurrent.futures as _cf
         _u3.disable_warnings(_u3.exceptions.InsecureRequestWarning)
 
-        ts  = int(_time.time() * 1000)
-        url = f"https://www.twse.com.tw/rwd/zh/announcement/notice?response=json&_={ts}"
-        hdrs = {
+        twse_hdrs = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Accept": "application/json, text/plain, */*",
             "Accept-Language": "zh-TW,zh;q=0.9",
             "Referer": "https://www.twse.com.tw/",
         }
-        try:
-            r = _req.get(url, headers=hdrs, timeout=10, verify=False)
-            r.raise_for_status()
-            return jsonify(r.json())
-        except Exception as e:
-            print(f"[api/notice] 失敗: {e}")
-            return jsonify({"stat": "error", "error": str(e), "data": []}), 200
+        otc_hdrs = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-TW,zh;q=0.9",
+            "Referer": "https://www.tpex.org.tw/",
+        }
+
+        # ── 抓上市 TWSE ──────────────────────────────────────────────────────
+        def fetch_twse():
+            ts  = int(_time.time() * 1000)
+            url = f"https://www.twse.com.tw/rwd/zh/announcement/notice?response=json&_={ts}"
+            try:
+                r    = _req.get(url, headers=twse_hdrs, timeout=10, verify=False)
+                data = r.json()
+                items = []
+                if data.get("stat") in ("OK", "ok"):
+                    fields = data.get("fields", [])
+                    rows   = data.get("data", [])
+                    # 若 tables 結構
+                    if not rows and data.get("tables"):
+                        for t in data["tables"]:
+                            fields = t.get("fields", fields)
+                            rows.extend(t.get("data", []))
+                    for row in rows:
+                        if isinstance(row, list):
+                            obj = {fields[i]: str(row[i]).strip() for i in range(min(len(fields), len(row)))}
+                        else:
+                            obj = {k: str(v).strip() for k, v in row.items()}
+                        code = obj.get("證券代號") or obj.get("股票代號") or ""
+                        if not code:
+                            continue
+                        items.append({
+                            "market":  "上市",
+                            "code":    code,
+                            "name":    obj.get("證券名稱") or obj.get("股票簡稱") or "",
+                            "count":   obj.get("累計次數") or obj.get("累計") or "",
+                            "reason":  obj.get("注意交易資訊") or obj.get("注意原因") or "",
+                            "date":    obj.get("日期") or obj.get("公告日期") or data.get("date", ""),
+                            "close":   obj.get("收盤價") or "",
+                            "per":     obj.get("本益比") or "",
+                        })
+                return items, data.get("date", "")
+            except Exception as e:
+                print(f"[api/notice] TWSE 失敗: {e}")
+                return [], ""
+
+        # ── 抓上櫃 TPEX ──────────────────────────────────────────────────────
+        def fetch_otc():
+            url = "https://www.tpex.org.tw/www/zh-tw/bulletin/attention?response=json"
+            try:
+                r    = _req.get(url, headers=otc_hdrs, timeout=10, verify=False)
+                data = r.json()
+                items = []
+                otc_date = data.get("date", "")
+                for table in data.get("tables", []):
+                    fields = table.get("fields", [])
+                    for row in table.get("data", []):
+                        if isinstance(row, list):
+                            obj = {fields[i]: str(row[i]).strip() for i in range(min(len(fields), len(row)))}
+                        else:
+                            obj = {k: str(v).strip() for k, v in row.items()}
+                        code = obj.get("證券代號") or obj.get("股票代號") or ""
+                        if not code:
+                            continue
+                        items.append({
+                            "market":  "上櫃",
+                            "code":    code,
+                            "name":    obj.get("證券名稱") or obj.get("股票簡稱") or "",
+                            "count":   obj.get("累計次數") or obj.get("累計") or "",
+                            "reason":  obj.get("注意交易資訊") or obj.get("注意原因") or "",
+                            "date":    obj.get("日期") or obj.get("公告日期") or "",
+                            "close":   obj.get("收盤價") or "",
+                            "per":     obj.get("本益比") or "",
+                        })
+                return items, otc_date
+            except Exception as e:
+                print(f"[api/notice] TPEX 失敗: {e}")
+                return [], ""
+
+        # ── 並行抓取，合併回傳 ────────────────────────────────────────────────
+        with _cf.ThreadPoolExecutor(max_workers=2) as ex:
+            ft = ex.submit(fetch_twse)
+            fo = ex.submit(fetch_otc)
+            twse_items, twse_date = ft.result()
+            otc_items,  otc_date  = fo.result()
+
+        all_items = twse_items + otc_items
+        # 合併日期取最新
+        merged_date = twse_date or otc_date
+
+        return jsonify({
+            "stat":       "OK" if all_items else "error",
+            "date":       merged_date,
+            "twse_count": len(twse_items),
+            "otc_count":  len(otc_items),
+            "count":      len(all_items),
+            "data":       all_items,
+        })
 
     # ── 處置股 API ─────────────────────────────────────────────────────────────
     @app.route("/api/disposal")

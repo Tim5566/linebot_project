@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>注意股查詢 — JellyStock 盤後雷達</title>
-  <meta name="description" content="台灣股市當日注意股清單，資料來源 TWSE 官方，每日 17:45 更新。"/>
+  <meta name="description" content="台灣股市當日注意股清單，涵蓋上市（TWSE）及上櫃（TPEX），資料來源官方，每日 17:45 更新。"/>
   <link rel="icon" type="image/png" href="/images/jelly.png"/>
   <link rel="apple-touch-icon" href="/images/jelly.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -223,6 +223,16 @@
       color:#ff9800; background:rgba(255,152,0,.1);
       border:1px solid rgba(255,152,0,.25); white-space:nowrap;
     }
+    /* 上市 badge（青藍） */
+    .notice-badge.twse {
+      color:#00e5ff; background:rgba(0,229,255,.08);
+      border-color:rgba(0,229,255,.25);
+    }
+    /* 上櫃 badge（橘，維持原色） */
+    .notice-badge.otc {
+      color:#ff9800; background:rgba(255,152,0,.1);
+      border-color:rgba(255,152,0,.25);
+    }
 
     .notice-card-body {
       flex:1; min-width:0; padding:13px 14px;
@@ -258,10 +268,42 @@
     body.theme-day .notice-card:hover { border-color:rgba(176,80,0,.3); box-shadow:0 3px 18px rgba(176,80,0,.1); }
     body.theme-day .notice-card-left { border-right-color:rgba(176,80,0,.12); background:rgba(176,80,0,.03); }
     body.theme-day .notice-code  { color:#071628; text-shadow:none; font-weight:800; }
-    body.theme-day .notice-badge { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .notice-badge.otc  { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .notice-badge.twse { color:#0a52a0; background:rgba(10,82,160,.08); border-color:rgba(10,82,160,.25); }
     body.theme-day .notice-count-badge { background:linear-gradient(135deg, rgba(176,80,0,.82), rgba(140,45,0,.72)); border-color:rgba(176,80,0,.45); box-shadow:0 0 8px rgba(176,80,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
     body.theme-day .notice-name  { color:#040e1c; }
     body.theme-day .notice-reason{ color:#1a3a5c; }
+
+    /* ── MARKET FILTER TABS ── */
+    .market-filter {
+      display:flex; align-items:center; gap:5px;
+    }
+    .mf-tab {
+      font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.1em;
+      padding:3px 10px; border-radius:20px; cursor:pointer;
+      border:1px solid rgba(0,229,255,.15);
+      background:transparent; color:var(--text-faint);
+      transition:all .18s; white-space:nowrap; user-select:none;
+    }
+    .mf-tab:hover { color:var(--text-dim); border-color:rgba(0,229,255,.3); }
+    .mf-tab.active {
+      background:rgba(0,229,255,.12); border-color:rgba(0,229,255,.45);
+      color:var(--accent); font-weight:700;
+    }
+    .mf-tab.twse-tab.active {
+      background:rgba(0,229,255,.1); border-color:rgba(0,229,255,.4); color:#00e5ff;
+    }
+    .mf-tab.otc-tab.active {
+      background:rgba(255,152,0,.1); border-color:rgba(255,152,0,.4); color:#ff9800;
+    }
+    .mf-count {
+      font-size:.52rem; opacity:.75; margin-left:3px;
+    }
+    body.theme-day .mf-tab { border-color:rgba(10,60,120,.18); color:#3a6080; }
+    body.theme-day .mf-tab:hover { color:#1a3a5c; border-color:rgba(10,60,120,.35); }
+    body.theme-day .mf-tab.active { background:rgba(10,82,160,.1); border-color:rgba(10,82,160,.4); color:#0a3a7a; }
+    body.theme-day .mf-tab.twse-tab.active { background:rgba(10,82,160,.1); border-color:rgba(10,82,160,.4); color:#0a52a0; }
+    body.theme-day .mf-tab.otc-tab.active  { background:rgba(176,80,0,.1); border-color:rgba(176,80,0,.38); color:#b05000; }
 
     /* ── FOOTER NOTE ── */
     .footer-note {
@@ -326,11 +368,11 @@
     <div class="page-tag">NOTICE STOCKS · 注意股</div>
     <div class="page-title">今日注意股查詢</div>
     <div class="page-desc">
-      資料來源：TWSE 臺灣證券交易所官方公告
+      資料來源：TWSE 臺灣證券交易所 + TPEX 櫃買中心官方公告
       <span class="sep">·</span>
       盤後約 17:45 更新
       <span class="sep">·</span>
-      點擊代號可至交易所查看詳情
+      涵蓋上市與上櫃個股
     </div>
   </div>
 
@@ -340,13 +382,23 @@
       <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
     <span>
-      注意股為交易所依市場監視規定公布的股票，表示近期交易量或漲跌幅異常，列入注意並不代表公司經營有問題。資料於每日盤後 <span class="info-highlight">約 17:45 前後</span> 更新，更新前顯示前一交易日資料，請投資人自行審慎判斷。
+      注意股為交易所依市場監視規定公布的股票，表示近期交易量或漲跌幅異常，列入注意並不代表公司經營有問題。本頁同時涵蓋 <span class="info-highlight">上市（TWSE）</span> 與 <span class="info-highlight">上櫃（TPEX）</span> 注意股。資料於每日盤後 <span class="info-highlight">約 17:45 前後</span> 更新，更新前顯示前一交易日資料，請投資人自行審慎判斷。
     </span>
   </div>
 
   <div class="meta-row" id="metaRow">
     <span class="meta-date" id="metaDate">載入中...</span>
-    <span class="meta-count">共 <strong id="noticeCount">--</strong> 檔注意股</span>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <span class="meta-count">
+        共 <strong id="noticeCount">--</strong> 檔&nbsp;
+        <span id="metaSplit" style="opacity:.7;font-size:.58rem"></span>
+      </span>
+      <div class="market-filter" id="marketFilter">
+        <button class="mf-tab active" data-filter="all" onclick="setNoticeFilter('all')">全部<span class="mf-count" id="mfCountAll"></span></button>
+        <button class="mf-tab twse-tab" data-filter="twse" onclick="setNoticeFilter('twse')">上市<span class="mf-count" id="mfCountTwse"></span></button>
+        <button class="mf-tab otc-tab"  data-filter="otc"  onclick="setNoticeFilter('otc')">上櫃<span class="mf-count" id="mfCountOtc"></span></button>
+      </div>
+    </div>
   </div>
 
   <div id="noticeContent">
@@ -548,41 +600,88 @@ function showEmptyState() {
   setStatus('live', '資料已載入', '0', getTWTime().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
 }
 
+// ── 篩選狀態 ─────────────────────────────────────────────────────────────────
+let _noticeFilter = 'all';
+let _noticeItems  = [];
+
+function setNoticeFilter(filter) {
+  _noticeFilter = filter;
+  // 更新 tab 樣式
+  document.querySelectorAll('.mf-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  // 篩選卡片顯示
+  const cards = document.querySelectorAll('#noticeContent .notice-card');
+  let shown = 0;
+  cards.forEach(card => {
+    const mkt = card.dataset.market;
+    const visible = filter === 'all' || (filter === 'twse' && mkt === 'twse') || (filter === 'otc' && mkt === 'otc');
+    card.style.display = visible ? '' : 'none';
+    if (visible) shown++;
+  });
+  document.getElementById('noticeCount').textContent = shown;
+}
+
 // ── 渲染注意股清單 ─────────────────────────────────────────────────────────
-function renderNotice(items, date) {
+function renderNotice(items, date, twseCount, otcCount) {
   if (!items || items.length === 0) { showEmptyState(); return; }
+
+  _noticeItems = items;
+  _noticeFilter = 'all';
+
+  // 自動計算上市/上櫃數（API 若未回傳則自行統計）
+  const twseN = twseCount ?? items.filter(i => (i.market || '').trim() !== '上櫃').length;
+  const otcN  = otcCount  ?? items.filter(i => (i.market || '').trim() === '上櫃').length;
 
   const content = document.getElementById('noticeContent');
   const html = items.map(item => {
-    const code   = (item.StockCode || '--').trim();
-    const name   = (item.StockName || '--').trim();
-    const count  = (item.Count || '').trim();
-    const reason = (item.Reason || '').trim();
+    const code   = (item.code   || '--').trim();
+    const name   = (item.name   || '--').trim();
+    const count  = (item.count  || '').toString().trim();
+    const reason = (item.reason || '').trim();
+    const market = (item.market || '').trim();  // '上市' or '上櫃'
 
-    // TWSE 查詢連結
-    const mopsUrl = `https://www.twse.com.tw/rwd/zh/announcement/notice?response=html&StockCode=${code}`;
+    const isOtc      = market === '上櫃';
+    const badgeClass = isOtc ? 'otc' : 'twse';
+    const badgeText  = isOtc ? '上櫃' : '上市';
+    const mktKey     = isOtc ? 'otc' : 'twse';
 
     return `
-      <div class="notice-card">
+      <div class="notice-card" data-market="${mktKey}">
         <div class="notice-card-left">
           <span class="notice-code">${code}</span>
-          <span class="notice-badge">注意</span>
+          <span class="notice-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="notice-card-body">
           <div class="notice-name-row">
             <span class="notice-name">${name}</span>
             ${count ? `<span class="notice-count-badge">${count}次</span>` : ''}
           </div>
-          ${reason ? `<div class="notice-reason">${reason}</div>` : ''}
+          ${reason ? `<div class="notice-reason">${reason.replace(/<br>/g, ' ').replace(/&lt;br&gt;/g, ' ')}</div>` : ''}
         </div>
       </div>`;
   }).join('');
 
   content.innerHTML = `<div class="notice-list">${html}</div>`;
-  // Update meta date
-  const dateEl = document.getElementById('metaDate');
-  if (dateEl && date) dateEl.textContent = `日期：${date}`;
-  else if (dateEl) dateEl.textContent = `日期：${getTWTime().toLocaleDateString('zh-TW')}`;
+
+  // 更新日期與筆數
+  const dateEl  = document.getElementById('metaDate');
+  const splitEl = document.getElementById('metaSplit');
+  if (dateEl) dateEl.textContent = date ? `更新時間：${date}` : `更新時間：${getTWTime().toLocaleDateString('zh-TW')}`;
+  if (splitEl) splitEl.textContent = `上市 ${twseN} ／ 上櫃 ${otcN}`;
+
+  // 更新 tab 數字
+  const elAll  = document.getElementById('mfCountAll');
+  const elTwse = document.getElementById('mfCountTwse');
+  const elOtc  = document.getElementById('mfCountOtc');
+  if (elAll)  elAll.textContent  = ` ${items.length}`;
+  if (elTwse) elTwse.textContent = ` ${twseN}`;
+  if (elOtc)  elOtc.textContent  = ` ${otcN}`;
+
+  // 重設為全部
+  document.querySelectorAll('.mf-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+  document.getElementById('noticeCount').textContent = items.length;
+
   setStatus('live', '資料已載入', items.length, getTWTime().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
 }
 
@@ -601,74 +700,37 @@ async function loadNotice() {
     <div class="state-wrap">
       <div class="spinner2"></div>
       <div class="state-title">LOADING</div>
-      <div class="state-sub">正在向 TWSE 取得今日注意股資料...</div>
+      <div class="state-sub">正在取得上市 TWSE + 上櫃 TPEX 注意股資料...</div>
     </div>`;
   setStatus('live', '載入中...', '--', '--');
 
   try {
-    const ts = Date.now();
+    const ts  = Date.now();
     const res = await fetch(`${API_URL}${ts}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    // TWSE API 回傳格式：{ stat, date, data: [...], fields: [...] }
-    // 或 { stat, date, tables: [...] }
-    let items = [];
-    let apiDate = '';
-
-    if (data.stat === 'OK' || data.stat === 'ok') {
-      apiDate = data.date || '';
-
-      // 將 array row + fields 轉成 {StockCode, StockName, Count, Reason}
-      function parseRows(rows, fields) {
-        return rows.map(row => {
-          const obj = {};
-          if (Array.isArray(row)) {
-            fields.forEach((f, i) => { obj[f] = (row[i] || '').toString().trim(); });
-          } else {
-            Object.assign(obj, row);
-          }
-          // TWSE 實際欄位：編號, 證券代號, 證券名稱, 累計次數, 注意交易資訊, 日期, 收盤價, 本益比
-          return {
-            StockCode: obj['證券代號'] || obj['股票代號'] || obj['公司代號'] || '',
-            StockName: obj['證券名稱'] || obj['股票簡稱'] || obj['公司簡稱'] || '',
-            Count:     obj['累計次數'] || '',
-            Reason:    obj['注意交易資訊'] || obj['注意原因'] || obj['原因'] || '',
-          };
-        }).filter(r => r.StockCode);
-      }
-
-      if (Array.isArray(data.data) && data.data.length > 0) {
-        items = parseRows(data.data, data.fields || []);
-      } else if (Array.isArray(data.tables) && data.tables.length > 0) {
-        data.tables.forEach(t => {
-          if (Array.isArray(t.data)) {
-            items.push(...parseRows(t.data, t.fields || []));
-          }
-        });
-      }
-    }
+    // 新 API 格式：{ stat, date, twse_count, otc_count, count, data:[{market,code,name,count,reason,date},...] }
+    const items     = Array.isArray(data.data) ? data.data : [];
+    const apiDate   = data.date || '';
+    const twseCount = data.twse_count ?? null;
+    const otcCount  = data.otc_count  ?? null;
 
     // 3. 判斷資料是否為今日（若是舊資料 + 時間未到 17:45，顯示等待）
-    const tw = getTWTime();
+    const tw       = getTWTime();
     const todayStr = `${tw.getFullYear()}/${String(tw.getMonth()+1).padStart(2,'0')}/${String(tw.getDate()).padStart(2,'0')}`;
+    const dataIsToday = apiDate.replace(/-/g,'/').includes(todayStr);
 
-    const dataIsToday = apiDate.includes(todayStr.replace(/\//g,'/')) ||
-                        apiDate.replace(/-/g,'/').includes(todayStr) ||
-                        apiDate === todayStr;
-
-    if (!dataIsToday && !isDataReady()) {
-      // 資料是昨天的，且今天還沒到 17:45 → 顯示等待
+    if (data.stat !== 'OK' || (!dataIsToday && !isDataReady())) {
       showPendingState();
       return;
     }
 
     // 4. 正常渲染
-    renderNotice(items, apiDate);
+    renderNotice(items, apiDate, twseCount, otcCount);
 
   } catch(e) {
     console.error('[notice] API 錯誤:', e);
-    // API 失敗時，若時間未到 17:45 顯示等待，否則顯示錯誤
     if (!isDataReady()) {
       showPendingState();
     } else {
@@ -676,7 +738,7 @@ async function loadNotice() {
         <div class="state-wrap">
           <div class="state-icon">⚠️</div>
           <div class="state-title">資料載入失敗</div>
-          <div class="state-sub">無法連線至 TWSE，請稍後重試<br>
+          <div class="state-sub">無法連線至伺服器，請稍後重試<br>
             <span style="font-size:.58rem;color:var(--text-faint)">${e.message}</span>
           </div>
           <button onclick="loadNotice()" style="

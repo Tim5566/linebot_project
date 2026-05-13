@@ -215,8 +215,8 @@
       letter-spacing:.12em; padding:1px 5px; border-radius:3px;
       white-space:nowrap;
     }
-    .disposal-badge.twse { color:#ff9800; background:rgba(255,152,0,.1); border:1px solid rgba(255,152,0,.28); }
-    .disposal-badge.otc  { color:#ff9800; background:rgba(255,152,0,.1); border:1px solid rgba(255,152,0,.28); }
+    .disposal-badge.twse { color:#00e5ff; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.28); }
+    .disposal-badge.otc  { color:#ff9800; background:rgba(255,152,0,.1);  border:1px solid rgba(255,152,0,.28); }
 
     /* 第幾次處置 badge */
     .disposal-measure {
@@ -266,14 +266,45 @@
     body.theme-day .disposal-card:hover { border-color:rgba(176,80,0,.3); box-shadow:0 3px 18px rgba(176,80,0,.1); }
     body.theme-day .disposal-card-left { border-right-color:rgba(176,80,0,.12); background:rgba(176,80,0,.03); }
     body.theme-day .disposal-code  { color:#071628; text-shadow:none; font-weight:800; }
-    body.theme-day .disposal-badge.twse { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
-    body.theme-day .disposal-badge.otc  { color:#b05000; background:rgba(176,80,0,.09); border-color:rgba(176,80,0,.25); }
+    body.theme-day .disposal-badge.twse { color:#0a52a0; background:rgba(10,82,160,.08); border-color:rgba(10,82,160,.28); }
+    body.theme-day .disposal-badge.otc  { color:#b05000; background:rgba(176,80,0,.09);  border-color:rgba(176,80,0,.25); }
     body.theme-day .disposal-measure    { color:#b05000; border-color:rgba(176,80,0,.28); background:rgba(176,80,0,.06); }
     body.theme-day .disposal-name  { color:#040e1c; }
     body.theme-day .disposal-condition { color:#1a3a5c; }
     body.theme-day .disposal-meta-item { color:#3a6080; }
     body.theme-day .disposal-meta-item.highlight { color:#b05000; }
     body.theme-day .disposal-period { background:linear-gradient(135deg, rgba(176,80,0,.82), rgba(140,45,0,.72)); border-color:rgba(176,80,0,.45); box-shadow:0 0 8px rgba(176,80,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
+
+    /* ── MARKET FILTER TABS ── */
+    .market-filter {
+      display:flex; align-items:center; gap:5px;
+    }
+    .mf-tab {
+      font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.1em;
+      padding:3px 10px; border-radius:20px; cursor:pointer;
+      border:1px solid rgba(0,229,255,.15);
+      background:transparent; color:var(--text-faint);
+      transition:all .18s; white-space:nowrap; user-select:none;
+    }
+    .mf-tab:hover { color:var(--text-dim); border-color:rgba(0,229,255,.3); }
+    .mf-tab.active {
+      background:rgba(0,229,255,.12); border-color:rgba(0,229,255,.45);
+      color:var(--accent); font-weight:700;
+    }
+    .mf-tab.twse-tab.active {
+      background:rgba(0,229,255,.1); border-color:rgba(0,229,255,.4); color:#00e5ff;
+    }
+    .mf-tab.otc-tab.active {
+      background:rgba(255,152,0,.1); border-color:rgba(255,152,0,.4); color:#ff9800;
+    }
+    .mf-count {
+      font-size:.52rem; opacity:.75; margin-left:3px;
+    }
+    body.theme-day .mf-tab { border-color:rgba(10,60,120,.18); color:#3a6080; }
+    body.theme-day .mf-tab:hover { color:#1a3a5c; border-color:rgba(10,60,120,.35); }
+    body.theme-day .mf-tab.active { background:rgba(10,82,160,.1); border-color:rgba(10,82,160,.4); color:#0a3a7a; }
+    body.theme-day .mf-tab.twse-tab.active { background:rgba(10,82,160,.1); border-color:rgba(10,82,160,.4); color:#0a52a0; }
+    body.theme-day .mf-tab.otc-tab.active  { background:rgba(176,80,0,.1); border-color:rgba(176,80,0,.38); color:#b05000; }
 
     /* ── FOOTER NOTE ── */
     .footer-note {
@@ -357,7 +388,14 @@
 
   <div class="meta-row" id="metaRow">
     <span class="meta-date" id="metaDate">載入中...</span>
-    <span class="meta-count">共 <strong id="disposalCount">--</strong> 檔處置股</span>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <span class="meta-count">共 <strong id="disposalCount">--</strong> 檔&nbsp;<span id="metaSplit" style="opacity:.7;font-size:.58rem"></span>處置股</span>
+      <div class="market-filter" id="marketFilter">
+        <button class="mf-tab active" data-filter="all" onclick="setDisposalFilter('all')">全部<span class="mf-count" id="mfCountAll"></span></button>
+        <button class="mf-tab twse-tab" data-filter="twse" onclick="setDisposalFilter('twse')">上市<span class="mf-count" id="mfCountTwse"></span></button>
+        <button class="mf-tab otc-tab"  data-filter="otc"  onclick="setDisposalFilter('otc')">上櫃<span class="mf-count" id="mfCountOtc"></span></button>
+      </div>
+    </div>
   </div>
 
   <div id="disposalContent">
@@ -525,8 +563,32 @@ function showEmptyState() {
   document.getElementById('disposalCount').textContent = '0';
 }
 
+// ── 篩選狀態 ─────────────────────────────────────────────────────────────────
+let _disposalFilter = 'all';
+
+function setDisposalFilter(filter) {
+  _disposalFilter = filter;
+  document.querySelectorAll('.mf-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  const cards = document.querySelectorAll('#disposalContent .disposal-card');
+  let shown = 0;
+  cards.forEach(card => {
+    const mkt = card.dataset.market;
+    const visible = filter === 'all' || (filter === 'twse' && mkt === 'twse') || (filter === 'otc' && mkt === 'otc');
+    card.style.display = visible ? '' : 'none';
+    if (visible) shown++;
+  });
+  document.getElementById('disposalCount').textContent = shown;
+}
+
 function renderDisposal(items, date) {
   if (!items || items.length === 0) { showEmptyState(); return; }
+
+  _disposalFilter = 'all';
+
+  const twseN = items.filter(i => (i.market || '').trim() !== '上櫃').length;
+  const otcN  = items.filter(i => (i.market || '').trim() === '上櫃').length;
 
   const html = items.map(item => {
     const code      = (item.code      || '--').trim();
@@ -540,13 +602,14 @@ function renderDisposal(items, date) {
     const measure   = (item.measure   || '').trim();
     const period    = start && end ? `${start} ～ ${end}` : (start || end || '');
     const badgeCls  = market === '上櫃' ? 'otc' : 'twse';
+    const mktKey    = market === '上櫃' ? 'otc' : 'twse';
 
     return `
-      <div class="disposal-card">
+      <div class="disposal-card" data-market="${mktKey}">
         <div class="disposal-card-left">
           <span class="disposal-code">${code}</span>
           <span class="disposal-badge ${badgeCls}">${market || '上市'}</span>
-          ${measure ? `<span class="disposal-measure">${measure}</span>` : ''}
+
         </div>
         <div class="disposal-card-body">
           <div class="disposal-name-row">
@@ -563,11 +626,24 @@ function renderDisposal(items, date) {
   }).join('');
 
   document.getElementById('disposalContent').innerHTML = `<div class="disposal-list">${html}</div>`;
-  document.getElementById('disposalCount').textContent = items.length;
 
-  const tw = getTWTime();
-  const dateEl = document.getElementById('metaDate');
-  if (dateEl) dateEl.textContent = `日期：${date || tw.toLocaleDateString('zh-TW')}`;
+  // 更新日期與筆數
+  const dateEl  = document.getElementById('metaDate');
+  const splitEl = document.getElementById('metaSplit');
+  if (dateEl) dateEl.textContent = `日期：${date || getTWTime().toLocaleDateString('zh-TW')}`;
+  if (splitEl) splitEl.textContent = `上市 ${twseN} ／ 上櫃 ${otcN}　`;
+
+  // 更新 tab 數字
+  const elAll  = document.getElementById('mfCountAll');
+  const elTwse = document.getElementById('mfCountTwse');
+  const elOtc  = document.getElementById('mfCountOtc');
+  if (elAll)  elAll.textContent  = ` ${items.length}`;
+  if (elTwse) elTwse.textContent = ` ${twseN}`;
+  if (elOtc)  elOtc.textContent  = ` ${otcN}`;
+
+  // 重設為全部
+  document.querySelectorAll('.mf-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+  document.getElementById('disposalCount').textContent = items.length;
 }
 
 async function loadDisposal() {
