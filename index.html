@@ -4222,6 +4222,14 @@
         </svg>
         波浪走勢分析
       </button>
+
+      <button class="nav-item" data-nav-id="snapfit" onclick="openSnapFitMA()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/><path d="m7 16 4-8 4 4 2-4"/>
+        </svg>
+        SNAP FIT MA
+        <span style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">均線定位</span>
+      </button>
     </div>
 
     <div class="drawer-divider"></div>
@@ -6420,6 +6428,15 @@ function openWaveChart() {
   const inputEl = document.getElementById('stockInput') || document.querySelector('input[placeholder*="代碼"]');
   const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
   const base = '/stock_site/tools/wave_chart.html';
+  const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
+  window.location.href = url;
+}
+
+function openSnapFitMA() {
+  closeDrawer();
+  const inputEl = document.getElementById('stockInput') || document.querySelector('input[placeholder*="代碼"]');
+  const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
+  const base = '/stock_site/tools/ma_finder.html';
   const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
   window.location.href = url;
 }

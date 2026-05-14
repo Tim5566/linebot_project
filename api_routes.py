@@ -571,6 +571,10 @@ def register_api(app):
     def page_wave_chart():
         return send_from_directory('stock_site/tools', 'wave_chart.html')
 
+    @app.route("/stock_site/tools/ma_finder.html")
+    def page_ma_finder():
+        return send_from_directory('stock_site/tools', 'ma_finder.html')
+
     # ── 波浪走勢資料 Proxy API ─────────────────────────────────────────────────
     #
     # 三層保護：
