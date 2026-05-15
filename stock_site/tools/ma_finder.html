@@ -58,7 +58,7 @@
     .btn-primary:disabled{opacity:.35;cursor:not-allowed}
 
     /* controls */
-    .controls-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .controls-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;row-gap:6px}
     .ctrl-group{display:flex;align-items:center;gap:6px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.12);border-radius:10px;padding:5px 10px}
     .ctrl-group-label{font-size:.62rem;color:var(--accent);opacity:.55;font-family:'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:.1em;text-transform:uppercase;border-right:1px solid rgba(0,229,255,.12);padding-right:8px;margin-right:2px}
     .tab-group{display:flex;gap:4px}
@@ -202,6 +202,22 @@
     .long .ma-winbar-fill{background:linear-gradient(90deg,var(--ma-long),rgba(192,132,252,.5))}
     .ma-winrate-label{font-size:.63rem;color:var(--text-dark);font-family:'JetBrains Mono',monospace}
 
+    /* SIMPLE CARD ELEMENTS */
+    .simple-accuracy-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
+    .acc-main{text-align:center;flex-shrink:0;min-width:70px}
+    .acc-label{font-size:.58rem;color:var(--text-dim);margin-bottom:4px}
+    .acc-value{font-family:'Orbitron',monospace;font-size:1.55rem;font-weight:700;line-height:1.1}
+    .acc-grade{font-size:.62rem;font-weight:700;margin-top:3px}
+    .acc-bar-wrap{flex:1}
+    .acc-bar{height:6px;background:var(--border2);border-radius:6px;overflow:hidden;margin-bottom:6px}
+    .acc-bar-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+    .acc-sub{font-size:.62rem;color:var(--text-dim)}
+    .simple-sig-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+    .simple-sig-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center}
+    .simple-sig-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text)}
+    .simple-sig-lbl{font-size:.56rem;color:var(--text-dim);margin-top:2px}
+    .simple-warn{font-size:.66rem;color:#ff9a3c;background:rgba(255,154,60,.08);border:1px solid rgba(255,154,60,.25);border-radius:7px;padding:6px 10px;margin-bottom:6px;line-height:1.5}
+
     /* SIGNAL TABLE */
     .signal-section{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px}
     .signal-tab-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
@@ -240,6 +256,29 @@
     .vol-area canvas{display:block;width:100% !important}
     @media(max-width:600px){.vol-area canvas{height:64px !important}}
 
+    /* GUIDE PANEL */
+    .guide-panel{background:var(--surface);border:1px solid rgba(0,229,255,.18);border-radius:16px;margin-bottom:14px;overflow:hidden;transition:all .3s}
+    .guide-inner{padding:16px 20px}
+    .guide-header{display:flex;align-items:center;gap:12px;margin-bottom:0}
+    .guide-icon{font-size:1.3rem;flex-shrink:0}
+    .guide-title{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:2px}
+    .guide-sub{font-size:.68rem;color:var(--text-dim)}
+    .guide-collapse-btn{margin-left:auto;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--text-dim);border-radius:8px;padding:5px 12px;font-size:.66rem;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .2s;white-space:nowrap;flex-shrink:0}
+    .guide-collapse-btn:hover{color:var(--accent);border-color:rgba(0,229,255,.4)}
+    .guide-body{margin-top:14px;display:grid;gap:10px}
+    .guide-body.collapsed{display:none}
+    .guide-steps{display:grid;gap:8px}
+    .guide-step{display:flex;align-items:flex-start;gap:10px}
+    .guide-step-num{width:22px;height:22px;border-radius:50%;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.3);color:var(--accent);font-size:.72rem;font-weight:700;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+    .guide-step-text{font-size:.78rem;color:var(--text-dim);line-height:1.55}
+    .guide-step-text b{color:var(--text)}
+    .guide-exp{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:12px 14px}
+    .guide-exp-what{background:rgba(192,132,252,.03);border-color:rgba(192,132,252,.12)}
+    .guide-exp-title{font-size:.74rem;font-weight:700;color:var(--accent);margin-bottom:7px}
+    .guide-exp-what .guide-exp-title{color:var(--purple)}
+    .guide-exp-text{font-size:.74rem;color:var(--text-dim);line-height:1.65}
+    .guide-exp-text b{color:var(--text)}
+
     /* DISCLAIMER */
     .disclaimer{text-align:center;color:var(--text-dark);font-size:.65rem;padding:14px 0;border-top:1px solid var(--border);line-height:1.8;font-family:'JetBrains Mono',monospace}
 
@@ -249,27 +288,44 @@
 
     /* RESPONSIVE */
     @media(max-width:600px){
-      header{padding:0 10px 0 6px;height:50px}
+      header{padding:0 10px 0 6px;height:52px}
       .hd-sub{display:none}.hd-logo-icon{width:34px;height:34px}
       .hd-logo-icon img{width:44px;height:44px;top:-4px;left:-4px}
-      .hd-title{font-size:.74rem}.hd-clock{font-size:.62rem;padding:3px 8px;letter-spacing:.06em}
-      .btn-back{padding:4px 9px;font-size:.6rem;gap:4px}.app{padding:8px 8px 48px}
-      .search-panel{padding:10px;margin-bottom:8px;border-radius:12px}
-      .search-row{gap:6px;margin-bottom:8px;flex-wrap:nowrap}
-      .input-wrap{min-width:0;padding:0 9px;border-radius:8px}
-      .input-wrap input{font-size:.82rem;padding:9px 0}
-      .btn{padding:9px 12px;font-size:.76rem;border-radius:8px}
-      .controls-row{flex-wrap:wrap;gap:5px}.ctrl-group{padding:3px 7px;gap:3px}
-      .ctrl-group-label{font-size:.52rem;padding-right:5px;margin-right:0}
-      .tab-btn{padding:4px 10px;font-size:.66rem}.ma-btn{padding:4px 9px;font-size:.65rem}
-      .status-bar{font-size:.65rem;padding:6px 9px;min-height:32px}
-      .stock-info-bar{padding:9px 11px;gap:8px;border-radius:12px;flex-wrap:wrap}
-      .sib-name{font-size:1rem}.sib-price{font-size:1.45rem}.sib-mid{gap:10px}
+      .hd-title{font-size:.78rem}.hd-clock{font-size:.62rem;padding:3px 8px;letter-spacing:.06em}
+      .btn-back{padding:5px 10px;font-size:.62rem;gap:4px}.app{padding:10px 10px 48px}
+      .search-panel{padding:12px;margin-bottom:10px;border-radius:12px}
+      .search-row{gap:6px;margin-bottom:10px;flex-wrap:nowrap}
+      .input-wrap{min-width:0;padding:0 10px;border-radius:8px}
+      .input-wrap input{font-size:.84rem;padding:10px 0}
+      .btn{padding:10px 14px;font-size:.78rem;border-radius:8px;flex-shrink:0}
+      .controls-row{flex-wrap:wrap;gap:6px}
+      .ctrl-group{padding:4px 8px;gap:4px;border-radius:8px}
+      .ctrl-group-label{font-size:.54rem;padding-right:6px;margin-right:0}
+      .tab-btn{padding:4px 10px;font-size:.68rem}
+      .ma-btn{padding:4px 9px;font-size:.67rem}
+      .sig-vis-btn{padding:4px 9px;font-size:.67rem}
+      .status-bar{font-size:.67rem;padding:7px 10px;min-height:34px}
+      .stock-info-bar{padding:10px 12px;gap:10px;border-radius:12px;flex-wrap:wrap}
+      .sib-name{font-size:1.05rem}.sib-price{font-size:1.5rem}.sib-mid{gap:10px}
       .sib-toggle{display:inline-flex;align-items:center;gap:4px}
       .sib-extra{max-height:0;opacity:0}.sib-extra.open{max-height:100px;opacity:1}
-      .sib-stats{gap:10px}.sib-stat-val{font-size:.74rem}
-      .chart-wrap{border-radius:12px;margin-bottom:8px}
+      .sib-stats{gap:10px}.sib-stat-val{font-size:.76rem}
+      .chart-wrap{border-radius:12px;margin-bottom:10px}
+      .chart-toolbar{padding:8px 12px;gap:6px}
       .ma-period-num{font-size:2rem}
+      .guide-panel{margin-bottom:10px}
+      .guide-inner{padding:12px 14px}
+      .guide-exp{padding:10px 12px}
+      .guide-step-text{font-size:.75rem}
+      .guide-exp-text{font-size:.72rem}
+      .section-title{font-size:.68rem}
+      .ma-cards{gap:8px}
+      .ma-card{padding:14px}
+      .signal-section{padding:14px}
+    }
+    @media(max-width:400px){
+      .ctrl-group-label{display:none}
+      .ctrl-group{padding:4px 6px}
     }
 
     /* DAY THEME */
@@ -319,10 +375,10 @@
     </div>
     <div class="controls-row">
       <div class="ctrl-group">
-        <span class="ctrl-group-label">期間</span>
+        <span class="ctrl-group-label">分析期間</span>
         <div class="tab-group" id="periodGroup">
           <button class="tab-btn" data-m="6"  onclick="setPeriod(6)">6M</button>
-          <button class="tab-btn active" data-m="9"  onclick="setPeriod(9)">9M</button>
+          <button class="tab-btn" data-m="9"  onclick="setPeriod(9)">9M</button>
           <button class="tab-btn" data-m="12" onclick="setPeriod(12)">12M</button>
         </div>
       </div>
@@ -352,10 +408,60 @@
     </div>
   </div>
 
-  <!-- STATUS BAR -->
+  <!-- GUIDE PANEL -->
+  <div class="guide-panel fade-in" id="guidePanel">
+    <div class="guide-inner">
+      <div class="guide-header">
+        <span class="guide-icon">🧭</span>
+        <div>
+          <div class="guide-title">怎麼使用？</div>
+          <div class="guide-sub">輸入股票代碼，系統自動找出最有效的均線參數</div>
+        </div>
+        <button class="guide-collapse-btn" id="guideCollapseBtn" onclick="toggleGuide()">收起 ▲</button>
+      </div>
+      <div class="guide-body" id="guideBody">
+        <div class="guide-steps">
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-text"><b>輸入股票代碼或名稱</b>，例如 2330 或「台積電」，按「分析均線」</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-text"><b>選擇分析期間</b>（6M / 9M / 12M），系統自動定位短、中、長期的最佳均線</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-text"><b>看卡片的「近期準度」</b>，數字愈高代表這條均線近期訊號愈可靠</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-text"><b>圖表上的彩色線</b>即最佳均線，可觀察股價如何在均線附近反應</div>
+          </div>
+        </div>
+        <div class="guide-exp">
+          <div class="guide-exp-title">📊 分析期間怎麼選？</div>
+          <div class="guide-exp-text">
+            <b>· 6 個月</b> — 聚焦當前趨勢，訊號較新鮮，適合短線或波段操作。<br>
+            <b>· 9 個月</b> — 兼顧中期走勢與近期節奏，準確率通常更穩定。<br>
+            <b>· 12 個月</b> — 涵蓋完整年度，適合中長線佈局的投資人。<br><br>
+            建議三個期間都跑一次，<b>挑準確率最高且訊號次數足夠的那個</b>，就是最適合這檔股票的分析週期。
+          </div>
+        </div>
+        <div class="guide-exp guide-exp-what">
+          <div class="guide-exp-title">💡 卡片數字怎麼看？</div>
+          <div class="guide-exp-text">
+            <b>近期準度</b> — 後 30% 區間的訊號準確率，最能反映當前均線效能。<br>
+            <b>整體準確率</b> — 全期加權勝率，愈新的訊號影響比重愈大。<br>
+            <b>⚡ 近期下滑</b> — 代表這條均線最近效能已衰退，建議搭配其他期間再確認。<br>
+            <b>訊號次數</b> — 有效訊號數，低於 5 次時準確率僅供參考。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="status-bar fade-in" id="statusBar">
     <span class="status-dot"></span>
-    <span id="statusText">輸入股票代碼或名稱後按「分析均線」開始查詢</span>
+    <span id="statusText">請輸入股票代碼或名稱，按「分析均線」開始</span>
   </div>
 
   <!-- STOCK INFO BAR -->
@@ -421,7 +527,7 @@
 
   <!-- MA RESULT CARDS -->
   <div class="ma-result-section fade-in" id="maResultSection" style="display:none">
-    <div class="section-title">最佳均線定位結果</div>
+    <div class="section-title" id="maResultTitle">📌 最佳均線定位結果 — 近 6 個月分析</div>
     <div class="ma-cards" id="maCards"></div>
   </div>
 
@@ -438,10 +544,19 @@
 
 <script>
 const API_BASE=(()=>{const h=window.location.hostname;return(h==='localhost'||h==='127.0.0.1')?'http://127.0.0.1:5000':'https://linebot-project-oxnw.onrender.com'})();
-let MONTHS=9,DATA=[],KEYWORD='',STOCK_NO='',STOCK_NAME='',ANALYSIS=null;
+let MONTHS=6,DATA=[],KEYWORD='',STOCK_NO='',STOCK_NAME='',ANALYSIS=null;
 let MA_VISIBLE={short:true,mid:true,long:true};
+// v7：雙線選擇狀態 'score'=高分線 | 'winrate'=高勝率線
+let MA_CHOICE={short:'score',mid:'score',long:'score'};
 let SIG_FILTER={valid:true,fake:true};
 let ACTIVE_SIG_RES=null,ACTIVE_SIG_DATA=null;
+
+function toggleGuide(){
+  const body=document.getElementById('guideBody');
+  const btn=document.getElementById('guideCollapseBtn');
+  const collapsed=body.classList.toggle('collapsed');
+  btn.textContent=collapsed?'展開 ▼':'收起 ▲';
+}
 
 // Signal filter toggle
 function toggleSigFilter(type){
@@ -469,8 +584,15 @@ function setStatus(html,cls=''){
   bar.innerHTML=dot+'<span id="statusText">'+html+'</span>';
 }
 
-// Period
-function setPeriod(m){MONTHS=m;document.querySelectorAll('#periodGroup .tab-btn').forEach(b=>b.classList.toggle('active',+b.dataset.m===m))}
+// Period — 切換後自動重新分析以更新跨期穩定性徽章
+function setPeriod(m){
+  MONTHS=m;
+  document.querySelectorAll('#periodGroup .tab-btn').forEach(b=>b.classList.toggle('active',+b.dataset.m===m));
+  const titleEl=document.getElementById('maResultTitle');
+  if(titleEl)titleEl.textContent=`📌 最佳均線定位結果 — 近 ${m} 個月分析`;
+  // 若已有資料則重新查詢以取得該期間資料
+  if(KEYWORD) doSearch();
+}
 
 // MA toggle
 function toggleMA(type){
@@ -499,60 +621,521 @@ function updateSIB(data){
 }
 function toggleSibExtra(){const e=document.getElementById('sibExtra'),open=e.classList.toggle('open');document.getElementById('sibToggleIcon').textContent=open?'▲':'▼'}
 
-// MA Calc
-function calcMA(closes,period){return closes.map((_,i)=>{if(i<period-1)return null;let s=0;for(let j=i-period+1;j<=i;j++)s+=closes[j];return s/period})}
+// ============================================================
+//  均線雷達 ── 雙線模式（高分均線 × 高勝率均線）
+//  scoreMA 搜尋同時追蹤「高分線」與「高勝率線」
+//  兩線相同 → 卡片顯示單一結果
+//  兩線不同 → 卡片同時顯示兩選項，使用者可切換
+// ============================================================
 
-function scoreMA(closes,period){
-  const ma=calcMA(closes,period),signals=[];
-  for(let i=period;i<closes.length-1;i++){
-    if(!ma[i]||!ma[i-1])continue;
-    const pA=closes[i-1]>ma[i-1],cA=closes[i]>ma[i],pB=closes[i-1]<ma[i-1],cB=closes[i]<ma[i];
-    let type=null;
-    if(pB&&cA)type='break_up';
-    else if(pA&&cB)type='break_dn';
-    else if(cA&&Math.abs(Math.min(closes[i],closes[i-1])-ma[i])/ma[i]<0.005)type='touch_up';
-    if(!type)continue;
-    const d2=i+1;if(d2>=closes.length)continue;
-    const valid=(type==='break_up'||type==='touch_up')?closes[d2]>closes[i]:closes[d2]<closes[i];
-    signals.push({idx:i,type,price:closes[i],maVal:ma[i],day2Price:closes[d2],valid});
-  }
-  const total=signals.length,validN=signals.filter(s=>s.valid).length,winRate=total>0?validN/total:0;
-  return{period,signals,total,validN,winRate,score:total>=3?winRate*Math.log(total+1):0,ma};
+function calcMA(closes, period) {
+  return closes.map((_, i) => {
+    if (i < period - 1) return null;
+    let s = 0;
+    for (let j = i - period + 1; j <= i; j++) s += closes[j];
+    return s / period;
+  });
 }
 
-function findBestMA(closes,minP,maxP){let best=null;for(let p=minP;p<=maxP;p++){const r=scoreMA(closes,p);if(!best||r.score>best.score)best=r}return best}
 
-function analyzeMA(data){const closes=data.map(d=>d.close);return{short:findBestMA(closes,16,25),mid:findBestMA(closes,26,44),long:findBestMA(closes,45,70),closes,data}}
+// ── 均線斜率 ──
+function calcMASlope(ma, idx, lookback = 5) {
+  if (idx < lookback) return 0;
+  const s = ma[idx - lookback], e = ma[idx];
+  if (!s || !e) return 0;
+  return (e - s) / s;
+}
 
-// Render cards
-function renderCards({short,mid,long,closes}){
+// ── ATR（全局波動分類用）──
+function calcATR(data, period = 14) {
+  const atr = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i === 0) { atr.push(data[i].high - data[i].low); continue; }
+    const tr = Math.max(
+      data[i].high - data[i].low,
+      Math.abs(data[i].high - data[i-1].close),
+      Math.abs(data[i].low  - data[i-1].close)
+    );
+    atr.push(i < period ? tr : (atr[i-1] * (period-1) + tr) / period);
+  }
+  return atr;
+}
+
+// ── 預計算全局 ATR%，供動態波動視窗使用 ──
+function calcAtrPcts(data) {
+  const atr = calcATR(data, 14);
+  return atr.map((a, i) => data[i].close > 0 ? (a / data[i].close) * 100 : 0);
+}
+
+// ── 動態波動視窗 — 取訊號前 30 根 K 棒的 ATR% 平均 ──
+function getRollingRegime(atrPcts, idx) {
+  const lookback = 30;
+  const start = Math.max(0, idx - lookback);
+  const slice = atrPcts.slice(start, idx + 1);
+  if (!slice.length) return { touchThresh: 0.007, sigMode: 'CROSS_TOUCH', densityLimit: 2.8 };
+  const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
+  const sorted = [...slice].sort((a, b) => a - b);
+  const p25 = sorted[Math.floor(sorted.length * 0.25)];
+  const p75 = sorted[Math.floor(sorted.length * 0.75)];
+  // LOW 制度：短線(period<26)維持 CROSS_TOUCH，中長線覆蓋為 CROSS_ONLY
+  // HIGH 制度量能門檻 0.6（防止短樣本量能過濾太嚴導致 0 訊號）
+  if (avg <= p25 * 1.2) {
+    return { touchThresh: 0.005, sigMode: 'CROSS_TOUCH',     densityLimit: 2.2 };
+  } else if (avg >= p75 * 0.9) {
+    return { touchThresh: 0.012, sigMode: 'CROSS_TOUCH_VOL', densityLimit: 3.5 };
+  }
+  return { touchThresh: 0.007, sigMode: 'CROSS_TOUCH',      densityLimit: 2.8 };
+}
+
+// ── 全局波動制度分類（用於決定全局 sigMode 及 densityLimit 基準）──
+function classifyVolRegime(data) {
+  const atr    = calcATR(data, 14);
+  const closes = data.map(d => d.close);
+  const atrPcts = atr.map((a, i) => closes[i] > 0 ? (a / closes[i]) * 100 : 0);
+  const recent  = atrPcts.slice(Math.floor(atrPcts.length * 0.5));
+  const avg     = recent.reduce((a, b) => a + b, 0) / recent.length;
+  const sorted  = [...atrPcts].sort((a, b) => a - b);
+  const p25 = sorted[Math.floor(sorted.length * 0.25)];
+  const p75 = sorted[Math.floor(sorted.length * 0.75)];
+
+  const firstClose = closes[0], lastClose = closes[closes.length - 1];
+  const totalReturn = firstClose > 0 ? (lastClose - firstClose) / firstClose : 0;
+  const isTrending  = Math.abs(totalReturn) > 0.55;
+
+  let regime, touchThresh, densityLimit, label, color;
+  let sigMode, sigModeLabel, sigModeColor;
+
+  if (avg <= p25 * 1.2) {
+    regime = 'LOW'; touchThresh = 0.005; densityLimit = 2.2;
+    label = '低波動'; color = '#00e5ff';
+    // LOW 制度：短線用 CROSS_TOUCH；中長期 period>=26 覆蓋為 CROSS_ONLY
+    sigMode = 'CROSS_TOUCH'; sigModeLabel = '穿越+觸及'; sigModeColor = '#00e5ff';
+  } else if (avg >= p75 * 0.9) {
+    regime = 'HIGH'; touchThresh = 0.012; densityLimit = 3.5;
+    label = '高波動'; color = '#ff9a3c';
+    sigMode = 'CROSS_TOUCH_VOL'; sigModeLabel = '穿越+觸及(量濾)'; sigModeColor = '#ff9a3c';
+  } else {
+    regime = 'MID'; touchThresh = 0.007; densityLimit = 2.8;
+    label = '中波動'; color = '#ffd600';
+    sigMode = 'CROSS_TOUCH'; sigModeLabel = '穿越+觸及'; sigModeColor = '#ffd600';
+  }
+
+  if (isTrending) densityLimit = Math.max(densityLimit, 4.0);
+
+  return {
+    regime, atrPctAvg: +avg.toFixed(3),
+    touchThresh, densityLimit, label, color,
+    sigMode, sigModeLabel, sigModeColor,
+    isTrending, totalReturn: +totalReturn.toFixed(3)
+  };
+}
+
+// ── 20日均量（HIGH 制度觸及型量能過濾）──
+function calcVolMA20(data) {
+  return data.map((_, i) => {
+    if (i < 19) return null;
+    let s = 0;
+    for (let j = i - 19; j <= i; j++) s += (data[j].volume || 0);
+    return s / 20;
+  });
+}
+
+// ── 核心評分函式 ──
+function scoreMA(data, closes, period, volCtx, atrPcts) {
+  const ma  = calcMA(closes, period);
+  const n   = closes.length;
+  const { densityLimit, isTrending } = volCtx;
+
+  // 指數時間衰減參數
+  const LAMBDA = 2.5;
+
+  // 後 25% 切點（供⑤衰退偵測用）
+  const decayCutoff25 = Math.floor(n * 0.75);
+  // 後 30% 切點（供近期勝率計算用）
+  const recentCutoff  = Math.floor(n * 0.70);
+
+  // HIGH 制度全局均量（若需要）
+  const volMA20 = (volCtx.sigMode === 'CROSS_TOUCH_VOL') ? calcVolMA20(data) : null;
+
+  const signals = [];
+
+  for (let i = period; i < n - 2; i++) {  // n-2 保留 5日驗證空間
+    if (!ma[i] || !ma[i-1]) continue;
+
+    // 動態取當前局部波動制度
+    const localRegime = getRollingRegime(atrPcts, i);
+    let { touchThresh, sigMode } = localRegime;
+
+    // 分層制度：中長期均線（period >= 26）在 LOW 制度下強制回 CROSS_ONLY
+    // 保護中長期高準度；短期（period < 26）維持 CROSS_TOUCH
+    if (period >= 26 && sigMode === 'CROSS_TOUCH') {
+      sigMode = 'CROSS_ONLY';
+    }
+
+    const pA = closes[i-1] > ma[i-1];
+    const cA = closes[i]   > ma[i];
+    let type = null;
+
+    if (!pA && cA)      type = 'break_up';
+    else if (pA && !cA) type = 'break_dn';
+    else if (sigMode !== 'CROSS_ONLY') {
+      if (pA && cA) {
+        const low = data[i].low;
+        if (low <= ma[i] && Math.abs(low - ma[i]) / ma[i] < touchThresh) {
+          if (sigMode === 'CROSS_TOUCH_VOL' && volMA20?.[i]) {
+            // 量能門檻 0.6，避免短樣本量能過濾太嚴
+            if ((data[i].volume || 0) >= volMA20[i] * 0.6) type = 'touch_up';
+          } else { type = 'touch_up'; }
+        }
+      } else if (!pA && !cA) {
+        const high = data[i].high;
+        if (high >= ma[i] && Math.abs(high - ma[i]) / ma[i] < touchThresh) {
+          if (sigMode === 'CROSS_TOUCH_VOL' && volMA20?.[i]) {
+            // 量能門檻 0.6
+            if ((data[i].volume || 0) >= volMA20[i] * 0.6) type = 'touch_dn';
+          } else { type = 'touch_dn'; }
+        }
+      }
+    }
+
+    if (!type) continue;
+
+    // 斜率一致性過濾 — 排除逆勢訊號
+    const slope = calcMASlope(ma, i);
+    const SLOPE_THRESH = 0.0015;
+    if (type === 'break_up' && slope < -SLOPE_THRESH) continue;
+    if (type === 'break_dn' && slope >  SLOPE_THRESH) continue;
+
+    const isUp = type === 'break_up' || type === 'touch_up';
+
+    // 多日驗證窗口（次日、第3日、第5日）
+    const d2 = i + 1, d3 = Math.min(i + 2, n - 1), d5 = Math.min(i + 4, n - 1);
+    const hit2 = isUp ? closes[d2] > closes[i] : closes[d2] < closes[i];
+    const hit3 = isUp ? closes[d3] > closes[i] : closes[d3] < closes[i];
+    const hit5 = isUp ? closes[d5] > closes[i] : closes[d5] < closes[i];
+    // 3日內至少2日方向正確 → 有效
+    const hitCount = [hit2, hit3, hit5].filter(Boolean).length;
+    const valid = hitCount >= 2;
+    // day2Price 保留次日價格供表格顯示
+    const day2Price = closes[d2];
+
+    // 指數時間衰減權重（最新訊號權重最高）
+    const ageFrac = i / (n - 1);  // 0 = 最早，1 = 最新
+    const weight  = Math.exp(LAMBDA * ageFrac);
+
+    signals.push({ idx: i, type, price: closes[i], maVal: ma[i],
+      day2Price, valid, weight, slope,
+      hit2, hit3, hit5, hitCount });
+  }
+
+  const total = signals.length;
+  if (total === 0) return {
+    period, signals, total, validN: 0,
+    winRate: 0, weightedWinRate: 0,
+    recentWinRate: 0, recentTotal: 0, recentValid: 0,
+    densityPenalty: 1, streakPenalty: 1, precisionBonus: 1,
+    regimeDecay: 1, sigPerMonth: 0, score: 0, ma,
+    anomaly: { triggered: true, reason: '無訊號' }
+  };
+
+  const validN     = signals.filter(s => s.valid).length;
+  const rawWinRate = validN / total;
+
+  // 指數時間衰減加權勝率（主力評分依據）
+  let wV = 0, wT = 0;
+  signals.forEach(s => { wT += s.weight; if (s.valid) wV += s.weight; });
+  const weightedWinRate = wT > 0 ? wV / wT : rawWinRate;
+
+  // 近期勝率（後 30%，供卡片「近期準度」顯示）
+  const recentSigs    = signals.filter(s => s.idx >= recentCutoff);
+  const recentTotal   = recentSigs.length;
+  const recentValid   = recentSigs.filter(s => s.valid).length;
+  const recentWinRate = recentTotal > 0 ? recentValid / recentTotal : rawWinRate;
+
+  // 近期制度衰退偵測（後25% vs 前75%）
+  const earlyS = signals.filter(s => s.idx < decayCutoff25);
+  const lateS  = signals.filter(s => s.idx >= decayCutoff25);
+  const earlyWR = earlyS.length > 0 ? earlyS.filter(s => s.valid).length / earlyS.length : rawWinRate;
+  const lateWR  = lateS.length  > 0 ? lateS.filter(s => s.valid).length  / lateS.length  : rawWinRate;
+  const decayGap = earlyWR - lateWR; // 正值 = 近期變差
+  let regimeDecay = 1.0;
+  let regimeDecayLabel = '';
+  if (lateS.length >= 2 && decayGap >= 0.18) {
+    regimeDecay = decayGap >= 0.35 ? 0.58 : decayGap >= 0.25 ? 0.72 : 0.85;
+    regimeDecayLabel = `近期效能下滑 ${(decayGap*100).toFixed(0)}%`;
+  }
+
+  // 訊號密度懲罰
+  const months      = data.length / 21;
+  const sigPerMonth = total / Math.max(months, 1);
+  let densityPenalty = sigPerMonth > densityLimit
+    ? Math.max(0.55, 1 - (sigPerMonth - densityLimit) * 0.13)
+    : 1.0;
+  if (isTrending && sigPerMonth < 1.5) densityPenalty = Math.max(densityPenalty, 0.90);
+
+  // 近期連敗懲罰（最後 6 筆，配合③多日驗證）
+  const recent6    = signals.slice(-6);
+  const recentFail = recent6.filter(s => !s.valid).length;
+  const streakPenalty = recentFail >= 5 ? 0.55 : recentFail >= 4 ? 0.72 : recentFail >= 3 ? 0.88 : 1.0;
+
+  // 精準獎勵（小樣本高勝率補償）
+  let precisionBonus = 1.0;
+  if (total <= 10 && weightedWinRate >= 0.70) {
+    precisionBonus = Math.min(1.60, 1.0 + (weightedWinRate - 0.70) * 2.0);
+  }
+
+  // 最終評分
+  // = 衰減加權勝率 × log(有效訊號+1) × 斜率過濾已內建 × 衰退係數 × 密度懲罰 × 連敗懲罰 × 精準獎勵
+  const score = total >= 3
+    ? weightedWinRate * Math.log(validN + 1) * regimeDecay * densityPenalty * streakPenalty * precisionBonus
+    : 0;
+
+  // 特例偵測（異常警示）
+  let anomaly = { triggered: false, reason: '' };
+  if (total < 3) {
+    anomaly = { triggered: true, reason: `訊號數僅 ${total} 筆，樣本不足` };
+  } else if (weightedWinRate < 0.50 && recentWinRate < 0.50) {
+    anomaly = { triggered: true, reason: `加權勝率 ${(weightedWinRate*100).toFixed(0)}% 且近期勝率 ${(recentWinRate*100).toFixed(0)}% 雙低` };
+  } else if (recentFail >= 5) {
+    anomaly = { triggered: true, reason: `近期 ${recentFail}/6 連敗，最近完全失效` };
+  } else if (regimeDecayLabel) {
+    anomaly = { triggered: true, reason: `⚡ ${regimeDecayLabel}，建議重新確認` };
+  }
+
+  return {
+    period, signals, total, validN,
+    winRate: rawWinRate, weightedWinRate,
+    recentWinRate, recentTotal, recentValid,
+    densityPenalty, streakPenalty, precisionBonus,
+    regimeDecay, regimeDecayLabel,
+    sigPerMonth: +sigPerMonth.toFixed(2),
+    score: +score.toFixed(3), ma, anomaly,
+    earlyWR: +earlyWR.toFixed(3), lateWR: +lateWR.toFixed(3)
+  };
+}
+
+// ── 雙線搜尋 ── findBestMA 返回 { scoreMA, winRateMA, isDual }
+function findBestMA(data, closes, minP, maxP, volCtx, atrPcts) {
+  let bestScore   = null;
+  let bestWinRate = null;
+
+  for (let p = minP; p <= maxP; p++) {
+    const r = scoreMA(data, closes, p, volCtx, atrPcts);
+
+    if (!bestScore || r.score > bestScore.score) bestScore = r;
+
+    if (r.total >= 5) {
+      if (!bestWinRate ||
+          r.weightedWinRate > bestWinRate.weightedWinRate ||
+          (r.weightedWinRate === bestWinRate.weightedWinRate && r.total > bestWinRate.total)) {
+        bestWinRate = r;
+      }
+    }
+  }
+
+  if (!bestWinRate || bestScore.period === bestWinRate.period) {
+    return { scoreMA: bestScore, winRateMA: null, isDual: false };
+  }
+  return { scoreMA: bestScore, winRateMA: bestWinRate, isDual: true };
+}
+
+// ── 跨期一致性（穩定性徽章）──
+function computeStabilityBadge(currentPeriod, rangeType) {
+  if (!window._maHistory) return null;
+  const vals = Object.values(window._maHistory)
+    .map(h => h[rangeType]?.period).filter(Boolean);
+  if (vals.length < 2) return null;
+  const avgDiff = vals.reduce((a, v) => a + Math.abs(v - currentPeriod), 0) / vals.length;
+  if (avgDiff <= 1)  return { label: '極穩定', color: '#00e676' };
+  if (avgDiff <= 3)  return { label: '穩定',   color: '#ffd600' };
+  return               { label: '漂移中', color: '#ff9a3c' };
+}
+
+function analyzeMA(data) {
+  const closes  = data.map(d => d.close);
+  const volCtx  = classifyVolRegime(data);
+  // 預計算全局 ATR%，傳入所有 scoreMA 呼叫
+  const atrPcts = calcAtrPcts(data);
+
+  const shortResult = findBestMA(data, closes, 16, 25, volCtx, atrPcts);
+  const midResult   = findBestMA(data, closes, 26, 44, volCtx, atrPcts);
+  const longResult  = findBestMA(data, closes, 45, 70, volCtx, atrPcts);
+
+  const result = {
+    short:     shortResult.scoreMA,
+    mid:       midResult.scoreMA,
+    long:      longResult.scoreMA,
+    shortDual: shortResult,
+    midDual:   midResult,
+    longDual:  longResult,
+    volCtx, closes, data
+  };
+  if (!window._maHistory) window._maHistory = {};
+  window._maHistory[MONTHS] = { short: result.short, mid: result.mid, long: result.long };
+  return result;
+}
+
+// Stability CSS injection
+(function injectStabilityCSS(){
+  if(document.getElementById('stability-css'))return;
+  const s=document.createElement('style');s.id='stability-css';
+  s.textContent=`
+  .stability-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:5px;font-size:.56rem;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid;margin-left:4px;letter-spacing:.06em}
+  .vol-regime-bar{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:9px;margin-bottom:10px;font-size:.6rem;font-family:'JetBrains Mono',monospace;border:1px solid;flex-wrap:wrap;gap:6px}
+  .vol-regime-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .score-detail-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin:8px 0 4px}
+  .sd-item{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:7px;padding:5px 6px;text-align:center}
+  .sd-val{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;color:var(--text)}
+  .sd-lbl{font-size:.52rem;color:var(--text-dim);margin-top:1px;line-height:1.2}
+  .win-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0 4px}
+  .win-block{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.09);border-radius:8px;padding:6px 8px}
+  .win-block-lbl{font-size:.52rem;color:var(--text-dim);margin-bottom:3px}
+  .win-block-bar{height:4px;border-radius:4px;background:var(--border2);overflow:hidden;margin-bottom:4px}
+  .win-block-fill-w{height:100%;border-radius:4px;background:linear-gradient(90deg,#00cfff,#0077aa)}
+  .win-block-fill-r{height:100%;border-radius:4px;background:linear-gradient(90deg,#00e676,#009944)}
+  .win-block-val{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600}
+  .win-block-sub{font-size:.52rem;color:var(--text-dim);margin-top:1px}
+  .density-ok{color:#00e676}.density-warn{color:#ffd600}.density-bad{color:#ff3d5a}
+  .trending-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:.55rem;font-weight:700;background:#ff9a3c18;border:1px solid #ff9a3c40;color:#ff9a3c;font-family:'JetBrains Mono',monospace;margin-left:4px}
+  .precision-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:.55rem;font-weight:700;background:#c084fc18;border:1px solid #c084fc40;color:#c084fc;font-family:'JetBrains Mono',monospace;margin-top:4px}
+  .anomaly-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;margin-top:8px;font-size:.6rem;font-family:'JetBrains Mono',monospace;background:rgba(255,154,60,.08);border:1px solid rgba(255,154,60,.3);color:#ff9a3c;line-height:1.4}
+  .anomaly-icon{font-size:.75rem;flex-shrink:0}
+  .ma-card.anomaly-card{border-color:rgba(255,154,60,.3) !important;opacity:.85}
+  .ma-card.anomaly-card::before{background:linear-gradient(90deg,#ff9a3c,rgba(255,154,60,.3)) !important}
+  /* v7 dual-line selector */
+  .dual-choice-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 4px}
+  .dual-choice-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 6px;border-radius:9px;border:1.5px solid rgba(0,229,255,.15);background:rgba(0,229,255,.03);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;user-select:none}
+  .dual-choice-btn:hover{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.08)}
+  .dual-choice-btn.active-score{border-color:rgba(0,200,255,.7) !important;background:rgba(0,200,255,.12) !important;box-shadow:0 0 10px rgba(0,200,255,.2)}
+  .dual-choice-btn.active-winrate{border-color:rgba(0,230,118,.7) !important;background:rgba(0,230,118,.1) !important;box-shadow:0 0 10px rgba(0,230,118,.2)}
+  .dual-choice-label{font-size:.55rem;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase}
+  .dual-choice-ma{font-family:'Orbitron',monospace;font-size:1.15rem;font-weight:700;line-height:1}
+  .dual-choice-sub{font-size:.52rem;color:var(--text-dim)}
+  .dual-choice-badge{font-size:.52rem;padding:1px 5px;border-radius:4px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-top:1px}
+  .badge-score{background:rgba(0,200,255,.12);border:1px solid rgba(0,200,255,.35);color:#00cfff}
+  .badge-winrate{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.35);color:#00e676}
+  .dual-now-label{font-size:.58rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;text-align:center;margin:2px 0 6px;opacity:.7}
+  `;
+  document.head.appendChild(s);
+})();
+
+// v7：使用者選擇均線後切換圖表
+function chooseMA(cls, choice) {
+  MA_CHOICE[cls] = choice;
+  const dual = ANALYSIS[cls+'Dual'];
+  // 更新 ANALYSIS.short/mid/long 指向選擇的均線（供圖表/訊號使用）
+  ANALYSIS[cls] = choice === 'winrate' && dual.winRateMA ? dual.winRateMA : dual.scoreMA;
+  // 重繪圖表 + 更新卡片高亮
+  if(ANALYSIS) { drawMAChart(); }
+  // 更新卡片按鈕狀態
+  const card = document.querySelector(`.ma-card.${cls}`);
+  if(card){
+    card.querySelectorAll('.dual-choice-btn').forEach(b=>{
+      b.classList.remove('active-score','active-winrate');
+    });
+    const activeBtn = card.querySelector(`.dual-choice-btn[data-choice="${choice}"]`);
+    if(activeBtn) activeBtn.classList.add('active-'+choice);
+    const nowLabel = card.querySelector('.dual-now-label');
+    if(nowLabel){
+      const r = ANALYSIS[cls];
+      nowLabel.textContent = `圖表顯示：MA${r.period} · ${choice==='score'?'高分均線':'高勝率均線'}`;
+    }
+  }
+  // 更新訊號表（若目前顯示中）
+  if(ACTIVE_SIG_RES && ACTIVE_SIG_DATA){
+    const tabType=['short','mid','long'].find(t=>ANALYSIS[t]===ACTIVE_SIG_RES);
+    if(tabType===cls) renderSignalTable(ANALYSIS[cls], ANALYSIS.data);
+  }
+}
+
+// ── 預測準度評級 ──
+function gradeAccuracy(pct){
+  if(pct>=75)return{label:'極佳',color:'#00e676',emoji:'🏆'};
+  if(pct>=65)return{label:'優良',color:'#00cfff',emoji:'✅'};
+  if(pct>=55)return{label:'尚可',color:'#ffd600',emoji:'👍'};
+  return{label:'偏低',color:'#ff3d5a',emoji:'⚠️'};
+}
+
+// Render cards — 簡潔使用者友善版
+function renderCards({short,mid,long,shortDual,midDual,longDual,closes,volCtx}){
   const el=document.getElementById('maCards');el.innerHTML='';
-  [{res:short,cls:'short',label:'短期',range:'16–25日'},{res:mid,cls:'mid',label:'中期',range:'26–44日'},{res:long,cls:'long',label:'長期',range:'45–70日'}]
-  .forEach(({res,cls,label,range})=>{
+
+  const dualMap = { short: shortDual, mid: midDual, long: longDual };
+
+  [{res:short,cls:'short',label:'短期均線',emoji:'⚡',desc:'捕捉短波段節奏'},
+   {res:mid,  cls:'mid',  label:'中期均線',emoji:'🎯',desc:'過濾雜訊，追蹤主趨勢'},
+   {res:long, cls:'long', label:'長期均線',emoji:'🔭',desc:'觀察長線大方向'}]
+  .forEach(({res,cls,label,emoji,desc})=>{
     if(!res)return;
+    const dual = dualMap[cls];
+    const isDual = dual && dual.isDual && dual.winRateMA;
+    const currentChoice = MA_CHOICE[cls];
+    const activeRes = isDual && currentChoice === 'winrate' ? dual.winRateMA : dual.scoreMA;
+
     const hidden=!MA_VISIBLE[cls]?' hidden-card':'';
-    const winPct=(res.winRate*100).toFixed(1);
+    const recWinPct = Math.round((activeRes.recentWinRate||activeRes.winRate)*100);
+    const wWinPct   = Math.round((activeRes.weightedWinRate||activeRes.winRate)*100);
+    const totalSig  = activeRes.total||0;
+    const validSig  = activeRes.validN||0;
+    const grade     = gradeAccuracy(recWinPct);
+    const lowSample = totalSig < 5;
+    const anomaly   = activeRes.anomaly?.triggered;
+
+    // v7 dual selector (score only)
+    let dualHTML = '';
+
     const card=document.createElement('div');
-    card.className=`ma-card ${cls}${hidden}`;
+    card.className=`ma-card ${cls}${hidden}${anomaly?' anomaly-card':''}`;
+
     card.innerHTML=`
       <div class="ma-card-header">
-        <div class="ma-type-tag">${label} · ${range}</div>
-        <span class="ma-score-badge">評分 ${res.score.toFixed(1)}</span>
+        <div class="ma-type-tag">${emoji} ${label}</div>
+        <span style="font-size:.64rem;color:var(--text-dim)">${desc}</span>
       </div>
-      <div class="ma-period-wrap">
-        <div class="ma-period-num">MA${res.period}</div>
+
+      <!-- 主要數字：均線參數 -->
+      <div class="ma-period-wrap"><div class="ma-period-num">MA${activeRes.period}</div></div>
+      <div class="ma-period-unit">${activeRes.period} 日均線　·　近 ${MONTHS} 個月最佳</div>
+
+      <!-- 迷你走勢圖 -->
+      <canvas class="ma-sparkline" data-cls="${cls}" data-period="${activeRes.period}" width="240" height="38"
+        style="width:100%;height:38px;display:block;margin:8px 0;border-radius:6px;opacity:.75"></canvas>
+
+      <!-- 核心指標：預測準度 -->
+      <div class="simple-accuracy-block">
+        <div class="acc-main">
+          <div class="acc-label">近期預測準度</div>
+          <div class="acc-value" style="color:${grade.color}">${recWinPct}%</div>
+          <div class="acc-grade" style="color:${grade.color}">${grade.emoji} ${grade.label}</div>
+        </div>
+        <div class="acc-bar-wrap">
+          <div class="acc-bar"><div class="acc-bar-fill" style="width:${recWinPct}%;background:${grade.color}88"></div></div>
+          <div class="acc-sub">整體準確率 ${wWinPct}%${activeRes.regimeDecayLabel?` · <span style="color:#ff9a3c">⚡ 近期下滑</span>`:''}</div>
+        </div>
       </div>
-      <div class="ma-period-unit">${res.period} 日均線</div>
-      <canvas class="ma-sparkline" data-cls="${cls}" data-period="${res.period}" width="240" height="38" style="width:100%;height:38px;display:block;margin-bottom:10px;border-radius:6px;opacity:.75"></canvas>
-      <div class="ma-stats">
-        <div class="ma-stat"><div class="ma-stat-val">${res.total}</div><div class="ma-stat-lbl">總訊號</div></div>
-        <div class="ma-stat"><div class="ma-stat-val">${res.validN}</div><div class="ma-stat-lbl">有效訊號</div></div>
+
+      <!-- 訊號次數 -->
+      <div class="simple-sig-row">
+        <div class="simple-sig-item">
+          <div class="simple-sig-val">${totalSig}</div>
+          <div class="simple-sig-lbl">訊號總次數</div>
+        </div>
+        <div class="simple-sig-item">
+          <div class="simple-sig-val" style="color:#00e676">${validSig}</div>
+          <div class="simple-sig-lbl">準確次數</div>
+        </div>
+        <div class="simple-sig-item">
+          <div class="simple-sig-val" style="color:#ff3d5a">${totalSig-validSig}</div>
+          <div class="simple-sig-lbl">失準次數</div>
+        </div>
       </div>
-      <div class="ma-winbar"><div class="ma-winbar-fill" style="width:${res.winRate*100}%"></div></div>
-      <div class="ma-winrate-label">次日驗證勝率：${winPct}%</div>`;
+
+      ${lowSample?'<div class="simple-warn">⚠ 訊號次數偏少，準確率僅供參考</div>':''}
+      ${anomaly?`<div class="simple-warn">⚠ ${activeRes.anomaly.reason}</div>`:''}
+      ${dualHTML}`;
+
     el.appendChild(card);
-    // draw sparkline after element is in DOM
-    requestAnimationFrame(()=>drawSparkline(card.querySelector('.ma-sparkline'),cls,res.period));
+    requestAnimationFrame(()=>drawSparkline(card.querySelector('.ma-sparkline'),cls,activeRes.period));
   });
 }
 
@@ -975,7 +1558,12 @@ function renderSignalTabs({short,mid,long,data}){
   .forEach(({key,res,label})=>{
     if(!res)return;const btn=document.createElement('button');
     btn.className='sig-tab-btn'+(first?' active':'');btn.dataset.type=key;btn.textContent=label;
-    btn.onclick=()=>{document.querySelectorAll('#signalTabRow .sig-tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderSignalTable(res,data)};
+    // v7：點選時從 ANALYSIS 取最新選擇的均線（可能已被 chooseMA 更新）
+    btn.onclick=()=>{
+      document.querySelectorAll('#signalTabRow .sig-tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSignalTable(ANALYSIS[key], ANALYSIS.data);
+    };
     row.appendChild(btn);if(first){renderSignalTable(res,data);first=false}
   });
 }
@@ -984,14 +1572,49 @@ function renderSignalTable(res,data){
   ACTIVE_SIG_RES=res;ACTIVE_SIG_DATA=data;
   const wrap=document.getElementById('signalTableWrap');
   if(!res?.signals?.length){wrap.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dark);font-size:.74rem;font-family:\'JetBrains Mono\',monospace">無訊號資料</div>';return}
-  const tl={break_up:'<span class="sig-type sig-break-up">↑ 突破</span>',break_dn:'<span class="sig-type sig-break-dn">↓ 跌破</span>',touch_up:'<span class="sig-type sig-touch">～ 觸碰</span>'};
-  const filtered=res.signals.slice(-30).reverse().filter(s=>(s.valid&&SIG_FILTER.valid)||(!s.valid&&SIG_FILTER.fake));
+  const tl={
+    break_up:'<span class="sig-type sig-break-up">↑ 突破</span>',
+    break_dn:'<span class="sig-type sig-break-dn">↓ 跌破</span>',
+    touch_up:'<span class="sig-type sig-touch">▲ 觸均線</span>',
+    touch_dn:'<span class="sig-type sig-touch">▼ 觸均線</span>'
+  };
+  const filtered=res.signals.slice(-40).reverse().filter(s=>(s.valid&&SIG_FILTER.valid)||(!s.valid&&SIG_FILTER.fake));
   if(!filtered.length){wrap.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dark);font-size:.74rem;font-family:\'JetBrains Mono\',monospace">目前篩選條件無符合訊號</div>';return}
   const rows=filtered.map(s=>{
     const chg=((s.day2Price-s.price)/s.price*100).toFixed(2);
-    return`<tr><td>${data[s.idx]?.date||''}</td><td>${tl[s.type]||s.type}</td><td>${s.price.toFixed(2)}</td><td>${s.maVal.toFixed(2)}</td><td>${s.day2Price.toFixed(2)}</td><td class="${chg>0?'chg-pos':chg<0?'chg-neg':'chg-neu'}">${chg>0?'+':''}${chg}%</td><td>${s.valid?'<span class="sig-valid">✔ 有效</span>':'<span class="sig-fake">✘ 假訊號</span>'}</td></tr>`
+    const slopeVal=s.slope||0;
+    const slopeHTML=slopeVal>0.002
+      ?'<span style="color:#00e676;font-size:.6rem">↗上彎</span>'
+      :slopeVal<-0.002
+        ?'<span style="color:#ff3d5a;font-size:.6rem">↘下彎</span>'
+        :'<span style="color:#7a9ab8;font-size:.6rem">→平</span>';
+    // 多日驗證顯示
+    const h2=s.hit2,h3=s.hit3,h5=s.hit5;
+    const dot=ok=>`<span style="color:${ok?'#00e676':'#ff3d5a'};font-size:.62rem">${ok?'✔':'✘'}</span>`;
+    const multiDay = (h2!==undefined)
+      ? `<span style="font-size:.58rem;color:var(--text-dim)">${dot(h2)}D2 ${dot(h3)}D3 ${dot(h5)}D5</span>`
+      : '';
+    // 指數衰減權重
+    const wDisp=s.weight?`<span style="color:var(--text-dim);font-size:.56rem">×${s.weight.toFixed(2)}</span>`:'';
+    return`<tr>
+      <td>${data[s.idx]?.date||''}</td>
+      <td>${tl[s.type]||s.type}</td>
+      <td>${s.price.toFixed(2)}</td>
+      <td>${s.maVal.toFixed(2)}</td>
+      <td>${slopeHTML}</td>
+      <td>${s.day2Price.toFixed(2)}</td>
+      <td class="${chg>0?'chg-pos':chg<0?'chg-neg':'chg-neu'}">${chg>0?'+':''}${chg}%</td>
+      <td>${multiDay}</td>
+      <td>${s.valid?'<span class="sig-valid">✔ 有效</span>':'<span class="sig-fake">✘ 假訊號</span>'} ${wDisp}</td>
+    </tr>`;
   }).join('');
-  wrap.innerHTML=`<table class="sig-table"><thead><tr><th>日期</th><th>訊號</th><th>當日收盤</th><th>MA值</th><th>次日收盤</th><th>次日漲跌</th><th>次日驗證</th></tr></thead><tbody>${rows}</tbody></table>`;
+  wrap.innerHTML=`<table class="sig-table">
+    <thead><tr>
+      <th>日期</th><th>訊號</th><th>當日收盤</th><th>MA值</th>
+      <th>均線斜率</th><th>次日收盤</th><th>次日漲跌</th><th>多日驗證</th><th>結果 (衰減權重)</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 
 // Draw Volume Chart
@@ -1061,8 +1684,10 @@ function drawVolChart(){
 async function doSearch(){
   const kw=document.getElementById('stockInput').value.trim();
   if(!kw){setStatus('⚠ 請輸入股票代碼或名稱','warn');return}
+  // 切換股票時重置跨期快取
+  if(kw!==KEYWORD){window._maHistory={};MA_CHOICE={short:'score',mid:'score',long:'score'};}
   KEYWORD=kw;
-  setStatus('<span class="spin">◌</span> 查詢 Firebase 快取中…','load');
+  setStatus('<span class="spin">◌</span> 數據抓取中…','load');
   document.getElementById('searchBtn').disabled=true;
   document.getElementById('stockInfoBar').style.display='none';
   document.getElementById('maResultSection').style.display='none';
@@ -1074,12 +1699,13 @@ async function doSearch(){
   const t0=performance.now();
   try{
     const res=await fetch(`${API_BASE}/api/wave_data?keyword=${encodeURIComponent(KEYWORD)}&months=${MONTHS}`);
-    const elapsed=((performance.now()-t0)/1000).toFixed(2);
     const json=await res.json();
     if(json.error)throw new Error(json.error);
     if(!json.data?.length)throw new Error('查無股價資料');
-    STOCK_NO=json.stockNo||KEYWORD;STOCK_NAME=(json.name&&json.name!==STOCK_NO)?json.name:STOCK_NO;DATA=json.data;
-    setStatus('<span class="spin">◌</span> 正在計算最佳均線…','load');
+    STOCK_NO=json.stockNo||KEYWORD;
+    STOCK_NAME=(json.name&&json.name!==STOCK_NO)?json.name:STOCK_NO;
+    DATA=json.data;
+    setStatus('<span class="spin">◌</span> 均線引擎運算中…','load');
     await new Promise(r=>setTimeout(r,60));
     ANALYSIS=analyzeMA(DATA);
     updateSIB(DATA);renderCards(ANALYSIS);
@@ -1087,13 +1713,22 @@ async function doSearch(){
     drawMAChart();renderSignalTabs(ANALYSIS);
     document.getElementById('maResultSection').style.display='block';
     document.getElementById('signalSection').style.display='block';
-    setStatus(`✔ 真實資料　｜　${STOCK_NAME}（${STOCK_NO}）　｜　${DATA.length} 筆　${DATA[0]?.date} ～ ${DATA[DATA.length-1]?.date}`,'ok');
+
+    const s=ANALYSIS.short,m=ANALYSIS.mid,l=ANALYSIS.long;
+    const fmtSimple=r=>r?`MA${r.period}（近期${Math.round((r.recentWinRate||r.winRate)*100)}%）`:'--';
+    setStatus(
+      `✔ ${STOCK_NAME}（${STOCK_NO}）　近 ${MONTHS} 個月 ${DATA.length} 筆　${DATA[0]?.date} ～ ${DATA[DATA.length-1]?.date}　｜　短 ${fmtSimple(s)}　中 ${fmtSimple(m)}　長 ${fmtSimple(l)}`,
+      'ok'
+    );
   }catch(e){setStatus(`✘ ${e.message}`,'err')}
   finally{document.getElementById('searchBtn').disabled=false}
 }
 
 window.addEventListener('resize',()=>{if(ANALYSIS){drawMAChart();drawVolChart()}});
-window.addEventListener('DOMContentLoaded',()=>{const kw=new URLSearchParams(window.location.search).get('stock')||'';if(kw){document.getElementById('stockInput').value=kw;doSearch()}});
+window.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('#periodGroup .tab-btn').forEach(b=>b.classList.toggle('active',+b.dataset.m===MONTHS));
+  const kw=new URLSearchParams(window.location.search).get('stock')||'';if(kw){document.getElementById('stockInput').value=kw;doSearch()}
+});
 (function(){const applyTheme=t=>document.body.classList.toggle('theme-day',t==='day');applyTheme(localStorage.getItem('jelly_global_theme')||'space');try{const bc=new BroadcastChannel('jellystock_theme');bc.onmessage=e=>{if(e.data?.theme)applyTheme(e.data.theme)}}catch(e){}window.addEventListener('storage',e=>{if(e.key==='jelly_global_theme')applyTheme(e.newValue||'space')})})();
 </script>
 </body>

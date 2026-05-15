@@ -519,13 +519,27 @@ def sync_all(today: str = None, label: int = None):
       None / 手動 → 全量同步（向下相容手動觸發）
       2  = 15:00  投信 TWSE（sync_institutional，只有投信先出）
       1  = 15:10  大盤法人（sync_market）
-      9  = 15:30  OTC 三大法人（sync_otc_institutional）
+      9  = 15:30  OTC 三大法人（sync_otc_institutional）★ 不受鎖限制
+      10 = 16:30  OTC 三大法人補跑（萬一 15:30 失敗）★ 不受鎖限制
       3  = 16:10  重跑 TWSE 三大法人（補外資 + 自營商）
       7  = 21:10  大盤融資（sync_market）
       8  = 21:30  借券賣出（sync_short_sale）
     """
     if today is None:
         today = get_today()
+
+    # ── label=9 / label=10：OTC 資料來源獨立，不需要跟 TWSE 搶鎖 ──────────
+    # 根本原因：label=2 含 DATE_RETRY_WAIT 等待，執行時間長，
+    # 若 label=9 在鎖內等待會直接被 blocking=False 跳過，造成 OTC 當天沒寫入。
+    if label in (9, 10):
+        tag = f"label={label}"
+        print(f"[sync_all] 開始同步 date={today} {tag}（OTC 獨立執行，不受鎖限制）")
+        try:
+            sync_otc_institutional(today)
+            print(f"[sync_all] 完成 date={today} {tag}")
+        except Exception as e:
+            print(f"[sync_all] OTC 同步失敗 {tag}: {e} ⚠️")
+        return
 
     # ── 防重疊：已有同步在跑就跳過，避免 thread 競爭 ──────────────────────
     if not _sync_lock.acquire(blocking=False):
@@ -543,10 +557,6 @@ def sync_all(today: str = None, label: int = None):
         elif label == 1:
             # 15:10 — 大盤法人買賣金額
             sync_market(today)
-
-        elif label == 9:
-            # 15:30 — OTC 三大法人
-            sync_otc_institutional(today)
 
         elif label == 3:
             # 16:10 — 重跑 TWSE 三大法人（補外資 + 自營商）
