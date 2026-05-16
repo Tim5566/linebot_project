@@ -4015,6 +4015,8 @@
               }));
               _updateAuthUI(window._currentUser);
               document.dispatchEvent(new Event('_authChanged'));
+              // ✅ token 取得成功後，啟動自動刷新計時器
+              _scheduleTokenRefresh();
             } catch(e) {
               console.error('[Auth] 取得用戶資訊失敗:', e);
             }
@@ -4032,6 +4034,23 @@
       }
     }
 
+    // ── 靜默刷新 token（不彈出視窗，在背景自動取得新 token）──
+    // 用途：頁面重新整理後恢復 token，以及每 45 分鐘自動續命
+    let _tokenRefreshTimer = null;
+
+    function _silentTokenRefresh() {
+      // 沒有 GIS client 或沒有登入狀態就跳過
+      if (!_gisClient || !window._currentUser) return;
+      // hint：告訴 Google 要刷新哪個帳號的 token，避免跳出帳號選擇器
+      _gisClient.requestAccessToken({ prompt: '', login_hint: window._currentUser.email });
+    }
+
+    function _scheduleTokenRefresh() {
+      if (_tokenRefreshTimer) clearInterval(_tokenRefreshTimer);
+      // 每 45 分鐘刷新一次（token 有效期 1 小時，提早 15 分鐘換）
+      _tokenRefreshTimer = setInterval(_silentTokenRefresh, 45 * 60 * 1000);
+    }
+
     // DOMContentLoaded 後開始嘗試初始化，並恢復上次登入狀態
     document.addEventListener('DOMContentLoaded', () => {
       // ✅ 從 localStorage 恢復登入狀態（跨分頁、重新載入都有效）
@@ -4046,6 +4065,14 @@
         }
       }
       _initGIS();
+
+      // ✅ GIS 就緒後，若已有登入狀態則立刻靜默刷新 token
+      // 等 2 秒讓 GIS 完成初始化再執行
+      setTimeout(() => {
+        if (window._currentUser?.email && _gisClient) {
+          _silentTokenRefresh();
+        }
+      }, 2000);
     });
 
     function _updateAuthUI(user) {
@@ -4096,6 +4123,8 @@
       if (window._currentUser?.token && typeof google !== 'undefined') {
         google.accounts.oauth2.revoke(window._currentUser.token);
       }
+      // ✅ 清除自動刷新計時器
+      if (_tokenRefreshTimer) { clearInterval(_tokenRefreshTimer); _tokenRefreshTimer = null; }
       window._currentUser = null;
       localStorage.removeItem('_authUser'); // ✅ 清除持久化
       _updateAuthUI(null);
