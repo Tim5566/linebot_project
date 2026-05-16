@@ -805,5 +805,44 @@ loadNotice();
   </div>
 </footer>
 
+
+<!-- ── 維護模式遮罩 ── -->
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+    <div style="margin-top:22px;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:rgba(0,229,255,.35);text-transform:uppercase;">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+  </div>
+</div>
+<script>
+/* ── 維護模式輪詢（所有子頁面共用）── */
+(function() {
+  const API_BASE = window.location.origin;
+  const overlay  = document.getElementById('maintenanceOverlay');
+  function check() {
+    fetch(API_BASE + '/api/maintenance?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var msg = document.getElementById('maintMsgText');
+        if (msg && d.message) msg.textContent = d.message;
+        if (d.enabled) {
+          overlay.style.display = 'flex';
+        } else {
+          overlay.style.display = 'none';
+        }
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(check, 30000); });
+  }
+  check();
+})();
+</script>
+
 </body>
 </html>
