@@ -233,7 +233,7 @@
     <div class="page-tag">· About · JellyStock ·</div>
     <h1 class="page-title">關於<span class="hl">本站</span></h1>
     <p class="page-intro">盤後雷達是一個台股法人動向查詢工具，專為需要快速掌握三大法人買賣超資訊的投資人而設計。核心查詢功能完全免費，本站以廣告收入維持營運。</p>
-    <div class="page-meta" style="margin-top:10px;">最後更新：<b>2026 年 4 月</b> &nbsp;·&nbsp; 適用網站：<b>盤後雷達 JellyStock</b></div>
+    <div class="page-meta" style="margin-top:10px;">最後更新：<b>2026 年 5 月 16 日</b> &nbsp;·&nbsp; 適用網站：<b>盤後雷達 JellyStock</b></div>
   </div>
 
   <div class="mission-banner">
@@ -256,7 +256,13 @@
           <div style="font-size:.84rem;color:var(--text-dim);line-height:1.8;">台股散戶出身，長期研究籌碼面與技術分析，深知資料查詢的痛點。白天上班，下班寫 code 維護這個網站。</div>
         </div>
       </div>
-      <p>JellyStock 盤後雷達從規劃、設計、前後端開發到伺服器維運，全部由一個人完成。後端使用 Python Flask 搭配 Firebase Realtime Database，每天盤後自動從 TWSE 與 TPEx 官方 API 抓取資料、同步至雲端，再透過網站即時提供查詢服務。</p>
+      <p>JellyStock 盤後雷達於 <strong>2025 年正式上線</strong>，從規劃、設計、前後端開發到伺服器維運，全部由一個人完成。技術架構如下：</p>
+      <ul style="margin:12px 0 12px 20px;color:var(--text-dim);line-height:2;font-size:.88rem;">
+        <li><strong style="color:var(--text);">前端</strong> — 純靜態 HTML / CSS / JavaScript，部署於 Cloudflare，全球 CDN 加速</li>
+        <li><strong style="color:var(--text);">後端</strong> — Python Flask API，部署於 Render 雲端平台</li>
+        <li><strong style="color:var(--text);">資料庫</strong> — Firebase Realtime Database，作為盤後資料快取層</li>
+        <li><strong style="color:var(--text);">資料抓取</strong> — 每日盤後自動從 TWSE 與 TPEx 官方 API 抓取，同步至雲端後即時提供查詢</li>
+      </ul>
       <p style="margin-top:12px;">除了查詢工具，網站內也附有一套完整的<strong>技術分析教學（共 10 章）</strong>，從股票本質、K棒解讀、趨勢結構到實戰案例，全部免費開放，希望對正在學習技術分析的朋友有所幫助。</p>
       <div class="stats-row" style="margin-top:22px;">
         <div class="stat-box"><div class="stat-num">10</div><div class="stat-label">技術分析教學章節</div></div>
