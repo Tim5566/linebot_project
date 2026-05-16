@@ -3056,6 +3056,78 @@
       box-shadow: 0 0 14px rgba(0,229,255,.2);
     }
     .theme-btn.active svg { opacity: 1; }
+
+    /* ── 維護模式遮罩 ── */
+    #maintenanceOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(3, 6, 14, 0.82);
+      backdrop-filter: blur(6px) saturate(1.1);
+      -webkit-backdrop-filter: blur(6px) saturate(1.1);
+      pointer-events: all;
+      animation: maintFadeIn .4s ease;
+    }
+    #maintenanceOverlay.active { display: flex; align-items: center; justify-content: center; }
+    @keyframes maintFadeIn { from { opacity:0; } to { opacity:1; } }
+    .maint-box {
+      background: linear-gradient(145deg, rgba(7,13,26,.97), rgba(11,18,32,.98));
+      border: 1px solid rgba(0,229,255,.25);
+      border-radius: 22px;
+      box-shadow: 0 0 60px rgba(0,229,255,.12), 0 24px 60px rgba(0,0,0,.6);
+      padding: 48px 52px 44px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: maintSlideUp .5s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes maintSlideUp { from { transform: translateY(24px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+    .maint-icon {
+      width: 60px; height: 60px;
+      margin: 0 auto 20px;
+      background: rgba(255,180,0,.08);
+      border: 1px solid rgba(255,180,0,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      animation: maintPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes maintPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,180,0,.25); }
+      50%      { box-shadow: 0 0 0 12px rgba(255,180,0,0); }
+    }
+    .maint-title { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:700; color:#ffd600; letter-spacing:.06em; margin-bottom:12px; }
+    .maint-msg { font-family:'Noto Sans TC',sans-serif; font-size:.85rem; color:var(--text-dim); line-height:1.7; }
+    .maint-sub { margin-top:22px; font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.18em; color:rgba(0,229,255,.35); text-transform:uppercase; }
+    /* 管理員維護工具列（管理員看得到，用戶看不到） */
+    #adminMaintBar {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9100;
+      background: rgba(255,100,0,.13);
+      border-bottom: 1px solid rgba(255,140,0,.4);
+      backdrop-filter: blur(12px);
+      padding: 7px 20px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    #adminMaintBar.active { display: flex; }
+    .admin-bar-label { font-family:'Share Tech Mono',monospace; font-size:.62rem; letter-spacing:.18em; color:#ffaa00; text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+    .admin-bar-label svg { width:14px; height:14px; flex-shrink:0; }
+    .admin-bar-close-btn { font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:.1em; color:#ff6b35; border:1px solid rgba(255,107,53,.4); background:rgba(255,107,53,.08); border-radius:8px; padding:5px 14px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .admin-bar-close-btn:hover { background:rgba(255,107,53,.2); border-color:rgba(255,107,53,.7); }
+    /* 維護切換開關（設定頁） */
+    .maint-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; background:rgba(255,100,0,.05); border:1px solid rgba(255,140,0,.2); border-radius:12px; margin-top:4px; }
+    .maint-toggle-row.on { background:rgba(255,50,0,.08); border-color:rgba(255,100,0,.4); }
+    .maint-switch { position:relative; width:46px; height:24px; flex-shrink:0; }
+    .maint-switch input { opacity:0; width:0; height:0; }
+    .maint-switch-track { position:absolute; inset:0; background:rgba(255,255,255,.1); border-radius:24px; border:1px solid rgba(255,255,255,.15); cursor:pointer; transition:background .3s, border-color .3s; }
+    .maint-switch-track::after { content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform .3s cubic-bezier(.22,1,.36,1); box-shadow:0 1px 4px rgba(0,0,0,.4); }
+    .maint-switch input:checked + .maint-switch-track { background:rgba(255,80,0,.5); border-color:rgba(255,120,0,.7); }
+    .maint-switch input:checked + .maint-switch-track::after { transform:translateX(22px); background:#ff6b35; }
+
     /* 設定未登入提示 */
     .settings-login-notice {
       display: flex;
@@ -4061,8 +4133,8 @@
       <div>
         <div class="logo-text">JellyStock</div>
         <div class="logo-sub-status">
-          <div class="status-dot-inline"></div>
-          <span>TWSE / TPEX LIVE</span>
+
+          <span>盤後數據查詢</span>
         </div>
       </div>
     </div>
@@ -6764,12 +6836,185 @@ function openSettingsModal() {
             </button>
           </div>
         </div>
+        ${window._isAdmin ? _renderAdminMaintSection() : ''}
       </div>`;
   }
 
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 維護模式系統
+// ═══════════════════════════════════════════════════════════════
+
+// 管理員身份（前端僅用於 UI 判斷，實際權限後端再驗一次）
+window._isAdmin = false;
+
+document.addEventListener('_authChanged', () => {
+  const email = window._currentUser?.email || '';
+  // 前端只用 email 判斷是否顯示管理員 UI，
+  // 實際寫入時後端會用 Google token 再次驗證，email 無法偽造 token
+  window._isAdmin = email.includes('llomoll5566');
+});
+
+// ── 渲染管理員維護區塊（嵌入設定頁） ─────────────────────────
+function _renderAdminMaintSection() {
+  const isOn = window._maintEnabled || false;
+  return `
+    <div>
+      <div class="settings-section-title">🔧 管理員功能</div>
+      <div class="settings-row" style="margin-top:12px;">
+        <div>
+          <div class="settings-row-label">網站維護模式</div>
+          <div class="settings-row-sub">開啟後一般用戶將看到維護通知，無法操作網站</div>
+        </div>
+      </div>
+      <div class="maint-toggle-row ${isOn ? 'on' : ''}" id="maintToggleRow" style="margin-top:14px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.08em;color:${isOn ? '#ff8c42' : 'var(--text-dim)'};">
+            ${isOn ? '⚠️ 維護中・用戶無法使用' : '正常營運中'}
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-faint);letter-spacing:.04em;">
+            只有您可以操作網站
+          </div>
+        </div>
+        <label class="maint-switch" title="${isOn ? '點擊關閉維護' : '點擊開啟維護'}">
+          <input type="checkbox" id="maintCheckbox" ${isOn ? 'checked' : ''}
+            onchange="adminToggleMaintenance(this.checked)">
+          <span class="maint-switch-track"></span>
+        </label>
+      </div>
+    </div>`;
+}
+
+// ── 管理員切換維護狀態 ────────────────────────────────────────
+async function adminToggleMaintenance(enable) {
+  const token = window._currentUser?.token;
+  if (!token) {
+    alert('請先登入 Google 帳號');
+    return;
+  }
+
+  // 樂觀更新 UI
+  window._maintEnabled = enable;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/maintenance`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+      },
+      body: JSON.stringify({
+        enabled: enable,
+        message: '本網站暫時維護中，請稍後再試。',
+      }),
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      alert('身份驗證失敗，無法切換維護模式');
+      window._maintEnabled = !enable; // 回滾
+      _applyMaintUI(!enable);
+      return;
+    }
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || '未知錯誤');
+
+    _applyMaintUI(enable);
+
+    // 重新渲染設定頁，更新 toggle 狀態
+    const content = document.getElementById('settingsContent');
+    if (content && window._isAdmin) {
+      const s = _loadSettings();
+      const curTheme = s.theme || 'space';
+      content.innerHTML = `
+        <div class="settings-body">
+          <div>
+            <div class="settings-section-title">🎨 外觀主題</div>
+            <div class="settings-row" style="margin-top:12px;"><div>
+              <div class="settings-row-label">背景主題</div>
+              <div class="settings-row-sub">切換網站背景風格，設定將綁定帳號儲存</div>
+            </div></div>
+            <div class="theme-switcher" style="margin-top:14px;">
+              <button class="theme-btn ${curTheme === 'space' ? 'active' : ''}" data-theme="space" onclick="setTheme('space')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>太空星際
+              </button>
+              <button class="theme-btn ${curTheme === 'day' ? 'active' : ''}" data-theme="day" onclick="setTheme('day')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>白天晴空
+              </button>
+            </div>
+          </div>
+          ${_renderAdminMaintSection()}
+        </div>`;
+    }
+  } catch(e) {
+    console.error('[Maintenance]', e);
+    alert('操作失敗：' + e.message);
+    window._maintEnabled = !enable;
+    _applyMaintUI(!enable);
+  }
+}
+
+// ── 套用維護 UI ───────────────────────────────────────────────
+function _applyMaintUI(enabled) {
+  const overlay   = document.getElementById('maintenanceOverlay');
+  const adminBar  = document.getElementById('adminMaintBar');
+  if (!overlay) return;
+
+  if (enabled) {
+    if (window._isAdmin) {
+      // 管理員：看到提示列，遮罩不擋操作
+      overlay.classList.remove('active');
+      if (adminBar) adminBar.classList.add('active');
+    } else {
+      // 一般用戶：全畫面遮罩
+      overlay.classList.add('active');
+      if (adminBar) adminBar.classList.remove('active');
+    }
+  } else {
+    overlay.classList.remove('active');
+    if (adminBar) adminBar.classList.remove('active');
+  }
+}
+
+// ── 輪詢維護狀態（每 30 秒查一次，非管理員才需要） ──────────
+let _maintPollTimer = null;
+
+async function _fetchMaintStatus() {
+  try {
+    const res  = await fetch(`${API_BASE}/api/maintenance?t=${Date.now()}`);
+    const data = await res.json();
+    window._maintEnabled = !!data.enabled;
+    const msgEl = document.getElementById('maintMsgText');
+    if (msgEl && data.message) msgEl.textContent = data.message;
+    _applyMaintUI(data.enabled);
+  } catch(e) {
+    // 網路失敗時不顯示維護畫面，保守策略
+    console.warn('[Maintenance] 狀態查詢失敗', e);
+  }
+}
+
+function _startMaintPoll() {
+  _fetchMaintStatus(); // 立即查一次
+  if (_maintPollTimer) clearInterval(_maintPollTimer);
+  _maintPollTimer = setInterval(_fetchMaintStatus, 30000); // 每 30 秒
+}
+
+// 頁面載入後開始輪詢
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(_startMaintPoll, 1000);
+});
+// 登入/登出時重新評估 UI
+document.addEventListener('_authChanged', () => {
+  window._isAdmin = !!(window._currentUser?.email?.includes('llomoll5566'));
+  if (window._maintEnabled !== undefined) _applyMaintUI(window._maintEnabled);
+});
 
 function closeSettingsModal() {
   document.getElementById('settingsModal').classList.remove('open');
@@ -6875,6 +7120,34 @@ setTimeout(() => {
 </script>
 
 <!-- VISITOR PANEL (admin only: llomoll5566) -->
+
+<!-- ── 維護模式遮罩（一般用戶看到此畫面，無法操作網站） ── -->
+<div id="maintenanceOverlay">
+  <div class="maint-box">
+    <div class="maint-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div class="maint-title">系統維護中</div>
+    <div class="maint-msg" id="maintMsgText">本網站暫時維護中，請稍後再試。</div>
+    <div class="maint-sub">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+  </div>
+</div>
+
+<!-- ── 管理員維護工具列（維護模式開啟時，管理員看到此列，遮罩對管理員透明） ── -->
+<div id="adminMaintBar">
+  <div class="admin-bar-label">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    維護模式進行中・一般用戶無法使用網站
+  </div>
+  <button class="admin-bar-close-btn" onclick="adminToggleMaintenance(false)">✕ 結束維護 開放網站</button>
+</div>
+
 <div id="visitorPanel">
   <!-- 頂部收合列 -->
   <div class="vp-toggle" onclick="toggleVisitorPanel()">

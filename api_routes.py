@@ -897,6 +897,78 @@ def register_api(app):
             print(f"[Visitor] Firebase 錯誤: {e}")
             return jsonify({"error": str(e)}), 500
 
+    # ── 維護模式 API ──────────────────────────────────────────────────────────
+    # 安全設計：
+    #   1. 管理員 email 只存在後端環境變數，前端永遠看不到
+    #   2. 用 Google token 向 Google 驗證身份，無法偽造
+    #   3. Firebase 的維護狀態只有後端可寫入（Security Rules 鎖住）
+    ADMIN_EMAILS = set(
+        e.strip() for e in
+        os.environ.get("ADMIN_EMAILS", "llomoll5566@gmail.com").split(",")
+        if e.strip()
+    )
+
+    def _verify_admin_token(token: str):
+        """向 Google 驗證 Access Token，回傳 email 或 None（驗證失敗）"""
+        import requests as _req
+        try:
+            r = _req.get(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=5,
+            )
+            if r.status_code != 200:
+                return None
+            email = r.json().get("email", "")
+            return email if email in ADMIN_EMAILS else None
+        except Exception as e:
+            print(f"[Admin] token 驗證失敗: {e}")
+            return None
+
+    @app.route("/api/maintenance", methods=["GET"])
+    def api_maintenance_get():
+        """任何人都可以查詢目前維護狀態（前端需要知道要不要顯示維護畫面）"""
+        try:
+            ref  = firebase_db.reference("maintenance")
+            data = ref.get() or {}
+            return jsonify({
+                "enabled": bool(data.get("enabled", False)),
+                "message": data.get("message", "本網站暫時維護中，請稍後再試。"),
+            })
+        except Exception as e:
+            print(f"[Maintenance] 讀取失敗: {e}")
+            # Firebase 讀取失敗時預設不維護（不影響一般用戶）
+            return jsonify({"enabled": False, "message": ""})
+
+    @app.route("/api/maintenance", methods=["POST"])
+    def api_maintenance_set():
+        """只有管理員可以開關維護模式，需附上 Google Access Token 驗證"""
+        token = request.headers.get("X-Admin-Token", "")
+        if not token:
+            return jsonify({"error": "未提供驗證 Token"}), 401
+
+        email = _verify_admin_token(token)
+        if not email:
+            return jsonify({"error": "身份驗證失敗，無管理員權限"}), 403
+
+        body    = request.get_json(silent=True) or {}
+        enabled = bool(body.get("enabled", False))
+        message = str(body.get("message", "本網站暫時維護中，請稍後再試。"))[:200]
+
+        try:
+            from datetime import datetime, timezone, timedelta
+            firebase_db.reference("maintenance").set({
+                "enabled":    enabled,
+                "message":    message,
+                "updated_by": email,
+                "updated_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),
+            })
+            print(f"[Maintenance] {'開啟' if enabled else '關閉'} by {email}")
+            return jsonify({"ok": True, "enabled": enabled})
+        except Exception as e:
+            print(f"[Maintenance] 寫入失敗: {e}")
+            return jsonify({"error": str(e)}), 500
+
 
 # ── 工具函式 ──────────────────────────────────────────────────────────────────
 def _extract_val(line):
