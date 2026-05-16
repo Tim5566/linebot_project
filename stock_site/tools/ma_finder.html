@@ -543,7 +543,7 @@
 </div>
 
 <script>
-const API_BASE=(()=>{const h=window.location.hostname;return(h==='localhost'||h==='127.0.0.1')?'http://127.0.0.1:5000':'https://linebot-project-oxnw.onrender.com'})();
+const API_BASE=(()=>{const h=window.location.hostname;return(h==='localhost'||h==='127.0.0.1')?'http://127.0.0.1:5000':window.location.origin})(); // 自動使用當前網域
 let MONTHS=6,DATA=[],KEYWORD='',STOCK_NO='',STOCK_NAME='',ANALYSIS=null;
 let MA_VISIBLE={short:true,mid:true,long:true};
 // v7：雙線選擇狀態 'score'=高分線 | 'winrate'=高勝率線

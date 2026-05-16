@@ -453,7 +453,34 @@
       background:linear-gradient(90deg, var(--border2), transparent);
     }
 
-    .wave-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:8px }
+    .wave-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:8px }
+    /* 手機橫向滑動包裝 */
+    .wave-cards-scroll-wrap { position:relative; }
+    @media(max-width:600px){
+      .wave-cards-scroll-wrap::after {
+        content:'← 左右滑動 →';
+        display:block; text-align:center;
+        font-size:.56rem; color:rgba(0,229,255,.32);
+        font-family:'JetBrains Mono',monospace;
+        letter-spacing:.08em; margin-top:4px;
+        pointer-events:none;
+      }
+      .wave-cards {
+        display:flex !important; flex-direction:row !important;
+        overflow-x:auto; overflow-y:hidden;
+        gap:8px !important;
+        padding:4px 0 6px;
+        scroll-snap-type:x mandatory;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+      }
+      .wave-cards::-webkit-scrollbar { display:none; }
+      .wave-cards > .wave-card {
+        flex:0 0 148px !important; min-width:148px !important;
+        scroll-snap-align:start;
+        padding:12px !important;
+      }
+    }
     .wave-card {
       background:var(--surface);
       border:1px solid var(--border2);
@@ -659,10 +686,8 @@
       .sim-row-label { font-size:.62rem; }
       .sim-row-val { font-size:.66rem; }
       .sim-verdict { font-size:.66rem; }
-      .wave-cards { grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:5px; }
-      .wave-card { padding:9px; border-radius:10px; }
-      .wc-label { font-size:.82rem; }
-      .wc-range { font-size:.67rem; }
+      .wave-section { margin-bottom:8px; }
+      .section-title { font-size:.64rem; margin-bottom:5px; }
       .stats-grid { grid-template-columns:repeat(2,1fr); gap:5px; margin-bottom:8px; }
       .stat-card { padding:9px 10px; border-radius:8px; }
       .stat-label { font-size:.58rem; }
@@ -690,7 +715,6 @@
       .tab-btn { padding:4px 9px; font-size:.65rem; }
       .ct-btn  { padding:4px 8px; font-size:.64rem; }
       .ma-btn  { padding:4px 8px; font-size:.64rem; }
-      .wave-cards { grid-template-columns:repeat(2,1fr); }
       .stats-grid { grid-template-columns:repeat(2,1fr); }
     }
 
@@ -1306,31 +1330,19 @@
       <div class="qs-steps">
         <div class="qs-step">
           <div class="qs-num">1</div>
-          <div class="qs-text">輸入股票代碼或名稱（如 2313 / 台積電），選擇期間後按<strong>「分析走勢」</strong></div>
+          <div class="qs-text">輸入股票代碼或名稱（如 <strong>2330</strong> 或 <strong>台積電</strong>），選擇查詢期間後按「分析走勢」</div>
         </div>
         <div class="qs-step">
           <div class="qs-num">2</div>
-          <div class="qs-text">K線圖上會自動標出波浪結構。<span style="color:var(--green)">推動浪（W1→W5）</span>代表主升段；<span style="color:var(--wa)">修正浪（A→B→C）</span>代表回調段</div>
+          <div class="qs-text">圖表會自動畫出波浪。<span style="color:var(--green)">W1~W5 是上升推動</span>，<span style="color:var(--wa)">A→B→C 是下跌回調</span>。「進行中」代表目前 K 棒最可能處於那段浪</div>
         </div>
         <div class="qs-step">
           <div class="qs-num">3</div>
-          <div class="qs-text">看下方<strong>波浪結構卡</strong>了解目前處於第幾浪、漲跌幅、交易日數，以及<strong>預測目標價</strong></div>
+          <div class="qs-text">看下方卡片 →「目前在第幾浪」＋「下一步往哪走」＋「預測目標價」，一目了然</div>
         </div>
-        <div class="qs-step">
-          <div class="qs-num">4</div>
-          <div class="qs-text">
-            <strong>為什麼沒有 W1~W5？</strong> → 該股已完成5浪推動，目前進入 ABC 修正階段<br>
-            <strong>為什麼沒有 A→B→C？</strong> → 該股仍在5浪推動進行中，ABC 尚未開始
-          </div>
-        </div>
-        <div class="qs-step" style="grid-column:1/-1;border-color:rgba(255,214,0,.2);background:rgba(255,214,0,.04);">
-          <div class="qs-num" style="background:rgba(255,214,0,.15);border-color:rgba(255,214,0,.4);color:var(--yellow)">⚠</div>
-          <div class="qs-text">
-            <strong>看到「進行中」但價格在跌？這是正常的。</strong><br>
-            每個大浪內部還有子浪（W5 = W5-1 → W5-2 → W5-3 → W5-4 → W5-5）。
-            當前的回落可能只是 W5 內部的 <strong>W5-4 整理</strong>，整理完還有最後一小推才真正結束。
-            若跌破前一個大浪的起點，才確認大浪見頂。
-          </div>
+        <div class="qs-step" style="border-color:rgba(255,214,0,.2);background:rgba(255,214,0,.04);">
+          <div class="qs-num" style="background:rgba(255,214,0,.15);border-color:rgba(255,214,0,.4);color:var(--yellow)">💡</div>
+          <div class="qs-text">「進行中」的浪不一定只漲不跌，大浪裡面還有子浪。只要沒跌破前一浪的起點，就還在原來的浪段內整理。</div>
         </div>
       </div>
       <div class="qs-legend">
@@ -1584,83 +1596,70 @@
 
   <!-- WAVE CARDS -->
   <div class="wave-section fade-in" id="waveSection" style="display:none">
-    <div class="section-title" id="waveSectionTitle">波浪結構識別</div>
+    <div class="section-title" id="waveSectionTitle">波浪走勢 — 目前在哪・下一步往哪</div>
     <div id="cycleStageBanner" style="display:none;margin-bottom:8px;padding:10px 14px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:.72rem;border:1px solid;"></div>
-    <div class="wave-cards" id="waveCards"></div>
+    <div class="wave-cards-scroll-wrap">
+      <div class="wave-cards" id="waveCards"></div>
+    </div>
   </div>
 
   <!-- SUMMARY PANEL -->
   <div class="summary-panel fade-in" id="summaryPanel" style="display:none">
     <div class="summary-title">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      波浪分析摘要
+      分析摘要
     </div>
     <div class="summary-grid">
       <div class="summary-block" id="sbWavePos">
-        <div class="sb-title">當前波浪位置</div>
+        <div class="sb-title">🌊 目前在第幾浪・下一步預測</div>
         <div class="sb-content" id="sbWavePosContent">--</div>
       </div>
       <div class="summary-block" id="sbTrend">
-        <div class="sb-title">趨勢判斷</div>
+        <div class="sb-title">📊 均線趨勢方向</div>
         <div class="sb-content" id="sbTrendContent">--</div>
       </div>
       <div class="summary-block">
-        <div class="sb-title">黃金比例 (Fibonacci) 回撤</div>
+        <div class="sb-title">📉 回撤參考價位（從本期最高點計算）</div>
         <div class="fib-row" id="fibRow"></div>
       </div>
       <div class="summary-block">
-        <div class="sb-title">統計摘要</div>
+        <div class="sb-title">📋 基本資料</div>
         <div class="sb-content" id="sbStatsContent">--</div>
       </div>
     </div>
   </div>
 
-  <!-- WAVE GUIDE -->
+  <!-- WAVE GUIDE — 折疊版 -->
   <div class="wave-guide fade-in" id="waveGuide" style="display:none">
-    <div class="wg-title">
-      艾略特波浪理論說明
-      <span class="wg-title-badge">Elliott Wave Theory</span>
+    <div class="wg-title" style="cursor:pointer;" onclick="toggleWaveGuide()">
+      波浪理論簡介
+      <span class="wg-title-badge">Elliott Wave</span>
+      <span id="wgArrow" style="margin-left:auto;font-size:.7rem;color:var(--text-dim);">▶ 展開</span>
     </div>
+    <div id="wgBody" style="display:none;">
     <div class="wg-grid">
       <div class="wg-block">
-        <div class="wg-block-title" style="color:var(--cup)">▲ 推動浪（五浪結構）</div>
+        <div class="wg-block-title" style="color:var(--cup)">📈 推動浪（五浪上升）</div>
         <div class="wg-rules">
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w1)"></div>波浪1：趨勢啟動，成交量增加</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w2)"></div>波浪2：修正波，不超過浪1起點</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w3)"></div>波浪3：最強力浪，通常最長，成交量大</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w4)"></div>波浪4：調整波，通常為三角整理</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w5)"></div>波浪5：末升浪，成交量或萎縮</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w1)"></div><span><strong style="color:var(--w1)">浪1</strong>：趨勢啟動，初步上升</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w2)"></div><span><strong style="color:var(--w2)">浪2</strong>：回調整理，但不破浪1起點</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w3)"></div><span><strong style="color:var(--w3)">浪3</strong>：最強的主升段，成交量最大</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w4)"></div><span><strong style="color:var(--w4)">浪4</strong>：高檔整理，蓄勢待發</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--w5)"></div><span><strong style="color:var(--w5)">浪5</strong>：末升段，接近頂部</span></div>
         </div>
       </div>
       <div class="wg-block">
-        <div class="wg-block-title" style="color:var(--cdn)">▼ 修正浪（ABC結構）</div>
+        <div class="wg-block-title" style="color:var(--cdn)">📉 修正浪（ABC回檔）</div>
         <div class="wg-rules">
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wa)"></div>A浪：反向修正開始，跌勢出現</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wb)"></div>B浪：反彈修正，常見假突破</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wc)"></div>C浪：終極修正浪，力道強勁</div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wa)"></div><span><strong style="color:var(--wa)">A浪</strong>：五浪結束後開始回檔</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wb)"></div><span><strong style="color:var(--wb)">B浪</strong>：反彈一波，但難超前高</span></div>
+          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--wc)"></div><span><strong style="color:var(--wc)">C浪</strong>：最後一段下跌，接近底部</span></div>
           <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--yellow)"></div>
-            關鍵規則：浪2不能超過浪1起點；浪3不能是最短的推動浪；浪4不能與浪1重疊
+            ABC 結束後，通常開始新一輪 W1~W5 推動
           </div>
         </div>
       </div>
-      <div class="wg-block">
-        <div class="wg-block-title" style="color:var(--yellow)">📊 資料品質建議</div>
-        <div class="wg-rules">
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--green)"></div><span><strong style="color:var(--green)">200根以上（理想）</strong>：能看到完整的 5浪＋ABC 修正結構</span></div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--accent)"></div><span><strong style="color:var(--accent)">100～200根（尚可）</strong>：可辨識主要轉折，參考性較高</span></div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--red)"></div><span><strong style="color:var(--red)">100根以下（不建議）</strong>：樣本過短，容易只看到局部波動</span></div>
-          <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--yellow)"></div>建議使用 <strong style="color:var(--yellow)">6M ～ 12M</strong> 以確保充足的K棒數量</div>
-        </div>
-      </div>
-      <div class="wg-block">
-        <div class="wg-block-title" style="color:var(--purple)">📐 均線參考說明</div>
-        <div class="wg-rules">
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma5)"></div><strong style="color:var(--ma5)">MA5</strong>：5日均線，反映短線動能</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma10)"></div><strong style="color:var(--ma10)">MA10</strong>：10日均線，週線趨勢參考</div>
-          <div class="wg-rule"><div class="wg-rule-dot" style="background:var(--ma20)"></div><strong style="color:var(--ma20)">MA20</strong>：20日均線，月線支撐壓力</div>
-          <div class="wg-rule" style="margin-top:6px"><div class="wg-rule-dot" style="background:var(--text-dim)"></div>三線多頭排列（MA5＞MA10＞MA20）為強勢訊號；空頭排列反之</div>
-        </div>
-      </div>
+    </div>
     </div>
   </div>
 
@@ -1679,7 +1678,7 @@ const API_BASE = (() => {
   const h = window.location.hostname;
   return (h==='localhost'||h==='127.0.0.1')
     ? 'http://127.0.0.1:5000'
-    : 'https://linebot-project-oxnw.onrender.com';
+    : window.location.origin;               // 自動使用當前網域（jellystockdata.com）
 })();
 
 const C = {
@@ -2144,19 +2143,19 @@ function triangleValidate(pts, data, personality) {
     if(p3.price<p1.price) geoScore+=10;else geoScore-=15;
     if(p5.price<p3.price) geoScore+=6;
   }
-  // ── 時間比例驗證（新增）：各浪時間跨度不能差距懸殊
-  // 防止 W5 把大量 K棒（如200根）包進一個「子浪」的荒謬情況
+  // ── 時間比例驗證：各浪時間跨度不能差距懸殊
+  // 主浪跨越整段歷史，放寬限制（交由調用方的門檻控制）
   const d0=p0.idx, d1=p1.idx, d2=p2.idx, d3=p3.idx, d4=p4.idx, d5=p5.idx;
   const t1=d1-d0, t2=d2-d1, t3=d3-d2, t4=d4-d3, t5=d5-d4;
   const totalBars = d5 - d0;
   const maxT = Math.max(t1,t2,t3,t4,t5);
   const minT = Math.min(t1,t2,t3,t4,t5);
-  // 任一浪不得超過總時間的 60%（過大說明那段不是同級浪）
-  if(maxT > totalBars * 0.60) { geoScore -= 25; violations.push('某浪時間過長（>60%總時長）'); }
-  // 最長浪與最短浪時間比不能超過 8倍（艾略特要求波段時間大致相稱）
-  if(minT > 0 && maxT / minT > 8) { geoScore -= 15; violations.push('各浪時間比失衡（>8x）'); }
-  // W5 不得超過 W3 時間的 3 倍（W5 通常比 W3 短或等長）
-  if(t5 > t3 * 3) { geoScore -= 12; violations.push('W5時間遠超W3'); }
+  // 放寬：任一浪不得超過總時間的 75%（原60%太嚴，主浪W3可能很長）
+  if(maxT > totalBars * 0.75) { geoScore -= 20; violations.push('某浪時間過長（>75%總時長）'); }
+  // 最長浪與最短浪比不超過 12 倍（原8倍太嚴）
+  if(minT > 0 && maxT / minT > 12) { geoScore -= 12; violations.push('各浪時間比失衡（>12x）'); }
+  // W5 不得超過 W3 時間的 4 倍（放寬，原3倍）
+  if(t5 > t3 * 4) { geoScore -= 10; violations.push('W5時間遠超W3'); }
 
   geoScore=Math.max(0,Math.min(100,geoScore));
 
@@ -2203,23 +2202,33 @@ function triangleValidate(pts, data, personality) {
     const vW4=avgVol(0,p3.idx,p4.idx);
     const vW5=avgVol(0,p4.idx,p5.idx);
 
-    // W3 成交量應 > W1（最強浪最大量）
-    if(vW3>vW1) volumeScore+=20;else volumeScore-=5;
-    // 修正浪縮量（W2 < W1, W4 < W3）
-    if(vW2<vW1*0.85) volumeScore+=10;
-    if(vW4<vW3*0.85) volumeScore+=10;
-    // W5 量能萎縮（頂部徵兆）或放量（延伸浪）
-    if(vW5<vW3) volumeScore+=5;
-    volumeScore=Math.max(0,Math.min(100,volumeScore));
+    // ── 量能核心鐵律（波浪理論最重要的量能規則）──
+    // 鐵律：W3 必須是五浪中成交量最大段（推動浪主力噴出）
+    const maxImpulseVol = Math.max(vW1, vW3, vW5);
+    if(vW3 >= vW1 && vW3 >= vW5){
+      volumeScore += 30;   // W3量最大：強烈確認
+    } else if(vW3 >= vW1 * 0.85){
+      volumeScore += 12;   // W3量接近W1：尚可
+    } else {
+      volumeScore -= 20;   // W3量比W1還小：嚴重違規（假浪）
+    }
+    // 修正浪縮量（W2 < W1, W4 < W3）— 縮量回調才健康
+    if(vW2 < vW1 * 0.85) volumeScore += 15; else volumeScore -= 5;
+    if(vW4 < vW3 * 0.85) volumeScore += 15; else volumeScore -= 5;
+    // W5 背離：量能萎縮但價格創高（典型頂背離）
+    if(vW5 < vW3 * 0.80) volumeScore += 10;
+    else if(vW5 > vW3) volumeScore -= 8;  // W5量比W3大，不正常
+    volumeScore = Math.max(0, Math.min(100, volumeScore));
   }
 
   // ── 三角加權最終分數 ────────────────────────────────────
-  // 幾何 60% + 動能 25% + 量能 15%（幾何是必要條件）
-  const volWeight=hasVolume?0.15:0;
-  const momWeight=0.25+(!hasVolume?0.15:0);
-  const geoWeight=0.60;
-  let finalScore=geoScore*geoWeight+momentumScore*momWeight+
-    (hasVolume?volumeScore*volWeight:0);
+  // 幾何 50% + 動能 20% + 量能 30%（量能大幅提升比重）
+  // 沒有量能資料時：幾何 65% + 動能 35%
+  const volWeight  = hasVolume ? 0.30 : 0;
+  const momWeight  = hasVolume ? 0.20 : 0.35;
+  const geoWeight  = hasVolume ? 0.50 : 0.65;
+  let finalScore = geoScore * geoWeight + momentumScore * momWeight +
+    (hasVolume ? volumeScore * volWeight : 0);
 
   // 橫盤市場懲罰
   if(personality&&personality.marketState==='RANGING') finalScore-=12;
@@ -2256,6 +2265,22 @@ function validateABC(pts, data, personality) {
   const rsiA=rsi[Math.min(p1.idx,rsi.length-1)]||50;
   const rsiC=rsi[Math.min(p3.idx,rsi.length-1)]||50;
   if(isBearCorrection&&rsiC<rsiA) score+=8; // C浪更低，背離確認
+
+  // ── ABC 量能驗證 ──────────────────────────────────────────
+  // WA：大量殺跌（第一波恐慌） WB：縮量反彈（無力）  WC：大量再殺
+  const hasVol = data[0]&&data[0].volume>0;
+  if(hasVol){
+    const avgV=(from,to)=>{let s=0,c=0;for(let i=Math.max(0,from);i<=Math.min(data.length-1,to);i++){s+=data[i].volume;c++;}return c?s/c:0;};
+    const vA=avgV(p0.idx,p1.idx);
+    const vB=avgV(p1.idx,p2.idx);
+    const vC=avgV(p2.idx,p3.idx);
+    // WB 應縮量（反彈無力）
+    if(vB < vA * 0.85) score += 12; else if(vB > vA) score -= 8;
+    // WC 量能：大量確認（崩跌有量），或縮量耗盡（底部訊號）
+    if(vC >= vA * 0.9) score += 10; // WC大量，跌勢有確認
+    else if(vC < vA * 0.60) score += 6; // WC縮量，可能接近耗盡
+  }
+
   if(personality&&personality.marketState==='RANGING') score-=10;
   score=Math.max(0,Math.min(100,score));
   return {score,violations,isBull:!isBearCorrection};
@@ -2810,333 +2835,585 @@ function diagnosePattern(data, personality, zigzag) {
   return results[0];
 }
 let WAVE_ENGINE_RESULT={waves:[],forecast:[],forecastV4:{lines:[],zones:[],currentWaveNum:''},
-  confidence:0,status:'',zigzagPts:[],personality:null,longWaves:[]};
-// ═══════════════════════════════════════════════════════
-// 多時間尺度波浪偵測
-// 同時偵測三個級別的波浪：
-//   Level 1 短期（細節浪，最近30個轉折）
-//   Level 2 中期（主浪，寬鬆ZigZag）
-//   Level 3 長期（大浪，整體趨勢）
-// ═══════════════════════════════════════════════════════
+  confidence:0,status:'',zigzagPts:[],personality:null,longWaves:[],subWaves:{}};
 let MULTI_WAVE_LEVELS = { short: null, medium: null, long: null };
 
-function detectWavesAtLevel(data, personality, minPctOverride, scanWindowOverride) {
-  const minPct = minPctOverride || personality.zigzagMinPct;
-  const zigzag = zigzagFilter(data, minPct);
-  if(zigzag.length < 3) return null;
-  const origScanWindow = 30;
-  const scanWindow = scanWindowOverride || origScanWindow;
-  // Temporarily override scan window for findActiveCycle
-  const n = zigzag.length;
-  const scanFrom = Math.max(0, n - scanWindow);
-  // Run findActiveCycle with custom scanFrom
-  return findActiveCycleFrom(zigzag, data, personality, scanFrom);
-}
+// ═══════════════════════════════════════════════════════════════
+// WAVE ENGINE v6 — 主浪優先 + 主/子波分層架構
+//
+//  核心重構思路（對應你的參考圖）：
+//  ① 主浪（Degree 1）：從整段歷史的最低點出發，找跨越整個漲跌
+//     的 W1~W5 結構，ZigZag 門檻要夠大（8~20%）讓小波動被過濾掉
+//  ② 子波（Degree 2）：在主浪每一段內部，用較小門檻找子波
+//     例：主浪 W3 裡面的 W3-1, W3-2, W3-3, W3-4, W3-5
+//  ③ ABC 修正浪：在主浪 5 浪結束後識別
+//  ④ 顯示邏輯：先畫主浪骨架（粗線），再疊加子波（細線）
+// ═══════════════════════════════════════════════════════════════
 
-// findActiveCycle with explicit scanFrom parameter
-function findActiveCycleFrom(zigzag, data, personality, scanFrom) {
+// ── 全局搜索最佳波浪結構（從整段歷史從頭掃描）──────────────────
+function findBestCycleGlobal(zigzag, data, personality, minScore) {
   const n = zigzag.length;
   if(n < 3) return null;
-  const threshold = personality.confidenceThreshold;
-  const totalDataBars = data.length;
-  // 最大允許的單一循環時間跨度：總資料量的 80%（避免把整段歷史塞進一個循環）
-  const maxCycleBars = Math.floor(totalDataBars * 0.80);
+  const threshold = minScore != null ? minScore : personality.confidenceThreshold;
 
-  let bestCycle = null, bestScore = 0;
-  for(let start = scanFrom; start <= n-3; start++){
-    const available = zigzag.slice(start);
+  // ── 計算全局參考值，用來計算「覆蓋率加成」──
+  const allPrices = data.map(d => d.close);
+  const globalMin  = Math.min(...allPrices);
+  const globalMax  = Math.max(...allPrices);
+  const globalSpan = data.length;                          // 總K棒數
+  const globalMove = Math.max(globalMax - globalMin, 1);   // 總價格波動
 
-    // ── 時間跨度預篩：若從 available[0] 到最後一點超過 maxCycleBars，跳過
-    if(available.length >= 2){
-      const spanBars = available[available.length-1].idx - available[0].idx;
-      if(spanBars > maxCycleBars) continue;
-    }
+  // ══════════════════════════════════════════════════════
+  // compositeScore：幾何分 + 覆蓋率加成
+  //
+  // 核心思想：
+  //   波浪理論要從「最大的那段趨勢」開始算
+  //   如果一個結構只涵蓋 10% 的K棒、5% 的漲幅
+  //   就算幾何形狀很漂亮，也不該被選中
+  //
+  //   覆蓋率加成 = 時間覆蓋 * 0.5 + 價格覆蓋 * 0.5
+  //   加成最多 +40 分，避免純覆蓋率壓過幾何正確性
+  // ══════════════════════════════════════════════════════
+  function compositeScore(pts, baseScore, type) {
+    if(!pts || pts.length < 2) return baseScore;
+    const firstPt = pts[0];
+    const lastPt  = pts[pts.length - 1];
 
-    if(available.length >= 6){
-      const pts6 = available.slice(0,6);
-      // 額外檢查：6點跨度不能超過 maxCycleBars
-      const span6 = pts6[5].idx - pts6[0].idx;
-      if(span6 <= maxCycleBars){
+    // 時間覆蓋率：這段結構佔全部K棒的比例
+    const spanBars  = lastPt.idx - firstPt.idx;
+    const timeCov   = Math.min(1, spanBars / globalSpan);
+
+    // 價格覆蓋率：這段結構的起訖價格幅度佔全局的比例
+    const priceMove = Math.abs(lastPt.price - firstPt.price);
+    const priceCov  = Math.min(1, priceMove / globalMove);
+
+    // 起點距離全局低點（多頭）或高點（空頭）的接近程度
+    // 越靠近真正的底部/頂部，加分越多
+    const isBull = type === '5wave' || type === '5wave_partial'
+      ? (pts.length >= 2 && pts[1].price > pts[0].price)
+      : false;
+    const startProximity = isBull
+      ? 1 - Math.min(1, (firstPt.price - globalMin) / globalMove)  // 多頭：起點越低越好
+      : 1 - Math.min(1, (globalMax - firstPt.price) / globalMove); // 空頭：起點越高越好
+
+    // 完整5浪比部分浪加更多（有完整結構的加成更大）
+    const completenessBonus = (type === '5wave') ? 1.0 : 0.7;
+
+    const coverageBonus = (timeCov * 0.4 + priceCov * 0.4 + startProximity * 0.2)
+      * 40 * completenessBonus;
+
+    return baseScore + coverageBonus;
+  }
+
+  let bestCycle = null, bestScore = -1;
+
+  for(let start = 0; start <= n - 3; start++){
+    const startPt = zigzag[start];
+
+    // ── 完整 5 浪
+    if(available_len(zigzag, start, 6)){
+      const pts6 = zigzag.slice(start, start + 6);
+      const isBullStart = pts6[1].price > pts6[0].price;
+      // 多頭必須從低點出發，空頭從高點
+      if(isBullStart ? startPt.type === 'L' : startPt.type === 'H'){
         const res = triangleValidate(pts6, data, personality);
-        if(res.score > bestScore && res.score >= threshold){
-          bestScore = res.score;
-          bestCycle = {type:'5wave', pts:pts6, result:res, startIdx:start, complete:true};
+        if(res.score >= threshold){
+          const cs = compositeScore(pts6, res.score, '5wave');
+          if(cs > bestScore){
+            bestScore = cs;
+            bestCycle = {type:'5wave', pts:pts6, result:res, startIdx:start, complete:true};
+          }
         }
       }
     }
-    for(let partial=3; partial<=5; partial++){
-      if(available.length >= partial && available.length < 6){
-        const ppts = available.slice(0, partial);
-        const partialRes = validatePartial5Wave(ppts, data, personality);
-        if(partialRes.score > bestScore && partialRes.score >= threshold){
-          bestScore = partialRes.score;
-          bestCycle = {type:'5wave_partial', pts:ppts, result:partialRes, startIdx:start,
-            complete:false, currentWave:partial-1};
+    // ── 部分 5 浪（進行中）
+    for(let partial = 3; partial <= 5; partial++){
+      if(available_len(zigzag, start, partial)){
+        const ppts = zigzag.slice(start, start + partial);
+        const isBull = ppts.length >= 2 && ppts[1].price > ppts[0].price;
+        if(isBull ? startPt.type === 'L' : startPt.type === 'H'){
+          const partialRes = validatePartial5Wave(ppts, data, personality);
+          if(partialRes.score >= threshold){
+            const cs = compositeScore(ppts, partialRes.score, '5wave_partial');
+            if(cs > bestScore){
+              bestScore = cs;
+              bestCycle = {type:'5wave_partial', pts:ppts, result:partialRes, startIdx:start,
+                complete:false, currentWave:partial-1};
+            }
+          }
         }
       }
     }
-    if(available.length >= 4){
-      const pts4 = available.slice(0,4);
-      const span4 = pts4[3].idx - pts4[0].idx;
-      if(span4 <= maxCycleBars){
+    // ── 完整 ABC（ABC 不用覆蓋率加成，讓5浪優先）
+    if(available_len(zigzag, start, 4)){
+      const pts4 = zigzag.slice(start, start + 4);
+      const isBearCorr = pts4[1].price < pts4[0].price;
+      if(isBearCorr ? startPt.type === 'H' : startPt.type === 'L'){
         const abcRes = validateABC(pts4, data, personality);
-        if(abcRes.score > bestScore && abcRes.score >= threshold){
-          bestScore = abcRes.score;
-          bestCycle = {type:'abc', pts:pts4, result:abcRes, startIdx:start, complete:true};
+        if(abcRes.score >= threshold){
+          // ABC 加成較小，讓5浪結構更容易勝出
+          const cs = compositeScore(pts4, abcRes.score, 'abc') * 0.80;
+          if(cs > bestScore){
+            bestScore = cs;
+            bestCycle = {type:'abc', pts:pts4, result:abcRes, startIdx:start, complete:true};
+          }
         }
       }
     }
-    if(available.length >= 2 && available.length < 4){
-      const ppts = available.slice(0, available.length);
+    // ── 部分 ABC
+    if(n - start >= 2 && n - start < 4){
+      const ppts = zigzag.slice(start);
       const abcPartial = validatePartialABC(ppts, personality);
-      if(abcPartial.score > bestScore && abcPartial.score >= threshold){
-        bestScore = abcPartial.score;
-        bestCycle = {type:'abc_partial', pts:ppts, result:abcPartial, startIdx:start,
-          complete:false, currentWave:ppts.length-1};
+      if(abcPartial.score >= threshold){
+        const cs = abcPartial.score * 0.75; // 部分ABC優先級最低
+        if(cs > bestScore){
+          bestScore = cs;
+          bestCycle = {type:'abc_partial', pts:ppts, result:abcPartial, startIdx:start,
+            complete:false, currentWave:ppts.length-1};
+        }
       }
     }
   }
   return bestCycle;
 }
 
-function detectWaves(data) {
-  if(!data||data.length<20){
-    WAVE_ENGINE_RESULT={waves:[],forecast:[],forecastV4:{lines:[],zones:[],currentWaveNum:''},
-      confidence:0,status:'資料不足（需20根以上K棒）',zigzagPts:[],personality:null};
-    MULTI_WAVE_LEVELS = { short:null, medium:null, long:null };
-    return [];
-  }
+// helper：檢查 zigzag 從 start 起是否有足夠 count 個點
+function available_len(zigzag, start, count){ return zigzag.length - start >= count; }
 
-  // Step 0: 市場個性分析
-  const personality=analyzeMarketPersonality(data);
-  const {marketState,confidenceThreshold,zigzagMinPct}=personality;
+// ── 在主浪某一段內部偵測子波 ──────────────────────────────────
+// parentWave: { fromIdx, toIdx, label } (主浪中的一段)
+// data: 全局K棒資料
+// subMinPct: 子波 ZigZag 門檻（比主浪小 2~3 倍）
+function detectSubWaves(parentWave, data, personality, subMinPct) {
+  const { fromIdx, toIdx, label } = parentWave;
+  const segData = data.slice(fromIdx, toIdx + 1);
+  if(segData.length < 8) return []; // 段落太短無法再細分
 
-  if(marketState==='CHOPPY'){
-    const msg=`🚫 雜亂無序（震盪率${(personality.reversalRate*100).toFixed(0)}%）— 波浪理論不適用`;
-    WAVE_ENGINE_RESULT={waves:[],forecast:[],forecastV4:{lines:[],zones:[],currentWaveNum:''},
-      confidence:0,status:msg,zigzagPts:[],personality};
-    MULTI_WAVE_LEVELS = { short:null, medium:null, long:null };
-    return [];
-  }
+  const subZig = zigzagFilter(segData, subMinPct);
+  if(subZig.length < 3) return [];
 
-  // ═══ 多時間尺度 ZigZag ═══════════════════════
-  // 短期：精細（原始門檻），掃描最近30個轉折
-  const zigzagShort = zigzagFilter(data, zigzagMinPct);
-  // 中期：門檻放寬 2x，偵測主要波段
-  const zigzagMedium = zigzagFilter(data, Math.min(0.12, zigzagMinPct * 2.2));
-  // 長期：門檻放寬 4x，偵測整體趨勢大浪
-  const zigzagLong = zigzagFilter(data, Math.min(0.22, zigzagMinPct * 4.5));
+  // 判斷這段是推動浪還是修正浪
+  const isImpulse = ['1','3','5','B'].includes(String(label));
+  // 推動浪找5子波，修正浪找3子波
+  const targetCount = isImpulse ? 6 : 4;
 
-  // 各級別偵測（改進：短期掃描窗口縮小到最近20個轉折，避免把遠期大浪誤認為子浪）
-  const cycleShort  = zigzagShort.length  >= 3 ? findActiveCycleFrom(zigzagShort,  data, personality, Math.max(0, zigzagShort.length-20))  : null;
-  const cycleMedium = zigzagMedium.length >= 3 ? findActiveCycleFrom(zigzagMedium, data, personality, Math.max(0, zigzagMedium.length-15)) : null;
-  const cycleLong   = zigzagLong.length   >= 3 ? findActiveCycleFrom(zigzagLong,   data, personality, 0) : null;
+  // 重新建一個寬鬆的 personality（子波不用三角驗證那麼嚴格）
+  const relaxedPersonality = { ...personality, confidenceThreshold: 40, validationMode:'normal' };
 
-  // 存入全域供繪圖使用
-  MULTI_WAVE_LEVELS = { short: cycleShort, medium: cycleMedium, long: cycleLong,
-    zigzagShort, zigzagMedium, zigzagLong };
-
-  // 主要（短期）仍作為主波浪使用
-  const zigzag = zigzagShort;
-
-  if(zigzag.length<3){
-    const msg=marketState==='RANGING'
-      ?`⚠ 橫盤整理（趨勢強度${(personality.trendScore*100).toFixed(0)}分），轉折不足`
-      :`轉折點不足，波浪無法辨識`;
-    WAVE_ENGINE_RESULT={waves:[],forecast:[],forecastV4:{lines:[],zones:[],currentWaveNum:''},
-      confidence:0,status:msg,zigzagPts:zigzag,personality};
-    return [];
-  }
-
-  // 選最佳循環：優先短期，其次中期（若短期無效）
-  const activeCycle = cycleShort || cycleMedium;
-
-  if(!activeCycle){
-    const ltOnlyMsg = cycleLong
-      ? `⚠ 短中期波浪結構未成形，但長期大浪已偵測到（圖表上顯示帶圈符號）`
-      : `❌ 未找到有效波浪結構（最嚴格的三角驗證均未通過）`;
-    // Still try to show long waves even if short/medium fail
-    const LONG_WAVES_ONLY = [];
-    if(cycleLong){
-      const ltPts = cycleLong.pts;
-      const ltLabels5 = ['①','②','③','④','⑤'];
-      const ltLabelsABC = ['Ⓐ','Ⓑ','Ⓒ'];
-      const buildLt = (f,t,label) => ({
-        fromIdx:f.idx,toIdx:t.idx,fromPrice:f.price,toPrice:t.price,
-        label,isImpulse:['①','③','⑤','Ⓑ'].includes(label),
-        pct:(t.price-f.price)/f.price*100, days:t.idx-f.idx,
-        color:C.wave[['①','②','③','④','⑤'].indexOf(label)>=0?['1','2','3','4','5'][['①','②','③','④','⑤'].indexOf(label)]:'A']||C.waveDefault,
-        score:cycleLong.result.score, partial:!cycleLong.complete, isLongTerm:true
-      });
-      if(cycleLong.type==='5wave'||cycleLong.type==='5wave_partial'){
-        for(let i=0;i<ltPts.length-1;i++) LONG_WAVES_ONLY.push(buildLt(ltPts[i],ltPts[i+1],ltLabels5[i]||`${i+1}`));
-      } else {
-        for(let i=0;i<ltPts.length-1;i++) LONG_WAVES_ONLY.push(buildLt(ltPts[i],ltPts[i+1],ltLabelsABC[i]||`${i}`));
+  let best = null, bestScore = -1;
+  for(let s = 0; s <= subZig.length - 2; s++){
+    const avail = subZig.slice(s);
+    if(isImpulse && avail.length >= 6){
+      const res = triangleValidate(avail.slice(0,6), segData, relaxedPersonality);
+      if(res.score > bestScore && res.score >= 38){
+        bestScore = res.score;
+        best = {type:'5wave', pts:avail.slice(0,6), result:res, complete:true};
       }
     }
-    WAVE_ENGINE_RESULT={waves:[],forecast:[],forecastV4:{lines:[],zones:[],currentWaveNum:''},
-      confidence:0,status:ltOnlyMsg,zigzagPts:zigzag,personality,longWaves:LONG_WAVES_ONLY};
+    if(isImpulse){
+      for(let p=3; p<=5; p++){
+        if(avail.length >= p){
+          const res = validatePartial5Wave(avail.slice(0,p), segData, relaxedPersonality);
+          if(res.score > bestScore && res.score >= 38){
+            bestScore = res.score;
+            best = {type:'5wave_partial', pts:avail.slice(0,p), result:res, complete:false, currentWave:p-1};
+          }
+        }
+      }
+    } else {
+      if(avail.length >= 4){
+        const res = validateABC(avail.slice(0,4), segData, relaxedPersonality);
+        if(res.score > bestScore && res.score >= 38){
+          bestScore = res.score;
+          best = {type:'abc', pts:avail.slice(0,4), result:res, complete:true};
+        }
+      }
+      if(avail.length >= 2 && avail.length < 4){
+        const res = validatePartialABC(avail.slice(0, avail.length), relaxedPersonality);
+        if(res.score > bestScore && res.score >= 35){
+          bestScore = res.score;
+          best = {type:'abc_partial', pts:avail.slice(0, avail.length), result:res, complete:false};
+        }
+      }
+    }
+  }
+  if(!best) return [];
+
+  // 把子波的 idx 從 segData 局部索引轉回全局索引
+  const subPts = best.pts.map(p => ({ ...p, idx: p.idx + fromIdx }));
+  const subLabels = isImpulse
+    ? [label+'-1', label+'-2', label+'-3', label+'-4', label+'-5']
+    : [label+'-A', label+'-B', label+'-C'];
+
+  const waves = [];
+  for(let i = 0; i < subPts.length - 1; i++){
+    const subLabel = subLabels[i] || `${label}-${i+1}`;
+    const isSubImpulse = ['1','3','5','B'].includes(subLabel.split('-')[1]);
+    waves.push({
+      fromIdx: subPts[i].idx,
+      toIdx:   subPts[i+1].idx,
+      fromPrice: subPts[i].price,
+      toPrice:   subPts[i+1].price,
+      label: subLabel,
+      parentLabel: String(label),
+      isImpulse: isSubImpulse,
+      pct: (subPts[i+1].price - subPts[i].price) / Math.max(subPts[i].price, 0.001) * 100,
+      days: subPts[i+1].idx - subPts[i].idx,
+      color: C.wave[String(label)] || C.waveDefault,
+      score: bestScore,
+      partial: !best.complete,
+      isSubWave: true
+    });
+  }
+  return waves;
+}
+
+// findActiveCycleFrom（保留舊 API 供其他函式使用）
+function findActiveCycleFrom(zigzag, data, personality, scanFrom) {
+  const sliced = zigzag.slice(scanFrom);
+  // 對 sliced zigzag 執行全局搜索
+  const result = findBestCycleGlobal(sliced, data, personality, null);
+  if(result) result.startIdx = (result.startIdx || 0) + scanFrom;
+  return result;
+}
+
+function detectWaves(data) {
+  if(!data || data.length < 20){
+    WAVE_ENGINE_RESULT = {waves:[], forecast:[], forecastV4:{lines:[],zones:[],currentWaveNum:''},
+      confidence:0, status:'資料不足（需20根以上K棒）', zigzagPts:[], personality:null, longWaves:[], subWaves:{}};
+    MULTI_WAVE_LEVELS = { short:null, medium:null, long:null };
     return [];
   }
 
-  // Step 3: 組裝波浪繪製資料
-  const pts=activeCycle.pts;
-  const result=[];
-  const waveLabels5=['1','2','3','4','5'];
-  const waveLabelsABC=['A','B','C'];
+  // ── Step 0: 市場個性分析 ──────────────────────────────────────
+  const personality = analyzeMarketPersonality(data);
+  const { marketState, zigzagMinPct } = personality;
 
-  const buildWave=(f,t,label,isLongTerm=false)=>{
-    const isImpulse=['1','3','5','B_impulse'].includes(label);
-    const isABCImpulse=label==='B';
+  if(marketState === 'CHOPPY'){
+    const msg = `⚠️ 暫時看不出波浪理論 — 走勢雜亂無序（震盪率${(personality.reversalRate*100).toFixed(0)}%），缺乏方向性趨勢。建議觀察更長週期。`;
+    WAVE_ENGINE_RESULT = {waves:[], forecast:[], forecastV4:{lines:[],zones:[],currentWaveNum:''},
+      confidence:0, status:msg, zigzagPts:[], personality, longWaves:[], subWaves:{}};
+    MULTI_WAVE_LEVELS = { short:null, medium:null, long:null };
+    return [];
+  }
+
+  // ── Step 1: 多層 ZigZag 門檻 ──────────────────────────────────
+  //
+  // 策略：從「最粗」到「最細」產生多個 ZigZag 層級
+  // 最粗的層級只留下真正的大波段（整段上漲只有 6~8 個轉折點）
+  // 這樣才能正確識別從底部出發的 1~5 浪結構
+  //
+  const closes = data.map(d => d.close);
+  const globalMax = Math.max(...closes), globalMin = Math.min(...closes);
+  const globalRange = (globalMax - globalMin) / Math.max(globalMin, 1);
+
+  // ── 關鍵：大漲股（>50%）強制使用更大的 ZigZag 門檻 ──
+  // 目的：確保底部→頂部的整段大漲能被拆成 5~7 個轉折點
+  // 如果門檻太小（如 5%），200% 漲幅裡會出現 40+ 個轉折點
+  // 根本無法從中辨識 1~5 浪
+
+  // 先用自適應公式算初始門檻
+  const basePct = Math.max(0.06, Math.min(0.30, globalRange / 5));
+
+  // 動態縮放：目標讓主 ZigZag 產生 6~10 個轉折點
+  // （剛好夠放下一套 1~5 浪的 6 個端點）
+  function findThresholdForTargetPivots(targetMin, targetMax) {
+    let pct = basePct;
+    // 先放大直到轉折點 <= targetMax
+    for(let i = 0; i < 10; i++){
+      if(zigzagFilter(data, pct).length <= targetMax) break;
+      pct *= 1.30;
+    }
+    // 再縮小直到轉折點 >= targetMin
+    for(let i = 0; i < 6; i++){
+      if(zigzagFilter(data, pct).length >= targetMin) break;
+      pct *= 0.75;
+    }
+    return pct;
+  }
+
+  // 超粗層：6~9 個轉折點 → 用來找完整 1~5 浪骨架
+  const ultraPct   = findThresholdForTargetPivots(6, 9);
+  // 粗層：8~14 個轉折點 → 用來找部分 5 浪或 ABC
+  const primaryPct = findThresholdForTargetPivots(8, 14);
+  // 中層：給子波用
+  const mediumMinPct = Math.max(0.03, primaryPct / 3.5);
+  // 短期：圓點用（原始動態門檻）
+  const shortMinPct  = zigzagMinPct;
+
+  const zigzagUltra   = zigzagFilter(data, ultraPct);    // 超粗：只有大波段
+  const zigzagPrimary = zigzagFilter(data, primaryPct);  // 粗：標準主浪
+  const zigzagMedium  = zigzagFilter(data, mediumMinPct);
+  const zigzagShort   = zigzagFilter(data, shortMinPct);
+
+  const finalPrimary = ultraPct; // 供後續 subMinPct 參考
+
+  // ── Step 2: 選浪策略（強制5浪優先）──────────────────────────
+  //
+  // 核心原則：
+  //   當資料有明顯大漲（>40%），必須先找 1~5 浪
+  //   只有找不到 1~5 浪時，才允許顯示 ABC
+  //   這樣避免把整段上漲誤標成「WA」
+  //
+  const bigTrend = globalRange > 0.40; // 整體漲跌幅 > 40% 視為大趨勢
+  const loosePersonality = {
+    ...personality,
+    confidenceThreshold: Math.max(35, personality.confidenceThreshold - 20)
+  };
+
+  // 先用超粗 ZigZag 找完整/部分 5 浪（最優先）
+  function findImpulseOnly(zigzag) {
+    if(zigzag.length < 3) return null;
+    const n = zigzag.length;
+    const allPrices = data.map(d => d.close);
+    const gMin = Math.min(...allPrices), gMax = Math.max(...allPrices);
+    const gMove = Math.max(gMax - gMin, 1);
+    const gSpan = data.length;
+    let best = null, bestCs = -1;
+
+    for(let start = 0; start <= n - 3; start++){
+      const sp = zigzag[start];
+      // 完整 5 浪
+      if(n - start >= 6){
+        const pts = zigzag.slice(start, start + 6);
+        const isBull = pts[1].price > pts[0].price;
+        if(isBull ? sp.type === 'L' : sp.type === 'H'){
+          const res = triangleValidate(pts, data, loosePersonality);
+          if(res.score >= loosePersonality.confidenceThreshold){
+            const timeCov = Math.min(1,(pts[5].idx - pts[0].idx)/gSpan);
+            const priceCov= Math.min(1,Math.abs(pts[5].price-pts[0].price)/gMove);
+            const startProx = isBull ? 1 - Math.min(1,(pts[0].price-gMin)/gMove) : 1 - Math.min(1,(gMax-pts[0].price)/gMove);
+            const cs = res.score + (timeCov*0.4+priceCov*0.4+startProx*0.2)*40;
+            if(cs > bestCs){ bestCs=cs; best={type:'5wave',pts,result:res,complete:true}; }
+          }
+        }
+      }
+      // 部分 5 浪（W1~W4 或 W1~W3）
+      for(let partial = 3; partial <= 5; partial++){
+        if(n - start >= partial){
+          const pts = zigzag.slice(start, start + partial);
+          const isBull = pts[1].price > pts[0].price;
+          if(isBull ? sp.type === 'L' : sp.type === 'H'){
+            const res = validatePartial5Wave(pts, data, loosePersonality);
+            if(res.score >= loosePersonality.confidenceThreshold){
+              const timeCov = Math.min(1,(pts[pts.length-1].idx - pts[0].idx)/gSpan);
+              const priceCov= Math.min(1,Math.abs(pts[pts.length-1].price-pts[0].price)/gMove);
+              const startProx = isBull ? 1 - Math.min(1,(pts[0].price-gMin)/gMove) : 1;
+              const cs = res.score + (timeCov*0.4+priceCov*0.4+startProx*0.2)*35;
+              if(cs > bestCs){ bestCs=cs; best={type:'5wave_partial',pts,result:res,complete:false,currentWave:partial-1}; }
+            }
+          }
+        }
+      }
+    }
+    return best;
+  }
+
+  // 第一優先：超粗層找 5 浪
+  let cyclePrimary = findImpulseOnly(zigzagUltra);
+  // 找不到？用粗層再試
+  if(!cyclePrimary) cyclePrimary = findImpulseOnly(zigzagPrimary);
+  // 還找不到？允許 ABC（中層）
+  const cycleMedium = (!cyclePrimary)
+    ? findBestCycleGlobal(zigzagPrimary, data, loosePersonality, null)
+    : null;
+  // 最後手段（短期）
+  const cycleShort = (!cyclePrimary && !cycleMedium && zigzagShort.length >= 3)
+    ? findBestCycleGlobal(zigzagShort, data, personality, null)
+    : null;
+
+  MULTI_WAVE_LEVELS = { short: cycleShort, medium: cycleMedium, long: cyclePrimary,
+    zigzagShort, zigzagMedium, zigzagLong: zigzagUltra };
+
+  // 選主要顯示循環：5浪 >> ABC >> 短期
+  const activeCycle = cyclePrimary || cycleMedium || cycleShort;
+
+  const zigzag = zigzagShort; // 圓點仍用短期
+
+  if(!activeCycle){
+    // 診斷原因：給出更具體的說明
+    const _closes = data.map(d=>d.close);
+    const _gMax = Math.max(..._closes), _gMin = Math.min(..._closes);
+    const _totalChg = (_gMax - _gMin) / Math.max(_gMin, 0.001);
+    const _zLen = zigzagPrimary.length;
+    let noWaveReason;
+    if(_zLen < 4) noWaveReason = `轉折點太少（${_zLen}個），趨勢結構尚未形成`;
+    else if(_totalChg < 0.10) noWaveReason = `整體波動幅度僅 ${(_totalChg*100).toFixed(1)}%，漲跌幅不足以形成有效波浪`;
+    else if(marketState === 'RANGING') noWaveReason = '目前處於橫盤震盪，無明確方向';
+    else noWaveReason = '轉折點未符合艾略特三大鐵律（W2不破起點、W3非最短、W4不穿W1）';
+    const msg = `⚠️ 暫時看不出波浪理論結構 — ${noWaveReason}。建議觀察更長週期或等待趨勢明朗。`;
+    WAVE_ENGINE_RESULT = {waves:[], forecast:[], forecastV4:{lines:[],zones:[],currentWaveNum:''},
+      confidence:0, status:msg, zigzagPts:zigzag, personality, longWaves:[], subWaves:{},
+      noWave:true, noWaveReason};
+    return [];
+  }
+
+  // ── Step 3: 組裝主浪波段 ─────────────────────────────────────
+  const pts = activeCycle.pts;
+  const result = [];
+  const waveLabels5 = ['1','2','3','4','5'];
+  const waveLabelsABC = ['A','B','C'];
+
+  const buildWave = (f, t, label, extra={}) => {
+    const isImpulse = ['1','3','5','B'].includes(String(label));
     return {
-      fromIdx:f.idx,toIdx:t.idx,
-      fromPrice:f.price,toPrice:t.price,
-      label,isImpulse:isImpulse||isABCImpulse,
-      pct:(t.price-f.price)/f.price*100,
-      days:t.idx-f.idx,
-      color:C.wave[label]||C.waveDefault,
-      score:activeCycle.result.score,
-      partial:activeCycle.complete===false,
-      isLongTerm
+      fromIdx:   f.idx,
+      toIdx:     t.idx,
+      fromPrice: f.price,
+      toPrice:   t.price,
+      label,
+      isImpulse,
+      pct:  (t.price - f.price) / Math.max(f.price, 0.001) * 100,
+      days: t.idx - f.idx,
+      color: C.wave[String(label)] || C.waveDefault,
+      score: activeCycle.result.score,
+      partial: activeCycle.complete === false,
+      ...extra
     };
   };
 
-  if(activeCycle.type==='5wave'||activeCycle.type==='5wave_partial'){
-    for(let i=0;i<pts.length-1;i++){
-      result.push(buildWave(pts[i],pts[i+1],waveLabels5[i]||`${i+1}`));
-    }
-  } else if(activeCycle.type==='abc'||activeCycle.type==='abc_partial'){
-    for(let i=0;i<pts.length-1;i++){
-      result.push(buildWave(pts[i],pts[i+1],waveLabelsABC[i]||`${i}`));
-    }
+  if(activeCycle.type === '5wave' || activeCycle.type === '5wave_partial'){
+    for(let i = 0; i < pts.length - 1; i++)
+      result.push(buildWave(pts[i], pts[i+1], waveLabels5[i] || `${i+1}`));
+  } else {
+    for(let i = 0; i < pts.length - 1; i++)
+      result.push(buildWave(pts[i], pts[i+1], waveLabelsABC[i] || `${i}`));
   }
 
-  // ── 長期/中期大浪加入（以不同透明度繪製，不計入主要波浪）
-  const LONG_WAVES = []; // 供繪圖使用
-  const ltCycle = cycleLong || cycleMedium;
-  if(ltCycle && ltCycle !== activeCycle){
-    const ltPts = ltCycle.pts;
-    const ltLabels5 = ['①','②','③','④','⑤'];
-    const ltLabelsABC = ['Ⓐ','Ⓑ','Ⓒ'];
-    if(ltCycle.type==='5wave'||ltCycle.type==='5wave_partial'){
-      for(let i=0;i<ltPts.length-1;i++){
-        LONG_WAVES.push(buildWave(ltPts[i],ltPts[i+1],ltLabels5[i]||`${i+1}`,true));
-      }
-    } else if(ltCycle.type==='abc'||ltCycle.type==='abc_partial'){
-      for(let i=0;i<ltPts.length-1;i++){
-        LONG_WAVES.push(buildWave(ltPts[i],ltPts[i+1],ltLabelsABC[i]||`${i}`,true));
-      }
-    }
-  }
-
-  // ── Step 3.5: 5浪完成後往後偵測 ABC 修正浪（核心新增）──────────
-  // 若 activeCycle 是完整 5 浪，且 W5 結束點不是資料最末端，
-  // 則從 W5 結束點之後的 zigzag 點繼續找 ABC
+  // ── Step 3.5: 5浪完成後偵測 ABC 修正浪 ────────────────────────
   const POST_ABC_WAVES = [];
-  if((activeCycle.type==='5wave' && activeCycle.complete) || activeCycle.type==='abc'){
-    const lastCyclePt = pts[pts.length-1]; // W5 終點（或 C 浪終點）
-    // 找 zigzag 裡 lastCyclePt.idx 之後的點
-    const postIdx = zigzag.findIndex(z => z.idx >= lastCyclePt.idx);
-    const postZigzag = postIdx >= 0 ? zigzag.slice(postIdx) : [];
+  // 條件放寬：5wave 完整 OR 5wave_partial 但 pts 已有 6 個點（W1~W5 全部轉折點）
+  const is5WaveComplete = (activeCycle.type === '5wave' && activeCycle.complete)
+    || (activeCycle.type === '5wave_partial' && activeCycle.pts && activeCycle.pts.length >= 6);
+  if(is5WaveComplete){
+    const lastPt = pts[pts.length - 1];
+    // 用中層 ZigZag 找 ABC（避免短期雜訊），從5浪終點之後開始
+    const _abcZig = zigzagMedium.length >= 3 ? zigzagMedium : zigzagShort;
+    const postIdx = _abcZig.findIndex(z => z.idx >= lastPt.idx);
+    const postZig_raw = postIdx >= 0 ? _abcZig.slice(postIdx) : [];
+    // 同時嘗試短層 zigzag 作為備用（中層點太少時用短層補）
+    const _abcZigShort = zigzagShort;
+    const postIdxShort = _abcZigShort.findIndex(z => z.idx > lastPt.idx);
+    const postZigShort = postIdxShort >= 0 ? _abcZigShort.slice(postIdxShort) : [];
 
-    if(postZigzag.length >= 3){
-      // 嘗試找 ABC（至少需要 4 個 zigzag 點：A起點+A終點+B終點+C終點）
-      let bestAbcScore = 0, bestAbc = null;
-      for(let s=0; s<=postZigzag.length-3; s++){
-        const avail = postZigzag.slice(s);
+    // 選用點數較多的那層
+    const postZig = postZig_raw.length >= postZigShort.length ? postZig_raw : postZigShort;
+
+    // ── 嘗試找完整或部分 ABC ──
+    let bestAbc = null, bestAbcScore = 0;
+    if(postZig.length >= 2){
+      for(let s = 0; s <= postZig.length - 2; s++){
+        const avail = postZig.slice(s);
         if(avail.length >= 4){
-          const abcRes = validateABC(avail.slice(0,4), data, personality);
-          if(abcRes.score > bestAbcScore && abcRes.score >= Math.max(45, personality.confidenceThreshold - 15)){
-            bestAbcScore = abcRes.score;
-            bestAbc = {type:'abc', pts:avail.slice(0,4), result:abcRes, complete:true};
+          const res = validateABC(avail.slice(0,4), data, personality);
+          if(res.score > bestAbcScore && res.score >= Math.max(38, personality.confidenceThreshold - 20)){
+            bestAbcScore = res.score;
+            bestAbc = {type:'abc', pts:avail.slice(0,4), result:res, complete:true};
           }
         }
-        // 部分 ABC（只有 A 或 AB）
         if(avail.length >= 2 && avail.length < 4){
-          const abcPartial = validatePartialABC(avail.slice(0, avail.length), personality);
-          if(abcPartial.score > bestAbcScore && abcPartial.score >= 35){
-            bestAbcScore = abcPartial.score;
-            bestAbc = {type:'abc_partial', pts:avail.slice(0, avail.length), result:abcPartial,
-              complete:false, currentWave:avail.length-1};
+          const res = validatePartialABC(avail.slice(0, avail.length), personality);
+          if(res.score > bestAbcScore && res.score >= 30){
+            bestAbcScore = res.score;
+            bestAbc = {type:'abc_partial', pts:avail.slice(0, avail.length), result:res, complete:false};
           }
         }
       }
-      if(bestAbc){
-        const abcPts = bestAbc.pts;
-        const abcLabels = ['A','B','C'];
-        for(let i=0; i<abcPts.length-1; i++){
+    }
+
+    if(bestAbc){
+      // 有完整或部分 ABC
+      const abcPts = bestAbc.pts;
+      for(let i = 0; i < abcPts.length - 1; i++){
+        const lbl = ['A','B','C'][i] || `${i}`;
+        POST_ABC_WAVES.push({
+          fromIdx: abcPts[i].idx, toIdx: abcPts[i+1].idx,
+          fromPrice: abcPts[i].price, toPrice: abcPts[i+1].price,
+          label: lbl, isImpulse: lbl === 'B',
+          pct: (abcPts[i+1].price - abcPts[i].price) / Math.max(abcPts[i].price, 0.001) * 100,
+          days: abcPts[i+1].idx - abcPts[i].idx,
+          color: C.wave[lbl] || C.waveDefault,
+          score: bestAbcScore, partial: !bestAbc.complete, isPostCycle: true
+        });
+      }
+    } else {
+      // ── Fallback：至少把 WA 段畫出來 ──
+      // 優先用 postZig 的第一個往下轉折
+      const aEndCandidate = postZig.length >= 1 ? postZig[0] : null;
+      if(aEndCandidate && aEndCandidate.idx > lastPt.idx){
+        POST_ABC_WAVES.push({
+          fromIdx: lastPt.idx, toIdx: aEndCandidate.idx,
+          fromPrice: lastPt.price, toPrice: aEndCandidate.price,
+          label:'A', isImpulse:false,
+          pct: (aEndCandidate.price - lastPt.price) / Math.max(lastPt.price, 0.001) * 100,
+          days: aEndCandidate.idx - lastPt.idx,
+          color: C.wave['A'], score:38, partial:true, isPostCycle:true
+        });
+      } else {
+        // 連轉折點都沒有：用最新收盤價當暫時 WA 終點（只要價格比 W5 高點低）
+        const latestPrice = data[data.length - 1].close;
+        const latestIdx   = data.length - 1;
+        if(latestIdx > lastPt.idx && latestPrice < lastPt.price){
           POST_ABC_WAVES.push({
-            fromIdx: abcPts[i].idx,
-            toIdx:   abcPts[i+1].idx,
-            fromPrice: abcPts[i].price,
-            toPrice:   abcPts[i+1].price,
-            label: abcLabels[i] || `${i}`,
-            isImpulse: abcLabels[i] === 'B',
-            pct: (abcPts[i+1].price - abcPts[i].price) / abcPts[i].price * 100,
-            days: abcPts[i+1].idx - abcPts[i].idx,
-            color: C.wave[abcLabels[i]] || C.waveDefault,
-            score: bestAbcScore,
-            partial: !bestAbc.complete,
-            isPostCycle: true   // 標記為後續修正浪
+            fromIdx: lastPt.idx, toIdx: latestIdx,
+            fromPrice: lastPt.price, toPrice: latestPrice,
+            label:'A', isImpulse:false,
+            pct: (latestPrice - lastPt.price) / Math.max(lastPt.price, 0.001) * 100,
+            days: latestIdx - lastPt.idx,
+            color: C.wave['A'], score:33, partial:true, isPostCycle:true
           });
         }
       }
     }
-
-    // 若 5 浪完成但 ABC 點不足（少於 3 個 zigzag），至少找到第一個轉折顯示 A 浪開始
-    if(POST_ABC_WAVES.length === 0 && postZigzag.length >= 2){
-      const aStart = lastCyclePt;
-      const aEnd   = postZigzag[1]; // 第一個反向轉折
-      if(aEnd && Math.abs(aEnd.idx - aStart.idx) >= 2){
-        POST_ABC_WAVES.push({
-          fromIdx: aStart.idx, toIdx: aEnd.idx,
-          fromPrice: aStart.price, toPrice: aEnd.price,
-          label: 'A',
-          isImpulse: false,
-          pct: (aEnd.price - aStart.price) / aStart.price * 100,
-          days: aEnd.idx - aStart.idx,
-          color: C.wave['A'],
-          score: 40,
-          partial: true,
-          isPostCycle: true
-        });
-      }
-    }
   }
-  // 把後續 ABC 加入主結果（合併繪製）
   result.push(...POST_ABC_WAVES);
 
-  // Step 4: 生成預測路徑
-  const forecastV4=generateForecast(activeCycle,data,personality);
+  // ── Step 4: 子波偵測 ─────────────────────────────────────────
+  // 對每一段主浪，用子波門檻在其內部找子浪
+  const SUB_WAVES = {}; // key: parentLabel → waves[]
+  const subMinPct = Math.max(0.025, finalPrimary / 3.5);
+  for(const mainWave of result){
+    if(mainWave.isSubWave || mainWave.isPostCycle) continue;
+    const segLen = mainWave.toIdx - mainWave.fromIdx;
+    if(segLen < 10) continue; // 段落太短不細分
+    const subs = detectSubWaves(mainWave, data, personality, subMinPct);
+    if(subs.length >= 2) SUB_WAVES[String(mainWave.label)] = subs;
+  }
 
-  // 相容舊的 forecast 格式（給 wave cards 用）
-  const forecast=forecastV4.lines.slice(0,3).map(l=>({
-    price:l.price,label:l.label,ratio:0,fromIdx:pts[pts.length-1].idx,
-    color:l.color,priority:l.priority,type:l.type
+  // ── Step 5: 預測路徑 ─────────────────────────────────────────
+  const forecastV4 = generateForecast(activeCycle, data, personality);
+  const forecast = forecastV4.lines.slice(0, 3).map(l => ({
+    price: l.price, label: l.label, ratio: 0,
+    fromIdx: pts[pts.length-1].idx,
+    color: l.color, priority: l.priority, type: l.type
   }));
 
-  // Step 5: 狀態文字
-  const score=activeCycle.result.score;
-  const isPartial=!activeCycle.complete;
-  const stateEmoji={STRONG_TREND:'✅',WEAK_TREND:'📊',RANGING:'⚠',CHOPPY:'🚫'}[marketState]||'📊';
-  const geoS=activeCycle.result.geoScore!=null?` 幾何${activeCycle.result.geoScore}`:''
-  const momS=activeCycle.result.momentumScore!=null?` 動能${activeCycle.result.momentumScore}`:'';
-  const volS=activeCycle.result.volumeScore!=null?` 量能${activeCycle.result.volumeScore}`:'';
+  // ── Step 6: 狀態文字 ─────────────────────────────────────────
+  const score = activeCycle.result.score;
+  const isPartial = !activeCycle.complete;
+  const stateEmoji = {STRONG_TREND:'✅',WEAK_TREND:'📊',RANGING:'⚠',CHOPPY:'🚫'}[marketState] || '📊';
+  const typeLabel = activeCycle.type === '5wave' ? '5浪衝浪完成'
+    : activeCycle.type === '5wave_partial' ? `5浪進行中（已完成W${result.filter(w=>!w.isPostCycle).length}）`
+    : activeCycle.type === 'abc' ? 'ABC修正完成' : 'ABC進行中';
+  const usedLevel = cyclePrimary ? '主浪' : cycleMedium ? '中浪' : '短浪';
+  const violStr = activeCycle.result.violations && activeCycle.result.violations.length
+    ? ` ｜違規：${activeCycle.result.violations.slice(0,2).join('、')}` : '';
+  const subCount = Object.values(SUB_WAVES).reduce((s, v) => s + v.length, 0);
+  const subInfo = subCount > 0 ? ` ｜子波 ${subCount}段` : '';
 
-  let statusStr='';
-  const typeLabel=activeCycle.type==='5wave'?'5浪衝浪完成':
-    activeCycle.type==='5wave_partial'?`5浪進行中（已完成W${result.length}）`:
-    activeCycle.type==='abc'?'ABC修正完成':'ABC進行中';
-  const violStr=activeCycle.result.violations&&activeCycle.result.violations.length
-    ?` ｜違規：${activeCycle.result.violations.join('、')}`:'';
+  let statusStr = `${stateEmoji} ${typeLabel}（${usedLevel}·${score}分）${violStr}${subInfo}`;
+  if(marketState === 'RANGING') statusStr += ' ⚠橫盤';
+  if(marketState === 'WEAK_TREND') statusStr += ' 趨勢偏弱';
+  if(isPartial) statusStr += ' 🔄進行中';
 
-  statusStr=`${stateEmoji} ${typeLabel}（三角驗證 ${score}分${geoS}${momS}${volS}）${violStr}`;
-  if(marketState==='RANGING') statusStr+=' ⚠橫盤';
-  if(marketState==='WEAK_TREND') statusStr+=' 趨勢偏弱';
-  if(isPartial) statusStr+=' 🔄進行中';
-
-  WAVE_ENGINE_RESULT={waves:result,forecast,forecastV4,
-    confidence:score,status:statusStr,zigzagPts:zigzag,personality,activeCycle,longWaves:LONG_WAVES};
+  WAVE_ENGINE_RESULT = {
+    waves: result, forecast, forecastV4,
+    confidence: score, status: statusStr,
+    zigzagPts: zigzag, personality, activeCycle,
+    longWaves: [],   // 已隱藏，不再使用
+    subWaves: SUB_WAVES,
+    primaryMinPct: finalPrimary, mediumMinPct, subMinPct
+  };
   return result;
 }
 
@@ -3603,7 +3880,7 @@ function drawMain(data, waves) {
   // ── Mobile: tighter padding so chart fills to the edge
   const isMobile = W < 520;
   const p = isMobile
-    ? { l:46, r:10, t:PAD.t, b:PAD.b }
+    ? { l:46, r:8, t:PAD.t, b:PAD.b }
     : { ...PAD };
   const cW = W-p.l-p.r, cH = H-p.t-p.b;
 
@@ -3719,8 +3996,8 @@ function drawMain(data, waves) {
   // ── Wave highlight overlay (drawn before wave lines so lines appear on top)
   drawWaveHighlight(ctx, waves, xS, yS, p, H, viStart);
 
-  // ── 長期大浪繪製（圓圈數字標記，半透明背景色塊）
-  if (WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.longWaves && WAVE_ENGINE_RESULT.longWaves.length) {
+  // ── 長期大浪繪製（已隱藏）
+  if (false && WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.longWaves && WAVE_ENGINE_RESULT.longWaves.length) {
     WAVE_ENGINE_RESULT.longWaves.forEach(w => {
       const fromD = data[w.fromIdx - viStart] || data[0];
       const toD   = data[w.toIdx   - viStart] || data[data.length-1];
@@ -3859,33 +4136,80 @@ function drawMain(data, waves) {
       ctx.fillText(pctText, lblX, lblY2+(isMobile?9:11));
     } else {
       // 正常：標準大小清晰標籤（框半透明讓K棒透出）
-      const lblFont = isMobile ? 'bold 8px "Orbitron",monospace' : 'bold 10px "Orbitron",monospace';
+      const lblFont = isMobile ? 'bold 10px "Orbitron",monospace' : 'bold 10px "Orbitron",monospace';
       ctx.font = lblFont;
       const twMain = ctx.measureText(waveText).width;
-      ctx.font = isMobile?'5.5px "JetBrains Mono",monospace':'6.5px "JetBrains Mono",monospace';
+      ctx.font = isMobile?'7px "JetBrains Mono",monospace':'6.5px "JetBrains Mono",monospace';
       const twPct = ctx.measureText(pctText).width;
-      const boxW = Math.max(twMain, twPct) + (isMobile?8:12);
-      const boxH = isMobile ? 22 : 27;
-      ctx.globalAlpha = 0.88;
-      ctx.fillStyle = 'rgba(2,5,14,0.60)';   // 降低：原 0.88，現 0.60，K棒可透出
-      ctx.strokeStyle = col+'88';
-      ctx.lineWidth = 1;
+      const boxW = Math.max(twMain, twPct) + (isMobile?12:12);
+      const boxH = isMobile ? 28 : 27;
+      ctx.globalAlpha = 0.92;
+      ctx.fillStyle = isMobile ? 'rgba(2,5,14,0.82)' : 'rgba(2,5,14,0.60)';
+      ctx.strokeStyle = col + (isMobile ? 'cc' : '88');
+      ctx.lineWidth = isMobile ? 1.5 : 1;
       ctx.beginPath();
-      ctx.roundRect(lblX-boxW/2, lblY2-boxH/2, boxW, boxH, isMobile?4:5);
+      ctx.roundRect(lblX-boxW/2, lblY2-boxH/2, boxW, boxH, isMobile?6:5);
       ctx.fill(); ctx.stroke();
       ctx.font = lblFont;
       ctx.fillStyle = col; ctx.textAlign = 'center';
-      ctx.fillText(waveText, lblX, lblY2-(isMobile?3:4));
-      ctx.font = isMobile?'5.5px "JetBrains Mono",monospace':'6.5px "JetBrains Mono",monospace';
-      ctx.fillStyle = w.pct>=0?'rgba(0,230,118,0.85)':'rgba(255,61,90,0.85)';
-      ctx.fillText(pctText, lblX, lblY2+(isMobile?7:9));
+      ctx.fillText(waveText, lblX, lblY2-(isMobile?4:4));
+      ctx.font = isMobile?'7px "JetBrains Mono",monospace':'6.5px "JetBrains Mono",monospace';
+      ctx.fillStyle = w.pct>=0?'rgba(0,230,118,0.95)':'rgba(255,61,90,0.95)';
+      ctx.fillText(pctText, lblX, lblY2+(isMobile?9:9));
     }
     ctx.globalAlpha = 1;
     ctx.restore();
   });
 
-  // ── 長期 Fibonacci 回撤線（改進：從主波浪W1起點~W5終點計算，更精確）
-  if(WAVE_VISIBLE && !isMobile && WAVES && WAVES.length >= 2){
+  // ── 子波繪製（在主浪內部，細虛線 + 小標籤）──────────────────────
+  if(WAVE_VISIBLE && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.subWaves){
+    const subWavesMap = WAVE_ENGINE_RESULT.subWaves;
+    Object.values(subWavesMap).forEach(subList => {
+      subList.forEach(sw => {
+        const fromD = data[sw.fromIdx - viStart];
+        const toD   = data[sw.toIdx   - viStart];
+        if(!fromD || !toD) return;
+        const lFrom = sw.fromIdx - viStart, lTo = sw.toIdx - viStart;
+        if(lFrom < 0 || lTo >= data.length) return;
+        const sx1 = xS(lFrom), sy1 = yS(fromD.close);
+        const sx2 = xS(lTo),   sy2 = yS(toD.close);
+        const sCol = sw.color || 'rgba(150,180,220,0.6)';
+
+        // 細虛線
+        ctx.save();
+        ctx.strokeStyle = sCol;
+        ctx.lineWidth = isMobile ? 0.9 : 1.2;
+        ctx.globalAlpha = 0.55;
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+
+        // 子波標籤（小，只在非手機或 hover 時顯示）
+        if(!isMobile){
+          const smx = (sx1+sx2)/2, smy = (sy1+sy2)/2;
+          const sIsUp = sy2 < sy1;
+          const sLblY = smy + (sIsUp ? -10 : 10);
+          ctx.save();
+          ctx.font = '7px "JetBrains Mono",monospace';
+          ctx.fillStyle = sCol;
+          ctx.globalAlpha = 0.7;
+          ctx.textAlign = 'center';
+          // 顯示 W3-1 格式
+          const subTxt = `W${sw.label}`;
+          const stw = ctx.measureText(subTxt).width + 6;
+          ctx.fillStyle = 'rgba(2,5,14,0.6)';
+          ctx.fillRect(smx - stw/2, sLblY - 7, stw, 12);
+          ctx.fillStyle = sCol;
+          ctx.fillText(subTxt, smx, sLblY + 3);
+          ctx.globalAlpha = 1;
+          ctx.restore();
+        }
+      });
+    });
+  }
+  if(WAVE_VISIBLE && WAVES && WAVES.length >= 2){
     // 嘗試從 WAVES 取得有效的高低點
     const waveFromPrices = WAVES.map(w => w.fromPrice || 0).filter(p2=>p2>0);
     const waveToPrices   = WAVES.map(w => w.toPrice   || 0).filter(p2=>p2>0);
@@ -3912,11 +4236,17 @@ function drawMain(data, waves) {
         ctx.globalAlpha = 0.45;
         ctx.beginPath(); ctx.moveTo(p.l, fy); ctx.lineTo(W-p.r, fy); ctx.stroke();
         ctx.setLineDash([]);
-        ctx.globalAlpha = 0.38;
-        ctx.font = '6px "JetBrains Mono",monospace';
+        ctx.globalAlpha = isMobile ? 0.55 : 0.38;
+        ctx.font = isMobile ? '7px "JetBrains Mono",monospace' : '6px "JetBrains Mono",monospace';
         ctx.fillStyle = fl.c.replace(/[\d.]+\)/, '0.9)');
-        ctx.textAlign = 'left';
-        ctx.fillText(`${fl.lbl} ${fp.toFixed(1)}`, W-p.r+2, fy+3);
+        if(isMobile){
+          // 手機：顯示在圖表內側右上角（避免被截斷）
+          ctx.textAlign = 'right';
+          ctx.fillText(`${fl.lbl} ${fp.toFixed(1)}`, W-p.r-4, fy-3);
+        } else {
+          ctx.textAlign = 'left';
+          ctx.fillText(`${fl.lbl} ${fp.toFixed(1)}`, W-p.r+2, fy+3);
+        }
       });
       ctx.globalAlpha = 1;
       ctx.restore();
@@ -4573,7 +4903,7 @@ function updateStockInfoBar() {
 }
 
 // ═══════════════════════════════════════════════════════
-// WAVE CARDS
+// WAVE CARDS — 簡潔版（隱藏複雜數學，突出波浪位置）
 // ═══════════════════════════════════════════════════════
 function updateWaveCards() {
   const wrap = document.getElementById('waveCards');
@@ -4584,270 +4914,274 @@ function updateWaveCards() {
   const confidence = engineResult.confidence || 0;
   const forecast = engineResult.forecast || [];
   const personality = engineResult.personality || null;
-  const threshold = personality ? personality.confidenceThreshold : 55;
 
-  // ── 市場個性卡（永遠顯示在最頂部）──
-  if (personality) {
-    const msColor = {
-      'STRONG_TREND':'var(--green)','WEAK_TREND':'var(--yellow)',
-      'RANGING':'var(--orange)','CHOPPY':'var(--red)'
-    }[personality.marketState]||'var(--text-dim)';
-    const msIcon = {
-      'STRONG_TREND':'🚀','WEAK_TREND':'📊','RANGING':'↔','CHOPPY':'⚡'
-    }[personality.marketState]||'?';
-    const msName = {
-      'STRONG_TREND':'強趨勢市場','WEAK_TREND':'弱趨勢市場',
-      'RANGING':'橫盤震盪','CHOPPY':'雜亂無序'
-    }[personality.marketState]||personality.marketState;
-    const tsBar=Math.round(personality.trendScore*100);
-    const r2=Math.round(personality.rSquared*100);
-    const rr=Math.round(personality.reversalRate*100);
-    const zzPct=(personality.zigzagMinPct*100).toFixed(1);
-
-    const pcDiv=document.createElement('div');
-    pcDiv.style.cssText='grid-column:1/-1;border-radius:10px;padding:12px 14px;margin-bottom:2px;'+
-      `border:1px solid ${msColor}33;background:${msColor}0d;font-family:"JetBrains Mono",monospace;`;
-    pcDiv.innerHTML=`
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-size:1.1rem">${msIcon}</span>
-        <span style="color:${msColor};font-weight:700;font-size:.8rem">${msName}</span>
-        <span style="color:var(--text-dim);font-size:.68rem;margin-left:auto">自適應分析</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:.68rem;color:var(--text-dim)">
-        <div>趨勢強度
-          <div style="background:rgba(255,255,255,0.1);border-radius:2px;height:3px;margin-top:2px;">
-            <div style="width:${tsBar}%;height:100%;background:${msColor};border-radius:2px;"></div>
-          </div>
-          <span style="color:${msColor}">${tsBar}/100</span>
-        </div>
-        <div>線性趨勢 R² <span style="color:var(--text)">${r2}%</span></div>
-        <div>震盪反轉率 <span style="color:${rr>45?'var(--red)':'var(--text)'}">${rr}%</span></div>
-        <div>ZigZag門檻 <span style="color:var(--text)">${zzPct}%</span></div>
-      </div>
-      <div style="margin-top:6px;font-size:.66rem;color:${msColor}88;">
-        信心門檻自動設定為 ${threshold} 分
-        ${personality.marketState==='RANGING'?' — ⚠ 橫盤行情，波浪準確度下降':''}
-        ${personality.marketState==='CHOPPY'?' — 🚫 不建議使用波浪理論':''}
-      </div>`;
-    wrap.appendChild(pcDiv);
-
-    // ── 循環階段說明 Banner ────────────────────────────────────
-    const isImpulse = engineResult.cycleType !== 'ABC';
-    const hasABC = engineResult.abcDetected || (engineResult.waves && engineResult.waves.some && engineResult.waves.some(w=>['A','B','C'].includes(String(w.label))));
-    const hasImpulse = WAVES && WAVES.some(w=>['1','2','3','4','5'].includes(String(w.label)));
-    const banner = document.getElementById('cycleStageBanner');
-    if (banner) {
-      if (hasImpulse && !hasABC) {
-        banner.style.display = 'block';
-        banner.style.borderColor = 'rgba(0,230,118,.35)';
-        banner.style.background = 'rgba(0,230,118,.06)';
-        banner.innerHTML = '<span style="color:var(--green);font-weight:700">📈 當前：推動浪階段（W1→W5）</span>'
-          + '<span style="color:var(--text-dim);margin-left:10px">5浪推動尚未完成 → ABC 修正浪尚未開始，故不顯示 A/B/C</span>';
-      } else if (hasABC && !hasImpulse) {
-        banner.style.display = 'block';
-        banner.style.borderColor = 'rgba(255,154,60,.35)';
-        banner.style.background = 'rgba(255,154,60,.06)';
-        banner.innerHTML = '<span style="color:var(--orange);font-weight:700">📉 當前：修正浪階段（A→B→C）</span>'
-          + '<span style="color:var(--text-dim);margin-left:10px">已完成5浪推動 → 進入 ABC 修正，W1~W5 已標記在更早的圖表區間</span>';
-      } else {
-        banner.style.display = 'none';
-      }
+  // ── 循環階段 Banner（推動浪 / 修正浪）──
+  const hasABC = engineResult.waves && engineResult.waves.some && engineResult.waves.some(w=>['A','B','C'].includes(String(w.label)));
+  const hasImpulse = WAVES && WAVES.some(w=>['1','2','3','4','5'].includes(String(w.label)));
+  const hasPostCycleABC = WAVES && WAVES.some(w=>['A','B','C'].includes(String(w.label)) && w.isPostCycle);
+  const banner = document.getElementById('cycleStageBanner');
+  if (banner) {
+    if (hasPostCycleABC) {
+      // 5浪完成後接 ABC：顯示「已完成5浪推動，ABC修正中」
+      banner.style.display = 'block';
+      banner.style.borderColor = 'rgba(255,154,60,.35)';
+      banner.style.background = 'rgba(255,154,60,.06)';
+      banner.innerHTML = '<span style="color:var(--orange);font-weight:700">📉 已完成5浪，進入ABC修正</span>'
+        + '<span style="color:var(--text-dim);margin-left:10px;font-size:.68rem">五浪推動已結束，目前進入 ABC 回檔修正階段</span>';
+    } else if (hasImpulse && !hasABC) {
+      banner.style.display = 'block';
+      banner.style.borderColor = 'rgba(0,230,118,.35)';
+      banner.style.background = 'rgba(0,230,118,.06)';
+      banner.innerHTML = '<span style="color:var(--green);font-weight:700">📈 推動浪階段（W1→W5）</span>'
+        + '<span style="color:var(--text-dim);margin-left:10px;font-size:.68rem">目前市場處於上升推動階段，共五個波浪</span>';
+    } else if (hasABC && !hasImpulse) {
+      banner.style.display = 'block';
+      banner.style.borderColor = 'rgba(255,154,60,.35)';
+      banner.style.background = 'rgba(255,154,60,.06)';
+      banner.innerHTML = '<span style="color:var(--orange);font-weight:700">📉 修正浪階段（A→B→C）</span>'
+        + '<span style="color:var(--text-dim);margin-left:10px;font-size:.68rem">五浪推動已結束，目前進入 ABC 回檔修正</span>';
+    } else {
+      banner.style.display = 'none';
     }
   }
 
+  // ── 波浪未成形 ──
   if (!WAVES.length) {
     document.getElementById('waveSection').style.display='block';
-
-    // ── 執行型態診斷 ──
     const diag = diagnosePattern(DATA, personality, WAVE_ENGINE_RESULT.zigzagPts||[]);
     const dColor = diag ? diag.color : 'var(--red)';
 
-    // ── 波浪未成形標題卡 ──
     const noWaveDiv = document.createElement('div');
-    noWaveDiv.style.cssText = `grid-column:1/-1;background:rgba(255,61,90,0.05);border:1px solid rgba(255,61,90,0.2);`+
-      `border-radius:10px;padding:12px 14px;font-family:"JetBrains Mono",monospace;font-size:.72rem;margin-bottom:6px;`;
-    noWaveDiv.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <span style="color:var(--red);font-weight:700;font-size:.8rem">❌ 波浪結構未成形</span>
-      </div>
-      <div style="color:var(--text-dim);line-height:1.7;font-size:.69rem;">${status||'三角驗證未通過，不符合艾略特波浪條件'}</div>`;
-    wrap.appendChild(noWaveDiv);
+    noWaveDiv.style.cssText = 'grid-column:1/-1;border-radius:12px;padding:16px 18px;' +
+      (diag
+        ? `border:1px solid ${dColor}44;background:${dColor}0c;`
+        : 'border:1px solid rgba(255,61,90,0.2);background:rgba(255,61,90,0.05);');
 
-    // ── 型態診斷卡（主體）──
     if (diag) {
-      const diagDiv = document.createElement('div');
-      diagDiv.style.cssText = `grid-column:1/-1;border:1px solid ${dColor}44;background:${dColor}0c;`+
-        `border-radius:12px;padding:14px 16px;font-family:"JetBrains Mono",monospace;`;
-
-      // 標題列
-      diagDiv.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid ${dColor}22;">
-          <span style="font-size:1.4rem">${diag.icon}</span>
+      noWaveDiv.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:1.6rem">${diag.icon}</span>
           <div>
-            <div style="color:${dColor};font-weight:700;font-size:.85rem;">目前型態：${diag.pattern}</div>
-            <div style="color:var(--text-dim);font-size:.66rem;margin-top:2px;">型態辨識度 ${diag.score}%</div>
+            <div style="color:${dColor};font-weight:700;font-size:.9rem;">${diag.pattern}</div>
+            <div style="color:var(--text-dim);font-size:.7rem;margin-top:2px;">目前走勢型態</div>
           </div>
-          <div style="margin-left:auto;width:36px;height:36px;border-radius:50%;background:${dColor}22;
-            border:2px solid ${dColor}66;display:flex;align-items:center;justify-content:center;
-            color:${dColor};font-size:.72rem;font-weight:700;">${diag.score}</div>
         </div>
-
-        <div style="display:grid;gap:8px;font-size:.70rem;">
-
-          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 10px;">
-            <div style="color:var(--text-dim);font-size:.63rem;margin-bottom:3px;letter-spacing:.05em;">📊 型態描述</div>
-            <div style="color:var(--text);line-height:1.75;">${diag.desc}</div>
-            <div style="color:var(--text-dim);margin-top:4px;font-size:.66rem;">${diag.detail}</div>
-          </div>
-
-          <div style="background:rgba(255,61,90,0.06);border-left:2px solid rgba(255,61,90,0.5);
-            border-radius:0 8px 8px 0;padding:8px 10px;">
-            <div style="color:rgba(255,100,100,0.8);font-size:.63rem;margin-bottom:3px;letter-spacing:.05em;">🌊 為何不構成波浪</div>
-            <div style="color:var(--text-dim);line-height:1.75;">${diag.suggestion}</div>
-          </div>
-
-          <div style="background:rgba(0,229,255,0.05);border-left:2px solid rgba(0,229,255,0.4);
-            border-radius:0 8px 8px 0;padding:8px 10px;">
-            <div style="color:rgba(0,229,255,0.7);font-size:.63rem;margin-bottom:3px;letter-spacing:.05em;">💡 操作建議</div>
-            <div style="color:var(--text-dim);line-height:1.75;">${diag.action}</div>
-          </div>
-
+        <div style="color:var(--text);font-size:.8rem;line-height:1.8;margin-bottom:10px;">${diag.desc}</div>
+        <div style="background:rgba(0,229,255,0.05);border-left:3px solid rgba(0,229,255,0.4);
+          border-radius:0 8px 8px 0;padding:10px 12px;">
+          <div style="color:rgba(0,229,255,0.8);font-size:.7rem;font-weight:600;margin-bottom:4px;">💡 建議</div>
+          <div style="color:var(--text-dim);font-size:.76rem;line-height:1.7;">${diag.action}</div>
         </div>`;
-      wrap.appendChild(diagDiv);
+    } else {
+      const noWaveReason = (WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.noWaveReason) || '走勢結構尚不明朗';
+      noWaveDiv.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="font-size:1.5rem">🔍</span>
+          <div style="color:rgba(255,214,0,0.9);font-weight:700;font-size:.88rem;">暫時看不出波浪理論</div>
+        </div>
+        <div style="color:var(--text);font-size:.8rem;line-height:1.8;margin-bottom:10px;">
+          <b>原因：</b>${noWaveReason}
+        </div>
+        <div style="background:rgba(255,214,0,0.05);border-left:3px solid rgba(255,214,0,0.4);
+          border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;">
+          <div style="color:rgba(255,214,0,0.8);font-size:.7rem;font-weight:600;margin-bottom:4px;">📋 波浪理論適用條件</div>
+          <div style="color:var(--text-dim);font-size:.74rem;line-height:1.8;">
+            ① 鐵律：W2 不能跌破 W1 起點<br>
+            ② 鐵律：W3 不能是最短的推動浪<br>
+            ③ 鐵律：W4 不能進入 W1 的價格區間<br>
+            ④ 量能：W3 成交量應為五浪中最大
+          </div>
+        </div>
+        <div style="color:var(--text-dim);font-size:.72rem;">💡 建議換更長週期（如月K、季K）觀察大趨勢，或等待趨勢明朗後再做波浪判斷。</div>`;
     }
+    wrap.appendChild(noWaveDiv);
     return;
   }
+
   document.getElementById('waveSection').style.display='block';
 
-  // ── 狀態列 ──
-  const statusColor = confidence>=80?'var(--green)':confidence>=60?'var(--yellow)':'var(--orange)';
-  const statusDiv=document.createElement('div');
-  statusDiv.style.cssText='grid-column:1/-1;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.12);'+
-    'border-radius:10px;padding:10px 14px;margin-bottom:4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
-  // 取出分項分數
-  const ar = engineResult.activeCycle && engineResult.activeCycle.result;
-  const geoSc  = ar && ar.geoScore      != null ? ar.geoScore      : null;
-  const momSc  = ar && ar.momentumScore != null ? ar.momentumScore : null;
-  const volSc  = ar && ar.volumeScore   != null ? ar.volumeScore   : null;
-  const scoreBreakdown = [
-    geoSc  != null ? `幾何結構 ${geoSc}分（權重 60%）` : null,
-    momSc  != null ? `RSI動能  ${momSc}分（權重 25%）` : null,
-    volSc  != null ? `量能確認 ${volSc}分（權重 15%）` : null,
-  ].filter(Boolean).join('\n');
-  const scoreTooltip = scoreBreakdown
-    ? `三角驗證總分 = 幾何×60% + RSI動能×25% + 量能×15%\n\n${scoreBreakdown}\n\n分數愈高代表波浪結構愈符合艾略特三鐵律`
-    : '三角驗證：幾何結構 + RSI動能 + 量能確認 加權平均';
-
-  statusDiv.innerHTML=`
-    <span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:${statusColor}">${status}</span>
-    <div style="flex:1;min-width:80px;background:rgba(255,255,255,0.08);border-radius:4px;height:4px;overflow:hidden;">
-      <div style="width:${confidence}%;height:100%;background:${statusColor};border-radius:4px;transition:width .5s;"></div>
-    </div>
-    <span class="score-pill" title="${scoreTooltip}" style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:${statusColor};cursor:help;border-bottom:1px dashed ${statusColor}88;">${confidence}分 ℹ</span>
-    ${geoSc!=null?`<div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-top:4px;">
-      ${geoSc!=null?`<span class="score-tag" style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);">幾何 ${geoSc}</span>`:''}
-      ${momSc!=null?`<span class="score-tag" style="background:rgba(156,106,255,.08);border:1px solid rgba(156,106,255,.2);color:var(--purple);">動能 ${momSc}</span>`:''}
-      ${volSc!=null?`<span class="score-tag" style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--green);">量能 ${volSc}</span>`:''}
-    </div>`:''}`;
-  wrap.appendChild(statusDiv);
+  // ── 各波浪卡片 ──
+  const subWavesMap = (WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.subWaves) || {};
 
   WAVES.forEach((w, idx) => {
+    if(w.isSubWave) return; // 子波不單獨顯示卡片
     const isUp  = w.toPrice > w.fromPrice;
     const isImp = w.isImpulse;
-    const isLast = idx === WAVES.length - 1;
-    const typeTxt = isImp ? '推動浪' : '修正浪';
+
+    // ── 「進行中」判斷：取最後一個非子波的浪，且它是 partial（未完成）
+    // 同時：若存在 postCycle 浪（ABC），最後一個 postCycle 才算進行中；
+    // 若沒有 postCycle 浪，則最後一個主浪（partial）才算進行中
+    const visibleWaves = WAVES.filter(v => !v.isSubWave);
+    const lastVisible  = visibleWaves[visibleWaves.length - 1];
+    const hasPostCycle = visibleWaves.some(v => v.isPostCycle);
+    let isActive = false;
+    if(w === lastVisible){
+      // 如果有 postCycle 浪：最後一個 postCycle 浪就是「進行中」
+      // 如果沒有 postCycle 浪：最後一個主浪，且 activeCycle 是 partial，才是「進行中」
+      if(hasPostCycle && w.isPostCycle) isActive = true;
+      else if(!hasPostCycle && (w.partial || (WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.activeCycle && !WAVE_ENGINE_RESULT.activeCycle.complete))) isActive = true;
+    }
+    const isLast = isActive;
+
+    // 子波資訊
+    const subs = subWavesMap[String(w.label)] || [];
+    const subCount = subs.length;
+    const subHtml = subCount > 0 ? `
+      <div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:.58rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-bottom:3px;">子波結構</div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;">
+          ${subs.map(s => {
+            const sIsUp = s.toPrice > s.fromPrice;
+            const sLbl = String(s.label).split('-')[1] || s.label;
+            return `<span style="font-size:.58rem;padding:1px 5px;border-radius:4px;
+              background:${s.color}18;border:1px solid ${s.color}44;color:${s.color};
+              font-family:'JetBrains Mono',monospace;">
+              ${sLbl} ${sIsUp?'↑':'↓'}${Math.abs(s.pct).toFixed(0)}%
+            </span>`;
+          }).join('')}
+        </div>
+      </div>` : '';
+
+    // 波浪說明文字
+    const waveDesc = {
+      '1': '趨勢啟動，開始上升',
+      '2': '回調整理，修正W1',
+      '3': '主升段，力道最強',
+      '4': '高檔整理，蓄勢',
+      '5': '末升段，接近高點',
+      'A': '回檔開始，轉為下跌',
+      'B': '反彈修正，假突破',
+      'C': '末跌段，修正接近尾聲',
+    }[String(w.label)] || (isImp ? '推動浪' : '修正浪');
+
+    // 計算此波浪段的平均成交量，與整體均量比較
+    const wVolHtml = (() => {
+      if(!DATA || !DATA.length || !DATA[0] || !DATA[0].volume) return '';
+      const from = Math.max(0, w.fromIdx);
+      const to   = Math.min(DATA.length - 1, w.toIdx);
+      let volSum = 0, volCnt = 0;
+      for(let vi = from; vi <= to; vi++){ volSum += DATA[vi].volume || 0; volCnt++; }
+      if(!volCnt) return '';
+      const wAvgVol = volSum / volCnt;
+      const allAvgVol = DATA.reduce((s,d)=>s+(d.volume||0), 0) / DATA.length;
+      const ratio = wAvgVol / Math.max(allAvgVol, 1);
+      // 量能評估
+      const lbl = String(w.label);
+      let volStatus, volColor;
+      if(['1','3','5','B'].includes(lbl)){
+        // 推動浪：期望放量
+        if(lbl === '3'){
+          volStatus = ratio >= 1.1 ? '✅ 量能充足（主升符合規律）' : ratio >= 0.85 ? '⚠ 量能略弱（主升最好放量）' : '❌ 量能不足（W3應為最大量）';
+          volColor = ratio >= 1.1 ? 'var(--green)' : ratio >= 0.85 ? 'var(--yellow)' : 'var(--red)';
+        } else {
+          volStatus = ratio >= 0.9 ? '✅ 放量' : '⚠ 量能偏弱';
+          volColor = ratio >= 0.9 ? 'var(--green)' : 'var(--yellow)';
+        }
+      } else {
+        // 修正浪：期望縮量
+        volStatus = ratio <= 0.8 ? '✅ 縮量回調（健康）' : ratio <= 1.0 ? '⚠ 量未明顯縮' : '❌ 修正浪量太大';
+        volColor = ratio <= 0.8 ? 'var(--green)' : ratio <= 1.0 ? 'var(--yellow)' : 'var(--red)';
+      }
+      return `<div style="margin-top:4px;font-size:.62rem;color:${volColor};">${volStatus}</div>`;
+    })();
+
     const div = document.createElement('div');
     div.className = 'wave-card' + (isLast ? ' wave-card-active' : '');
     div.style.borderTopColor = w.color;
     if (isLast) div.style.setProperty('--wave-active-color', w.color);
+
     div.innerHTML = `
-      <div class="wc-label" style="color:${w.color}">波浪 ${w.label}${isLast ? ` <span class="wc-active-badge">進行中</span><span class="wave-info-tip" title="進行中≠只漲不跌&#10;&#10;每個大浪內部有子浪（例如W5包含W5-1到W5-5）。&#10;目前的回落可能只是W5內部的小四浪整理，&#10;整理完還有最後一小推，才真正進入ABC修正。&#10;&#10;若回落幅度持續超過W4低點，才考慮W5已見頂。">ℹ</span>` : ''}</div>
-      <div class="wc-type">${typeTxt}</div>
-      <div class="wc-range" style="color:${w.color}">${w.fromPrice.toFixed(1)} → ${w.toPrice.toFixed(1)}</div>
-      <div class="wc-change" style="color:${isUp?'var(--cup)':'var(--cdn)'}">
-        ${isUp?'▲':'▼'} ${Math.abs(w.toPrice-w.fromPrice).toFixed(1)} 元
+      <div class="wc-label" style="color:${w.color}">
+        浪 ${w.label}
+        ${isLast ? `<span class="wc-active-badge">進行中</span>` : ''}
+        ${subCount > 0 ? `<span style="font-size:.5rem;padding:1px 4px;border-radius:4px;background:rgba(255,255,255,.07);color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-left:3px;">${subCount}子</span>` : ''}
       </div>
-      <div class="wc-pct" style="color:${isUp?'var(--cup)':'var(--cdn)'}">${w.pct>=0?'+':''}${w.pct.toFixed(1)}%</div>
-      <div class="wc-days">⏱ ${w.days} 交易日</div>`;
+      <div class="wc-type" style="margin-bottom:6px;font-size:.7rem;color:var(--text);line-height:1.5;">${waveDesc}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+        <span style="font-size:.72rem;color:${isUp?'var(--cup)':'var(--cdn)'};font-weight:700;">
+          ${isUp?'▲':'▼'} ${Math.abs(w.pct).toFixed(1)}%
+        </span>
+        <span style="font-size:.65rem;color:var(--text-dim);">${w.days} 日</span>
+      </div>
+      ${wVolHtml}
+      ${subHtml}`;
     div.addEventListener('click', () => highlightWave(w, div));
     wrap.appendChild(div);
   });
 
-  // ── W5 / 末浪 疑似見頂警示 ──────────────────────────────────────
-  if (WAVES.length > 0) {
-    const lastW = WAVES[WAVES.length - 1];
+  // ── 下一浪預測卡 ──
+  const lastW = WAVES[WAVES.length - 1];
+  if (lastW) {
+    const nextLabel = { '1':'2','2':'3','3':'4','4':'5','5':'A','A':'B','B':'C','C':'1' };
+    const nl = nextLabel[String(lastW.label)];
+    if (nl) {
+      const nextIsImp = ['1','3','5','B'].includes(nl);
+      const nextDesc = {
+        '1':'新一輪上升即將開始','2':'拉回整理，屬正常修正',
+        '3':'主升段啟動，力道最強','4':'高檔整理，整理後繼續',
+        '5':'最後一段上升','A':'開始回檔修正',
+        'B':'短暫反彈，後續仍有修正','C':'修正末段，接近底部',
+      }[nl] || (nextIsImp ? '推動浪' : '修正浪');
+
+      const nextColor = nextIsImp ? 'var(--green)' : 'var(--orange)';
+      const nextDiv = document.createElement('div');
+      nextDiv.className = 'wave-card';
+      nextDiv.style.cssText = `border-top:3px solid ${nextColor};background:rgba(255,255,255,0.02);border-style:dashed;opacity:.85;`;
+      nextDiv.innerHTML = `
+        <div class="wc-label" style="color:${nextColor}">浪 ${nl} <span style="font-size:.55rem;font-family:'JetBrains Mono',monospace;opacity:.7;">下一步</span></div>
+        <div class="wc-type" style="font-size:.7rem;color:var(--text);line-height:1.5;margin-top:4px;">${nextDesc}</div>
+        <div style="font-size:.62rem;color:var(--text-dim);margin-top:8px;">${nextIsImp?'📈 偏多方向':'📉 偏空方向'}</div>`;
+      wrap.appendChild(nextDiv);
+    }
+  }
+
+  // ── 見頂警示 ──
+  if (lastW) {
     const lastClose = DATA[DATA.length - 1].close;
-    // 找最後一浪的高點（推動浪取最高，修正浪取低點）
     const lastHigh = Math.max(lastW.fromPrice, lastW.toPrice);
     const pullbackPct = (lastHigh - lastClose) / lastHigh * 100;
-    const isLastImpulse = lastW.isImpulse;
-    // 條件：推動浪 + 已從高點回落超過 8%
-    if (isLastImpulse && pullbackPct >= 8) {
+    if (lastW.isImpulse && pullbackPct >= 8) {
       const warnDiv = document.createElement('div');
-      warnDiv.style.cssText = 'grid-column:1/-1;border-radius:10px;padding:10px 14px;margin-bottom:4px;' +
-        'border:1px solid rgba(255,214,0,.4);background:rgba(255,214,0,.06);' +
-        'font-family:"JetBrains Mono",monospace;font-size:.72rem;';
-      const pullStr = pullbackPct.toFixed(1);
+      warnDiv.style.cssText = 'grid-column:1/-1;border-radius:10px;padding:12px 14px;' +
+        'border:1px solid rgba(255,214,0,.4);background:rgba(255,214,0,.05);';
       warnDiv.innerHTML = `
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <span style="font-size:1.2rem;line-height:1.2">⚠</span>
-          <div>
-            <div style="color:var(--yellow);font-weight:700;font-size:.78rem;margin-bottom:4px;">
-              疑似 W${lastW.label} 已見頂，留意 ABC 修正開始
-            </div>
-            <div style="color:var(--text-dim);line-height:1.7;font-size:.69rem;">
-              當前價 <span style="color:var(--text)">${lastClose.toFixed(1)}</span> 已從高點
-              <span style="color:var(--text)">${lastHigh.toFixed(1)}</span> 回落
-              <span style="color:var(--yellow)">${pullStr}%</span>，超過警示門檻（8%）。<br>
-              <strong style="color:rgba(255,214,0,.8)">可能是W${lastW.label}內部子浪整理（正常）</strong>，也可能是大浪見頂後的 A 浪開始。<br>
-              若後續跌破 W${lastW.label} 起點 <span style="color:var(--text)">${lastW.fromPrice.toFixed(1)}</span>，
-              則 ABC 修正確認。
-            </div>
-          </div>
+        <div style="color:var(--yellow);font-weight:700;font-size:.82rem;margin-bottom:6px;">⚠ 留意回調</div>
+        <div style="color:var(--text-dim);font-size:.76rem;line-height:1.75;">
+          當前已從波浪 ${lastW.label} 高點回落 <span style="color:var(--yellow);font-weight:700">${pullbackPct.toFixed(1)}%</span>，
+          需留意是否進入修正浪。若跌破 <span style="color:var(--text)">${lastW.fromPrice.toFixed(1)}</span>
+          則可能確認修正開始。
         </div>`;
       wrap.appendChild(warnDiv);
     }
   }
 
-  // 預測目標卡（費波那契延伸）
+  // ── 預測目標卡（僅顯示最重要的目標價）──
   if (forecast.length > 0) {
     const lastClose = DATA[DATA.length-1].close;
     const fcDiv = document.createElement('div');
-    fcDiv.className = 'wave-card';
-    fcDiv.style.borderTopColor = '#ffd600';
-    fcDiv.style.background = 'rgba(255,214,0,0.04)';
+    fcDiv.style.cssText = 'grid-column:1/-1;border-radius:12px;padding:14px 16px;' +
+      'border:1px solid rgba(255,214,0,.25);background:rgba(255,214,0,.04);';
     fcDiv.innerHTML = `
-      <div class="wc-label" style="color:#ffd600">📡 預測目標</div>
-      <div class="wc-type">費波那契延伸</div>
-      <div style="font-size:.62rem;color:var(--text-dim);margin-top:4px;margin-bottom:2px;line-height:1.5;">
-        以下為費波那契延伸目標，屬<strong style="color:rgba(255,214,0,.75)">機率性參考</strong>，非保證到達價位。
+      <div style="color:#ffd600;font-weight:700;font-size:.82rem;margin-bottom:10px;">📡 預測目標區</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;">
+        ${forecast.slice(0,3).map((fc, fi)=>{
+          const diff = fc.price - lastClose;
+          const pct = (diff/lastClose*100).toFixed(1);
+          const isUp = diff > 0;
+          const labels = ['近期目標','中期目標','遠期目標'];
+          return `<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px;text-align:center;">
+            <div style="font-size:.62rem;color:var(--text-dim);margin-bottom:4px;">${labels[fi]||'目標'}</div>
+            <div style="font-size:.9rem;font-weight:700;color:${isUp?'var(--cup)':'var(--cdn)'};">${fc.price.toFixed(1)}</div>
+            <div style="font-size:.65rem;color:${isUp?'var(--cup)':'var(--cdn)'};">${isUp?'+':''}${pct}%</div>
+          </div>`;
+        }).join('')}
       </div>
-      ${forecast.map((fc, fi)=>{
-        const diff = fc.price-lastClose;
-        const pct = (diff/lastClose*100).toFixed(1);
-        const isUp = diff>0;
-        // 情境標籤：第一個最近的是保守，中間是中性，最遠是樂觀（若漲）
-        const scenarioUp   = ['保守目標','中性目標','樂觀目標'];
-        const scenarioDown = ['常見支撐','深度回撤','極端情境'];
-        const scenarios = isUp ? scenarioUp : scenarioDown;
-        const scenLabel = scenarios[Math.min(fi, scenarios.length-1)];
-        const scenColor = fi===0?'rgba(0,229,255,.6)':fi===1?'rgba(255,214,0,.6)':'rgba(255,154,60,.6)';
-        return `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:.68rem;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-          <span style="display:flex;flex-direction:column;gap:1px;">
-            <span style="color:${scenColor};font-size:.58rem;">${scenLabel}</span>
-            <span style="color:var(--text-dim)">${fc.label}</span>
-          </span>
-          <span style="color:${isUp?'var(--cup)':'var(--cdn)'};">${fc.price.toFixed(1)} <span style="font-size:.62rem;opacity:.8;">(${isUp?'+':''}${pct}%)</span></span>
-        </div>`;
-      }).join('')}
-      <div style="font-size:.6rem;color:var(--text-dark);margin-top:6px;line-height:1.5;border-top:1px solid rgba(255,255,255,.05);padding-top:5px;">
-        💡 到達保守目標後若量縮、RSI背離，可留意反轉訊號
-      </div>`;
+      <div style="font-size:.63rem;color:var(--text-dark);margin-top:8px;">⚠ 目標僅供參考，非保證到達</div>`;
     wrap.appendChild(fcDiv);
   }
 
-  // ── v5: 波浪完成度卡 ──
-  if (WAVE_V5 && WAVE_V5.completion && WAVE_V5.completion.pct !== undefined) {
+  // ── v5: 波浪完成度卡（已隱藏：資訊重複，移除以簡化版面）──
+  if (false && WAVE_V5 && WAVE_V5.completion && WAVE_V5.completion.pct !== undefined) {
     const comp = WAVE_V5.completion;
     const compColor = comp.inZone ? 'var(--green)' : comp.isBull ? '#4db6ff' : '#f06292';
     const compDiv = document.createElement('div');
@@ -4883,8 +5217,8 @@ function updateWaveCards() {
     wrap.appendChild(vdDiv);
   }
 
-  // ── v5: 成交密集區卡 ──
-  if (WAVE_V5 && WAVE_V5.volumeProfile && WAVE_V5.volumeProfile.length) {
+  // ── v5: 成交密集區卡（已隱藏）──
+  if (false && WAVE_V5 && WAVE_V5.volumeProfile && WAVE_V5.volumeProfile.length) {
     const vpDiv = document.createElement('div');
     vpDiv.className = 'wave-card';
     vpDiv.style.borderTopColor = 'rgba(130,130,200,0.7)';
@@ -4902,8 +5236,8 @@ function updateWaveCards() {
     wrap.appendChild(vpDiv);
   }
 
-  // ── 長期大浪資訊卡 ──
-  if (WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.longWaves && WAVE_ENGINE_RESULT.longWaves.length > 0) {
+  // ── 長期大浪資訊卡（已隱藏）──
+  if (false && WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.longWaves && WAVE_ENGINE_RESULT.longWaves.length > 0) {
     const ltDiv = document.createElement('div');
     ltDiv.className = 'wave-card';
     ltDiv.style.borderTopColor = 'rgba(255,214,0,0.7)';
@@ -4926,8 +5260,8 @@ function updateWaveCards() {
     wrap.appendChild(ltDiv);
   }
 
-  // ── v5: 趨勢線 + 回測評分卡 ──
-  if (WAVE_V5 && (WAVE_V5.trendLines.support || WAVE_V5.trendLines.resistance || WAVE_V5.backtestScore)) {
+  // ── v5: 趨勢線 + 回測評分卡（已隱藏）──
+  if (false && WAVE_V5 && (WAVE_V5.trendLines.support || WAVE_V5.trendLines.resistance || WAVE_V5.backtestScore)) {
     const btDiv = document.createElement('div');
     btDiv.className = 'wave-card';
     btDiv.style.borderTopColor = 'rgba(255,214,0,0.6)';
@@ -4953,169 +5287,135 @@ function updateWaveCards() {
 }
 
 // ═══════════════════════════════════════════════════════
-// SUMMARY PANEL
+// SUMMARY PANEL — 簡潔版：目前位置 + 下一步預測
 // ═══════════════════════════════════════════════════════
 function updateSummaryPanel() {
   const panel = document.getElementById('summaryPanel');
 
-  // Current wave position
   const lastWave = WAVES[WAVES.length-1];
   const engineResult = WAVE_ENGINE_RESULT || {};
-  const confidence = engineResult.confidence || 0;
   const forecast = engineResult.forecast || [];
   const personality = engineResult.personality || null;
-  let wavePosHtml = '--';
 
-  // 市場個性區塊（永遠顯示，不論有無波浪）
-  if (personality) {
-    const msLabel = {
-      'STRONG_TREND': '✅ 強趨勢',
-      'WEAK_TREND':   '📊 弱趨勢',
-      'RANGING':      '⚠ 橫盤震盪',
-      'CHOPPY':       '🚫 雜亂無序'
-    }[personality.marketState] || personality.marketState;
-    const msColor = {
-      'STRONG_TREND': 'var(--green)',
-      'WEAK_TREND':   'var(--yellow)',
-      'RANGING':      'var(--orange)',
-      'CHOPPY':       'var(--red)'
-    }[personality.marketState] || 'var(--text-dim)';
-    const tsBar = Math.round(personality.trendScore*100);
-    const rrPct = Math.round(personality.reversalRate*100);
-    const r2Pct = Math.round(personality.rSquared*100);
-    wavePosHtml = `
-      <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:.68rem;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="color:${msColor};font-weight:700;">${msLabel}</span>
-          <span style="color:var(--text-dim)">趨勢強度</span>
-          <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:3px;height:4px;">
-            <div style="width:${tsBar}%;height:100%;background:${msColor};border-radius:3px;"></div>
-          </div>
-          <span style="color:${msColor}">${tsBar}分</span>
-        </div>
-        <div style="display:flex;gap:12px;color:var(--text-dim);">
-          <span>R²趨勢度 ${r2Pct}%</span>
-          <span>震盪率 ${rrPct}%</span>
-          <span>ZigZag門檻 ${(personality.zigzagMinPct*100).toFixed(1)}%</span>
-        </div>
-      </div>`;
-  }
-
+  // ── 當前波浪位置（直覺說明）──
+  let wavePosHtml = '';
   if (lastWave) {
-    const dir = lastWave.toPrice>lastWave.fromPrice?'上升':'下降';
-    const tag = lastWave.isImpulse
-      ? `<span class="sb-tag ${lastWave.toPrice>lastWave.fromPrice?'tag-up':'tag-down'}">推動浪${lastWave.label}</span>`
-      : `<span class="sb-tag tag-neutral">修正浪${lastWave.label}</span>`;
-    wavePosHtml += `${tag} 目前位於${dir}的波浪 ${lastWave.label}，`+
-      `區間 ${lastWave.fromPrice.toFixed(1)} → ${lastWave.toPrice.toFixed(1)} 元。`;
+    const isUp = lastWave.toPrice > lastWave.fromPrice;
+    const waveDescMap = {
+      '1':'趨勢啟動浪，上升開始','2':'回調整理浪，修正W1漲幅',
+      '3':'主升浪，力道最強最長','4':'高檔整理浪，蓄勢待發',
+      '5':'末升浪，接近頂部區域','A':'回檔修正開始，轉為下跌',
+      'B':'短暫反彈，後續仍有下跌空間','C':'修正末跌浪，接近底部',
+    };
+    const waveDesc = waveDescMap[String(lastWave.label)] || (lastWave.isImpulse?'推動浪':'修正浪');
+    const wColor = lastWave.isImpulse ? (isUp?'var(--green)':'var(--red)') : 'var(--orange)';
+    const stageIcon = lastWave.isImpulse ? (isUp?'📈':'📉') : '🔄';
 
-    // 信心度
-    const confColor = confidence>=80?'var(--green)':confidence>=60?'var(--yellow)':'var(--orange)';
-    wavePosHtml += `<br><span style="color:${confColor}">波浪信心分數：${confidence} / 100（門檻 ${personality?personality.confidenceThreshold:55}）</span>`;
-
-    // 費波那契預測目標
-    if (forecast.length>0) {
-      const lastClose = DATA[DATA.length-1].close;
-      wavePosHtml += `<br><span style="color:var(--yellow);font-size:.7rem">📡 費波那契目標：`;
-      wavePosHtml += forecast.map(fc=>{
-        const diff=fc.price-lastClose;
-        const pct=(diff/lastClose*100).toFixed(1);
-        return `${fc.price.toFixed(1)}（${pct}%）`;
-      }).join('　');
-      wavePosHtml += `</span>`;
-    }
-
-    // Next wave hint
+    // 下一浪
     const nextLabel = { '1':'2','2':'3','3':'4','4':'5','5':'A','A':'B','B':'C','C':'1' };
-    const nl = nextLabel[lastWave.label];
-    if (nl) {
-      const nextIsImp = ['1','3','5','B'].includes(nl);
-      wavePosHtml += `<br>下一段預期波浪 ${nl}（${nextIsImp?'推動浪':'修正浪'}）。`;
-    }
-    // 長期大浪提示
-    if(engineResult.longWaves && engineResult.longWaves.length > 0){
-      const ltW = engineResult.longWaves;
-      const ltLast = ltW[ltW.length-1];
-      const ltDir = ltLast.toPrice > ltLast.fromPrice ? '上升' : '下降';
-      wavePosHtml += `<br><span style="color:rgba(255,214,0,0.75);font-size:.68rem">🌊 大浪 ${ltLast.label}（${ltDir}浪，跨 ${ltLast.days} 日）—— 以帶圈符號顯示於圖表</span>`;
-    }
-  } else if (engineResult.status) {
-    // 波浪未成形 — 在 summary 裡也顯示型態診斷摘要
-    wavePosHtml += `<span style="color:var(--red);font-size:.7rem">${engineResult.status}</span>`;
-    const diag = diagnosePattern(DATA, personality, engineResult.zigzagPts||[]);
-    if (diag) {
-      wavePosHtml += `
-        <div style="margin-top:8px;background:${diag.color}0d;border:1px solid ${diag.color}33;
-          border-radius:8px;padding:8px 10px;font-size:.68rem;">
-          <div style="color:${diag.color};font-weight:700;margin-bottom:4px;">${diag.icon} 目前型態：${diag.pattern}</div>
-          <div style="color:var(--text-dim);line-height:1.7;">${diag.desc}</div>
-          <div style="color:var(--text-dim);margin-top:4px;font-size:.65rem;border-top:1px solid ${diag.color}22;padding-top:4px;">
-            💡 ${diag.action}
+    const nl = nextLabel[String(lastWave.label)];
+    const nextIsImp = nl && ['1','3','5','B'].includes(nl);
+    const nextDescMap = {
+      '1':'啟動新的上升趨勢','2':'回拉整理，屬正常修正',
+      '3':'主力大漲即將啟動','4':'整理蓄勢，再攻高點',
+      '5':'最後一段上升','A':'開始向下回檔',
+      'B':'反彈一波，後續繼續下','C':'最後一段下跌',
+    };
+    const nextDesc = nl ? (nextDescMap[nl] || (nextIsImp?'推動浪':'修正浪')) : '';
+
+    wavePosHtml = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+        <div style="width:54px;height:54px;border-radius:50%;
+          background:${wColor}22;border:2px solid ${wColor}66;
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="font-size:1.5rem;">${stageIcon}</span>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;color:${wColor}">浪 ${lastWave.label}</span>
+            <span class="wc-active-badge">進行中</span>
           </div>
-        </div>`;
-    }
+          <div style="color:var(--text);font-size:.82rem;margin-top:3px;">${waveDesc}</div>
+        </div>
+      </div>
+      ${nl ? `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+        border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);margin-bottom:10px;">
+        <span style="color:var(--text-dim);font-size:.72rem;">接下來預期</span>
+        <span style="font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;
+          color:${nextIsImp?'var(--green)':'var(--orange)'}">→ 浪 ${nl}</span>
+        <span style="color:var(--text-dim);font-size:.72rem;">${nextDesc}</span>
+        <span style="margin-left:auto;font-size:.7rem;">${nextIsImp?'📈 偏多':'📉 偏空'}</span>
+      </div>` : ''}
+      ${forecast.length>0 ? `
+      <div style="font-size:.72rem;color:var(--text-dim);margin-top:2px;">
+        📡 預測目標：${forecast.slice(0,2).map(fc=>{
+          const diff=fc.price-DATA[DATA.length-1].close;
+          const pct=(diff/DATA[DATA.length-1].close*100).toFixed(1);
+          return `<span style="color:${diff>0?'var(--cup)':'var(--cdn)'}">${fc.price.toFixed(1)}（${pct}%）</span>`;
+        }).join('　')}
+      </div>` : ''}`;
+  } else if (engineResult.status) {
+    wavePosHtml = `<div style="color:var(--text-dim);font-size:.78rem;line-height:1.8;">
+      尚未偵測到明確波浪結構。<br>可嘗試延長查詢期間（12M）或換其他股票。</div>`;
   }
   document.getElementById('sbWavePosContent').innerHTML = wavePosHtml;
 
-  // Trend
+  // ── 趨勢判斷（均線）──
   const closes = DATA.map(d=>d.close);
   const ma5  = closes.slice(-5).reduce((s,v)=>s+v,0)/5;
   const ma20 = closes.slice(-20).reduce((s,v)=>s+v,0)/20;
   const lastClose = closes[closes.length-1];
-  let trendTag='', trendDesc='';
+  let trendTag='', trendDesc='', trendEmoji='';
   if (lastClose>ma5 && ma5>ma20) {
-    trendTag='<span class="sb-tag tag-up">多頭排列</span>';
-    trendDesc='收盤 > MA5 > MA20，短中期均線多頭排列，趨勢偏多。';
+    trendTag='<span class="sb-tag tag-up">多頭</span>';
+    trendDesc='短中期均線多頭排列，方向向上。';
+    trendEmoji='📈';
   } else if (lastClose<ma5 && ma5<ma20) {
-    trendTag='<span class="sb-tag tag-down">空頭排列</span>';
-    trendDesc='收盤 < MA5 < MA20，短中期均線空頭排列，趨勢偏空。';
+    trendTag='<span class="sb-tag tag-down">空頭</span>';
+    trendDesc='短中期均線空頭排列，方向向下。';
+    trendEmoji='📉';
   } else {
     trendTag='<span class="sb-tag tag-neutral">盤整</span>';
-    trendDesc='均線交叉或排列不明顯，短期方向待確認。';
+    trendDesc='均線方向不明，短期待確認。';
+    trendEmoji='↔';
   }
-  document.getElementById('sbTrendContent').innerHTML = trendTag+' '+trendDesc;
+  document.getElementById('sbTrendContent').innerHTML = `
+    <div style="font-size:1.5rem;margin-bottom:6px;">${trendEmoji}</div>
+    ${trendTag} ${trendDesc}`;
 
-  // Fibonacci retracement
+  // ── Fibonacci 回撤（保留但標題改得更易懂）──
   const allClose = DATA.map(d=>d.close);
   const maxP = Math.max(...allClose);
   const minP = Math.min(...allClose);
   const diff = maxP - minP;
   const fibs = [
-    {ratio:'23.6%', level:maxP-diff*.236, color:'#38bdf8'},
-    {ratio:'38.2%', level:maxP-diff*.382, color:'#00e676'},
-    {ratio:'50.0%', level:maxP-diff*.500, color:'#ffd600'},
-    {ratio:'61.8%', level:maxP-diff*.618, color:'#ff9a3c'},
-    {ratio:'78.6%', level:maxP-diff*.786, color:'#f44336'},
+    {ratio:'輕度回撤 23.6%', level:maxP-diff*.236, color:'#38bdf8'},
+    {ratio:'中度回撤 38.2%', level:maxP-diff*.382, color:'#00e676'},
+    {ratio:'半路回撤 50.0%', level:maxP-diff*.500, color:'#ffd600'},
+    {ratio:'深度回撤 61.8%', level:maxP-diff*.618, color:'#ff9a3c'},
+    {ratio:'強力回撤 78.6%', level:maxP-diff*.786, color:'#f44336'},
   ];
   document.getElementById('fibRow').innerHTML = fibs.map(f => {
     const pct = ((f.level-minP)/diff*100);
     return `<div class="fib-item">
-      <span class="fib-ratio">${f.ratio}</span>
+      <span class="fib-ratio" style="width:90px;font-size:.62rem;">${f.ratio}</span>
       <div class="fib-bar-wrap"><div class="fib-bar" style="width:${pct}%;background:${f.color}"></div></div>
       <span class="fib-price">${f.level.toFixed(1)}</span>
     </div>`;
   }).join('');
 
-  // Stats
+  // ── 簡要統計（保留，但移除技術細節）──
   const n = DATA.length;
   const periodMax = Math.max(...DATA.map(d=>d.high)).toFixed(1);
   const periodMin = Math.min(...DATA.map(d=>d.low)).toFixed(1);
-  const avgVol    = Math.round(DATA.reduce((s,d)=>s+d.volume,0)/n);
   const upDays    = DATA.filter(d=>d.close>=d.open).length;
-  const downDays  = n-upDays;
-  // 長期波浪提示
-  let ltWaveHint = '';
-  if(WAVE_ENGINE_RESULT && WAVE_ENGINE_RESULT.longWaves && WAVE_ENGINE_RESULT.longWaves.length>0){
-    const ltW = WAVE_ENGINE_RESULT.longWaves;
-    const ltLast = ltW[ltW.length-1];
-    const ltDir = ltLast.toPrice > ltLast.fromPrice ? '上升' : '下降';
-    ltWaveHint = `<br><span style="color:var(--yellow);font-size:.68rem">📐 大浪 ${ltLast.label}（${ltDir}浪）跨越 ${ltLast.days} 個交易日</span>`;
-  }
+  const downDays  = n - upDays;
+  const upRatio   = Math.round(upDays/n*100);
   document.getElementById('sbStatsContent').innerHTML =
-    `期間 ${n} 個交易日<br>`+
+    `查詢期間 <span style="color:var(--text)">${n}</span> 個交易日<br>`+
     `最高 <span style="color:var(--cup)">${periodMax}</span>　最低 <span style="color:var(--cdn)">${periodMin}</span><br>`+
-    `平均量 <span style="color:var(--text)">${avgVol.toLocaleString()} 張</span><br>`+
-    `上漲 <span style="color:var(--cup)">${upDays}</span> 日　下跌 <span style="color:var(--cdn)">${downDays}</span> 日`+ltWaveHint;
+    `上漲 <span style="color:var(--cup)">${upDays}日（${upRatio}%）</span>　下跌 <span style="color:var(--cdn)">${downDays}日</span>`;
 
   panel.style.display='block';
 }
@@ -5667,6 +5967,15 @@ function toggleSibExtra() {
 // ═══════════════════════════════════════════════════════
 // QUICKSTART TOGGLE
 // ═══════════════════════════════════════════════════════
+function toggleWaveGuide() {
+  const body = document.getElementById('wgBody');
+  const arrow = document.getElementById('wgArrow');
+  if (!body) return;
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '▶ 展開' : '▼ 收合';
+}
+
 function toggleQuickstart() {
   const body = document.getElementById('qsBody');
   const arrow = document.getElementById('qsArrow');

@@ -4903,7 +4903,7 @@ const API_BASE = (() => {
   if (host === '127.0.0.1' || host === 'localhost') {
     return 'http://127.0.0.1:5000';           // 本地開發
   }
-  return 'https://linebot-project-oxnw.onrender.com'; // GitHub Pages / 正式環境
+  return window.location.origin;              // 自動使用當前網域（jellystockdata.com）
 })();
 
 // ── PARTICLE SYSTEM ───────────────────────────────────────────────────────────
