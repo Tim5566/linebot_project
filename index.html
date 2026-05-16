@@ -2029,7 +2029,7 @@
     .nav-item.active::before { opacity: 1; }
     .nav-item.active svg { color: var(--accent); filter: drop-shadow(0 0 4px rgba(0,229,255,.5)); }
 
-    /* ── 群組 1：查詢工具 — 青藍色 ── */
+    /* ── 群組 1：個股查詢工具 — 青藍色 ── */
     .nav-group-search .nav-item { color: rgba(255,255,255,.92); }
     .nav-group-search .nav-item svg { color: rgba(0,229,255,.8); filter: drop-shadow(0 0 3px rgba(0,229,255,.3)); }
     .nav-group-search .nav-item:hover { color: #ffffff; background: rgba(0,229,255,.09); border-color: rgba(0,229,255,.28); }
@@ -3267,7 +3267,7 @@
     body.theme-day .nav-badge { background: rgba(26,100,180,.12); border-color: rgba(26,100,180,.25); color: #1a5090; text-shadow: none; }
 
     /* ── icon 顏色：跟太空主題完全一致（只移除 glow，改為 filter:none）── */
-    /* 查詢工具：青色 rgba(0,229,255) */
+    /* 個股查詢工具：青色 rgba(0,229,255) */
     body.theme-day .nav-group-search .nav-item { color: #1a4a78; }
     body.theme-day .nav-group-search .nav-item svg { color: rgba(0,180,215,.85); filter: none; opacity: 1; }
     body.theme-day .nav-group-search .nav-item:hover { color: #0d3560; background: rgba(0,160,200,.06); border-color: rgba(0,160,200,.18); }
@@ -4197,15 +4197,15 @@
 
     <div class="drawer-divider"></div>
 
-    <!-- ── 群組 1：查詢工具 ── -->
+    <!-- ── 群組 1：個股查詢工具 ── -->
     <div class="drawer-section nav-group-search">
-      <span class="nav-group-label">查詢工具</span>
+      <span class="nav-group-label">個股查詢工具</span>
 
       <button class="nav-item" id="navScrollMain" data-nav-id="main" onclick="scrollToMain()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        個股查詢
+        盤後法人數據
       </button>
 
       <button class="nav-item fav-nav-item" id="navWatchlist" data-nav-id="watchlist" onclick="openWatchlistModal()">
@@ -4227,7 +4227,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 3v18h18"/><path d="m7 16 4-8 4 4 2-4"/>
         </svg>
-        SNAP FIT MA
+        最佳均線分析
         <span style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">均線定位</span>
       </button>
     </div>
@@ -4887,7 +4887,7 @@
       <span class="footer-sep">·</span>
       <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
       <span class="footer-sep">·</span>
-      <a href="mailto:llowoll5566@gmail.com">聯絡我們</a>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
     </div>
   </div>
 </footer>
