@@ -243,7 +243,24 @@
     body.theme-day .card-title { color:#1a3a5c; }
     body.theme-day .state-box  { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.12); color:#2a5070; }
     body.theme-day .footer-note { background:rgba(255,255,255,.45); border-color:rgba(10,60,120,.12); color:#3a6080; }
-  </style>
+  
+    /* ── Site-wide footer (sf-*) ── */
+    #site-footer { position:relative; z-index:10; border-top:1px solid rgba(0,229,255,.08); background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99)); box-shadow:0 -2px 30px rgba(0,0,0,.4); margin-top:40px; }
+    .sf-inner { padding:20px 40px 24px; display:flex; flex-direction:column; gap:8px; }
+    .sf-disclaimer { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:rgba(122,154,184,.6); line-height:1.7; text-align:center; margin:0; }
+    .sf-links { display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; margin-top:4px; }
+    .sf-links a { color:rgba(0,229,255,.6); font-size:.7rem; font-family:'Share Tech Mono',monospace; text-decoration:none; transition:color .2s; }
+    .sf-links a:hover { color:#00e5ff; }
+    .sf-sep { color:rgba(0,229,255,.2); }
+    .sf-copy { text-align:center; font-family:'Share Tech Mono',monospace; font-size:.6rem; color:rgba(122,154,184,.3); margin:6px 0 0; }
+    /* Day theme overrides */
+    body.theme-day #site-footer { background:rgba(240,247,255,.97) !important; border-top-color:rgba(26,123,191,.14) !important; box-shadow:0 -2px 16px rgba(26,100,180,.07) !important; }
+    body.theme-day .sf-disclaimer { color:#4a7090 !important; }
+    body.theme-day .sf-links a { color:#1a7bbf !important; }
+    body.theme-day .sf-links a:hover { color:#0d5fa0 !important; }
+    body.theme-day .sf-sep { color:rgba(26,123,191,.3) !important; }
+    body.theme-day .sf-copy { color:#7a9cb8 !important; }
+</style>
 </head>
 <body>
 
@@ -584,39 +601,19 @@ loadNews();
 </script>
 
 <!-- ── FOOTER ── -->
-<footer style="
-  position: relative;
-  z-index: 10;
-  border-top: 1px solid rgba(0,229,255,.08);
-  background: linear-gradient(180deg, rgba(3,6,14,.97), rgba(2,4,10,.99));
-  box-shadow: 0 -2px 30px rgba(0,0,0,.4);
-  margin-top: 40px;
-">
-  <div style="padding: 20px 40px 24px; display: flex; flex-direction: column; gap: 8px;">
-    <p style="
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .62rem;
-      color: rgba(122,154,184,.6);
-      line-height: 1.7;
-      text-align: center;
-    ">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
-    <div style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    ">
-      <a href="/stock_site/legal/about.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">關於本站</a>
-      <span style="color:rgba(0,229,255,.2);">·</span>
-      <a href="/stock_site/legal/privacy.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">隱私政策</a>
-      <span style="color:rgba(0,229,255,.2);">·</span>
-      <a href="/stock_site/legal/disclaimer.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">免責聲明</a>
-      <span style="color:rgba(0,229,255,.2);">·</span>
-      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">聯絡我們</a>
+<footer id="site-footer">
+  <div class="sf-inner">
+    <p class="sf-disclaimer">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div class="sf-links">
+      <a href="/stock_site/legal/about.html">關於本站</a>
+      <span class="sf-sep">·</span>
+      <a href="/stock_site/legal/privacy.html">隱私政策</a>
+      <span class="sf-sep">·</span>
+      <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+      <span class="sf-sep">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
     </div>
-    <p style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(122,154,184,.3);margin-top:6px;">© 2025 JellyStock. All rights reserved.</p>
+    <p class="sf-copy">© 2026 JellyStock. All rights reserved.</p>
   </div>
 </footer>
 

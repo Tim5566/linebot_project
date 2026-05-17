@@ -2939,6 +2939,148 @@
       background: rgba(10,60,160,.05);
       border-color: rgba(10,60,160,.16);
     }
+
+    /* ── site footer: day theme ── */
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(240,247,255,.97), rgba(228,240,255,.99)) !important;
+      border-top-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span {
+      color: rgba(30,70,120,.65) !important;
+    }
+    body.theme-day #site-footer a {
+      color: rgba(18,101,168,.7) !important;
+    }
+    body.theme-day #site-footer a:hover {
+      color: #1265a8 !important;
+    }
+
+    /* ══════════════════════════════════════
+       NEW BONUS SECTIONS — CSS
+    ═══════════════════════════════════════ */
+
+    /* ── Compare table scrollable wrapper ── */
+    .table-scroll-wrap { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+    /* ── Corp event tabs ── */
+    .corp-tab {
+      padding:8px 18px; border-radius:10px; font-family:'Share Tech Mono',monospace;
+      font-size:.72rem; letter-spacing:.07em; cursor:pointer; transition:all .2s;
+      background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.18); color:var(--text-dim);
+    }
+    .corp-tab.active { background:rgba(0,229,255,.12); border-color:rgba(0,229,255,.45); color:var(--accent); }
+    .corp-tab:hover { background:rgba(0,229,255,.08); color:var(--text); }
+    body.theme-day .corp-tab { background:rgba(26,123,191,.06); border-color:rgba(26,101,168,.25); color:#1a3a60; }
+    body.theme-day .corp-tab.active { background:rgba(26,123,191,.14); border-color:#1265a8; color:#1265a8; }
+
+    /* ── Calc labels/inputs ── */
+    .calc-label { display:block; font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:.12em; color:var(--text-faint); margin-bottom:6px; text-transform:uppercase; }
+    .calc-input {
+      width:100%; background:rgba(0,0,0,.3); border:1px solid rgba(0,229,255,.18);
+      border-radius:8px; padding:9px 12px; color:var(--text); font-size:.88rem;
+      font-family:'Share Tech Mono',monospace; transition:border-color .2s; outline:none;
+    }
+    .calc-input:focus { border-color:rgba(0,229,255,.5); }
+    body.theme-day .calc-input { background:rgba(255,255,255,.85); border-color:rgba(26,101,168,.25); color:#0a1828; }
+    body.theme-day .calc-input:focus { border-color:rgba(26,101,168,.5); }
+
+    /* ── Calc result box ── */
+    .calc-result {
+      background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.15);
+      border-radius:12px; padding:16px 18px; font-size:.86rem; line-height:1.85;
+      color:var(--text); min-height:80px;
+    }
+    .calc-result .r-num { font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:700; }
+    body.theme-day .calc-result { background:rgba(26,123,191,.05); border-color:rgba(26,101,168,.18); color:#0a1828; }
+
+    /* ── History timeline ── */
+    .hist-timeline { display:flex; flex-direction:column; gap:0; margin:20px 0; }
+    .hist-item { display:flex; gap:0; align-items:flex-start; position:relative; }
+    .hist-year {
+      width:110px; flex-shrink:0; font-family:'Orbitron',monospace; font-size:.78rem;
+      font-weight:700; padding-top:18px; text-align:right; padding-right:16px; letter-spacing:.04em;
+    }
+    .hist-connector {
+      width:2px; background:rgba(0,229,255,.18); flex-shrink:0; min-height:100%;
+      position:relative; margin:0 14px;
+    }
+    .hist-connector::before {
+      content:''; position:absolute; top:20px; left:50%; transform:translateX(-50%);
+      width:10px; height:10px; border-radius:50%;
+      background:rgba(0,229,255,.5); border:2px solid rgba(0,229,255,.8);
+      box-shadow:0 0 10px rgba(0,229,255,.4);
+    }
+    .hist-card {
+      flex:1; background:rgba(0,0,0,.2); border:1px solid rgba(0,229,255,.15);
+      border-radius:14px; padding:16px 18px; margin-bottom:16px;
+    }
+    .hist-title { font-size:.92rem; font-weight:700; color:#fff; margin-bottom:4px; }
+    .hist-range { font-family:'Share Tech Mono',monospace; font-size:.72rem; color:var(--text-dim); margin-bottom:4px; }
+    .hist-stat { font-family:'Orbitron',monospace; font-size:.75rem; font-weight:700; margin-bottom:10px; }
+    .hist-desc { font-size:.82rem; color:var(--text-dim); line-height:1.75; }
+    .hist-lesson { margin-top:10px; font-size:.8rem; color:var(--yellow); background:rgba(255,214,0,.06); border-left:2px solid rgba(255,214,0,.4); padding:8px 12px; border-radius:0 8px 8px 0; }
+    body.theme-day .hist-card { background:rgba(255,255,255,.82); border-color:rgba(26,101,168,.18); }
+    body.theme-day .hist-title { color:#0a1828; }
+    body.theme-day .hist-desc { color:#1a3550; }
+    body.theme-day .hist-lesson { background:rgba(184,136,14,.07); border-left-color:rgba(184,136,14,.4); color:#8a6000; }
+    @media(max-width:600px){
+      .hist-year { width:72px; font-size:.68rem; }
+      .hist-card { padding:12px 14px; }
+    }
+
+    /* ── Psych quiz ── */
+    .psych-q-block { margin-bottom:20px; background:rgba(0,0,0,.15); border:1px solid rgba(0,229,255,.1); border-radius:14px; padding:18px 20px; }
+    .psych-q-label { font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.18em; color:var(--accent); opacity:.7; margin-bottom:8px; }
+    .psych-q-text { font-size:.9rem; color:var(--text); margin-bottom:14px; line-height:1.65; }
+    .psych-opts { display:flex; flex-direction:column; gap:8px; }
+    .psych-opt {
+      padding:10px 14px; border-radius:9px; font-size:.84rem; color:var(--text-dim);
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.1); cursor:pointer; transition:all .18s;
+    }
+    .psych-opt:hover { background:rgba(0,229,255,.07); color:var(--text); border-color:rgba(0,229,255,.25); }
+    .psych-opt.selected { background:rgba(0,229,255,.12); color:var(--accent); border-color:rgba(0,229,255,.45); }
+    body.theme-day .psych-q-block { background:rgba(255,255,255,.7); border-color:rgba(26,101,168,.18); }
+    body.theme-day .psych-q-text { color:#0a1828; }
+    body.theme-day .psych-opt { background:rgba(255,255,255,.6); border-color:rgba(26,101,168,.18); color:#1a3550; }
+    body.theme-day .psych-opt:hover { background:rgba(26,123,191,.08); border-color:rgba(26,101,168,.35); color:#0d3560; }
+    body.theme-day .psych-opt.selected { background:rgba(26,123,191,.14); border-color:#1265a8; color:#1265a8; }
+
+    /* ── Psych result ── */
+    .psych-result-card {
+      border-radius:16px; padding:24px; border:1.5px solid;
+    }
+    .psych-result-type { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:700; margin-bottom:8px; }
+    .psych-result-desc { font-size:.86rem; color:var(--text-dim); line-height:1.8; margin-bottom:16px; }
+    .psych-advice-title { font-family:'Share Tech Mono',monospace; font-size:.62rem; letter-spacing:.15em; margin-bottom:10px; opacity:.8; }
+    .psych-advice-item { font-size:.83rem; line-height:1.75; color:var(--text-dim); padding:4px 0; }
+
+    /* ── MktCap cards ── */
+    .mktcap-card:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,.3); }
+    body.theme-day .mktcap-card { background:rgba(255,255,255,.82) !important; }
+
+    /* ── IPO flow ── */
+    .ipo-flow { display:flex; align-items:flex-start; gap:0; flex-wrap:wrap; margin:0; justify-content:center; }
+    .ipo-step {
+      background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.2); border-radius:12px;
+      padding:14px 14px; text-align:center; flex:1; min-width:120px; max-width:160px;
+    }
+    .ipo-step-icon { font-size:1.6rem; margin-bottom:6px; }
+    .ipo-step-num { font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.15em; color:var(--accent); margin-bottom:5px; }
+    .ipo-step-title { font-size:.82rem; font-weight:700; color:#fff; margin-bottom:8px; }
+    .ipo-step-desc { font-size:.75rem; color:var(--text-faint); line-height:1.65; text-align:left; }
+    .ipo-arrow { font-size:1.2rem; color:var(--accent); padding:30px 4px 0; flex-shrink:0; opacity:.6; }
+    body.theme-day .ipo-step { background:rgba(255,255,255,.75); border-color:rgba(26,101,168,.2); }
+    body.theme-day .ipo-step-title { color:#0a1828; }
+    body.theme-day .ipo-step-desc { color:#3a5070; }
+    body.theme-day .ipo-arrow { color:#1265a8; }
+    @media(max-width:600px){
+      .ipo-flow { flex-direction:column; align-items:stretch; }
+      .ipo-step { max-width:100%; }
+      .ipo-arrow { transform:rotate(90deg); padding:0 0; text-align:center; }
+    }
+
   </style>
 <script type="application/ld+json">
 {
@@ -3084,6 +3226,20 @@
     <div class="toc-item" onclick="scrollToSec('sec9')"><div class="toc-dot" id="d9">09</div><div class="toc-lbl">真實<br/>案例</div></div>
     <div class="toc-connector"></div>
     <div class="toc-item" onclick="scrollToSec('sec10')"><div class="toc-dot" id="d10">10</div><div class="toc-lbl">總結<br/>測驗</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secA')"><div class="toc-dot" id="dA" style="font-size:.7rem">🌐</div><div class="toc-lbl">台vs美<br/>股對比</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secB')"><div class="toc-dot" id="dB" style="font-size:.7rem">🥧</div><div class="toc-lbl">台灣50<br/>圓餅圖</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secC')"><div class="toc-dot" id="dC" style="font-size:.7rem">🧮</div><div class="toc-lbl">除息<br/>計算器</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secD')"><div class="toc-dot" id="dD" style="font-size:.7rem">📜</div><div class="toc-lbl">歷史<br/>時間軸</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secE')"><div class="toc-dot" id="dE" style="font-size:.7rem">🧬</div><div class="toc-lbl">投資人<br/>測驗</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secF')"><div class="toc-dot" id="dF" style="font-size:.7rem">⚖️</div><div class="toc-lbl">市值vs<br/>股價</div></div>
+    <div class="toc-connector"></div>
+    <div class="toc-item" onclick="scrollToSec('secG')"><div class="toc-dot" id="dG" style="font-size:.7rem">🚀</div><div class="toc-lbl">IPO<br/>機制</div></div>
   </div>
 
   <!-- SEC 1：股票是什麼 -->
@@ -4027,6 +4183,796 @@
     </div>
   </div>
 
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC A：台股 vs 美股對比表 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secA">
+    <div class="card-header">
+      <div class="card-icon">🌐</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.A</div>
+        <div class="card-title">台股 vs 美股——你需要知道的關鍵差異</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        很多台灣投資人同時買台股和美股，但兩個市場的規則差很多。搞不清楚規則，就像用台灣的交通規則開車進美國高速公路——危險又無效率。
+      </p>
+
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin:20px 0;">
+      <table class="compare-table" style="min-width:580px;">
+        <thead>
+          <tr>
+            <th style="min-width:120px">項目</th>
+            <th style="color:var(--red);min-width:180px">🇹🇼 台股</th>
+            <th style="color:var(--accent);min-width:180px">🇺🇸 美股</th>
+            <th style="min-width:120px">影響</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">交易時間</strong></td>
+            <td>週一至五<br>09:00 – 13:30（台灣時間）</td>
+            <td>週一至五<br>09:30 – 16:00（美東時間）<br>= 台灣夜間 22:30 – 05:00</td>
+            <td style="color:var(--yellow)">台灣人買美股需熬夜或掛單</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">漲跌幅限制</strong></td>
+            <td><span style="color:var(--red);font-weight:700">±10%</span><br>每日最大漲跌幅上限</td>
+            <td><span style="color:var(--accent);font-weight:700">無上限</span><br>熔斷機制（跌7/13/20%暫停）</td>
+            <td style="color:var(--yellow)">台股不會單日腰斬；美股可以</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">結算制度</strong></td>
+            <td>T+2 交割<br>（買股後第2個交易日扣款）</td>
+            <td>T+1 交割<br>（2024年後改為T+1）</td>
+            <td style="color:var(--yellow)">台股資金調度較寬裕</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">最小買賣單位</strong></td>
+            <td><span style="color:var(--red)">1張 = 1,000股</span><br>（零股可買1股）</td>
+            <td><span style="color:var(--accent)">1股起</span><br>部分支援小數股</td>
+            <td style="color:var(--yellow)">台積電1張約25萬台幣起跳</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">資本利得稅</strong></td>
+            <td><span style="color:var(--green);font-weight:700">免稅</span><br>（買賣差價不課稅）</td>
+            <td><span style="color:var(--red);font-weight:700">需課稅</span><br>短期/長期稅率不同（15-37%）</td>
+            <td style="color:var(--yellow)">台股對散戶在稅上更友善</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">交易稅</strong></td>
+            <td>賣出時課 <span style="color:var(--red)">0.3%</span> 證券交易稅</td>
+            <td>SEC費用極低（幾乎可忽略）</td>
+            <td style="color:var(--yellow)">頻繁短線在台股成本較高</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">股息課稅</strong></td>
+            <td>股息納入所得稅<br>（有8.5%可抵免）</td>
+            <td>台灣人收到美股股息<br>被預扣 <span style="color:var(--red)">30%</span> 美國稅</td>
+            <td style="color:var(--yellow)">高股息美股對台人稅損較大</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">做空機制</strong></td>
+            <td>融券放空<br>須符合資格限制</td>
+            <td>直接放空或買入反向ETF<br>選擇權更靈活</td>
+            <td style="color:var(--yellow)">美股空單工具更多元</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">市場深度</strong></td>
+            <td>市值約 <span style="color:var(--red)">62兆台幣</span><br>（以台積電為核心）</td>
+            <td>市值約 <span style="color:var(--accent)">1,000兆台幣</span><br>（全球最大市場）</td>
+            <td style="color:var(--yellow)">美股流動性更高，操控難度更大</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="insight-box" style="margin-top:16px">
+        <div class="insight-icon">💡</div>
+        <div class="insight-text">
+          <strong style="color:var(--accent)">給新手的建議：</strong>先熟悉台股規則。台股的10%漲跌幅限制讓行情節奏較慢，給新手更多反應時間。美股雖然機會更多，但波動也更劇烈，且需要考慮夜間交易和複雜的稅務問題——建議有一年以上台股經驗後再涉足。
+          <span class="insight-quote">「學會在小池塘游泳，再去挑戰大海。」</span>
+        </div>
+      </div>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(0,229,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.8" opacity="0.88"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#00b8d4"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#00b8d4"/>
+            <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(0,229,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">JELLY 提醒</div>
+          台股10%漲跌幅看似很多，但在極端行情下（例如 2022 年升息）依然可以「連續10%跌停」跌幾十天。別以為有限制就代表安全——停損永遠是必要的！
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC B：台灣50成分股圓餅圖 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secB">
+    <div class="card-header">
+      <div class="card-icon">🥧</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.B</div>
+        <div class="card-title">台灣50成分股——誰是台股的真正主人？</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        台灣50（0050）是台股最重要的ETF，追蹤台灣市值前50大公司。這50間公司市值合計佔台股總市值超過70%。換句話說，當你在看「大盤」，其實在看這50間公司的表現。
+      </p>
+      <p class="content-para">
+        其中最驚人的是：<em class="hl">台積電一家公司就佔了大盤近35%的比重</em>。這意味著台積電打噴嚏，台股整個感冒。
+      </p>
+
+      <!-- Interactive Pie Chart -->
+      <div id="tw50Chart" style="margin:24px 0;background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:24px;position:relative;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.8;margin-bottom:20px;text-align:center;">▶ 台灣50 前10大成分股比重（互動圓餅圖）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:center;">
+          <!-- SVG Pie -->
+          <svg id="pieSvg" viewBox="0 0 240 240" width="240" height="240" style="flex-shrink:0;overflow:visible">
+            <defs>
+              <filter id="pieGlow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- Pie slices drawn by JS -->
+          </svg>
+
+          <!-- Legend -->
+          <div id="pieLegend" style="display:flex;flex-direction:column;gap:7px;min-width:200px;max-width:260px;">
+            <!-- filled by JS -->
+          </div>
+        </div>
+
+        <!-- Hover tooltip -->
+        <div id="pieTooltip" style="display:none;position:fixed;pointer-events:none;z-index:999;
+             background:rgba(3,6,14,.96);border:1px solid rgba(0,229,255,.3);border-radius:10px;
+             padding:10px 14px;font-family:'Share Tech Mono',monospace;font-size:.72rem;
+             color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.5);">
+        </div>
+
+        <div style="margin-top:18px;font-size:.78rem;color:var(--text-faint);text-align:center;line-height:1.7;">
+          資料來源：元大投信（台灣50 0050 成分股，以市值加權比重，每季調整）<br>
+          <span style="color:rgba(0,229,255,.5)">點擊或移動滑鼠到扇形查看詳細資訊</span>
+        </div>
+      </div>
+
+      <div class="insight-box" style="background:linear-gradient(135deg,rgba(255,61,90,.07),rgba(200,20,50,.03));border-color:rgba(255,61,90,.22)">
+        <div class="insight-icon">⚠️</div>
+        <div class="insight-text">
+          <strong style="color:var(--red)">集中度風險：</strong>台股高度依賴台積電。2022年台積電從688元跌到370元，跌幅-46%，帶動大盤同期從18619點跌至12,629點，跌幅超過32%。當你買0050，你本質上是在以三成五的比重押注台積電。
+        </div>
+      </div>
+
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:12px;padding:14px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--accent);margin-bottom:8px">TOP 1</div>
+          <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:4px">台積電 (2330)</div>
+          <div style="font-size:.8rem;color:var(--text-dim)">半導體製造｜全球晶圓代工龍頭</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--accent);margin-top:8px">≈ 35.2%</div>
+        </div>
+        <div style="background:rgba(255,110,180,.04);border:1px solid rgba(255,110,180,.12);border-radius:12px;padding:14px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--pink);margin-bottom:8px">TOP 2–5</div>
+          <div style="font-size:.88rem;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.8">鴻海 5.1%<br>聯發科 4.8%<br>台達電 2.1%<br>富邦金 2.0%</div>
+          <div style="font-size:.78rem;color:var(--text-dim)">電子/金融多元布局</div>
+        </div>
+        <div style="background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.12);border-radius:12px;padding:14px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--green);margin-bottom:8px">TOP 6–10</div>
+          <div style="font-size:.88rem;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.8">國泰金 1.9%<br>中華電 1.7%<br>南亞 1.6%<br>台塑 1.4%<br>聯電 1.3%</div>
+          <div style="font-size:.78rem;color:var(--text-dim)">金融/傳產/半導體</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC C：除息/拆股/減資互動計算器 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secC">
+    <div class="card-header">
+      <div class="card-icon">🧮</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.C</div>
+        <div class="card-title">除息 / 股票拆分 / 減資——互動計算器</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        很多新手看到「除息後股價下跌」就以為公司出了問題，或看到「股票拆分後股數變多」就誤以為更有價值。這三件事搞不清楚，你的損益計算永遠都會出錯。
+      </p>
+
+      <!-- Tab selector -->
+      <div style="display:flex;gap:8px;margin:20px 0 0;flex-wrap:wrap">
+        <button class="corp-tab active" onclick="switchTab('div')" id="tab-div">📤 除息 (除權息)</button>
+        <button class="corp-tab" onclick="switchTab('split')" id="tab-split">✂️ 股票拆分</button>
+        <button class="corp-tab" onclick="switchTab('reduce')" id="tab-reduce">📉 減資</button>
+      </div>
+
+      <!-- 除息 panel -->
+      <div id="panel-div" class="corp-panel" style="display:block;margin-top:16px;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.12);border-radius:14px;padding:20px 22px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);margin-bottom:16px">除權息 — 計算「填息」需要多久回本</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div>
+            <label class="calc-label">持股股數 (股)</label>
+            <input class="calc-input" type="number" id="div-shares" value="1000" min="1" oninput="calcDiv()">
+          </div>
+          <div>
+            <label class="calc-label">目前股價 (元)</label>
+            <input class="calc-input" type="number" id="div-price" value="80" step="0.1" oninput="calcDiv()">
+          </div>
+          <div>
+            <label class="calc-label">現金股利 (元/股)</label>
+            <input class="calc-input" type="number" id="div-cash" value="4" step="0.1" oninput="calcDiv()">
+          </div>
+          <div>
+            <label class="calc-label">股票股利 (元/股)</label>
+            <input class="calc-input" type="number" id="div-stock" value="0.5" step="0.1" oninput="calcDiv()">
+          </div>
+        </div>
+        <div id="div-result" class="calc-result"></div>
+        <div style="margin-top:14px;font-size:.78rem;color:var(--text-faint);line-height:1.7">
+          <strong style="color:var(--yellow)">重要觀念：</strong>除息不是「賺到股息」，除息當天股價會自動扣除股利金額（除息基準價）。股息是從你的資產裡「分出來」的，等股價漲回除息前的價格才叫「填息成功」。
+        </div>
+      </div>
+
+      <!-- 拆分 panel -->
+      <div id="panel-split" class="corp-panel" style="display:none;margin-top:16px;background:rgba(0,0,0,.2);border:1px solid rgba(255,110,180,.12);border-radius:14px;padding:20px 22px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--pink);margin-bottom:16px">股票拆分 — 股數增加，股價等比下降</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div>
+            <label class="calc-label">目前持股 (股)</label>
+            <input class="calc-input" type="number" id="split-shares" value="1000" min="1" oninput="calcSplit()">
+          </div>
+          <div>
+            <label class="calc-label">目前股價 (元)</label>
+            <input class="calc-input" type="number" id="split-price" value="1200" step="0.1" oninput="calcSplit()">
+          </div>
+          <div>
+            <label class="calc-label">拆分比例 (新:舊)</label>
+            <select class="calc-input" id="split-ratio" onchange="calcSplit()">
+              <option value="2">2:1（每股拆成2股）</option>
+              <option value="3">3:1（每股拆成3股）</option>
+              <option value="4">4:1（每股拆成4股）</option>
+              <option value="5">5:1（每股拆成5股）</option>
+              <option value="10">10:1（每股拆成10股）</option>
+            </select>
+          </div>
+        </div>
+        <div id="split-result" class="calc-result"></div>
+        <div style="margin-top:14px;font-size:.78rem;color:var(--text-faint);line-height:1.7">
+          <strong style="color:var(--yellow)">重要觀念：</strong>股票拆分後，你持有的總市值<span style="color:var(--green)">完全不變</span>。股數多了，股價等比例降低，就像把一張1000元鈔票換成十張100元——錢沒有增加，只是面額不同。台股近年台積電、聯發科都有進行過股票分割（如2022年台積電調整股數）。
+        </div>
+      </div>
+
+      <!-- 減資 panel -->
+      <div id="panel-reduce" class="corp-panel" style="display:none;margin-top:16px;background:rgba(0,0,0,.2);border:1px solid rgba(255,61,90,.12);border-radius:14px;padding:20px 22px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--red);margin-bottom:16px">減資 — 公司縮減股本，股數減少，股價重算</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+          <div>
+            <label class="calc-label">目前持股 (股)</label>
+            <input class="calc-input" type="number" id="red-shares" value="5000" min="1" oninput="calcReduce()">
+          </div>
+          <div>
+            <label class="calc-label">目前股價 (元)</label>
+            <input class="calc-input" type="number" id="red-price" value="30" step="0.1" oninput="calcReduce()">
+          </div>
+          <div>
+            <label class="calc-label">減資比例 (%)</label>
+            <input class="calc-input" type="number" id="red-pct" value="60" min="1" max="99" oninput="calcReduce()">
+          </div>
+          <div>
+            <label class="calc-label">減資類型</label>
+            <select class="calc-input" id="red-type" onchange="calcReduce()">
+              <option value="cash">現金減資（退還現金給股東）</option>
+              <option value="loss">彌補虧損減資（無現金退回）</option>
+            </select>
+          </div>
+        </div>
+        <div id="red-result" class="calc-result"></div>
+        <div style="margin-top:14px;font-size:.78rem;color:var(--text-faint);line-height:1.7">
+          <strong style="color:var(--yellow)">重要觀念：</strong>
+          <span id="red-tip">現金減資通常是健康信號，公司把多餘現金還給股東；彌補虧損減資則是公司在消除帳面上的累積虧損，調整后每股淨值，股東市值不變但需注意公司體質。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC D：台股牛熊市歷史時間軸 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secD">
+    <div class="card-header">
+      <div class="card-icon">📜</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.D</div>
+        <div class="card-title">台股重大轉折點歷史時間軸</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        歷史不會重演，但往往押韻。研究台股過去的重大崩跌與反彈，能讓你在下次風暴來臨時保持冷靜——因為你知道「這不是第一次，也不會是最後一次」。
+      </p>
+
+      <div class="hist-timeline">
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--red)">1990</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.04)">
+            <div class="hist-title" style="color:var(--red)">🔴 台股史上最大崩盤</div>
+            <div class="hist-range">12,682 → 2,485 點</div>
+            <div class="hist-stat" style="color:var(--red)">跌幅 -80% | 歷時 8 個月</div>
+            <div class="hist-desc">
+              1980年代台灣錢淹腳目，全民瘋炒股，台股從1986年的1,000點飆漲至1990年2月的12,682點高峰——4年漲了12倍。隨後央行升息、波斯灣戰爭爆發、資金外逃，台股8個月內崩跌80%，是台股史上最慘烈的熊市。
+              <div class="hist-lesson">📌 教訓：全民瘋炒股往往是頂部訊號。上漲越劇烈，下跌越深。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--green)">1994–2000</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)">
+            <div class="hist-title" style="color:var(--green)">🟢 科技股黃金年代</div>
+            <div class="hist-range">2,500 → 10,202 點</div>
+            <div class="hist-stat" style="color:var(--green)">漲幅 +308% | 歷時約 6 年</div>
+            <div class="hist-desc">
+              台灣電子科技業崛起，台積電1987年成立、聯電擴大、鴻海布局代工，台股在這段期間靠電子股帶動長期多頭。1997年亞洲金融風暴後短暫修正，但2000年科技泡沫前再次衝高至萬點。
+              <div class="hist-lesson">📌 教訓：產業結構改變帶來長期主升段，要順著大趨勢操作。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--red)">2000–2001</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.04)">
+            <div class="hist-title" style="color:var(--red)">🔴 科技泡沫破裂 + 九二一地震</div>
+            <div class="hist-range">10,202 → 3,411 點</div>
+            <div class="hist-stat" style="color:var(--red)">跌幅 -67% | 歷時 18 個月</div>
+            <div class="hist-desc">
+              全球那斯達克泡沫破裂（dot-com crash），台灣科技股首當其衝。加上1999年九二一大地震衝擊，多重利空夾擊下台股重跌。這次也讓散戶首次理解「電子股並非永遠只漲不跌」。
+              <div class="hist-lesson">📌 教訓：高本益比（PE）的成長股在利率上升時跌最深、最快。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--red)">2008</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.04)">
+            <div class="hist-title" style="color:var(--red)">🔴 全球金融海嘯</div>
+            <div class="hist-range">9,309 → 3,955 點</div>
+            <div class="hist-stat" style="color:var(--red)">跌幅 -58% | 歷時 14 個月</div>
+            <div class="hist-desc">
+              美國次貸危機引爆全球金融體系崩潰，雷曼兄弟倒閉。台股從2007年高點9,309點崩跌，2008年11月最低點3,955點，短短14個月跌去將近六成。這是全球系統性風險的典型案例——台股只要「外資賣」就跌，沒有任何基本面能抵擋。
+              <div class="hist-lesson">📌 教訓：當外資系統性撤退，技術分析失效，現金為王。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--green)">2009–2015</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)">
+            <div class="hist-title" style="color:var(--green)">🟢 QE 量化寬鬆多頭</div>
+            <div class="hist-range">3,955 → 10,014 點</div>
+            <div class="hist-stat" style="color:var(--green)">漲幅 +153% | 歷時 6 年</div>
+            <div class="hist-desc">
+              美聯儲大規模量化寬鬆（QE）釋放流動性，全球股市同步走牛。台股在2009年觸底後展開長達六年的多頭，2015年重新站上萬點。台積電等電子股受惠於智慧型手機滲透率爆發。
+              <div class="hist-lesson">📌 教訓：全球流動性氾濫期間，多頭力量強大，逢低做多是最佳策略。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--red)">2020 Q1</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.04)">
+            <div class="hist-title" style="color:var(--yellow)">⚡ COVID-19 閃崩</div>
+            <div class="hist-range">12,197 → 8,523 點</div>
+            <div class="hist-stat" style="color:var(--yellow)">跌幅 -30% | 歷時僅 35 天</div>
+            <div class="hist-desc">
+              COVID-19 疫情蔓延全球，市場恐慌性拋售。台股在35天內從12,197點暴跌至8,523點，跌幅30%。但因各國政府迅速大規模財政刺激，股市快速V型反彈，創下史上最短熊市紀錄。
+              <div class="hist-lesson">📌 教訓：黑天鵝事件初期不要接刀，但政策底確立後的V型反彈往往是最大機會。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--green)">2020–2022</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)">
+            <div class="hist-title" style="color:var(--green)">🚀 疫情多頭 + AI 浪潮</div>
+            <div class="hist-range">8,523 → 18,619 點</div>
+            <div class="hist-stat" style="color:var(--green)">漲幅 +118% | 歷時 22 個月</div>
+            <div class="hist-desc">
+              史上最快速的V型反彈，疫情帶動遠距辦公、雲端運算、半導體需求爆發，台積電受惠於5nm、3nm製程優勢屢創新高。散戶大量入市，台股成交量屢破歷史紀錄，全民打開股票帳戶。
+              <div class="hist-lesson">📌 教訓：產業大轉型浪潮（AI、5G、電動車）是多頭最大燃料。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--red)">2022</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.04)">
+            <div class="hist-title" style="color:var(--red)">🔴 暴力升息熊市</div>
+            <div class="hist-range">18,619 → 12,629 點</div>
+            <div class="hist-stat" style="color:var(--red)">跌幅 -32% | 歷時 12 個月</div>
+            <div class="hist-desc">
+              美聯儲為打通膨在一年內暴力升息17碼（4.25%），是1980年代以來最激進升息。科技股評價大幅壓縮，台積電從688元跌至370元（-46%），帶動台股大盤重挫。通膨、升息、庫存去化三重打擊同時爆發。
+              <div class="hist-lesson">📌 教訓：利率是資產估值的萬有引力，升息期間高估值成長股跌最兇。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hist-item">
+          <div class="hist-year" style="color:var(--green)">2023–2025</div>
+          <div class="hist-connector"></div>
+          <div class="hist-card" style="border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.04)">
+            <div class="hist-title" style="color:var(--accent)">🤖 AI 革命新浪潮</div>
+            <div class="hist-range">12,629 → 24,416 點（歷史新高）</div>
+            <div class="hist-stat" style="color:var(--accent)">漲幅 +93% | 持續進行中</div>
+            <div class="hist-desc">
+              ChatGPT 引爆全球 AI 軍備競賽，輝達（NVIDIA）、台積電成為最大受益者。台積電先進製程需求爆發，外資持續大幅買超，台股在2024年突破歷史新高24,416點，台積電股價突破1,000元大關。
+              <div class="hist-lesson">📌 教訓：掌握技術革命的前沿製造商，往往是時代最大贏家。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="insight-box" style="margin-top:24px">
+        <div class="insight-icon">📊</div>
+        <div class="insight-text">
+          <strong style="color:var(--accent)">歷史統計規律：</strong>台股每一次從高點崩跌超過30%，最終都出現了新的歷史高點。問題從來不是「會不會回來」，而是「你的資金和心理撐不撐得到那時候」。長期投資的最大敵人，不是市場，而是自己的恐慌。
+          <span class="insight-quote">「市場先生每天開價，但你不必每天做決定。」</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC E：你是哪種投資人心理測驗 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secE">
+    <div class="card-header">
+      <div class="card-icon">🧬</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.E</div>
+        <div class="card-title">你是哪種投資人？——風險屬性心理測驗</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        投資策略沒有對錯，只有適不適合你的風險承受度。以下5個問題，幫你找出自己真實的投資風格——誠實作答，結果才準確！
+      </p>
+
+      <div id="psychQuiz" style="margin-top:20px">
+
+        <!-- Q1 -->
+        <div class="psych-q-block" id="pq1" data-q="1">
+          <div class="psych-q-label">問題 1 / 5</div>
+          <div class="psych-q-text">你剛買的股票突然跌了20%，你的第一直覺是？</div>
+          <div class="psych-opts">
+            <div class="psych-opt" onclick="selectPsych(1,'A',this)">A. 立刻停損出場，保住剩餘的80%</div>
+            <div class="psych-opt" onclick="selectPsych(1,'B',this)">B. 先觀察幾天，看看是否反彈</div>
+            <div class="psych-opt" onclick="selectPsych(1,'C',this)">C. 檢查基本面，若沒問題就加碼攤平</div>
+            <div class="psych-opt" onclick="selectPsych(1,'D',this)">D. 完全不在意，相信長期終會漲回</div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="psych-q-block" id="pq2" data-q="2">
+          <div class="psych-q-label">問題 2 / 5</div>
+          <div class="psych-q-text">你有100萬閒錢，你會如何分配投資？</div>
+          <div class="psych-opts">
+            <div class="psych-opt" onclick="selectPsych(2,'A',this)">A. 全部放定存或債券，追求穩定</div>
+            <div class="psych-opt" onclick="selectPsych(2,'B',this)">B. 70%穩健，30%股票，保守成長</div>
+            <div class="psych-opt" onclick="selectPsych(2,'C',this)">C. 50%核心ETF，50%個股，均衡配置</div>
+            <div class="psych-opt" onclick="selectPsych(2,'D',this)">D. 80-100%集中押注看好的個股</div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="psych-q-block" id="pq3" data-q="3">
+          <div class="psych-q-text">你最能接受哪種操作節奏？</div>
+          <div class="psych-q-label">問題 3 / 5</div>
+          <div class="psych-opts">
+            <div class="psych-opt" onclick="selectPsych(3,'A',this)">A. 每天看盤，短線進出，享受波動</div>
+            <div class="psych-opt" onclick="selectPsych(3,'B',this)">B. 每週追蹤，波段操作，持有數週</div>
+            <div class="psych-opt" onclick="selectPsych(3,'C',this)">C. 每月檢視，中長線，持有數月到一年</div>
+            <div class="psych-opt" onclick="selectPsych(3,'D',this)">D. 每季看一次，長期持有超過3年</div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="psych-q-block" id="pq4" data-q="4">
+          <div class="psych-q-label">問題 4 / 5</div>
+          <div class="psych-q-text">如果你的投資組合在一個月內虧損了30%，你的反應是？</div>
+          <div class="psych-opts">
+            <div class="psych-opt" onclick="selectPsych(4,'A',this)">A. 睡不著覺，嚴重影響日常生活</div>
+            <div class="psych-opt" onclick="selectPsych(4,'B',this)">B. 很焦慮，會反覆查看帳戶</div>
+            <div class="psych-opt" onclick="selectPsych(4,'C',this)">C. 有些不舒服，但還能理性思考</div>
+            <div class="psych-opt" onclick="selectPsych(4,'D',this)">D. 沉著冷靜，甚至考慮加碼</div>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="psych-q-block" id="pq5" data-q="5">
+          <div class="psych-q-label">問題 5 / 5</div>
+          <div class="psych-q-text">你學習投資的主要目的是？</div>
+          <div class="psych-opts">
+            <div class="psych-opt" onclick="selectPsych(5,'A',this)">A. 打敗通膨，保值資產不貶值</div>
+            <div class="psych-opt" onclick="selectPsych(5,'B',this)">B. 每年穩定獲得5-10%的報酬</div>
+            <div class="psych-opt" onclick="selectPsych(5,'C',this)">C. 10年後讓資產翻3-5倍</div>
+            <div class="psych-opt" onclick="selectPsych(5,'D',this)">D. 1-3年內大幅財富增長，積極賺錢</div>
+          </div>
+        </div>
+
+        <button id="psychSubmit" onclick="calcPsych()" style="display:none;margin-top:20px;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(0,100,200,.1));border:1.5px solid rgba(0,229,255,.4);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:.82rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;width:100%">
+          🔍 查看我的投資類型
+        </button>
+
+        <div id="psychResult" style="display:none;margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC F：市值 vs 股價觀念釐清 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secF">
+    <div class="card-header">
+      <div class="card-icon">⚖️</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.F</div>
+        <div class="card-title">市值 vs 股價——為什麼便宜的股票不一定「划算」？</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        新手最常犯的錯誤之一：看到股價30元就覺得「很便宜」，看到股價800元就說「太貴了買不起」。
+        <em class="hl">股價的數字本身幾乎毫無意義</em>——真正重要的是市值和你為每一元獲利付出的代價。
+      </p>
+
+      <!-- Interactive comparison -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;" id="mktCapCompare">
+        <div class="mktcap-card" id="mcc1" style="background:rgba(0,0,0,.25);border:1.5px solid rgba(0,229,255,.18);border-radius:14px;padding:18px;cursor:pointer;transition:all .25s" onclick="showDetail('A')">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--text-faint);margin-bottom:10px">公司 A</div>
+          <div style="font-size:2.2rem;font-weight:900;font-family:'Orbitron',monospace;color:var(--green)">$15</div>
+          <div style="font-size:.8rem;color:var(--text-dim);margin-top:6px">股價（元）</div>
+          <div style="margin-top:12px;font-size:.8rem;color:var(--text-faint)">點擊查看完整資訊 →</div>
+        </div>
+        <div class="mktcap-card" id="mcc2" style="background:rgba(0,0,0,.25);border:1.5px solid rgba(255,110,180,.18);border-radius:14px;padding:18px;cursor:pointer;transition:all .25s" onclick="showDetail('B')">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--text-faint);margin-bottom:10px">公司 B</div>
+          <div style="font-size:2.2rem;font-weight:900;font-family:'Orbitron',monospace;color:var(--pink)">$620</div>
+          <div style="font-size:.8rem;color:var(--text-dim);margin-top:6px">股價（元）</div>
+          <div style="margin-top:12px;font-size:.8rem;color:var(--text-faint)">點擊查看完整資訊 →</div>
+        </div>
+      </div>
+
+      <div id="mktDetail" style="display:none;margin:16px 0;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.15);border-radius:14px;padding:20px;"></div>
+
+      <div style="margin:20px 0;overflow-x:auto;">
+      <table class="compare-table" style="min-width:520px;">
+        <thead>
+          <tr>
+            <th>概念</th>
+            <th>公司 A（股價 $15）</th>
+            <th>公司 B（股價 $620）</th>
+            <th>結論</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">總股數</strong></td>
+            <td>100億股</td>
+            <td>1,000萬股</td>
+            <td style="color:var(--text-faint)">A的股數是B的1,000倍</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">市值</strong></td>
+            <td style="color:var(--red)">$1,500億（15 × 100億）</td>
+            <td style="color:var(--green)">$62億（620 × 1,000萬）</td>
+            <td style="color:var(--yellow)">⚠️ 「便宜」的A，市值反而高24倍！</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">年獲利</strong></td>
+            <td>$30億</td>
+            <td>$10億</td>
+            <td style="color:var(--text-faint)">A獲利是B的3倍</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">本益比 (PE)</strong></td>
+            <td style="color:var(--red)">50倍（貴！）</td>
+            <td style="color:var(--green)">6.2倍（便宜！）</td>
+            <td style="color:var(--green)">B才是真正便宜的那個</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="insight-box" style="background:linear-gradient(135deg,rgba(255,61,90,.08),rgba(200,20,50,.04));border-color:rgba(255,61,90,.25)">
+        <div class="insight-icon">🚨</div>
+        <div class="insight-text">
+          <strong style="color:var(--red)">三大常見錯誤觀念：</strong>
+          <br><br>
+          ❌ <strong>「股價低就是便宜」</strong> → 錯！要看市值和本益比，不是股價絕對值。<br>
+          ❌ <strong>「股票多就代表多賺」</strong> → 錯！股票數量多但市值不變，你的財富沒有增加。<br>
+          ❌ <strong>「高股價代表公司很賺」</strong> → 錯！股價高只反映市場願意付的價格，不代表獲利能力強。
+        </div>
+      </div>
+
+      <div style="margin:20px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:16px;">
+          <div style="font-size:.75rem;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:'Share Tech Mono',monospace">📐 本益比（P/E Ratio）</div>
+          <div style="font-size:.85rem;color:var(--text);line-height:1.7">股價 ÷ 每股盈餘（EPS）<br>衡量你為每1元獲利付出多少。台股平均PE約12-18倍。PE越低代表估值越便宜，但也可能代表公司成長性低。</div>
+        </div>
+        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:16px;">
+          <div style="font-size:.75rem;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:'Share Tech Mono',monospace">💰 市值（Market Cap）</div>
+          <div style="font-size:.85rem;color:var(--text);line-height:1.7">股價 × 總流通股數<br>代表市場對整家公司的估值。買股票其實是在以「一小份」的方式買入整間公司。市值才是公司真實「大小」的衡量。</div>
+        </div>
+        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:16px;">
+          <div style="font-size:.75rem;font-weight:700;color:var(--accent);margin-bottom:8px;font-family:'Share Tech Mono',monospace">📈 每股盈餘（EPS）</div>
+          <div style="font-size:.85rem;color:var(--text);line-height:1.7">稅後淨利 ÷ 總股數<br>公司為每一股創造了多少獲利。EPS成長代表公司越來越賺錢，是判斷公司體質最核心的數字。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 新增 SEC G：IPO 機制說明 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="section-card reveal" id="secG">
+    <div class="card-header">
+      <div class="card-icon">🚀</div>
+      <div class="card-title-wrap">
+        <div class="card-num">BONUS 1.G</div>
+        <div class="card-title">IPO 機制完整說明——股票是怎麼「上市」的？</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="content-para">
+        你在市場上買的股票，最初是從哪裡來的？一間公司從私人企業變成上市公司的過程，叫做 <em class="hl">IPO（Initial Public Offering，首次公開募股）</em>。搞懂這個機制，你才能理解「為什麼IPO股搶都搶不到，卻常常上市就崩」。
+      </p>
+
+      <!-- IPO Flow -->
+      <div style="margin:24px 0;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.8;margin-bottom:16px;text-align:center;">▶ 台灣 IPO 上市流程（從創業到掛牌）</div>
+
+        <div class="ipo-flow">
+          <div class="ipo-step">
+            <div class="ipo-step-icon">🏗️</div>
+            <div class="ipo-step-num">STEP 1</div>
+            <div class="ipo-step-title">未上市階段</div>
+            <div class="ipo-step-desc">公司為私人企業，股票在場外流通（俗稱「未上市股票」），流動性極低，買賣困難，風險極高。早期投資人包含天使投資人、創投（VC）。</div>
+          </div>
+          <div class="ipo-arrow">→</div>
+          <div class="ipo-step" style="border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.04)">
+            <div class="ipo-step-icon">📋</div>
+            <div class="ipo-step-num" style="color:var(--yellow)">STEP 2</div>
+            <div class="ipo-step-title" style="color:var(--yellow)">興櫃掛牌</div>
+            <div class="ipo-step-desc">提出申請後，先在「興櫃市場」交易（台灣獨有制度）。興櫃股票流動性較低，價格波動大，但讓公司有機會「試水溫」，準備未來上市/上櫃。</div>
+          </div>
+          <div class="ipo-arrow">→</div>
+          <div class="ipo-step" style="border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.04)">
+            <div class="ipo-step-icon">📊</div>
+            <div class="ipo-step-num" style="color:var(--purple)">STEP 3</div>
+            <div class="ipo-step-title" style="color:var(--purple)">申請審查</div>
+            <div class="ipo-step-desc">向金管會、台灣證交所（TWSE）或櫃買中心（TPEx）提出申請，需符合獲利、股本、公司治理等條件。審查期間約 6–18 個月。</div>
+          </div>
+          <div class="ipo-arrow">→</div>
+          <div class="ipo-step" style="border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.04)">
+            <div class="ipo-step-icon">💵</div>
+            <div class="ipo-step-num" style="color:var(--pink)">STEP 4</div>
+            <div class="ipo-step-title" style="color:var(--pink)">承銷定價</div>
+            <div class="ipo-step-desc">由承銷商（券商）訂定「承銷價」，向投資人募集資金。台灣通常採「競價拍賣」或「固定價格」方式，散戶可透過「申購」方式參與，中籤率通常只有幾%。</div>
+          </div>
+          <div class="ipo-arrow">→</div>
+          <div class="ipo-step" style="border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)">
+            <div class="ipo-step-icon">🎉</div>
+            <div class="ipo-step-num" style="color:var(--green)">STEP 5</div>
+            <div class="ipo-step-title" style="color:var(--green)">正式掛牌上市</div>
+            <div class="ipo-step-desc">首個交易日，股票在公開市場自由買賣。開盤價由市場決定，通常比承銷價高（蜜月行情），但也可能跌破承銷價（破發）。</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin:20px 0;overflow-x:auto;">
+      <table class="compare-table" style="min-width:460px;">
+        <thead>
+          <tr>
+            <th>市場</th>
+            <th>特性</th>
+            <th>適合投資人</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">🏗️ 未上市</strong></td>
+            <td style="color:var(--text-faint)">流動性極低，資訊不透明，可能全部損失</td>
+            <td style="color:var(--red)">只適合專業創投，散戶避開</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--yellow)">📋 興櫃</strong></td>
+            <td style="color:var(--text-faint)">每日漲跌幅無限制，流動性低，波動極大</td>
+            <td style="color:var(--yellow)">有研究能力的積極型投資人</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--purple)">🏦 上櫃（OTC）</strong></td>
+            <td style="color:var(--text-faint)">中型企業為主，漲跌幅±10%，流動性中等</td>
+            <td style="color:var(--purple)">熟悉個股研究的投資人</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--accent)">📈 上市（TWSE）</strong></td>
+            <td style="color:var(--text-faint)">大型企業，漲跌幅±10%，流動性最高</td>
+            <td style="color:var(--green)">所有投資人，入門首選</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- 承銷價怎麼定 -->
+      <div style="margin-top:20px;background:rgba(0,0,0,.2);border:1px solid rgba(178,102,255,.2);border-radius:14px;padding:20px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--purple);margin-bottom:14px">💡 承銷價怎麼定？</div>
+        <div style="font-size:.86rem;color:var(--text);line-height:1.85">
+          台灣IPO承銷價通常參考以下幾個方式：
+          <br><br>
+          <strong style="color:var(--accent)">① 競價拍賣法：</strong>承銷商向機構投資人詢價（book building），根據需求訂定上市價格。
+          <br>
+          <strong style="color:var(--pink)">② 固定價格法：</strong>事先設定承銷價，散戶以此價格申購，中籤才能取得股票。
+          <br>
+          <strong style="color:var(--yellow)">③ 參考本益比法：</strong>根據同業的市場本益比，估算合理的每股價值作為參考。
+          <br><br>
+          承銷價設太低 → 公司籌到的錢少，但上市後有「蜜月行情」，投資人歡迎。<br>
+          承銷價設太高 → 上市後股價跌破承銷價（俗稱「破發」），中籤的人反而賠錢。
+        </div>
+      </div>
+
+      <div class="mistake-box" style="margin-top:20px">
+        <div class="insight-icon">🚫</div>
+        <div class="insight-text">
+          <strong style="color:var(--red)">IPO常見陷阱：</strong>「上市第一天一定大漲」是迷思。台灣近年許多IPO在蜜月行情後迅速崩跌，因為早期投資人（創投、員工）在鎖定期結束後大量賣出。<em class="hl">承銷價申購到賺到的，≠ 上市後隨時可以賺到的。</em>
+        </div>
+      </div>
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="26" cy="47" rx="17" ry="4" fill="rgba(0,229,255,0.07)"/>
+            <path d="M26 7 C14 7 9 16 8 25 C7 34 9 42 14 46 C19 50 33 50 38 46 C43 42 45 34 44 25 C43 16 38 7 26 7 Z" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.8" opacity="0.88"/>
+            <ellipse cx="20" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <ellipse cx="32" cy="30" rx="3" ry="3.5" fill="#fff" opacity="0.9"/>
+            <circle cx="21" cy="30.5" r="1.7" fill="#00b8d4"/>
+            <circle cx="33" cy="30.5" r="1.7" fill="#00b8d4"/>
+            <path d="M22 38 Q26 41 30 38" fill="none" stroke="rgba(0,229,255,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">JELLY 說</div>
+          IPO申購就像搖彩券——偶爾中獎很開心，但不應該把它當穩定獲利的策略。真正重要的是：<strong style="color:var(--accent)">搞清楚公司上市後的真實價值，在市場給出合理價格時才是好的買點。</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
   
   <!-- ── CHAPTER FOOTER ── -->
 
@@ -4056,6 +5002,354 @@
 </main>
 
 <script>
+
+// ══════════════════════════════════════════════════════════════
+// NEW BONUS SECTIONS — JavaScript
+// ══════════════════════════════════════════════════════════════
+
+// ── BONUS B: Taiwan 50 Pie Chart ──────────────────────────────
+(function() {
+  var tw50Data = [
+    {name:'台積電 2330', pct:35.2, color:'#00e5ff'},
+    {name:'鴻海 2317', pct:5.1, color:'#ff6eb4'},
+    {name:'聯發科 2454', pct:4.8, color:'#b266ff'},
+    {name:'台達電 2308', pct:2.1, color:'#ffd600'},
+    {name:'富邦金 2881', pct:2.0, color:'#00e676'},
+    {name:'國泰金 2882', pct:1.9, color:'#ff8a65'},
+    {name:'中華電 2412', pct:1.7, color:'#80deea'},
+    {name:'南亞 1303', pct:1.6, color:'#f48fb1'},
+    {name:'台塑 1301', pct:1.4, color:'#a5d6a7'},
+    {name:'聯電 2303', pct:1.3, color:'#ffe082'},
+    {name:'其餘40檔', pct:42.9, color:'rgba(74,104,136,0.8)'}
+  ];
+
+  function drawPie() {
+    var svg = document.getElementById('pieSvg');
+    var legend = document.getElementById('pieLegend');
+    if (!svg || !legend) return;
+
+    var cx = 120, cy = 120, r = 100, rInner = 52;
+    var total = tw50Data.reduce(function(s,d){return s+d.pct;},0);
+    var startAngle = -Math.PI/2;
+    var paths = '';
+
+    tw50Data.forEach(function(d, i) {
+      var angle = (d.pct / total) * 2 * Math.PI;
+      var endAngle = startAngle + angle;
+      var x1 = cx + r * Math.cos(startAngle);
+      var y1 = cy + r * Math.sin(startAngle);
+      var x2 = cx + r * Math.cos(endAngle);
+      var y2 = cy + r * Math.sin(endAngle);
+      var xi1 = cx + rInner * Math.cos(startAngle);
+      var yi1 = cy + rInner * Math.sin(startAngle);
+      var xi2 = cx + rInner * Math.cos(endAngle);
+      var yi2 = cy + rInner * Math.sin(endAngle);
+      var large = angle > Math.PI ? 1 : 0;
+
+      var midAngle = startAngle + angle / 2;
+      var labelR = r + 18;
+      var lx = cx + labelR * Math.cos(midAngle);
+      var ly = cy + labelR * Math.sin(midAngle);
+
+      paths += '<path class="pie-slice" data-idx="' + i + '" '
+        + 'd="M ' + xi1 + ' ' + yi1 + ' L ' + x1 + ' ' + y1
+        + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2
+        + ' L ' + xi2 + ' ' + yi2
+        + ' A ' + rInner + ' ' + rInner + ' 0 ' + large + ' 0 ' + xi1 + ' ' + yi1 + ' Z"'
+        + ' fill="' + d.color + '" opacity="0.88"'
+        + ' stroke="rgba(3,6,14,.8)" stroke-width="1.5"'
+        + ' style="cursor:pointer;transition:opacity .2s,transform .2s;transform-origin:' + cx + 'px ' + cy + 'px"'
+        + '></path>';
+
+      if (d.pct > 3) {
+        paths += '<text x="' + lx + '" y="' + (ly+4) + '" text-anchor="middle" '
+          + 'font-family="Share Tech Mono,monospace" font-size="8" fill="' + d.color + '" opacity="0.9">'
+          + d.pct + '%</text>';
+      }
+
+      startAngle = endAngle;
+    });
+
+    // Center text
+    paths += '<text x="' + cx + '" y="' + (cy-6) + '" text-anchor="middle" font-family="Orbitron,monospace" font-size="10" fill="rgba(0,229,255,.8)">台灣50</text>';
+    paths += '<text x="' + cx + '" y="' + (cy+10) + '" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="8" fill="rgba(180,200,220,.6)">前10大</text>';
+
+    svg.innerHTML = '<defs><filter id="pieGlow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' + paths;
+
+    // Legend
+    var legHtml = '';
+    tw50Data.forEach(function(d, i) {
+      legHtml += '<div class="pie-leg-item" data-idx="' + i + '" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 6px;border-radius:6px;transition:background .15s" '
+        + 'onmouseover="highlightSlice(' + i + ')" onmouseout="unhighlightSlice()">'
+        + '<div style="width:10px;height:10px;border-radius:50%;background:' + d.color + ';flex-shrink:0"></div>'
+        + '<span style="font-family:Noto Sans TC,sans-serif;font-size:.78rem;color:var(--text-dim);flex:1">' + d.name + '</span>'
+        + '<span style="font-family:Share Tech Mono,monospace;font-size:.72rem;color:' + d.color + ';font-weight:700">' + d.pct + '%</span>'
+        + '</div>';
+    });
+    legend.innerHTML = legHtml;
+
+    // Hover on slices
+    svg.querySelectorAll('.pie-slice').forEach(function(el) {
+      var idx = parseInt(el.dataset.idx);
+      el.addEventListener('mouseenter', function(e) {
+        highlightSlice(idx);
+        showPieTooltip(e, idx);
+      });
+      el.addEventListener('mousemove', function(e) { movePieTooltip(e); });
+      el.addEventListener('mouseleave', function() { unhighlightSlice(); hidePieTooltip(); });
+    });
+  }
+
+  window.highlightSlice = function(idx) {
+    document.querySelectorAll('.pie-slice').forEach(function(s,i) {
+      s.style.opacity = i === idx ? '1' : '0.5';
+      s.style.transform = i === idx ? 'scale(1.04)' : 'scale(1)';
+    });
+    document.querySelectorAll('.pie-leg-item').forEach(function(l,i) {
+      l.style.background = i === idx ? 'rgba(0,229,255,.08)' : '';
+    });
+  };
+  window.unhighlightSlice = function() {
+    document.querySelectorAll('.pie-slice').forEach(function(s) { s.style.opacity='0.88'; s.style.transform='scale(1)'; });
+    document.querySelectorAll('.pie-leg-item').forEach(function(l) { l.style.background=''; });
+    hidePieTooltip();
+  };
+
+  var tip = null;
+  function showPieTooltip(e, idx) {
+    if (!tip) tip = document.getElementById('pieTooltip');
+    if (!tip) return;
+    var d = tw50Data[idx];
+    tip.innerHTML = '<div style="color:' + d.color + ';font-weight:700;margin-bottom:4px">' + d.name + '</div>'
+      + '<div>比重：<span style="color:' + d.color + '">' + d.pct + '%</span></div>';
+    tip.style.display = 'block';
+    movePieTooltip(e);
+  }
+  function movePieTooltip(e) {
+    if (!tip) return;
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY - 40) + 'px';
+  }
+  function hidePieTooltip() {
+    if (!tip) return;
+    tip.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', drawPie);
+})();
+
+// ── BONUS C: Corporate Event Calculator ───────────────────────
+function switchTab(tab) {
+  ['div','split','reduce'].forEach(function(t) {
+    document.getElementById('panel-' + t).style.display = t === tab ? 'block' : 'none';
+    var el = document.getElementById('tab-' + t);
+    if (el) { el.classList.toggle('active', t === tab); }
+  });
+}
+
+function calcDiv() {
+  var shares = parseFloat(document.getElementById('div-shares').value) || 0;
+  var price = parseFloat(document.getElementById('div-price').value) || 0;
+  var cash = parseFloat(document.getElementById('div-cash').value) || 0;
+  var stock = parseFloat(document.getElementById('div-stock').value) || 0;
+  var out = document.getElementById('div-result');
+  if (!shares || !price) { out.innerHTML='<span style="color:var(--text-faint)">請輸入持股數與股價</span>'; return; }
+
+  var totalMktVal = shares * price;
+  var newSharesFromStock = Math.floor(shares * (stock / 10));
+  var totalShares = shares + newSharesFromStock;
+  var exDivPrice = Math.max(0, price - cash - stock);
+  var totalValueAfter = totalShares * exDivPrice + cash * shares;
+  var cashReceived = cash * shares;
+  var fillPct = exDivPrice > 0 ? ((price - exDivPrice) / exDivPrice * 100).toFixed(2) : '0';
+
+  out.innerHTML = ''
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">除息基準股價</div><div class="r-num" style="color:var(--accent)">' + exDivPrice.toFixed(2) + ' 元</div></div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">現金股息入袋</div><div class="r-num" style="color:var(--green)">' + cashReceived.toLocaleString() + ' 元</div></div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">股票股利新增股數</div><div class="r-num" style="color:var(--pink)">' + newSharesFromStock + ' 股</div></div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">填息需漲幅</div><div class="r-num" style="color:var(--yellow)">+' + fillPct + '%</div></div>'
+    + '</div>'
+    + '<div style="font-size:.8rem;color:var(--text-faint)">除息後你的總資產市值：<strong style="color:var(--text)">' + totalValueAfter.toLocaleString(undefined,{maximumFractionDigits:0}) + ' 元</strong>（含現金股息）= 與除息前相同，僅形式改變。</div>';
+}
+
+function calcSplit() {
+  var shares = parseFloat(document.getElementById('split-shares').value) || 0;
+  var price = parseFloat(document.getElementById('split-price').value) || 0;
+  var ratio = parseInt(document.getElementById('split-ratio').value) || 2;
+  var out = document.getElementById('split-result');
+  if (!shares || !price) { out.innerHTML='<span style="color:var(--text-faint)">請輸入持股數與股價</span>'; return; }
+
+  var newShares = shares * ratio;
+  var newPrice = price / ratio;
+  var mktBefore = shares * price;
+  var mktAfter = newShares * newPrice;
+
+  out.innerHTML = ''
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">拆分前</div><div class="r-num" style="color:var(--text-dim);font-size:.95rem">' + shares.toLocaleString() + ' 股<br>@' + price + ' 元</div></div>'
+    + '<div style="text-align:center;font-size:1.5rem;padding-top:12px">→</div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">拆分後</div><div class="r-num" style="color:var(--accent);font-size:.95rem">' + newShares.toLocaleString() + ' 股<br>@' + newPrice.toFixed(1) + ' 元</div></div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">拆分前市值</div><div class="r-num" style="color:var(--text-dim)">' + mktBefore.toLocaleString() + ' 元</div></div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">拆分後市值</div><div class="r-num" style="color:var(--green)">' + mktAfter.toLocaleString() + ' 元</div></div>'
+    + '</div>';
+}
+
+function calcReduce() {
+  var shares = parseFloat(document.getElementById('red-shares').value) || 0;
+  var price = parseFloat(document.getElementById('red-price').value) || 0;
+  var pct = parseFloat(document.getElementById('red-pct').value) || 0;
+  var type = document.getElementById('red-type').value;
+  var out = document.getElementById('red-result');
+  var tipEl = document.getElementById('red-tip');
+  if (!shares || !price || !pct) { out.innerHTML='<span style="color:var(--text-faint)">請輸入數值</span>'; return; }
+
+  var keepRatio = 1 - pct / 100;
+  var newShares = Math.floor(shares * keepRatio);
+  var newPrice = price / keepRatio;
+  var mktBefore = shares * price;
+  var mktAfter = newShares * newPrice;
+  var cashReturn = type === 'cash' ? shares * (pct / 100) * 10 : 0; // 以面額10元計算現金退回
+
+  out.innerHTML = ''
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">減資後持股</div><div class="r-num" style="color:var(--accent)">' + newShares.toLocaleString() + ' 股</div></div>'
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">調整後股價</div><div class="r-num" style="color:var(--pink)">' + newPrice.toFixed(2) + ' 元</div></div>'
+    + (type === 'cash' ? '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">現金退回（以面額估算）</div><div class="r-num" style="color:var(--green)">' + cashReturn.toLocaleString() + ' 元</div></div>' : '')
+    + '<div><div style="font-size:.7rem;color:var(--text-faint);margin-bottom:4px">市值變化</div><div class="r-num" style="color:' + (Math.abs(mktAfter - mktBefore) < 1 ? 'var(--accent)' : 'var(--yellow)') + '">' + mktAfter.toLocaleString(undefined,{maximumFractionDigits:0}) + ' 元</div></div>'
+    + '</div>';
+
+  if (tipEl) {
+    tipEl.textContent = type === 'cash'
+      ? '現金減資：公司認為目前股本太大、資金過剩，透過退還現金縮減股本。每股調整後股價等比例上升，市值理論上不變，但會收到現金退回，對股東有利。'
+      : '彌補虧損減資：公司過去有累積虧損，透過縮減股本來消除帳面赤字，讓財報更健康。股東不會收到現金，但每股股價提高，市值理論上不變。通常是公司重整的訊號。';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  calcDiv(); calcSplit(); calcReduce();
+});
+
+// ── BONUS E: Psych Quiz ────────────────────────────────────────
+var psychAnswers = {};
+function selectPsych(q, choice, el) {
+  document.querySelectorAll('#pq' + q + ' .psych-opt').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  psychAnswers[q] = choice;
+  var answered = Object.keys(psychAnswers).length;
+  if (answered >= 5) {
+    var btn = document.getElementById('psychSubmit');
+    if (btn) btn.style.display = 'block';
+  }
+}
+
+function calcPsych() {
+  var scores = {conservative:0, steady:0, balanced:0, aggressive:0};
+  var map = {
+    1: {A:'aggressive',B:'steady',C:'balanced',D:'conservative'},
+    2: {A:'conservative',B:'steady',C:'balanced',D:'aggressive'},
+    3: {A:'aggressive',B:'steady',C:'balanced',D:'conservative'},
+    4: {A:'conservative',B:'steady',C:'balanced',D:'aggressive'},
+    5: {A:'conservative',B:'steady',C:'balanced',D:'aggressive'}
+  };
+  for (var q in psychAnswers) {
+    var type = map[q][psychAnswers[q]];
+    if (type) scores[type]++;
+  }
+  var max = 0, result = 'balanced';
+  for (var t in scores) { if (scores[t] > max) { max = scores[t]; result = t; } }
+
+  var profiles = {
+    conservative: {
+      emoji:'🛡️', color:'#00e676', borderColor:'rgba(0,230,118,.3)', bg:'rgba(0,230,118,.04)',
+      type:'穩健保守型',
+      desc:'你對風險極度敏感，最重視本金安全。市場波動會讓你感到焦慮，你更希望資產能穩定成長而非大起大落。',
+      advice:['適合持有：高股息ETF（如0056）、債券型基金、定存概念股','操作原則：分散持有、長期定期定額、設定合理報酬預期（年化5-8%）','風險提醒：過度保守可能讓資產無法跑贏通膨，適度布局成長型標的仍有必要']
+    },
+    steady: {
+      emoji:'⚓', color:'#00e5ff', borderColor:'rgba(0,229,255,.3)', bg:'rgba(0,229,255,.04)',
+      type:'穩定成長型',
+      desc:'你追求穩定成長但也能承受中等波動。你是多數成功長線投資人的類型，能夠保持紀律，不被市場短期波動影響決策。',
+      advice:['適合持有：大型ETF（0050）、績優藍籌股、高品質科技股','操作原則：核心+衛星策略（7核心ETF+3衛星個股），年度再平衡','風險提醒：注意避免在牛市末期追高，保持現金部位應對修正機會']
+    },
+    balanced: {
+      emoji:'⚖️', color:'#b266ff', borderColor:'rgba(178,102,255,.3)', bg:'rgba(178,102,255,.04)',
+      type:'均衡積極型',
+      desc:'你能接受較大波動，懂得評估風險與報酬的平衡。你有研究個股的意願，也能在下跌時保持理性而非恐慌拋售。',
+      advice:['適合持有：個股研究（半導體、AI供應鏈）、波段操作、選擇性進出','操作原則：嚴格執行停損（-8~12%），多頭主動布局、空頭縮手保守','風險提醒：確保具備足夠的基本面分析能力再集中押注，避免過度自信']
+    },
+    aggressive: {
+      emoji:'🚀', color:'#ff6eb4', borderColor:'rgba(255,110,180,.3)', bg:'rgba(255,110,180,.04)',
+      type:'積極進取型',
+      desc:'你不怕波動，甚至享受市場的刺激感。你有強烈的致富動機，願意承擔高風險換取高報酬。但記住：高報酬伴隨高風險。',
+      advice:['適合持有：高成長個股、小型股、主題型ETF、可能涉及選擇權','操作原則：嚴格執行停損是你最重要的紀律；定義每筆交易最大虧損金額','風險提醒：每筆交易不超過總資金的5-10%；務必建立完整的交易系統才操作']
+    }
+  };
+
+  var p = profiles[result];
+  var advHtml = p.advice.map(function(a) { return '<div class="psych-advice-item">• ' + a + '</div>'; }).join('');
+
+  document.getElementById('psychResult').style.display = 'block';
+  document.getElementById('psychResult').innerHTML = ''
+    + '<div class="psych-result-card" style="background:' + p.bg + ';border-color:' + p.borderColor + '">'
+    + '<div style="font-size:2rem;margin-bottom:8px">' + p.emoji + '</div>'
+    + '<div class="psych-result-type" style="color:' + p.color + '">' + p.type + '</div>'
+    + '<div class="psych-result-desc">' + p.desc + '</div>'
+    + '<div class="psych-advice-title" style="color:' + p.color + '">操作建議</div>'
+    + advHtml
+    + '<div style="margin-top:16px;font-size:.75rem;color:var(--text-faint);line-height:1.6">'
+    + '⚠️ 以上結果僅供參考，不構成投資建議。不同市場環境和人生階段，你的風險承受度也會改變。建議每年重新評估一次。'
+    + '</div></div>';
+
+  document.getElementById('psychSubmit').textContent = '🔄 重新測驗';
+  document.getElementById('psychSubmit').onclick = function() {
+    psychAnswers = {};
+    document.querySelectorAll('.psych-opt').forEach(function(o) { o.classList.remove('selected'); });
+    document.getElementById('psychResult').style.display = 'none';
+    document.getElementById('psychSubmit').style.display = 'none';
+    document.getElementById('psychSubmit').textContent = '🔍 查看我的投資類型';
+    document.getElementById('psychSubmit').onclick = calcPsych;
+  };
+}
+
+// ── BONUS F: Market Cap Detail ─────────────────────────────────
+function showDetail(which) {
+  var det = document.getElementById('mktDetail');
+  if (!det) return;
+  if (which === 'A') {
+    det.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:.6rem;letter-spacing:.15em;color:var(--green);margin-bottom:12px">公司 A — 完整分析</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">股價</div><div style="font-family:Orbitron,monospace;font-size:1.2rem;color:var(--green);font-weight:700">$15</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">總股數</div><div style="font-family:Orbitron,monospace;font-size:1rem;color:var(--text);font-weight:700">100億股</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">市值</div><div style="font-family:Orbitron,monospace;font-size:1.2rem;color:var(--red);font-weight:700">$1,500億</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">年獲利 EPS</div><div style="font-family:Orbitron,monospace;font-size:1rem;color:var(--text);font-weight:700">$0.3/股</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">本益比 P/E</div><div style="font-family:Orbitron,monospace;font-size:1.4rem;color:var(--red);font-weight:700">50x</div></div>'
+      + '<div style="grid-column:1/-1;font-size:.82rem;color:var(--text-dim);line-height:1.7;padding-top:4px">雖然股價只有 $15，但因為總股數高達100億，整間公司的市值高達1,500億，本益比達50倍——比台積電的平均本益比還貴！這絕對不是一個「便宜」的股票。</div>'
+      + '</div>';
+    det.style.borderColor = 'rgba(0,230,118,.3)';
+  } else {
+    det.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:.6rem;letter-spacing:.15em;color:var(--pink);margin-bottom:12px">公司 B — 完整分析</div>'
+      + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">股價</div><div style="font-family:Orbitron,monospace;font-size:1.2rem;color:var(--pink);font-weight:700">$620</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">總股數</div><div style="font-family:Orbitron,monospace;font-size:1rem;color:var(--text);font-weight:700">1,000萬股</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">市值</div><div style="font-family:Orbitron,monospace;font-size:1.2rem;color:var(--green);font-weight:700">$62億</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">年獲利 EPS</div><div style="font-family:Orbitron,monospace;font-size:1rem;color:var(--text);font-weight:700">$100/股</div></div>'
+      + '<div><div style="font-size:.7rem;color:var(--text-faint)">本益比 P/E</div><div style="font-family:Orbitron,monospace;font-size:1.4rem;color:var(--green);font-weight:700">6.2x</div></div>'
+      + '<div style="grid-column:1/-1;font-size:.82rem;color:var(--text-dim);line-height:1.7;padding-top:4px">雖然股價高達 $620，但總股數只有1,000萬股，整間公司市值僅62億，本益比只有6.2倍——相當便宜！這才是真正「划算」的股票，高股價其實代表每股創造的獲利很強。</div>'
+      + '</div>';
+    det.style.borderColor = 'rgba(255,110,180,.3)';
+  }
+  det.style.display = 'block';
+}
+
+// ── Scroll to new sections from TOC ───────────────────────────
+window.scrollToSecBonus = function(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
 // ── Answer logic ───────────────────────────────────────────────
 const feedbackMap = {
   quiz1: {
@@ -4411,7 +5705,7 @@ secIds.forEach(id => {
 </script>
 
 <!-- ── FOOTER ── -->
-<footer style="
+<footer id="site-footer" style="
   position: relative;
   z-index: 10;
   border-top: 1px solid rgba(0,229,255,.08);

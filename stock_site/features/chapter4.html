@@ -2667,6 +2667,45 @@
       background: rgba(10,60,160,.05);
       border-color: rgba(10,60,160,.16);
     }
+
+    /* ── site footer: day theme ── */
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(240,247,255,.97), rgba(228,240,255,.99)) !important;
+      border-top-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span {
+      color: rgba(30,70,120,.65) !important;
+    }
+    body.theme-day #site-footer a {
+      color: rgba(18,101,168,.7) !important;
+    }
+    body.theme-day #site-footer a:hover {
+      color: #1265a8 !important;
+    }
+
+
+    /* ── inline diagram containers ch4 ── */
+    body.theme-day .inline-diagram-dark {
+      background: rgba(240,248,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .inline-diagram-dark svg text { opacity: 1 !important; }
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; opacity: 1 !important; }
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(0,230,118"],
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(0,229,176"] { fill: #157a32 !important; opacity: 1 !important; }
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(255,61,90"],
+    body.theme-day .inline-diagram-dark svg text[fill*="rgba(255,152,0"] { fill: #b54000 !important; opacity: 1 !important; }
+    body.theme-day .inline-diagram-dark svg line[stroke*="rgba(0,229,255"] { stroke: rgba(26,101,168,.15) !important; }
+    body.theme-day .inline-diagram-dark svg line[stroke*="rgba(255,255,255"] { stroke: rgba(26,101,168,.15) !important; }
+    body.theme-day .inline-diagram-dark svg polyline[stroke*="rgba(255,255,255"] { stroke: rgba(80,120,180,.5) !important; }
+    body.theme-day .inline-diagram-dark .vol-chart-title,
+    body.theme-day .inline-diagram-dark [style*="var(--teal)"],
+    body.theme-day .inline-diagram-dark [style*="var(--accent)"] { color: #1265a8 !important; opacity: 1 !important; }
+
   </style>
 <script type="application/ld+json">
 {
@@ -2826,7 +2865,7 @@
       </div>
 
       <!-- SVG 示意圖 -->
-      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.09);border-radius:14px;overflow:hidden;margin:18px 0;">
+      <div class="inline-diagram-dark" style="background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.09);border-radius:14px;overflow:hidden;margin:18px 0;">
         <div style="padding:10px 16px;border-bottom:1px solid rgba(0,229,255,.06);font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.14em;color:var(--text-faint);">── 支撐 / 壓力 示意圖 ──</div>
         <div style="padding:16px;">
           <svg viewBox="0 0 560 220" width="100%" style="display:block;max-width:560px;margin:0 auto;">
@@ -3219,7 +3258,7 @@
       </div>
 
       <!-- SVG 假突破示意圖 -->
-      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,61,90,.12);border-radius:14px;overflow:hidden;margin:20px 0;">
+      <div class="inline-diagram-dark" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,61,90,.12);border-radius:14px;overflow:hidden;margin:20px 0;">
         <div style="padding:10px 16px;border-bottom:1px solid rgba(255,61,90,.08);font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.14em;color:var(--red);">── 假突破示意：誘多陷阱 ──</div>
         <div style="padding:16px;">
           <svg viewBox="0 0 560 180" width="100%" style="display:block;max-width:560px;margin:0 auto;">
@@ -3321,7 +3360,7 @@
       </div>
 
       <!-- SVG 角色轉換示意圖 -->
-      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,152,0,.12);border-radius:14px;overflow:hidden;margin:20px 0;">
+      <div class="inline-diagram-dark" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,152,0,.12);border-radius:14px;overflow:hidden;margin:20px 0;">
         <div style="padding:10px 16px;border-bottom:1px solid rgba(255,152,0,.08);font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.14em;color:var(--orange);">── 角色轉換示意圖 ──</div>
         <div style="padding:16px;">
           <svg viewBox="0 0 560 200" width="100%" style="display:block;max-width:560px;margin:0 auto;">
@@ -4135,7 +4174,7 @@ function toggleAnswer() {
 </script>
 
 <!-- ── FOOTER ── -->
-<footer style="
+<footer id="site-footer" style="
   position: relative;
   z-index: 10;
   border-top: 1px solid rgba(0,229,255,.08);

@@ -2660,6 +2660,24 @@
       background: rgba(10,60,160,.05);
       border-color: rgba(10,60,160,.16);
     }
+
+    /* ── site footer: day theme ── */
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(240,247,255,.97), rgba(228,240,255,.99)) !important;
+      border-top-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span {
+      color: rgba(30,70,120,.65) !important;
+    }
+    body.theme-day #site-footer a {
+      color: rgba(18,101,168,.7) !important;
+    }
+    body.theme-day #site-footer a:hover {
+      color: #1265a8 !important;
+    }
+
   </style>
 <script type="application/ld+json">
 {
@@ -4061,7 +4079,7 @@ secIds.forEach(id => {
 </script>
 
 <!-- ── FOOTER ── -->
-<footer style="
+<footer id="site-footer" style="
   position: relative;
   z-index: 10;
   border-top: 1px solid rgba(0,229,255,.08);
