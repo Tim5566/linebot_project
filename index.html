@@ -4040,18 +4040,35 @@
     // ── 靜默刷新 token（不彈出視窗，在背景自動取得新 token）──
     // 用途：頁面重新整理後恢復 token，以及每 45 分鐘自動續命
     let _tokenRefreshTimer = null;
+    let _silentRefreshInProgress = false;  // 防止重複呼叫
 
     function _silentTokenRefresh() {
       // 沒有 GIS client 或沒有登入狀態就跳過
       if (!_gisClient || !window._currentUser) return;
+      // 防止同時多次呼叫（頁面切換回來常常連發）
+      if (_silentRefreshInProgress) return;
+      _silentRefreshInProgress = true;
+      setTimeout(() => { _silentRefreshInProgress = false; }, 5000); // 5 秒後重置
       // hint：告訴 Google 要刷新哪個帳號的 token，避免跳出帳號選擇器
-      _gisClient.requestAccessToken({ prompt: '', login_hint: window._currentUser.email });
+      // prompt: '' 表示靜默刷新，但 GIS 在 token 過期時仍可能短暫顯示 consent popup
+      // 改用 prompt: 'none' 確保完全不彈窗；若失敗則靜默忽略，等用戶手動登入
+      try {
+        _gisClient.requestAccessToken({
+          prompt: 'none',           // ← 關鍵：強制禁止任何彈出視窗
+          login_hint: window._currentUser.email
+        });
+      } catch(e) {
+        console.warn('[Auth] 靜默刷新失敗（正常）:', e.message);
+        _silentRefreshInProgress = false;
+      }
     }
 
     function _scheduleTokenRefresh() {
       if (_tokenRefreshTimer) clearInterval(_tokenRefreshTimer);
-      // 每 45 分鐘刷新一次（token 有效期 1 小時，提早 15 分鐘換）
-      _tokenRefreshTimer = setInterval(_silentTokenRefresh, 45 * 60 * 1000);
+      _tokenRefreshTimer = setInterval(() => {
+        _silentTokenRefresh();
+        localStorage.setItem('_lastTokenRefresh', String(Date.now()));
+      }, 45 * 60 * 1000);
     }
 
     // DOMContentLoaded 後開始嘗試初始化，並恢復上次登入狀態
@@ -4069,13 +4086,31 @@
       }
       _initGIS();
 
-      // ✅ GIS 就緒後，若已有登入狀態則立刻靜默刷新 token
-      // 等 2 秒讓 GIS 完成初始化再執行
+      // ✅ GIS 就緒後，若已有登入狀態則靜默刷新 token
+      // 僅在「真正需要」時刷新（例如上次登入超過 40 分鐘），避免頁面切換閃窗
       setTimeout(() => {
-        if (window._currentUser?.email && _gisClient) {
-          _silentTokenRefresh();
+        if (!window._currentUser?.email || !_gisClient) return;
+        // 改用 localStorage 記錄時間戳，確保跨頁面導航也有效
+        const lastRefresh = parseInt(localStorage.getItem('_lastTokenRefresh') || '0');
+        const elapsed = Date.now() - lastRefresh;
+        if (elapsed < 40 * 60 * 1000) {
+          console.log('[Auth] Token 仍新鮮，跳過靜默刷新（距上次:', Math.round(elapsed/60000), '分鐘）');
+          return;
         }
-      }, 2000);
+        _silentTokenRefresh();
+        localStorage.setItem('_lastTokenRefresh', String(Date.now()));
+      }, 2500);
+
+      // ✅ 防止分頁切換時重複觸發靜默刷新閃窗
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        if (!window._currentUser?.email || !_gisClient) return;
+        const lastRefresh = parseInt(localStorage.getItem('_lastTokenRefresh') || '0');
+        const elapsed = Date.now() - lastRefresh;
+        if (elapsed < 40 * 60 * 1000) return;
+        _silentTokenRefresh();
+        localStorage.setItem('_lastTokenRefresh', String(Date.now()));
+      });
     });
 
     function _updateAuthUI(user) {
