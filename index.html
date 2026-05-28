@@ -4030,8 +4030,7 @@
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
   </style>
-  <!-- Google Identity Services（OAuth Popup 方式） -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Google Identity Services（點登入時才載入，避免開站閃爍） -->
   <script>
     const GOOGLE_CLIENT_ID = '55383548448-irv83cd3m4j043dq4k0do6q7feafo7uk.apps.googleusercontent.com';
 
@@ -4134,7 +4133,7 @@
           localStorage.removeItem('_authUser');
         }
       }
-      _initGIS();
+      // GIS 改為點登入時才載入，不在此自動初始化
 
       // ✅ GIS 就緒後，若已有登入狀態則靜默刷新 token
       // 僅在「真正需要」時刷新（例如上次登入超過 40 分鐘），避免頁面切換閃窗
@@ -4195,21 +4194,35 @@
       }
     }
 
-    // ── 觸發 Google OAuth Popup 登入 ──
+    // ── 觸發 Google OAuth Popup 登入（點擊時才動態載入 SDK，避免開站閃爍）──
     window._googleSignIn = () => {
-      if (!_gisClient) {
-        // 還在初始化中，再等一下
-        console.warn('[Auth] _gisClient 尚未就緒，稍後重試...');
-        setTimeout(() => {
-          if (_gisClient) {
-            _gisClient.requestAccessToken();
-          } else {
-            alert('Google 登入服務載入中，請稍後再試');
-          }
-        }, 800);
+      if (_gisClient) {
+        // SDK 已載入，直接登入
+        _gisClient.requestAccessToken();
         return;
       }
-      _gisClient.requestAccessToken();
+      // 動態載入 GIS SDK
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.onload = () => {
+        _gisInitTries = 0;
+        _initGIS();
+        // 等待初始化完成後觸發登入
+        const waitAndLogin = () => {
+          if (_gisClient) {
+            _gisClient.requestAccessToken();
+          } else if (_gisInitTries < 33) {
+            setTimeout(waitAndLogin, 300);
+          } else {
+            alert('Google 登入服務載入失敗，請重新整理後再試');
+          }
+        };
+        setTimeout(waitAndLogin, 300);
+      };
+      script.onerror = () => {
+        alert('Google 登入服務載入失敗，請確認網路連線');
+      };
+      document.head.appendChild(script);
     };
 
     // ── 登出 ──
