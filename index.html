@@ -313,35 +313,7 @@
     }
 
     /* ── HEADER FAVORITE BUTTON ── */
-    /* ── MUSIC BUTTON ── */
-    #musicBtn {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,229,255,.25);
-      background: rgba(0,229,255,.06);
-      color: var(--accent);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .2s;
-      flex-shrink: 0;
-    }
-    #musicBtn svg { width: 13px; height: 13px; }
-    #musicBtn:hover {
-      background: rgba(0,229,255,.16);
-      border-color: var(--accent);
-      box-shadow: 0 0 16px rgba(0,229,255,.35);
-    }
-    #musicBtn.playing {
-      background: rgba(0,229,255,.12);
-      border-color: var(--accent);
-      animation: musicPulse 2.5s ease-in-out infinite;
-    }
-    @keyframes musicPulse {
-      0%,100% { box-shadow: 0 0 6px rgba(0,229,255,.15); }
-      50%      { box-shadow: 0 0 22px rgba(0,229,255,.55); }
-    }
+
 
     /* ── MARKET TITLE ROW ── */
     .market-title-row {
@@ -1556,7 +1528,6 @@
       .logo { gap: 12px; margin-left: 4px; }
       .hamburger { margin-right: 10px; width: 36px; height: 36px; }
       #clock { font-size: .62rem; letter-spacing: .02em; padding: 4px 9px; }
-      #musicBtn { width: 30px; height: 30px; }
 
       /* ── Main layout ── */
       main { padding: 16px 12px 72px; }
@@ -1971,6 +1942,8 @@
     .nav-group-search > .nav-group-label::after { background: linear-gradient(90deg, rgba(0,229,255,.25), transparent); }
     .nav-group-data > .nav-group-label { color: rgba(140,120,255,.65); }
     .nav-group-data > .nav-group-label::after { background: linear-gradient(90deg, rgba(140,100,255,.22), transparent); }
+    .nav-group-chip { padding-top: 0; }
+    .nav-group-learn { padding-bottom: 0; }
     .nav-group-learn > .nav-group-label { color: rgba(255,200,60,.65); }
     .nav-group-learn > .nav-group-label::after { background: linear-gradient(90deg, rgba(255,200,0,.2), transparent); }
     .nav-group-sys > .nav-group-label { color: rgba(100,180,210,.6); }
@@ -2193,7 +2166,7 @@
     }
     .nav-sub-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       padding: 9px 14px 9px 18px;
       font-family: 'Share Tech Mono', monospace;
@@ -2203,7 +2176,7 @@
       cursor: pointer;
       border-radius: 10px;
       transition: all .2s;
-      white-space: nowrap;
+      white-space: normal;
       background: none;
       border: 1px solid transparent;
       width: 100%;
@@ -4251,7 +4224,6 @@
 <canvas id="skyCanvas"></canvas>
 <canvas id="particleCanvas" style="display:none"></canvas>
 
-<audio src="/music/MapleMusic.mp3" loop></audio>
 
 <!-- HEADER -->
 <header>
@@ -4276,11 +4248,6 @@
     </div>
   </div>
   <div class="header-right">
-    <button id="musicBtn" onclick="toggleMusic()" title="播放/暫停音樂">
-      <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="5 3 19 12 5 21 5 3"/>
-      </svg>
-    </button>
     <div id="clock">--:--:--</div>
   </div>
 </header>
@@ -4440,15 +4407,7 @@
         <span style="margin-left:auto;font-size:.45rem;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.5);color:#ff3d5a;border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">優化中</span>
       </button>
 
-      <button class="nav-item" data-nav-id="kbar" onclick="openKBarRadar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="8" width="4" height="10" rx="1"/><line x1="5" y1="5" x2="5" y2="8"/><line x1="5" y1="18" x2="5" y2="21"/>
-          <rect x="10" y="4" width="4" height="14" rx="1"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="18" x2="12" y2="22"/>
-          <rect x="17" y="9" width="4" height="8" rx="1"/><line x1="19" y1="6" x2="19" y2="9"/><line x1="19" y1="17" x2="19" y2="20"/>
-        </svg>
-        K棒型態雷達
-        <span style="margin-left:auto;font-size:.45rem;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.5);color:#ff3d5a;border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">優化中</span>
-      </button>
+
     </div>
 
     <div class="drawer-divider"></div>
@@ -4597,6 +4556,93 @@
             <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
           </svg>
           第十章：實戰案例解析
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.10</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="drawer-section nav-group-chip">
+
+      <button class="nav-accordion-trigger" id="accChip" onclick="toggleAccordion('accChip','subChip')">
+        <svg class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <span class="acc-label">籌碼分析教學</span>
+        <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <div class="nav-sub-menu" id="subChip">
+        <a class="nav-sub-item" href="/stock_site/features/chip1.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第一章：籌碼本質與主力
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.01</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip2.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第二章：三大法人角色
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.02</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip3.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第三章：外資布局追蹤
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.03</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip4.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第四章：投信季底作帳
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.04</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip5.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第五章：自營商避險判讀
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.05</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip6.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第六章：融資增減與軋空
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.06</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip7.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第七章：借券賣出解讀
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.07</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip8.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第八章：集保與大戶持股
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.08</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip9.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第九章：法人買超與背離
+          <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.09</span>
+        </a>
+        <a class="nav-sub-item" href="/stock_site/features/chip10.html" style="text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          第十章：實戰選股建立
           <span class="sub-badge" style="margin-left:auto;font-size:.45rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">CH.10</span>
         </a>
       </div>
@@ -6031,44 +6077,6 @@ function scheduleResetAtMidnight() {
 }
 scheduleResetAtMidnight();
 
-// ── MUSIC ─────────────────────────────────────────────────────────────────────
-const audio    = document.querySelector('audio');
-const musicBtn = document.getElementById('musicBtn');
-const playIcon  = `<polygon points="5 3 19 12 5 21 5 3"/>`;
-const pauseIcon = `<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/>`;
-
-function _setMusicUI(playing) {
-  if (playing) {
-    musicBtn.classList.add('playing');
-    document.getElementById('musicIcon').innerHTML = pauseIcon;
-  } else {
-    musicBtn.classList.remove('playing');
-    document.getElementById('musicIcon').innerHTML = playIcon;
-  }
-}
-
-function toggleMusic() {
-  if (audio.paused) {
-    audio.play().then(() => {
-      _setMusicUI(true);
-      sessionStorage.setItem('musicPlaying', '1');
-    }).catch(err => console.warn('[Music] play failed:', err));
-  } else {
-    audio.pause();
-    _setMusicUI(false);
-    sessionStorage.setItem('musicPlaying', '0');
-  }
-}
-
-// 監聽外部 ended/pause/play 事件同步 UI
-audio.addEventListener('play',  () => _setMusicUI(true));
-audio.addEventListener('pause', () => _setMusicUI(false));
-
-// 只有使用者在本頁明確開過音樂，才自動播放
-if (sessionStorage.getItem('musicPlaying') === '1') {
-  audio.play().then(() => _setMusicUI(true)).catch(() => _setMusicUI(false));
-}
-
 // ── STOCK QUERY ───────────────────────────────────────────────────────────────
 const resultEl = document.getElementById('result');
 
@@ -6689,14 +6697,7 @@ function openSnapFitMA() {
   window.location.href = url;
 }
 
-function openKBarRadar() {
-  closeDrawer();
-  const inputEl = document.getElementById('stockInput') || document.querySelector('input[placeholder*="代碼"]');
-  const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
-  const base = '/stock_site/tools/kbar_pattern.html';
-  const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
-  window.location.href = url;
-}
+
 
 function closeWatchlistModal() {
   document.getElementById('watchlistModal').classList.remove('open');

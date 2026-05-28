@@ -6,8 +6,8 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226"
        crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>波浪走勢分析 v9｜台股技術分析</title>
-  <meta name="description" content="台股波浪走勢分析工具 v9，修復空頭五浪誤判：空頭startProx計算bug修正、空頭計數失效懲罰機制、上位浪級情境觸發門檻優化。" />
+  <title>波浪走勢分析 v10｜台股技術分析</title>
+  <meta name="description" content="台股波浪走勢分析工具 v10，修復 degreeContext 觸發時預測目標未切換為多頭浪5目標的問題；空頭失效懲罰門檻從 5% 降至 2%，修正世界先進等臨界案例誤判。" />
   <link rel="icon" type="image/png" href="/images/jelly.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet"/>
@@ -4688,12 +4688,12 @@ function findBestCycleGlobal(zigzag, data, personality, minScore) {
         const res = triangleValidate(pts6, data, personality);
         if(res.score >= threshold){
           let cs = compositeScore(pts6, res.score, '5wave');
-          // ★ v9：空頭失效懲罰 — 最新收盤已超過空頭起跌點，說明此計數被市場否定
+          // ★ v10：空頭失效懲罰 — 門檻從 5% 降至 2%
           if(!isBullStart){
             const latestClose = data[data.length-1].close;
             const overshoot = (latestClose - pts6[0].price) / Math.max(pts6[0].price, 1);
-            if(overshoot > 0.05)  cs *= 0.55;
-            else if(overshoot > 0) cs *= 0.75;
+            if(overshoot > 0.02)  cs *= 0.50;
+            else if(overshoot > 0) cs *= 0.72;
           }
           if(cs > bestScore){
             bestScore = cs;
@@ -4711,12 +4711,12 @@ function findBestCycleGlobal(zigzag, data, personality, minScore) {
           const partialRes = validatePartial5Wave(ppts, data, personality);
           if(partialRes.score >= threshold){
             let cs = compositeScore(ppts, partialRes.score, '5wave_partial');
-            // ★ v9：空頭失效懲罰
+            // ★ v10：空頭失效懲罰（門檻 2%）
             if(!isBull){
               const latestClose = data[data.length-1].close;
               const overshoot = (latestClose - ppts[0].price) / Math.max(ppts[0].price, 1);
-              if(overshoot > 0.05)  cs *= 0.55;
-              else if(overshoot > 0) cs *= 0.75;
+              if(overshoot > 0.02)  cs *= 0.50;
+              else if(overshoot > 0) cs *= 0.72;
             }
             if(cs > bestScore){
               bestScore = cs;
@@ -4967,14 +4967,15 @@ function detectWaves(data) {
             const priceCov= Math.min(1,Math.abs(pts[5].price-pts[0].price)/gMove);
             const startProx = isBull ? 1 - Math.min(1,(pts[0].price-gMin)/gMove) : 1 - Math.min(1,(gMax-pts[0].price)/gMove);
             let cs = res.score + (timeCov*0.4+priceCov*0.4+startProx*0.2)*40;
-            // ★ 修復v9：空頭結構失效懲罰
-            // 若最新收盤已明顯超過空頭起跌點（>5%），說明此空頭計數已被市場否定
+            // ★ 修復v10：空頭結構失效懲罰
+            // 若最新收盤已超過空頭起跌點（>2%），說明此空頭計數已被市場否定
+            // v10：從 5% 降至 2%，修正世界先進等「剛好差一點」的誤判案例
             if(!isBull){
               const latestClose = data[data.length-1].close;
               const bearStartPrice = pts[0].price;
               const overshootPct = (latestClose - bearStartPrice) / Math.max(bearStartPrice, 1);
-              if(overshootPct > 0.05)  cs *= 0.55; // 超過起跌點5%：大幅折扣（55%）
-              else if(overshootPct > 0) cs *= 0.75; // 微超：中度折扣
+              if(overshootPct > 0.02)  cs *= 0.50; // 超過起跌點2%：大幅折扣（50%）
+              else if(overshootPct > 0) cs *= 0.72; // 微超（0~2%）：中度折扣
             }
             if(cs > bestCs){ bestCs=cs; best={type:'5wave',pts,result:res,complete:true}; }
           }
@@ -4994,13 +4995,14 @@ function detectWaves(data) {
                 ? 1 - Math.min(1,(pts[0].price-gMin)/gMove)   // 多頭：起點越靠近全局低點越好
                 : 1 - Math.min(1,(gMax-pts[0].price)/gMove);  // 空頭：起點越靠近全局高點越好（修正bug：原本固定給1）
               let cs = res.score + (timeCov*0.4+priceCov*0.4+startProx*0.2)*35;
-              // ★ 修復v9：空頭部分結構失效懲罰（與完整浪一致）
+              // ★ 修復v10：空頭部分結構失效懲罰（與完整浪一致）
+              // v10：門檻從 5% 降至 2%
               if(!isBull){
                 const latestClose = data[data.length-1].close;
                 const bearStartPrice = pts[0].price;
                 const overshootPct = (latestClose - bearStartPrice) / Math.max(bearStartPrice, 1);
-                if(overshootPct > 0.05)  cs *= 0.55;
-                else if(overshootPct > 0) cs *= 0.75;
+                if(overshootPct > 0.02)  cs *= 0.50;
+                else if(overshootPct > 0) cs *= 0.72;
               }
               if(cs > bestCs){ bestCs=cs; best={type:'5wave_partial',pts,result:res,complete:false,currentWave:partial-1}; }
             }
@@ -5247,6 +5249,48 @@ function detectWaves(data) {
     fromIdx: pts[pts.length-1].idx,
     color: l.color, priority: l.priority, type: l.type
   }));
+
+  // ── ★ v10 修復：degreeContext 觸發時，覆蓋 forecast 為多頭浪5上升目標 ────────
+  // 問題根源：主計數是空頭五浪，generateForecast 產生空頭下跌目標
+  // 當 degreeContext 判定這是大多頭浪4修正時，預測目標必須改為多頭浪5上升目標
+  // 否則會出現「現價163，預測跌到16.5」的荒謬結果
+  if (degreeCtx && degreeCtx.isW4Correction && degreeCtx.contextConfidence >= 45) {
+    const _currentPx = data[data.length - 1].close;
+    // 從 degreeContext 取浪4低點（當前空頭計數的最低點）
+    const _w4LowPrice = activeCycle.pts
+      ? Math.min(...activeCycle.pts.map(p => p.price))
+      : _currentPx;
+    // 上位浪1幅度（用來計算浪5延伸目標）
+    const _macroW1Move = degreeCtx.macroBullCycle && degreeCtx.macroBullCycle.pts &&
+      degreeCtx.macroBullCycle.pts.length >= 2
+      ? Math.abs(degreeCtx.macroBullCycle.pts[1].price - degreeCtx.macroBullCycle.pts[0].price)
+      : 0;
+    // 備用：用浪4低點到浪3高點的幅度估算
+    const _macroW3Price = degreeCtx.macroW3Price || _currentPx;
+    const _fallbackMove = Math.abs(_macroW3Price - _w4LowPrice);
+    const _baseMove = _macroW1Move > 0 ? _macroW1Move : _fallbackMove;
+
+    if (_baseMove > 0) {
+      const _w5Targets = [
+        { r: 1.0,   label: '浪5目標（等W1）',       color: '#00e676', priority: 'primary'   },
+        { r: 1.618, label: '浪5目標（1.618x W1）',   color: '#00e5ff', priority: 'secondary' },
+        { r: 2.618, label: '浪5延伸（2.618x W1）',   color: '#c084fc', priority: 'secondary' },
+      ].map(t => ({
+        price:    _w4LowPrice + _baseMove * t.r,
+        label:    t.label,
+        ratio:    0,
+        fromIdx:  activeCycle.pts ? activeCycle.pts[activeCycle.pts.length - 1].idx : 0,
+        color:    t.color,
+        priority: t.priority,
+        type:     'w4_bull_target',
+      })).filter(t => t.price > _currentPx); // 只顯示高於現價的目標
+
+      if (_w5Targets.length >= 1) {
+        forecast = _w5Targets;
+        console.log('[v10 degreeCtx] forecast 已切換為多頭浪5上升目標', _w5Targets.map(t => t.price.toFixed(1)));
+      }
+    }
+  }
 
   // ── 新循環浪1修正預測目標 ────────────────────────────────────
   // 若已偵測到新循環浪1（ABC完成+反彈），舊的 forecast 是舊循環的ABC回撤目標，
@@ -7131,11 +7175,11 @@ function updateWaveCards() {
           : '浪4修正尚未完成，等待縮量止跌信號後佈局浪5';
         cycleWarning   = '⚠️ 演算法主計數顯示空頭五浪，但上位浪級分析顯示這更可能是大多頭的浪4修正（ABC結構）。請參考備用計數。';
       } else {
-        // ★ v9：即使 degreeContext 沒觸發，若最新價已明顯超過空頭起跌點也要警告
+        // ★ v10：即使 degreeContext 沒觸發，若最新價已超過空頭起跌點 2% 也要警告
         const _latestClose = DATA && DATA.length ? DATA[DATA.length-1].close : 0;
         const _bearStart   = ac.pts && ac.pts[0] ? ac.pts[0].price : 0;
         const _overshootPct = _bearStart > 0 ? (_latestClose - _bearStart) / _bearStart : 0;
-        const _bearInvalidated = _overshootPct > 0.05; // 超漲5%以上：此空頭計數疑似已失效
+        const _bearInvalidated = _overshootPct > 0.02; // v10：從 5% 降至 2%
 
         cycleDir       = 'BEAR_IMPULSE';
         cycleDirColor  = _bearInvalidated ? 'var(--orange)' : 'var(--red)';
@@ -7688,13 +7732,17 @@ function updateWaveCards() {
         const _acBull = _ac.result && _ac.result.isBull !== undefined ? _ac.result.isBull : true;
         const _is5w = _ac.type === '5wave' || _ac.type === '5wave_partial';
         const _isABC = _ac.type === 'abc' || _ac.type === 'abc_partial';
+        // ★ v10：degreeContext 觸發時，覆蓋 badge 為「多頭浪4修正」
+        const _degCtxBadge = WAVE_ENGINE_RESULT.degreeContext;
+        const _isW4CorrBadge = _degCtxBadge && _degCtxBadge.isW4Correction && _degCtxBadge.contextConfidence >= 45;
         let _badgeText, _badgeColor, _badgeBg;
-        if (isNewCycleW1)            { _badgeText='🟢 多頭推升循環';  _badgeColor='var(--green)'; _badgeBg='rgba(0,230,118,.1)'; }
-        else if (_is5w && _acBull)   { _badgeText='🟢 多頭推升循環';  _badgeColor='var(--green)'; _badgeBg='rgba(0,230,118,.1)'; }
-        else if (_is5w && !_acBull)  { _badgeText='🔴 空頭下跌循環';  _badgeColor='var(--red)';   _badgeBg='rgba(255,61,90,.1)'; }
-        else if (_isABC && _acBull)  { _badgeText='🟡 空頭反彈修正';  _badgeColor='var(--orange)';_badgeBg='rgba(255,154,60,.1)'; }
-        else if (_isABC && !_acBull) { _badgeText='🟡 多頭回調修正';  _badgeColor='var(--orange)';_badgeBg='rgba(255,154,60,.1)'; }
-        else                         { _badgeText='';                  _badgeColor=''; _badgeBg=''; }
+        if (isNewCycleW1)                    { _badgeText='🟢 多頭推升循環';    _badgeColor='var(--green)';  _badgeBg='rgba(0,230,118,.1)'; }
+        else if (_is5w && !_acBull && _isW4CorrBadge) { _badgeText='🟠 多頭浪4修正'; _badgeColor='#f0c040'; _badgeBg='rgba(240,192,64,.12)'; }
+        else if (_is5w && _acBull)           { _badgeText='🟢 多頭推升循環';    _badgeColor='var(--green)';  _badgeBg='rgba(0,230,118,.1)'; }
+        else if (_is5w && !_acBull)          { _badgeText='🔴 空頭下跌循環';    _badgeColor='var(--red)';    _badgeBg='rgba(255,61,90,.1)'; }
+        else if (_isABC && _acBull)          { _badgeText='🟡 空頭反彈修正';    _badgeColor='var(--orange)'; _badgeBg='rgba(255,154,60,.1)'; }
+        else if (_isABC && !_acBull)         { _badgeText='🟡 多頭回調修正';    _badgeColor='var(--orange)'; _badgeBg='rgba(255,154,60,.1)'; }
+        else                                 { _badgeText='';                    _badgeColor=''; _badgeBg=''; }
         if (_badgeText) {
           cwbCycleBadge.innerHTML = `<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:.6rem;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;color:${_badgeColor};background:${_badgeBg};border:1px solid ${_badgeColor}44;">${_badgeText}</span>`;
         } else {

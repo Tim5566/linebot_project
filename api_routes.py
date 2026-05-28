@@ -597,10 +597,6 @@ def register_api(app):
     def page_ma_finder():
         return send_from_directory('stock_site/tools', 'ma_finder.html')
 
-    @app.route("/stock_site/tools/kbar_pattern.html")
-    def page_kbar_pattern():
-        return send_from_directory('stock_site/tools', 'kbar_pattern.html')
-
     # ── 波浪走勢資料 Proxy API ─────────────────────────────────────────────────
     #
     # 三層保護：
