@@ -1,0 +1,9 @@
+flask
+line-bot-sdk
+apscheduler
+pytz
+pandas
+flask_cors
+flask-limiter
+python-dotenv
+firebase-admin

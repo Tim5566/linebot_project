@@ -1,0 +1,4133 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226"
+       crossorigin="anonymous"></script>
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="apple-touch-icon" href="/images/jelly.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第三章：趨勢與結構（核心章節）— 技術分析教學</title>
+  <meta name="description" content="趨勢與結構是技術分析的核心，學會辨識高點低點結構、上升下降趨勢與盤整型態，比均線更早發現趨勢轉折。技術分析教學第三章。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ch-color: var(--accent);
+      --ch-rgb: 0,229,255;
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;
+      --red:       #ff3d5a;
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    /* ── BG ── */
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+      animation:nebulaFloat 28s ease-in-out infinite alternate;
+    }
+    @keyframes nebulaFloat{0%{opacity:.7;transform:scale(1)}100%{opacity:1;transform:scale(1.02) translateX(4px)}}
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+
+
+
+    /* ── MAIN ── */
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:48px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(255,214,0,.16);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--yellow),rgba(255,150,0,.9),var(--yellow),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero::after {
+      content:'CH.03';
+      position:absolute;right:-10px;bottom:-20px;
+      font-family:'Orbitron',monospace;font-size:7rem;font-weight:900;
+      color:rgba(255,214,0,.035);pointer-events:none;line-height:1;
+    }
+
+    .hero-jelly{flex-shrink:0;width:120px;height:120px;position:relative}
+    .hero-icon{flex-shrink:0;width:110px;height:110px;display:flex;align-items:center;justify-content:center;background:rgba(255,214,0,.04);border:1px solid rgba(255,214,0,.2);border-radius:20px;position:relative;overflow:hidden;}
+    .hero-icon::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,214,0,.08),transparent 70%);}
+    .hero-content{flex:1;min-width:0}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--yellow);text-transform:uppercase;
+      opacity:.85;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.55rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 40%,rgba(255,214,0,.9));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(255,214,0,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;border:1px solid;cursor:default;
+    }
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07)}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07)}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07)}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07)}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07)}
+
+    /* ── CORE CONCEPT BANNER ── */
+
+    /* ── PROGRESS ── */
+    .sticky-progress {
+      position: sticky; top: 58px; z-index: 190;
+      background: rgba(3,6,14,.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,229,255,.07);
+      padding: 0;
+    }
+    .progress-track-sticky {
+      height: 3px; width: 100%;
+      background: rgba(0,229,255,.07);
+    }
+    .progress-fill-sticky {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--pink));
+      box-shadow: 0 0 10px rgba(0,229,255,.5);
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .progress-info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 24px;
+    }
+    .progress-label-sm {
+      font-family:'Share Tech Mono',monospace; font-size:.6rem;
+      letter-spacing:.1em; color:var(--text-faint);
+    }
+    .progress-pct-sm {
+      font-family:'Share Tech Mono',monospace; font-size:.65rem;
+      color:var(--accent); letter-spacing:.08em;
+    }
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.1);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.02);
+      opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;
+    }
+    .section-card.visible{opacity:1;transform:translateY(0)}
+    .section-card::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,214,0,.4),rgba(0,229,255,.4),transparent);
+      animation:borderGlow 5s ease-in-out infinite;
+    }
+    @keyframes borderGlow{0%,100%{opacity:.25}50%{opacity:1}}
+
+    .section-header {
+      padding:20px 28px;
+      display:flex;align-items:center;gap:14px;
+      border-bottom:1px solid rgba(0,229,255,.08);
+      background:linear-gradient(90deg,rgba(255,214,0,.04),rgba(0,229,255,.02),transparent);
+    }
+    .section-num {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.2em;color:var(--yellow);opacity:.8;
+      background:rgba(255,214,0,.07);border:1px solid rgba(255,214,0,.18);
+      border-radius:6px;padding:3px 8px;flex-shrink:0;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;
+      color:#fff;letter-spacing:.03em;flex:1;
+    }
+    .section-icon{font-size:1.3rem;flex-shrink:0}
+    .section-body{padding:26px 28px}
+
+    /* ── TEXT ── */
+    .prose{font-size:.9rem;line-height:1.85;color:var(--text);margin-bottom:18px}
+    .prose:last-child{margin-bottom:0}
+    .chip{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:2px 10px;border-radius:6px;letter-spacing:.06em}
+    .chip-red{color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.25)}
+    .chip-green{color:var(--green);background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25)}
+    .chip-yellow{color:var(--yellow);background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.22)}
+    .chip-cyan{color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.22)}
+    .chip-purple{color:var(--purple);background:rgba(178,102,255,.08);border:1px solid rgba(178,102,255,.22)}
+    .chip-orange{color:var(--orange);background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.22)}
+
+    /* val colors for tables */
+    .val-red{color:var(--red);font-weight:600}
+    .val-green{color:var(--green);font-weight:600}
+    .val-yellow{color:var(--yellow);font-weight:600}
+    .val-cyan{color:var(--accent);font-weight:600}
+    .val-purple{color:var(--purple);font-weight:600}
+    .val-orange{color:var(--orange);font-weight:600}
+
+    /* ── INSIGHT BOX ── */
+    .insight-box {
+      display:flex;gap:14px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(0,100,200,.04));
+      border:1px solid rgba(0,229,255,.2);border-radius:14px;
+      padding:18px 20px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.4rem;flex-shrink:0;padding-top:2px}
+    .insight-body{flex:1}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.18em;color:var(--accent);opacity:.75;margin-bottom:6px}
+    .insight-text{font-size:.88rem;line-height:1.8;color:var(--text)}
+    .insight-text strong{color:#fff}
+    .insight-quote{font-family:'Orbitron',monospace;font-size:.78rem;color:var(--accent);display:block;margin-top:8px;letter-spacing:.04em}
+
+    /* yellow insight */
+    .gold-box {
+      display:flex;gap:14px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(200,120,0,.04));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 20px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow)}
+    .gold-box .insight-text{color:var(--text)}
+
+    /* red insight */
+    .danger-box {
+      display:flex;gap:14px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.07),rgba(200,20,50,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 20px;margin:20px 0;
+    }
+    .danger-box .insight-label{color:var(--red)}
+    .danger-box .insight-text{color:var(--text-dim)}
+
+    /* green insight */
+    .success-box {
+      display:flex;gap:14px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,230,118,.07),rgba(0,150,80,.03));
+      border:1px solid rgba(0,230,118,.22);border-radius:14px;
+      padding:18px 20px;margin:20px 0;
+    }
+    .success-box .insight-label{color:var(--green)}
+    .success-box .insight-text{color:var(--text-dim)}
+
+    /* ── EXAMPLE BOX ── */
+    .example-box {
+      background:rgba(0,0,0,.3);border:1px solid rgba(255,214,0,.15);
+      border-radius:12px;padding:16px 20px;margin:18px 0;position:relative;
+    }
+    .example-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--yellow);opacity:.8;margin-bottom:8px;text-transform:uppercase}
+    .example-box p{font-size:.87rem;line-height:1.8;color:var(--text-dim)}
+    .example-box strong{color:var(--text)}
+
+    /* ── JELLY TIP ── */
+    .jelly-tip {
+      display:flex;gap:16px;align-items:flex-start;
+      margin:24px 0;padding:20px 22px;
+      background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(255,110,180,.03));
+      border:1px solid rgba(0,229,255,.15);border-radius:16px;position:relative;
+    }
+    .jelly-tip-mascot{flex-shrink:0}
+    .jelly-mini-svg{width:52px;height:52px}
+    .jelly-tip-bubble {
+      background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.2);
+      border-radius:12px;padding:12px 16px;
+      font-size:.85rem;line-height:1.75;color:var(--text);
+      position:relative;flex:1;
+    }
+    .jelly-tip-bubble::before {
+      content:'';position:absolute;left:-10px;top:16px;
+      border:5px solid transparent;border-right-color:rgba(0,229,255,.2);
+    }
+    .jelly-tip-name{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--accent);letter-spacing:.12em;margin-bottom:6px}
+
+    /* ── KEY CONCEPT ── */
+    .key-concept {
+      text-align:center;padding:24px 28px;margin:28px 0;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,214,0,.02));
+      border:1px solid rgba(255,214,0,.18);border-radius:16px;
+      position:relative;overflow:hidden;
+    }
+    .key-concept::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);animation:borderGlow 3s ease-in-out infinite}
+    .key-concept-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.25em;color:var(--yellow);opacity:.7;text-transform:uppercase;margin-bottom:10px}
+    .key-concept-text{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:var(--yellow);letter-spacing:.04em;line-height:1.5;text-shadow:0 0 30px rgba(255,214,0,.3)}
+
+    /* ── TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.83rem}
+    .cmp-table th{font-family:'Share Tech Mono',monospace;font-size:.66rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;padding:10px 16px;border-bottom:1px solid rgba(0,229,255,.2);text-align:left;background:rgba(0,229,255,.04)}
+    .cmp-table td{padding:11px 16px;border-bottom:1px solid rgba(0,229,255,.06);color:var(--text-dim);line-height:1.65}
+    .cmp-table tr:hover td{background:rgba(0,229,255,.025)}
+
+    /* ── VOCAB LIST ── */
+    .vocab-list{display:flex;flex-direction:column;gap:10px;margin:18px 0}
+    .vocab-item{display:flex;gap:16px;align-items:flex-start;padding:14px 18px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.08);transition:border-color .2s}
+    .vocab-item:hover{border-color:rgba(0,229,255,.2)}
+    .vocab-term{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--accent);font-weight:700;flex-shrink:0;min-width:80px}
+    .vocab-def{font-size:.86rem;color:var(--text-dim);line-height:1.65}
+    .vocab-def strong{color:var(--text)}
+
+    /* ── STRUCTURE DIAGRAM ── */
+    .struct-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+    .struct-card{background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.1);border-radius:14px;padding:18px 20px;text-align:center;transition:all .25s;cursor:default}
+    .struct-card:hover{border-color:rgba(0,229,255,.3);transform:translateY(-2px)}
+    .struct-card-title{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.1em;margin-bottom:10px;font-weight:700}
+    .struct-card.bull-card .struct-card-title{color:var(--red)}
+    .struct-card.bear-card .struct-card-title{color:var(--green)}
+    .struct-card.side-card .struct-card-title{color:var(--yellow)}
+    .struct-card-desc{font-size:.8rem;color:var(--text-dim);line-height:1.65}
+
+    /* ── HILO LABELS ── */
+    .hilo-row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+    .hilo-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:10px;font-family:'Share Tech Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:.08em}
+    .hilo-hh{color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.25)}
+    .hilo-hl{color:#ff9999;background:rgba(255,100,100,.07);border:1px solid rgba(255,100,100,.2)}
+    .hilo-lh{color:#88cc88;background:rgba(0,200,100,.07);border:1px solid rgba(0,200,100,.2)}
+    .hilo-ll{color:var(--green);background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25)}
+
+    /* ── THREE SIGNS CARDS ── */
+    .sign-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}
+    .sign-card{background:rgba(0,0,0,.25);border-radius:14px;padding:20px;text-align:center;border:1px solid;transition:all .25s;cursor:default}
+    .sign-card:hover{transform:translateY(-3px)}
+    .sign-card.red-sign{border-color:rgba(255,61,90,.2);background:rgba(255,61,90,.04)}
+    .sign-card.yellow-sign{border-color:rgba(255,214,0,.2);background:rgba(255,214,0,.04)}
+    .sign-card.purple-sign{border-color:rgba(178,102,255,.2);background:rgba(178,102,255,.04)}
+    .sign-icon{font-size:2rem;margin-bottom:10px}
+    .sign-title{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.08em;font-weight:700;margin-bottom:8px}
+    .sign-card.red-sign .sign-title{color:var(--red)}
+    .sign-card.yellow-sign .sign-title{color:var(--yellow)}
+    .sign-card.purple-sign .sign-title{color:var(--purple)}
+    .sign-desc{font-size:.78rem;color:var(--text-dim);line-height:1.65}
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:20px 0;padding:20px;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.1);border-radius:14px}
+    .flow-node{background:linear-gradient(135deg,rgba(0,229,255,.1),rgba(0,100,200,.07));border:1px solid rgba(0,229,255,.25);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--text);text-align:center;min-width:90px}
+    .flow-arrow{color:var(--accent);font-size:1.1rem;padding:0 6px;flex-shrink:0}
+    .flow-decision{background:linear-gradient(135deg,rgba(255,214,0,.1),rgba(200,160,0,.05));border:1px solid rgba(255,214,0,.3);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--yellow);text-align:center}
+    .flow-end-good{background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(0,180,80,.05));border:1px solid rgba(0,230,118,.3);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--green);text-align:center}
+    .flow-end-bad{background:linear-gradient(135deg,rgba(255,61,90,.1),rgba(200,20,50,.05));border:1px solid rgba(255,61,90,.3);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--red);text-align:center}
+    .flow-newline{flex-basis:100%;height:0}
+
+    /* ── QUIZ ── */
+    .quiz-block {
+      background:linear-gradient(135deg,rgba(178,102,255,.07),rgba(120,60,200,.04));
+      border:1px solid rgba(178,102,255,.22);border-radius:16px;
+      padding:24px;margin-top:28px;
+    }
+    .quiz-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.22em;color:var(--purple);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .quiz-label::before{content:'⚡'}
+    .quiz-q{font-size:.92rem;font-weight:600;color:#fff;margin-bottom:16px;line-height:1.6}
+    .quiz-options{display:flex;flex-direction:column;gap:8px}
+    .quiz-opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;border:1px solid rgba(178,102,255,.15);background:rgba(178,102,255,.04);font-size:.87rem;color:var(--text-dim);transition:all .2s;user-select:none}
+    .quiz-opt:hover:not(.disabled){background:rgba(178,102,255,.1);border-color:rgba(178,102,255,.35);color:var(--text)}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.5)!important;background:rgba(0,230,118,.1)!important;color:var(--green)!important}
+    .quiz-opt.wrong{border-color:rgba(255,61,90,.5)!important;background:rgba(255,61,90,.1)!important;color:var(--red)!important}
+    .quiz-opt.disabled{cursor:default;pointer-events:none}
+    .quiz-letter{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:.7rem;font-weight:700;border:1px solid rgba(178,102,255,.35);color:var(--purple);background:rgba(178,102,255,.08)}
+    .quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.85rem;line-height:1.7;display:none}
+    .quiz-feedback.show{display:block}
+    .quiz-feedback.ok{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:var(--green)}
+    .quiz-feedback.fail{background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.25);color:#ff8fa0}
+
+    /* ── INTERACTIVE: TREND BUILDER ── */
+    .trend-builder {
+      background:rgba(0,0,0,.35);border:1px solid rgba(255,214,0,.18);
+      border-radius:16px;padding:24px;margin:24px 0;
+    }
+    .trend-builder-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--yellow);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .trend-builder-title::before{content:'🎮'}
+    .tb-canvas{background:rgba(0,0,0,.4);border:1px solid rgba(0,229,255,.1);border-radius:10px;width:100%;cursor:crosshair;display:block;touch-action:none}
+    .tb-controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .tb-btn{font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid;letter-spacing:.06em}
+    .tb-btn.active-bull{color:var(--red);border-color:rgba(255,61,90,.4);background:rgba(255,61,90,.1)}
+    .tb-btn.active-bear{color:var(--green);border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.1)}
+    .tb-btn.neutral{color:var(--text-dim);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+    .tb-btn:hover{filter:brightness(1.2)}
+    .tb-result{margin-top:12px;padding:10px 16px;border-radius:8px;font-size:.82rem;min-height:38px;line-height:1.6;transition:all .3s;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);color:var(--text-dim)}
+
+    /* ── STRUCTURE LABEL GAME ── */
+    .label-game{margin:24px 0;background:rgba(0,0,0,.3);border:1px solid rgba(178,102,255,.18);border-radius:16px;padding:24px}
+    .label-game-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--purple);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .label-game-title::before{content:'🏷️'}
+    .label-points{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:14px 0}
+    .label-point-card{background:rgba(178,102,255,.06);border:1px solid rgba(178,102,255,.15);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
+    .label-point-card:hover{border-color:rgba(178,102,255,.4);background:rgba(178,102,255,.12)}
+    .label-point-card.revealed{border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08);cursor:default}
+    .label-point-q{font-size:.8rem;color:var(--text-dim);margin-bottom:6px}
+    .label-point-q strong{color:var(--text)}
+    .label-point-a{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--green);font-weight:700;display:none}
+    .label-point-card.revealed .label-point-a{display:block}
+    .label-hint{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-faint);letter-spacing:.1em;margin-top:12px}
+
+    /* ── TREND COLLAPSE CHECKLIST ── */
+    .collapse-check{margin:20px 0;display:flex;flex-direction:column;gap:10px}
+    .cc-item{display:flex;gap:14px;align-items:flex-start;padding:14px 18px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,61,90,.1);cursor:pointer;transition:all .2s;user-select:none}
+    .cc-item:hover{border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.04)}
+    .cc-item.checked{border-color:rgba(255,61,90,.5);background:rgba(255,61,90,.08)}
+    .cc-box{width:20px;height:20px;border-radius:5px;border:2px solid rgba(255,61,90,.4);flex-shrink:0;margin-top:1px;display:grid;place-items:center;transition:all .2s;font-size:.8rem}
+    .cc-item.checked .cc-box{border-color:var(--red);background:rgba(255,61,90,.2);color:var(--red)}
+    .cc-text{font-size:.86rem;color:var(--text-dim);line-height:1.65}
+    .cc-text strong{color:var(--text)}
+
+
+
+    
+.toc-dot:hover,
+    .toc-dot .toc-label{position:absolute;right:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--yellow);opacity:0;transition:opacity .2s;pointer-events:none;background:rgba(3,6,14,.9);padding:3px 8px;border-radius:6px;border:1px solid rgba(255,214,0,.2)}
+    .toc-dot:hover .toc-label{opacity:1}
+
+    /* ── TREND DEFINITION VISUAL ── */
+    .trend-visual{margin:20px 0;padding:24px;background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.1);border-radius:14px}
+    .trend-visual-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;opacity:.8}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:700px){
+      main{padding:28px 16px 80px}
+      .hero{flex-direction:column;gap:20px;padding:24px 22px}
+      .hero-jelly{width:80px;height:80px}
+      .struct-grid{grid-template-columns:1fr}
+      .sign-grid{grid-template-columns:1fr}
+      .toc{display:none}
+      .flow-wrap{flex-direction:column}
+      .chapter-footer{flex-direction:column}
+    }
+    @media(max-width:480px){.hero-title{font-size:1.2rem}}
+
+    /* ── JELLY ANIMATIONS ── */
+    @keyframes jellyWiggle{0%,100%{transform:scaleX(1) scaleY(1)}25%{transform:scaleX(1.06) scaleY(.96)}50%{transform:scaleX(.96) scaleY(1.06)}75%{transform:scaleX(1.04) scaleY(.98)}}
+    @keyframes eyeBlink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+    .jelly-wiggle{animation:jellyWiggle 2.5s ease-in-out infinite;transform-origin:center bottom}
+    .jelly-eye{animation:eyeBlink 4s ease-in-out infinite}
+    @keyframes sparkle{0%,100%{opacity:.8;transform:scale(1)}50%{opacity:.2;transform:scale(.5)}}
+
+    /* ── SECTION DIVIDER ── */
+    .sec-divider{text-align:center;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.25em;color:var(--text-faint);margin:24px 0;position:relative}
+    .sec-divider::before,.sec-divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.15))}
+    .sec-divider::before{left:0}.sec-divider::after{right:0;background:linear-gradient(90deg,rgba(0,229,255,.15),transparent)}
+
+    /* ── SPECIAL: TREND COLLAPSE WARNING ── */
+    .warning-banner {
+      display:flex;gap:16px;align-items:center;
+      background:linear-gradient(135deg,rgba(255,61,90,.08),rgba(178,102,255,.04));
+      border:1px solid rgba(255,61,90,.25);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warning-icon{font-size:1.8rem;flex-shrink:0}
+    .warning-text{font-size:.87rem;line-height:1.75;color:var(--text-dim)}
+    .warning-text strong{color:var(--red)}
+
+    /* ── BEFORE/AFTER COMPARISON ── */
+    .before-after{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+    .ba-card{border-radius:12px;padding:18px;border:1px solid}
+    .ba-card.before{border-color:rgba(255,61,90,.2);background:rgba(255,61,90,.04)}
+    .ba-card.after{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04)}
+    .ba-label{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;margin-bottom:10px;font-weight:700}
+    .before .ba-label{color:var(--red)}.after .ba-label{color:var(--green)}
+    .ba-text{font-size:.83rem;color:var(--text-dim);line-height:1.65}
+    .ba-text strong{color:var(--text)}
+    @media(max-width:500px){.before-after{grid-template-columns:1fr}}
+  
+    
+    
+    
+    /* top accent bar */
+    
+    /* bottom accent bar */
+    
+    
+    
+    /* hover glow sweep */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* chapter number dot for current */
+    
+    @media (max-width: 768px) {  }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    /* ═══ UNIFIED SIDENAV — SINGLE DEFINITIVE BLOCK ═══ */
+    .chapter-sidenav {
+      position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+      z-index: 150; display: flex; flex-direction: column;
+      background: rgba(2,5,14,.98); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: 1.5px solid rgba(0,229,255,.28); border-left: none;
+      border-radius: 0 18px 18px 0; overflow: hidden;
+      box-shadow: 6px 0 40px rgba(0,0,0,.65), 0 0 28px rgba(0,229,255,.08);
+      transition: box-shadow .3s, border-color .3s; min-width: 48px;
+    }
+    .chapter-sidenav:hover {
+      box-shadow: 8px 0 50px rgba(0,0,0,.7), 0 0 40px rgba(0,229,255,.12);
+      border-color: rgba(0,229,255,.35);
+    }
+    .chapter-sidenav::before {
+      content: ''; display: block; height: 2px; flex-shrink: 0;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.9), rgba(0,229,255,.5), transparent);
+    }
+    .chapter-sidenav::after {
+      content: ''; display: block; height: 2px; flex-shrink: 0; margin-top: auto;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.5), rgba(0,229,255,.2), transparent);
+    }
+    .ch-nav-item {
+      display: flex; align-items: center;
+      padding: 10px 14px 10px 12px;
+      font-family: 'Share Tech Mono', monospace; font-size: .7rem;
+      letter-spacing: .06em; color: rgba(200,220,240,.85);
+      text-decoration: none; cursor: pointer;
+      border-left: 2.5px solid transparent;
+      transition: all .22s ease; white-space: nowrap;
+      border-bottom: 1px solid rgba(0,229,255,.06);
+      position: relative; overflow: hidden; min-width: 148px;
+    }
+    .ch-nav-item:last-child { border-bottom: none; }
+    .ch-nav-item::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(0,229,255,.0), rgba(0,229,255,.07));
+      opacity: 0; transition: opacity .22s;
+    }
+    .ch-nav-item:hover::before { opacity: 1; }
+    .ch-nav-item .ch-num {
+      font-size: .66rem; font-weight: 700; opacity: 1; flex-shrink: 0;
+      min-width: 20px; transition: opacity .2s, color .2s; letter-spacing: .04em;
+      color: rgba(180,210,235,.9);
+    }
+    .ch-nav-item .ch-label {
+      opacity: 1; max-width: 160px; overflow: hidden;
+      transition: opacity .25s, max-width .25s, padding-left .25s;
+      font-size: .7rem; letter-spacing: .04em; color: rgba(220,235,250,.9);
+      padding-left: 8px;
+    }
+    .ch-nav-item:hover .ch-label,
+    .ch-nav-item.current-ch .ch-label { opacity: 1; max-width: 140px; padding-left: 8px; }
+    .ch-nav-item:hover { color: var(--accent); border-left-color: rgba(0,229,255,.6); background: rgba(0,229,255,.05); }
+    .ch-nav-item:hover .ch-num { opacity: 1; color: var(--accent); }
+    .ch-nav-item.current-ch {
+      color: var(--ch-color, var(--accent));
+      border-left-color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .08);
+    }
+    .ch-nav-item.current-ch .ch-num { opacity: 1; color: var(--ch-color, var(--accent)); }
+    .ch-nav-item.current-ch .ch-label { color: var(--ch-color, var(--accent)); }
+    .ch-nav-item.current-ch::after {
+      content: ''; position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ch-color, var(--accent));
+      box-shadow: 0 0 8px var(--ch-color, var(--accent));
+    }
+    .ch-nav-item.locked { opacity: .28; cursor: default; pointer-events: none; }
+    @media (max-width: 768px) { .chapter-sidenav { display: none; } }
+
+    /* ═══ UNIFIED TOC STRIP ═══ */
+    .toc-strip {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 44px; padding: 18px 24px;
+      background: rgba(var(--ch-rgb, 0,229,255), .03);
+      border: 1px solid rgba(var(--ch-rgb, 0,229,255), .12);
+      border-radius: 16px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .toc-strip::-webkit-scrollbar { display: none; }
+    .toc-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 7px; min-width: 64px; cursor: pointer;
+      padding: 5px 8px; border-radius: 10px; transition: background .2s;
+      flex-shrink: 0;
+    }
+    .toc-item:hover { background: rgba(var(--ch-rgb, 0,229,255), .08); }
+    .toc-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid rgba(var(--ch-rgb, 0,229,255), .28);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace; font-size: .62rem; font-weight: 700;
+      color: var(--text-faint); transition: all .3s; flex-shrink: 0;
+    }
+    .toc-dot.active {
+      border-color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .15);
+      color: var(--ch-color, var(--accent));
+      box-shadow: 0 0 14px rgba(var(--ch-rgb, 0,229,255), .35);
+    }
+    .toc-item:hover .toc-dot {
+      border-color: rgba(var(--ch-rgb, 0,229,255), .55);
+      color: rgba(var(--ch-rgb, 0,229,255), .8);
+    }
+    .toc-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem; color: var(--text-faint);
+      text-align: center; line-height: 1.35; transition: color .3s;
+      letter-spacing: .03em;
+    }
+    .toc-item:hover .toc-lbl { color: var(--text-dim); }
+    .toc-connector {
+      flex: 1; min-width: 12px; height: 1px;
+      background: rgba(var(--ch-rgb, 0,229,255), .12);
+    }
+
+    /* ══ UNIFIED HEADER ══ */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 0 14px; height: 58px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: rgba(3,6,14,.97);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--accent, #00e5ff) 20%, rgba(0,170,255,.9) 50%, var(--accent, #00e5ff) 80%, transparent);
+      background-size: 200% 100%; animation: headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep { from { background-position: -100% 0 } to { background-position: 200% 0 } }
+    .header-left { display: flex; align-items: center; gap: 0; }
+    .logo { display: flex; align-items: center; gap: 12px; margin-left: 2px; }
+    .logo-icon { width: 40px; height: 40px; border-radius: 9px; display: grid; place-items: center; position: relative; flex-shrink: 0; overflow: visible; }
+    .logo-icon img { width: 52px; height: 52px; object-fit: contain; border-radius: 9px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -5px; left: -5px; }
+    .logo-text { font-family: 'Orbitron', monospace; font-size: .92rem; font-weight: 700; letter-spacing: .1em; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,.4); }
+    .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: .5rem; color: var(--accent); letter-spacing: .22em; opacity: .65; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-back {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 16px; border-radius: 20px;
+      border: 1px solid rgba(0,229,255,.22);
+      background: rgba(0,229,255,.06);
+      color: #a0c8e8; font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem; letter-spacing: .07em; cursor: pointer;
+      text-decoration: none; transition: all .2s;
+      font-weight: 400;
+    }
+    .btn-back:hover { color: var(--accent); background: rgba(0,229,255,.14); border-color: rgba(0,229,255,.5); box-shadow: 0 0 16px rgba(0,229,255,.2); }
+    .btn-back svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .chapter-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: .65rem;
+      color: var(--ch-color, var(--accent));
+      background: rgba(var(--ch-rgb, 0,229,255), .09);
+      border: 1px solid rgba(var(--ch-rgb, 0,229,255), .28);
+      border-radius: 9px; padding: 4px 12px; letter-spacing: .14em;
+      text-shadow: 0 0 12px var(--ch-color, var(--accent));
+    }
+
+    /* ══ UNIFIED FOOTER (single-row) ══ */
+    .chapter-footer {
+      margin-top: 64px; padding: 0;
+      background: linear-gradient(135deg, rgba(6,12,26,.99), rgba(4,8,18,.99));
+      border: 1.5px solid rgba(0,229,255,.16);
+      border-radius: 20px; overflow: hidden; position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 0 30px rgba(0,229,255,.04);
+    }
+    .chapter-footer::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--ch-color, var(--accent)), rgba(0,229,255,.6), var(--ch-color, var(--accent)), transparent);
+      background-size: 300% 100%; animation: footerEdge 4s ease-in-out infinite;
+    }
+    @keyframes footerEdge { 0%,100%{background-position:-100% 0;opacity:.5}50%{background-position:200% 0;opacity:1} }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 28px; gap: 20px; flex-wrap: wrap;
+    }
+    .footer-left {
+      display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;
+    }
+    .footer-right {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .footer-complete-badge {
+      flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(var(--ch-rgb,0,229,255),.14), rgba(var(--ch-rgb,0,229,255),.06));
+      border: 1px solid rgba(var(--ch-rgb,0,229,255),.3);
+      display: grid; place-items: center; font-size: 1.3rem;
+    }
+    .footer-complete-text { flex: 1; min-width: 0; }
+    .footer-complete-title {
+      font-family: 'Orbitron', monospace; font-size: .82rem; font-weight: 700;
+      color: #fff; letter-spacing: .04em; margin-bottom: 4px;
+    }
+    .footer-complete-desc { font-size: .8rem; color: #7a9ab8; line-height: 1.6; }
+    .footer-next-hint {
+      font-size: .73rem; color: rgba(var(--ch-rgb,0,229,255),.8);
+      margin-top: 3px; font-family: 'Share Tech Mono', monospace;
+      letter-spacing: .04em; opacity: .75;
+    }
+    .fn-btn {
+      display: flex; align-items: center; gap: 9px;
+      padding: 11px 20px; border-radius: 12px;
+      font-family: 'Share Tech Mono', monospace; font-size: .74rem;
+      letter-spacing: .07em; cursor: pointer; text-decoration: none;
+      transition: all .22s; white-space: nowrap; border: 1.5px solid;
+    }
+    .fn-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .fn-btn.prev { color: #a0c8e8; border-color: rgba(0,229,255,.2); background: rgba(0,229,255,.05); }
+    .fn-btn.prev:hover { color: var(--accent); border-color: rgba(0,229,255,.45); background: rgba(0,229,255,.12); box-shadow: 0 0 14px rgba(0,229,255,.18); }
+    .fn-btn.next { color: var(--ch-color, var(--accent)); border-color: rgba(var(--ch-rgb,0,229,255),.3); background: rgba(var(--ch-rgb,0,229,255),.07); }
+    .fn-btn.next:hover { background: rgba(var(--ch-rgb,0,229,255),.15); border-color: rgba(var(--ch-rgb,0,229,255),.6); box-shadow: 0 0 18px rgba(var(--ch-rgb,0,229,255),.22); }
+    .fn-btn.locked { color: #a0c8e8; border-color: rgba(0,229,255,.2); background: rgba(0,229,255,.05); cursor: default; }
+    @media(max-width:600px){
+      .footer-inner { flex-direction: column; align-items: stretch; }
+      .footer-right { justify-content: center; }
+      .fn-btn { justify-content: center; }
+    .fn-btn.home { color: #7a9ab8; border-color: rgba(0,229,255,.15); background: rgba(0,229,255,.03); }
+    .fn-btn.home:hover { color: #00e5ff; border-color: rgba(0,229,255,.4); background: rgba(0,229,255,.09); box-shadow: 0 0 14px rgba(0,229,255,.15); }
+    body.theme-day .fn-btn.home { color: #2a5080; border-color: rgba(26,101,168,.2); background: rgba(26,123,191,.05); }
+    body.theme-day .fn-btn.home:hover { color: #1265a8; border-color: rgba(26,123,191,.45); background: rgba(26,123,191,.12); }
+    }
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── CSS 變數覆蓋 ── */
+    body.theme-day {
+      --bg:         #cce0f2;
+      --surface:    rgba(255,255,255,.88);
+      --surface2:   rgba(232,246,255,.92);
+      --border:     rgba(26,101,168,.18);
+      --border2:    rgba(26,101,168,.30);
+      --accent:     #1265a8;
+      --accent2:    #0d5090;
+      --accent3:    #1a88cc;
+      --green:      #157a32;
+      --red:        #b03020;
+      --yellow:     #b8880e;
+      --purple:     #6640c0;
+      --pink:       #c03080;
+      --muted:      #6a90b0;
+      --text:       #0c1c2e;
+      --text-dim:   #1a3550;
+      --text-faint: #3a6080;
+      --jelly-cyan: #1265a8;
+      --jelly-pink: #c03080;
+      --glow:       0 2px 14px rgba(26,101,168,.18);
+    }
+
+    /* ── 背景：藍天漸層 ── */
+    body.theme-day {
+      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 80%,#e8f8f0 100%);
+      scrollbar-color: rgba(26,123,191,.3) transparent;
+    }
+    body.theme-day .bg-nebula,
+    body.theme-day .bg-scanlines { opacity:0; pointer-events:none; }
+
+    /* ── Header ── */
+    body.theme-day header {
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(26,123,191,.15);
+      box-shadow: 0 2px 20px rgba(26,100,180,.1);
+    }
+    body.theme-day header::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.55) 30%,rgba(33,150,211,.75) 50%,rgba(26,123,191,.55) 70%,transparent);
+    }
+    body.theme-day .logo-text { color:#0a1828; text-shadow:0 1px 4px rgba(26,80,160,.18); }
+    body.theme-day .logo-sub  { color:#1265a8; opacity:.85; }
+    body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(26,100,180,.2)); }
+
+    /* ── 返回按鈕 / 章節 badge ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.15);
+      border-color: rgba(26,123,191,.4);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.28);
+      color: #1265a8;
+    }
+
+    /* ── 進度條 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,123,191,.12);
+    }
+    body.theme-day .progress-track-sticky { background: rgba(26,123,191,.1); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #c03080);
+      box-shadow: 0 0 8px rgba(26,123,191,.35);
+    }
+    body.theme-day .progress-label-sm { color: #5a8ab8; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; }
+
+    /* ── Hero 區塊 ── */
+    body.theme-day .hero {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,123,191,.22);
+      box-shadow: 0 8px 40px rgba(26,80,160,.12), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    body.theme-day .hero::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.45),rgba(33,150,211,.6),rgba(26,123,191,.45),transparent);
+    }
+    body.theme-day .hero-label  { color: #1265a8; }
+    body.theme-day .hero-title  {
+      background: linear-gradient(90deg,#0a2d50 0%,#1265a8 55%,#1a88cc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.4));
+    }
+    body.theme-day .hero-desc { color: #1a3550; }
+
+    /* ── Tags ── */
+    body.theme-day .tag-cyan   { color:#0d6ea8; border-color:rgba(13,110,168,.3); background:rgba(13,110,168,.08); }
+    body.theme-day .tag-pink   { color:#b0206a; border-color:rgba(176,32,106,.3); background:rgba(176,32,106,.07); }
+    body.theme-day .tag-green  { color:#157a32; border-color:rgba(21,122,50,.3); background:rgba(21,122,50,.07); }
+    body.theme-day .tag-yellow { color:#8a6000; border-color:rgba(138,96,0,.3); background:rgba(138,96,0,.07); }
+
+    /* ── Section Card ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.75);
+      animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    body.theme-day .section-card::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.35),transparent);
+      animation: none;
+      opacity: .6;
+    }
+    body.theme-day .card-header {
+      background: rgba(26,123,191,.04);
+      border-bottom-color: rgba(26,123,191,.1);
+    }
+    body.theme-day .card-icon {
+      background: linear-gradient(135deg,rgba(26,123,191,.12),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .card-num   { color: #1265a8; opacity: .8; }
+    body.theme-day .card-title { color: #0a1828; }
+    body.theme-day .card-body  { }
+
+    /* ── 內文 ── */
+    body.theme-day .content-para { color: #0c1c2e; }
+    body.theme-day em.hl        { color: #0d6ea8; }
+    body.theme-day em.hl-pink   { color: #b0206a; }
+    body.theme-day em.hl-yellow { color: #8a6000; }
+    body.theme-day em.hl-green  { color: #157a32; }
+
+    /* ── Insight Box ── */
+    body.theme-day .insight-box {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.05));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .insight-text  { color: #1a2d40; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Mistake Box ── */
+    body.theme-day .mistake-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-box .insight-text { color: #2a1818; }
+
+    /* ── Example Box ── */
+    body.theme-day .example-box {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .example-label { color: #8a6000; }
+    body.theme-day .example-box p { color: #2a3040; }
+
+    /* ── Compare Table ── */
+    body.theme-day .compare-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .compare-table td {
+      color: #1a2d40;
+      border-bottom-color: rgba(26,123,191,.07);
+    }
+    body.theme-day .compare-table tr:hover td { background: rgba(26,123,191,.04); }
+    body.theme-day .compare-table .val-up { color: #a02818; }
+    body.theme-day .compare-table .val-dn { color: #126e28; }
+
+    /* ── Flow Chart ── */
+    body.theme-day .flow-chart {
+      background: rgba(255,255,255,.65);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.3);
+      color: #0a1828;
+    }
+    body.theme-day .flow-arrow { color: #1265a8; }
+    body.theme-day .flow-decision {
+      background: linear-gradient(135deg,rgba(138,96,0,.1),rgba(120,80,0,.05));
+      border-color: rgba(138,96,0,.3);
+      color: #8a6000;
+    }
+
+    /* ── Quiz ── */
+    body.theme-day .quiz-block {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04));
+      border-color: rgba(102,64,192,.2);
+    }
+    body.theme-day .quiz-label { color: #6640c0; }
+    body.theme-day .quiz-q     { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(102,64,192,.04);
+      border-color: rgba(102,64,192,.15);
+      color: #1a2d40;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(102,64,192,.1);
+      border-color: rgba(102,64,192,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-opt.correct { border-color:rgba(21,122,50,.5)!important; background:rgba(21,122,50,.1)!important; color:#157a32!important; }
+    body.theme-day .quiz-opt.wrong   { border-color:rgba(176,48,32,.5)!important; background:rgba(176,48,32,.1)!important; color:#b03020!important; }
+    body.theme-day .quiz-letter {
+      border-color: rgba(102,64,192,.3);
+      color: #6640c0;
+      background: rgba(102,64,192,.08);
+    }
+    body.theme-day .quiz-feedback.ok   { background:rgba(21,122,50,.08); border-color:rgba(21,122,50,.25); color:#157a32; }
+    body.theme-day .quiz-feedback.fail { background:rgba(176,48,32,.08); border-color:rgba(176,48,32,.25); color:#b03020; }
+
+    /* ── Jelly Tip Bubble ── */
+    body.theme-day .jelly-tip {
+      background: linear-gradient(135deg,rgba(26,123,191,.06),rgba(192,48,128,.03));
+      border-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+    body.theme-day .jelly-tip-bubble::before { border-right-color: rgba(26,123,191,.22); }
+    body.theme-day .jelly-tip-name { color: #1265a8; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,123,191,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent);
+      animation: none; opacity: .65;
+    }
+    body.theme-day .key-concept-label { color: #1265a8; opacity: .85; }
+    body.theme-day .key-concept-text  { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+
+    /* ── Vocab List ── */
+    body.theme-day .vocab-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.28); }
+    body.theme-day .vocab-term { color: #1265a8; }
+    body.theme-day .vocab-def  { color: #1a3550; }
+
+    /* ── Chapter Footer ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .footer-info        { color: #5a8ab8; }
+    body.theme-day .footer-info strong { color: #2a4a68; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.07);
+      border-color: rgba(26,123,191,.22);
+      color: #2a4a78;
+    }
+
+    /* ── Timeline ── */
+    body.theme-day .timeline::before {
+      background: linear-gradient(180deg,#157a32,#1265a8,#b03020,#b8880e);
+    }
+    body.theme-day .timeline-dot { background: #daeeff; }
+    body.theme-day .timeline-dot.bull { border-color:#157a32; box-shadow:0 0 6px rgba(21,122,50,.4); }
+    body.theme-day .timeline-dot.bear { border-color:#b03020; box-shadow:0 0 6px rgba(176,48,32,.4); }
+    body.theme-day .timeline-dot.side { border-color:#b8880e; box-shadow:0 0 6px rgba(184,136,14,.4); }
+    body.theme-day .timeline-phase.bull { color: #157a32; }
+    body.theme-day .timeline-phase.bear { color: #b03020; }
+    body.theme-day .timeline-phase.side { color: #b8880e; }
+    body.theme-day .timeline-title      { color: #0a1828; }
+    body.theme-day .timeline-desc       { color: #1a3550; }
+
+    /* ── Stat Cards ── */
+    body.theme-day .stat-card {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+    body.theme-day .stat-card:hover { border-color: rgba(26,101,168,.3); }
+    body.theme-day .stat-label { color: #2a4a68; }
+
+    /* ── Case Study ── */
+    body.theme-day .case-study {
+      background: linear-gradient(135deg,rgba(138,96,0,.06),rgba(120,80,0,.02));
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .case-header {
+      background: rgba(138,96,0,.07);
+      border-bottom-color: rgba(138,96,0,.14);
+    }
+    body.theme-day .case-badge {
+      background: rgba(138,96,0,.1);
+      border-color: rgba(138,96,0,.25);
+      color: #8a6000;
+    }
+    body.theme-day .case-title { color: #0a1828; }
+    body.theme-day .case-body p { color: #2a3040; }
+    body.theme-day .case-lesson {
+      background: rgba(138,96,0,.07);
+      border-color: rgba(138,96,0,.2);
+      color: #8a6000;
+    }
+
+    /* ── Psychology Cards ── */
+    body.theme-day .psych-card.danger { background:rgba(255,255,255,.75); border-color:rgba(176,48,32,.22); }
+    body.theme-day .psych-card.warn   { background:rgba(255,255,255,.75); border-color:rgba(184,136,14,.22); }
+    body.theme-day .psych-name        { color: #0a1828; }
+    body.theme-day .psych-desc        { color: #1a3550; }
+    body.theme-day .psych-example     { color: #3a5070; background:rgba(0,0,0,.04); }
+
+    /* ── Kbar Demo ── */
+    body.theme-day .kbar-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .kbar-demo-title { color: #1265a8; }
+
+    /* ── Chart Demo ── */
+    body.theme-day .chart-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+
+    /* ── Emotion Strip ── */
+    body.theme-day .emotion-strip { border-color: rgba(26,101,168,.14); }
+
+    /* ── 強制移除白天模式閃爍 ── */
+    body.theme-day .section-card::before { animation: none !important; }
+    body.theme-day header::after          { animation: headerSweep 6s linear infinite; opacity: .6; }
+
+    /* ── 通用 scrollbar ── */
+    body.theme-day { scrollbar-color: rgba(26,123,191,.3) transparent; }
+    body.theme-day::-webkit-scrollbar-thumb { background: rgba(26,123,191,.25); }
+
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 — 全面修復補丁 v2
+       修復項目：
+         1. 側邊欄 (chapter-sidenav) — 白底深藍文字，清晰邊框
+         2. 進度導覽條 (toc-strip / toc-dot) — 深色圓圈文字，高對比
+         3. 章節底部 footer — 白底清晰文字，按鈕明顯
+         4. Header logo — 使用 jelly.png
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 1. 左側章節目錄 sidenav ── */
+    body.theme-day .chapter-sidenav {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-color: rgba(26,101,168,.35);
+      box-shadow: 4px 0 28px rgba(26,80,160,.18), 0 0 12px rgba(26,123,191,.08);
+    }
+    body.theme-day .chapter-sidenav:hover {
+      border-color: rgba(26,101,168,.5);
+      box-shadow: 6px 0 36px rgba(26,80,160,.22), 0 0 18px rgba(26,123,191,.1);
+    }
+    body.theme-day .chapter-sidenav::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.7), rgba(33,150,211,.5), transparent);
+    }
+    body.theme-day .chapter-sidenav::after {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.35), rgba(26,123,191,.2), transparent);
+    }
+    /* ch-nav-item 基礎：深藍文字 */
+    body.theme-day .ch-nav-item {
+      color: #1a3a60;
+      border-bottom-color: rgba(26,101,168,.1);
+      border-left-color: transparent;
+    }
+    body.theme-day .ch-nav-item::before {
+      background: linear-gradient(90deg, rgba(26,123,191,.0), rgba(26,123,191,.08));
+    }
+    body.theme-day .ch-nav-item .ch-num {
+      color: #2a5080;
+      font-weight: 700;
+    }
+    body.theme-day .ch-nav-item .ch-label {
+      color: #1a3a60;
+    }
+    /* hover 狀態 */
+    body.theme-day .ch-nav-item:hover {
+      color: #0d3d7a;
+      border-left-color: rgba(26,101,168,.55);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .ch-nav-item:hover .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item:hover .ch-label { color: #0d3d7a; }
+    /* 當前章節 */
+    body.theme-day .ch-nav-item.current-ch {
+      color: #1265a8;
+      border-left-color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    body.theme-day .ch-nav-item.current-ch .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item.current-ch .ch-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .ch-nav-item.current-ch::after {
+      background: #1265a8;
+      box-shadow: 0 0 6px rgba(26,101,168,.5);
+    }
+
+    /* ── 2. 進度導覽條 (toc-strip) ── */
+    body.theme-day .toc-strip {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .toc-item:hover {
+      background: rgba(26,123,191,.08);
+    }
+    /* toc-dot：深色圓圈，數字清晰可見 */
+    body.theme-day .toc-dot {
+      border-color: rgba(26,101,168,.35);
+      color: #1a3a60;
+      background: rgba(255,255,255,.9);
+      font-weight: 700;
+    }
+    body.theme-day .toc-dot.active {
+      border-color: #1265a8;
+      background: rgba(26,123,191,.15);
+      color: #1265a8;
+      box-shadow: 0 0 10px rgba(26,101,168,.3);
+    }
+    body.theme-day .toc-item:hover .toc-dot {
+      border-color: rgba(26,101,168,.6);
+      color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    /* toc-lbl：深色標籤文字 */
+    body.theme-day .toc-lbl {
+      color: #2a4a68;
+      font-weight: 500;
+    }
+    body.theme-day .toc-item:hover .toc-lbl { color: #0d3560; }
+    /* toc-connector：藍色連線 */
+    body.theme-day .toc-connector {
+      background: rgba(26,101,168,.2);
+    }
+
+    /* ── 3. 章節底部 footer (unified footer) ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(26,101,168,.22);
+      box-shadow: 0 6px 32px rgba(26,80,160,.1);
+    }
+    body.theme-day .chapter-footer::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), rgba(33,150,211,.65), rgba(26,123,191,.5), transparent);
+      animation: none;
+      opacity: .7;
+    }
+    /* footer 左側完成標章 */
+    body.theme-day .footer-complete-badge {
+      background: linear-gradient(135deg, rgba(26,123,191,.14), rgba(26,80,160,.08));
+      border-color: rgba(26,101,168,.3);
+    }
+    /* footer 標題 */
+    body.theme-day .footer-complete-title { color: #0a1828; }
+    body.theme-day .footer-complete-desc  { color: #2a5070; }
+    body.theme-day .footer-next-hint      { color: #1265a8; opacity: .85; }
+    /* fn-btn 上一章 */
+    body.theme-day .fn-btn.prev {
+      color: #2a5080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #0d3560;
+      border-color: rgba(26,101,168,.5);
+      background: rgba(26,123,191,.13);
+      box-shadow: 0 2px 12px rgba(26,101,168,.15);
+    }
+    /* fn-btn 下一章 (accent) */
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,101,168,.35);
+      background: rgba(26,123,191,.1);
+      font-weight: 600;
+    }
+    body.theme-day .fn-btn.next:hover {
+      color: #fff;
+      background: #1265a8;
+      border-color: #1265a8;
+      box-shadow: 0 4px 18px rgba(26,101,168,.3);
+    }
+    body.theme-day .fn-btn.locked {
+      color: #8ab0d0;
+      border-color: rgba(26,101,168,.15);
+      background: rgba(26,123,191,.04);
+    }
+
+    /* ── 舊版 footer (chapter1 樣式相容) ── */
+    body.theme-day .footer-info        { color: #2a4a68; }
+    body.theme-day .footer-info strong { color: #0a1828; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.28);
+      color: #1265a8;
+      font-weight: 600;
+    }
+    body.theme-day .next-btn:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.5);
+    }
+    body.theme-day .prev-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #2a5080;
+    }
+
+    /* ── 4. Header logo 圖片亮度 ── */
+    body.theme-day .logo-icon img {
+      filter: drop-shadow(0 2px 8px rgba(26,80,160,.25));
+      opacity: 1;
+    }
+    body.theme-day .logo-text {
+      color: #0a1828;
+      text-shadow: 0 1px 3px rgba(26,80,160,.15);
+      font-weight: 700;
+    }
+    body.theme-day .logo-sub { color: #1265a8; opacity: .9; font-weight: 600; }
+
+    /* ── 5. sticky progress bar 文字明顯化 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(26,123,191,.18);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .progress-label-sm { color: #2a4a68; font-weight: 500; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; font-weight: 700; }
+    body.theme-day .progress-track-sticky { background: rgba(26,101,168,.12); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #1a88cc);
+      box-shadow: 0 0 8px rgba(26,101,168,.4);
+    }
+
+    /* ── 6. back-btn / chapter-badge 明顯化 ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.3);
+      color: #1a3a60;
+      font-weight: 500;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.52);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,101,168,.35);
+      color: #1265a8;
+      font-weight: 700;
+    }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       COMPREHENSIVE DAY THEME PATCH — ALL MISSING COMPONENTS
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 通用：黑色背景容器 ── */
+    body.theme-day .rhythm-row,
+    body.theme-day .tri-canvas,
+    body.theme-day .pat-nav-wrap,
+    body.theme-day .sim-wrap,
+    body.theme-day .detector-wrap,
+    body.theme-day .rr-bar,
+    body.theme-day .strat-picker,
+    body.theme-day .sl-body,
+    body.theme-day .pat-output,
+    body.theme-day .tri-result,
+    body.theme-day .picker-result {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .jelly-bubble,
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+
+    /* ── 段落與 Prose ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+    body.theme-day .prose em { color: #1265a8; }
+    body.theme-day .section-title { color: #0a1828; }
+    body.theme-day .section-num { color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .section-header { border-bottom-color: rgba(26,123,191,.12); }
+    body.theme-day .section-header::after { background: linear-gradient(90deg,transparent,rgba(26,123,191,.3),transparent); }
+
+    /* ── 蠟燭卡片 ── */
+    body.theme-day .candle-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .candle-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .candle-name { color: #1265a8; }
+    body.theme-day .candle-desc { color: #1a3550; }
+
+    /* ── Insight Boxes (warn, gold, purple) ── */
+    body.theme-day .warn-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .warn-box .insight-text { color: #2a1818; }
+    body.theme-day .gold-box {
+      background: linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03));
+      border-color: rgba(184,136,14,.22);
+    }
+    body.theme-day .gold-box .insight-text { color: #2a2010; }
+    body.theme-day .purple-box {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.03));
+      border-color: rgba(102,64,192,.22);
+    }
+    body.theme-day .purple-box .insight-text { color: #1a1028; }
+    body.theme-day .danger-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .danger-box .insight-text { color: #2a1818; }
+    body.theme-day .success-box {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03));
+      border-color: rgba(21,122,50,.22);
+    }
+    body.theme-day .success-box .insight-text { color: #102018; }
+    body.theme-day .insight-box-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.07),rgba(160,80,0,.03));
+      border-color: rgba(184,100,0,.22);
+    }
+    body.theme-day .insight-box-orange .insight-label { color: #a05000; }
+    body.theme-day .insight-body .insight-text { color: #0c1c2e; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Force Meter ── */
+    body.theme-day .force-label { color: #1a3550; }
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .force-val { color: #3a5070; }
+
+    /* ── Pattern Cards ── */
+    body.theme-day .pattern-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .pattern-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .pattern-name { color: #0a1828; }
+    body.theme-day .pattern-desc { color: #1a3550; }
+    body.theme-day .pattern-key { color: #1265a8; }
+    body.theme-day .pb-bull { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .pb-bear { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .pb-warn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .pb-neutral { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+
+    /* ── Detector ── */
+    body.theme-day .detector-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .detector-title { color: #1265a8; }
+    body.theme-day .detector-item {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .detector-item:hover { background: rgba(26,123,191,.08); }
+    body.theme-day .detector-item.selected { background: rgba(26,123,191,.12); border-color: rgba(26,123,191,.35); }
+    body.theme-day .di-label { color: #1a3550; }
+    body.theme-day .detector-output {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #0a1828;
+    }
+    body.theme-day .detector-output strong { color: #1265a8; }
+
+    /* ── Sim Wrap ── */
+    body.theme-day .sim-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .sim-title { color: #1265a8; }
+    body.theme-day .sim-canvas { background: rgba(200,230,245,.5); border-color: rgba(26,101,168,.2); }
+    body.theme-day .sim-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .sim-btn:hover { background: rgba(26,123,191,.14); border-color: rgba(26,123,191,.4); }
+    body.theme-day .sim-result { color: #1a3550; }
+
+    /* ── Breakout Compare (bc-card) ── */
+    body.theme-day .bc-card.true {
+      background: rgba(176,48,32,.06);
+      border-color: rgba(176,48,32,.25);
+    }
+    body.theme-day .bc-card.false {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+    }
+    body.theme-day .bc-points { color: #1a3550; }
+
+    /* ── Flow Steps ── */
+    body.theme-day .flow-step {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .flow-step:hover { background: rgba(255,255,255,.92); border-color: rgba(26,123,191,.35); }
+    body.theme-day .flow-heading { color: #0a1828; }
+    body.theme-day .flow-sub { color: #1a3550; }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+    body.theme-day .flow-num.cn { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .flow-num.rn { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .flow-num.gn { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .flow-num.yn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .flow-num.pn { background:rgba(176,32,106,.1); border-color:rgba(176,32,106,.3); color:#b0206a; }
+    body.theme-day .flow-content .flow-sub strong { color: #0a1828; }
+
+    /* ── Shadow Lines ── */
+    body.theme-day .shadow-line,
+    body.theme-day .sl-wrap {
+      border-color: rgba(26,101,168,.15);
+      background: transparent;
+    }
+    body.theme-day .sl-body {
+      background: rgba(255,255,255,.72);
+    }
+    body.theme-day .sl-text { color: #1a3550; }
+    body.theme-day .sl-text strong { color: #0a1828; }
+
+    /* ── Chip ── */
+    body.theme-day .chip-red    { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-green  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-cyan   { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .chip-yellow { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .chip-purple { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+    body.theme-day .chip-orange { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.3); color:#a05000; }
+    body.theme-day .chip-support  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-resist   { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-neutral  { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+
+    /* ── Sec Divider ── */
+    body.theme-day .sec-divider { color: #5a8ab8; }
+    body.theme-day .sec-divider::before,
+    body.theme-day .sec-divider::after { background: rgba(26,123,191,.18); }
+
+    /* ── Val Colors ── */
+    body.theme-day .val-red,  body.theme-day .val-r { color: #a02818; }
+    body.theme-day .val-green, body.theme-day .val-g { color: #157a32; }
+    body.theme-day .val-yellow, body.theme-day .val-y { color: #8a6000; }
+    body.theme-day .val-cyan, body.theme-day .val-c { color: #0d6ea8; }
+    body.theme-day .val-purple, body.theme-day .val-p { color: #6640c0; }
+    body.theme-day .val-orange, body.theme-day .val-o { color: #a05000; }
+    body.theme-day .td-bull { color: #157a32 !important; }
+    body.theme-day .td-bear { color: #a02818 !important; }
+    body.theme-day .td-warn { color: #8a6000 !important; }
+
+    /* ── CMP/Compare Tables ── */
+    body.theme-day .cmp-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.2);
+    }
+    body.theme-day .cmp-table td {
+      color: #1a3550;
+      border-bottom-color: rgba(26,101,168,.08);
+    }
+    body.theme-day .cmp-table tr:hover td { background: rgba(26,123,191,.04); }
+
+    /* ── Quiz (all variants) ── */
+    body.theme-day .quiz-section {
+      background: linear-gradient(135deg,rgba(102,64,192,.06),rgba(26,80,160,.03));
+      border-color: rgba(102,64,192,.18);
+    }
+    body.theme-day .quiz-section-title { color: #0a1828; }
+    body.theme-day .quiz-q { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-letter {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.3);
+      color: #1265a8;
+    }
+
+    /* ── Checklist ── */
+    body.theme-day .check-item,
+    body.theme-day .check-list .check-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .check-text { color: #0a1828; }
+    body.theme-day .check-text strong { color: #1265a8; }
+
+    /* ── Before/After (ba-card) ── */
+    body.theme-day .ba-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .ba-label { color: #3a6080; }
+    body.theme-day .ba-text { color: #0a1828; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.07),rgba(26,80,160,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept-label { color: #1265a8; }
+    body.theme-day .key-concept-text { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+
+    /* ── Section Cards (general) ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    /* ── Pat Nav Tabs ── */
+    body.theme-day .pat-nav-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-nav-title { color: #1265a8; }
+    body.theme-day .pat-tab {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .pat-tab:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .pat-tab.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .pat-output {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-out-name { color: #0a1828; }
+    body.theme-day .pat-out-essence { color: #b0206a; }
+    body.theme-day .pat-out-body { color: #1a3550; }
+    body.theme-day .pat-out-body strong { color: #0a1828; }
+
+    /* ── Triangle Sim ── */
+    body.theme-day .tri-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .tri-title { color: #1265a8; }
+    body.theme-day .tri-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .tri-btn:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .tri-btn.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .tri-canvas { background: rgba(200,230,248,.6); border-color: rgba(26,101,168,.2); }
+    body.theme-day .tri-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .tri-result strong { color: #1265a8; }
+
+    /* ── Reliability Meter ── */
+    body.theme-day .rel-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rel-name { color: #0a1828; }
+    body.theme-day .rel-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .rel-pct { color: #3a6080; }
+
+    /* ── Mistake Cards ── */
+    body.theme-day .mistake-card {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-title { color: #a02818; }
+    body.theme-day .mistake-body { color: #2a1818; }
+    body.theme-day .mistake-fix {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+      color: #157a32;
+    }
+
+    /* ── Anatomy / SVG Col ── */
+    body.theme-day .anatomy-row { border-color: rgba(26,101,168,.15); }
+
+    /* ── BK Cards (支撐壓力) ── */
+    body.theme-day .bk-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .bk-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .bk-body { color: #1a3550; }
+    body.theme-day .bk-check { color: #157a32; }
+    body.theme-day .bk-icon { color: #1265a8; }
+    body.theme-day .bk-compare {
+      background: rgba(240,248,255,.7);
+      border-color: rgba(26,101,168,.15);
+    }
+
+    /* ── Danger Cards ── */
+    body.theme-day .danger-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.18);
+    }
+    body.theme-day .danger-title { color: #a02818; }
+    body.theme-day .danger-body { color: #2a2020; }
+
+    /* ── CS/Strength chips ── */
+    body.theme-day .cs-high { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.28); color:#a02818; }
+    body.theme-day .cs-med  { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.28); color:#8a6000; }
+    body.theme-day .cs-low  { background:rgba(13,110,168,.08); border-color:rgba(13,110,168,.22); color:#0d6ea8; }
+
+    /* ── Combo Row ── */
+    body.theme-day .combo-row {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .combo-ind { color: #1265a8; }
+    body.theme-day .combo-desc { color: #1a3550; }
+
+    /* ── Risk Reward Visual ── */
+    body.theme-day .rr-bar {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rr-label { color: #3a6080; }
+    body.theme-day .rr-track { background: rgba(26,80,160,.1); }
+    body.theme-day .rr-ratio-badge {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+    }
+    body.theme-day .rr-ratio-label { color: #5a8ab8; }
+
+    /* ── Error Analysis ── */
+    body.theme-day .error-analysis {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .error-header {
+      background: rgba(176,48,32,.07);
+      border-bottom-color: rgba(176,48,32,.15);
+    }
+    body.theme-day .error-title { color: #0a1828; }
+    body.theme-day .error-body p { color: #2a1818; }
+    body.theme-day .error-lesson {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.22);
+      color: #157a32;
+    }
+
+    /* ── Strategy Picker ── */
+    body.theme-day .strat-picker {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .strat-picker-title { color: #1265a8; }
+    body.theme-day .picker-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.22);
+      color: #1a3550;
+    }
+    body.theme-day .picker-btn:hover { border-color: rgba(26,123,191,.45); color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .picker-btn.active-btn { border-color: #1265a8; color: #1265a8; background: rgba(26,123,191,.14); }
+    body.theme-day .picker-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .picker-result strong { color: #0a1828; }
+
+    /* ── SOP Steps (ch10) ── */
+    body.theme-day .sop-title { color: #0a1828; }
+    body.theme-day .sop-desc { color: #1a3550; }
+    body.theme-day .sop-line { background: rgba(26,101,168,.15); }
+    body.theme-day .sc-c { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.4); color:#0d6ea8; }
+    body.theme-day .sc-g { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.35); color:#157a32; }
+    body.theme-day .sc-y { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.35); color:#8a6000; }
+    body.theme-day .sc-r { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.35); color:#a02818; }
+    body.theme-day .sc-p { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.35); color:#6640c0; }
+    body.theme-day .sc-o { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.35); color:#a05000; }
+
+    /* ── Autopsy Cards (ch10) ── */
+    body.theme-day .autopsy-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .autopsy-head {
+      background: rgba(26,123,191,.05);
+      border-bottom-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .autopsy-num { color: #3a6080; }
+    body.theme-day .autopsy-title { color: #0a1828; }
+    body.theme-day .autopsy-scene { color: #1a3550; }
+    body.theme-day .autopsy-why { color: #1265a8; }
+    body.theme-day .autopsy-fix { color: #157a32; }
+    body.theme-day .autopsy-body { color: #1a3550; }
+
+    /* ── Case Selectors (ch10) ── */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-panel {
+      background: rgba(240,248,255,.75);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .case-step { color: #1a3550; }
+
+    /* ── Graduation Badge ── */
+    body.theme-day .graduation {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(102,64,192,.05));
+      border-color: rgba(26,123,191,.22);
+    }
+
+    /* ── Flow Nodes (various) ── */
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+      color: #0a1828;
+    }
+    body.theme-day .flow-node-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.1),rgba(160,80,0,.05));
+      border-color: rgba(184,100,0,.28);
+      color: #a05000;
+    }
+    body.theme-day .flow-node-red {
+      background: linear-gradient(135deg,rgba(176,48,32,.1),rgba(150,20,10,.05));
+      border-color: rgba(176,48,32,.28);
+      color: #a02818;
+    }
+    body.theme-day .flow-node-green {
+      background: linear-gradient(135deg,rgba(21,122,50,.08),rgba(0,90,40,.04));
+      border-color: rgba(21,122,50,.28);
+      color: #157a32;
+    }
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+
+    /* ── CC Box (趨勢) ── */
+    body.theme-day .cc-box {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .cc-item { color: #1a3550; }
+    body.theme-day .cc-text { color: #0a1828; }
+
+    /* ── Before/After Cards ── */
+    body.theme-day .before-after { border-color: rgba(26,101,168,.15); }
+    body.theme-day .bull-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .bear-card {
+      background: rgba(21,122,50,.05);
+      border-color: rgba(21,122,50,.2);
+    }
+
+    /* ── Footer Buttons (fn-btn) ── */
+    body.theme-day .fn-btn.prev {
+      color: #3a6080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.06);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.45);
+      background: rgba(26,123,191,.12);
+    }
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.35);
+      background: rgba(26,123,191,.08);
+    }
+    body.theme-day .fn-btn.next:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,123,191,.55);
+    }
+    body.theme-day .footer-complete-text { color: #1a3550; }
+
+    /* ── RSI Gauge ── */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; }
+
+    /* ── Teal theme (ch9) day mode ── */
+    body.theme-day .tag-teal { color:#157a6a; border-color:rgba(21,122,106,.3); background:rgba(21,122,106,.07); }
+    body.theme-day .rr-ratio-num { color: #1265a8; }
+
+    /* ── Hero Icon border colors ── */
+    body.theme-day .hero-icon {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.25);
+      box-shadow: 0 4px 20px rgba(26,80,160,.1);
+    }
+
+    /* ── General text fixes ── */
+    body.theme-day strong { color: #0a1828; }
+    body.theme-day .section-body { color: #0c1c2e; }
+
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SPACE MODE VISUAL ENHANCEMENTS — 統一增強版
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Enhanced nebula animation for all chapters */
+    .bg-nebula {
+      animation: nebulaFloat 28s ease-in-out infinite alternate !important;
+    }
+    @keyframes nebulaFloat {
+      0%   { opacity:.75; transform:scale(1) translateX(0); }
+      50%  { opacity:.9; transform:scale(1.015) translateX(3px); }
+      100% { opacity:1;  transform:scale(1.025) translateX(-3px); }
+    }
+
+    /* Star particles overlay */
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 28%, rgba(200,240,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 5%  38%, rgba(255,255,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 33% 45%, rgba(180,220,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72% 50%, rgba(200,230,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 42%, rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 65% 65%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%),
+        radial-gradient(1px 1px at 8%  82%, rgba(255,255,255,.28) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 88%, rgba(180,220,255,.28) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92% 92%, rgba(255,255,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle {
+      0%   { opacity:.6; }
+      50%  { opacity:.85; }
+      100% { opacity:.7; }
+    }
+    /* Day mode: hide stars */
+    body.theme-day .bg-stars { opacity: 0; pointer-events: none; }
+
+    /* ── Enhanced card hover glow ── */
+    .section-card {
+      transition: transform .25s, box-shadow .3s, border-color .3s !important;
+    }
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 30px rgba(0,229,255,.06) !important;
+      border-color: rgba(0,229,255,.18) !important;
+    }
+    body.theme-day .section-card:hover {
+      box-shadow: 0 12px 40px rgba(26,80,160,.15), 0 0 0 1px rgba(26,123,191,.18) !important;
+      border-color: rgba(26,123,191,.3) !important;
+      transform: translateY(-2px);
+    }
+
+    /* ── Floating chapter number watermark ── */
+    .hero::after {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── Tag animations ── */
+    .tag {
+      transition: all .2s !important;
+    }
+    .tag:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.15);
+    }
+    body.theme-day .tag:hover { filter: brightness(.92); }
+
+    /* ── Better section divider ── */
+    .sec-divider {
+      position: relative;
+      overflow: visible;
+    }
+
+    /* ── Insight box border pulse ── */
+    .key-concept::after {
+      animation: borderGlow 3s ease-in-out infinite !important;
+    }
+    @keyframes borderGlow {
+      0%, 100% { opacity:.45; }
+      50%       { opacity:.85; }
+    }
+
+    /* ── Space mode: enhanced table ── */
+    .cmp-table th,
+    .compare-table th {
+      position: relative;
+    }
+    .cmp-table tbody tr:hover td,
+    .compare-table tbody tr:hover td {
+      background: rgba(0,229,255,.025) !important;
+      transition: background .15s;
+    }
+
+    /* ── Quiz option micro-animation ── */
+    .quiz-opt {
+      transition: all .18s cubic-bezier(.22,1,.36,1) !important;
+    }
+    .quiz-opt:hover:not(.disabled) {
+      transform: translateX(3px);
+    }
+
+    /* ── Day mode stars & nebula off ── */
+    body.theme-day .bg-nebula {
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+
+    /* ─── Chapter-specific dark background fixes ─── */
+
+    /* General: any container with rgba(0,0,0) bg needs white in day mode */
+    body.theme-day .pattern-master,
+    body.theme-day .vocab-item,
+    body.theme-day .struct-card,
+    body.theme-day .sign-card,
+    body.theme-day .flow-wrap,
+    body.theme-day .tb-canvas,
+    body.theme-day .label-game,
+    body.theme-day .cc-item,
+    body.theme-day .draw-zone,
+    body.theme-day .sr-sim-wrap,
+    body.theme-day .mistake-item,
+    body.theme-day .ma-visual,
+    body.theme-day .ma-card,
+    body.theme-day .diverge-demo,
+    body.theme-day .trap-step,
+    body.theme-day .ind-block,
+    body.theme-day .stat-card,
+    body.theme-day .example-box {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.32) !important; }
+    body.theme-day .vocab-term { color: #1265a8 !important; }
+    body.theme-day .vocab-def  { color: #1a3550 !important; }
+    body.theme-day .struct-card { color: #0a1828; }
+    body.theme-day .sign-card { color: #0a1828; }
+    body.theme-day .example-label { color: #8a6000 !important; }
+    body.theme-day .example-box p { color: #1a3550 !important; }
+    body.theme-day .example-box strong { color: #0a1828 !important; }
+
+    /* MA Visual (ch6) */
+    body.theme-day .ma-card { color: #0a1828; }
+    body.theme-day .ma-visual text { fill: #1a3550 !important; }
+
+    /* Trap steps (ch6) */
+    body.theme-day .trap-step { color: #1a3550; }
+
+    /* Indicator blocks (ch7) */
+    body.theme-day .ind-block { color: #0a1828; }
+
+    /* Stat cards */
+    body.theme-day .stat-card {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .stat-card:hover { border-color: rgba(26,101,168,.32) !important; }
+    body.theme-day .stat-label { color: #1a3550 !important; }
+
+    /* Flow chart containers */
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* Case selector (ch10) */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       DAY THEME VISUAL UPGRADE — 晴空動態效果
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Enhanced sky background with cloud-like wisps */
+    body.theme-day {
+      background:
+        radial-gradient(ellipse 60% 25% at 20% 15%, rgba(255,255,255,.5) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 75% 10%, rgba(255,255,255,.45) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 18% at 50% 25%, rgba(255,255,255,.3) 0%, transparent 50%),
+        linear-gradient(180deg,
+          #4fa8de 0%,
+          #6bbcec 12%,
+          #8bd0f5 28%,
+          #a8dff8 45%,
+          #c2edfb 62%,
+          #d5f3f8 78%,
+          #e4f8f2 100%
+        ) !important;
+    }
+
+    /* Animated cloud wisps */
+    body.theme-day::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 180px 35px at 15% 18%, rgba(255,255,255,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 220px 40px at 45% 12%, rgba(255,255,255,.5) 0%, transparent 70%),
+        radial-gradient(ellipse 160px 30px at 72% 22%, rgba(255,255,255,.45) 0%, transparent 65%),
+        radial-gradient(ellipse 200px 38px at 90% 8%,  rgba(255,255,255,.4) 0%, transparent 65%),
+        radial-gradient(ellipse 140px 28px at 30% 35%, rgba(255,255,255,.35) 0%, transparent 60%),
+        radial-gradient(ellipse 190px 35px at 62% 30%, rgba(255,255,255,.3) 0%, transparent 60%);
+      animation: cloudDrift 40s ease-in-out infinite alternate;
+    }
+    @keyframes cloudDrift {
+      0%   { transform: translateX(0); opacity: .8; }
+      100% { transform: translateX(18px); opacity: 1; }
+    }
+
+    /* Sun glow in top-right */
+    body.theme-day::after {
+      content: '';
+      position: fixed;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,100,.38) 0%, rgba(255,200,50,.15) 40%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+      animation: sunPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0%   { opacity: .7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+
+    /* Header sun rays effect */
+    body.theme-day header {
+      background: rgba(255,255,255,.88) !important;
+      box-shadow: 0 2px 28px rgba(26,80,160,.12), 0 1px 0 rgba(255,255,255,.8) !important;
+    }
+
+    /* Improved section card in day mode */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 8px 36px rgba(26,60,140,.1), inset 0 1px 0 rgba(255,255,255,.95) !important;
+    }
+    body.theme-day .section-card:hover {
+      background: rgba(255,255,255,.97) !important;
+      box-shadow: 0 14px 48px rgba(26,60,140,.15), inset 0 1px 0 rgba(255,255,255,1) !important;
+    }
+
+    /* Better hero in day mode */
+    body.theme-day .hero {
+      background: rgba(255,255,255,.9) !important;
+      box-shadow: 0 12px 48px rgba(26,60,140,.12), 0 2px 0 rgba(255,255,255,.9) inset !important;
+    }
+
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SVG 圖表白天模式完整修復 — 統一透明化暗色背景
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 所有 SVG 容器：白天模式統一白色背景 ── */
+    body.theme-day .vol-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .vol-chart-title { color: #1265a8 !important; opacity: 1 !important; }
+
+    body.theme-day .trend-visual {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .trend-visual-title { color: #1265a8 !important; opacity: 1 !important; }
+
+    body.theme-day .case-chart {
+      background: rgba(240,248,255,.92) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      box-shadow: 0 4px 16px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .cs-display {
+      background: rgba(240,248,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    body.theme-day .rsi-gauge-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-radius: 12px !important;
+      padding: 8px !important;
+      border: 1px solid rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+
+    body.theme-day .sim-canvas {
+      background: rgba(230,244,255,.88) !important;
+      border-color: rgba(26,101,168,.2) !important;
+    }
+
+    body.theme-day .anatomy-svg-col {
+      background: rgba(255,255,255,.9) !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+    }
+
+    /* ── SVG 內部：白天模式透明化暗底色 rect ── */
+    /* Target the background rect (first rect in SVG) in day mode */
+    body.theme-day .vol-chart-wrap svg > rect:first-child,
+    body.theme-day .sim-canvas svg > rect:first-child,
+    body.theme-day .rsi-gauge-wrap svg > rect:first-child,
+    body.theme-day .trend-visual svg > rect:first-child,
+    body.theme-day .case-chart svg > rect:first-child,
+    body.theme-day .anatomy-svg-col svg > rect:first-child,
+    body.theme-day .chart-demo svg > rect:first-child,
+    body.theme-day .tri-canvas svg > rect:first-child,
+    body.theme-day .ma-visual svg > rect:first-child,
+    body.theme-day .pattern-master svg > rect:first-child,
+    body.theme-day .diverge-demo svg > rect:first-child,
+    body.theme-day .ind-block svg > rect:first-child {
+      fill: transparent !important;
+    }
+
+    /* ── RSI Gauge SVG 白天模式完整修復 ── */
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(2) {
+      /* background track */
+      fill: rgba(26,101,168,.12) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(3),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(4),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(5) {
+      /* oversold zone */
+      fill: rgba(21,122,50,.2) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(6) {
+      /* neutral track */
+      fill: rgba(26,101,168,.08) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(7),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(8),
+    body.theme-day .rsi-gauge-wrap svg > rect:nth-child(9) {
+      /* overbought zone */
+      fill: rgba(176,48,32,.2) !important;
+    }
+    /* RSI text in day mode */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; opacity: 1 !important; }
+
+    /* ── Vol chart SVG：文字顏色在白天模式 ── */
+    body.theme-day .vol-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,255,255"] {
+      fill: #1a3550 !important;
+    }
+    body.theme-day .vol-chart-wrap svg text[fill*="0.5)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".5)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".3)"],
+    body.theme-day .vol-chart-wrap svg text[fill*=".25)"] {
+      opacity: 1 !important;
+    }
+
+    /* ── Trend visual SVG text ── */
+    body.theme-day .trend-visual svg text { opacity: 1 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255"] { 
+      stroke: rgba(26,101,168,.3) !important; 
+    }
+
+    /* ── Sim canvas SVG text ── */
+    body.theme-day .sim-canvas svg text { opacity: 1 !important; }
+    body.theme-day .sim-canvas svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .sim-canvas svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+
+    /* ── Chart demo SVG text ── */
+    body.theme-day .chart-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .chart-demo svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .chart-demo { 
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* ── Pattern Master (ch5 head/shoulders) ── */
+    body.theme-day .pattern-master {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .pattern-master svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .pattern-master svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .pattern-master svg text[fill*=".3)"],
+    body.theme-day .pattern-master svg text[fill*=".25)"],
+    body.theme-day .pattern-master svg text[fill*=".5)"] { opacity: 1 !important; }
+
+    /* ── Tri-canvas SVG text ── */
+    body.theme-day .tri-canvas svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .tri-canvas svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+
+    /* ── MA visual SVG text (ch6) ── */
+    body.theme-day .ma-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .ma-visual svg text[fill*=".5)"],
+    body.theme-day .ma-visual svg text[fill*=".3)"] { opacity: 1 !important; }
+
+    /* ── Diverge demo (ch6) ── */
+    body.theme-day .diverge-demo {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .diverge-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── Ind block (ch7) ── */
+    body.theme-day .ind-block {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .ind-block svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── Case chart (ch10) ── */
+    body.theme-day .case-chart svg text { opacity: 1 !important; }
+    body.theme-day .case-chart svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .case-chart svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .case-chart svg line[stroke*="rgba(255,255,255"] {
+      stroke: rgba(26,101,168,.25) !important;
+    }
+
+    /* ── CS display (ch10) ── */
+    body.theme-day .cs-display svg text { opacity: 1 !important; }
+    body.theme-day .cs-display svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .cs-display svg line[stroke*="rgba(255,255,255"] {
+      stroke: rgba(26,101,168,.25) !important;
+    }
+
+    /* ── Example box（所有章節）── */
+    body.theme-day .example-box {
+      background: linear-gradient(135deg,rgba(255,245,210,.9),rgba(255,248,225,.8)) !important;
+      border-color: rgba(184,136,14,.28) !important;
+    }
+    body.theme-day .example-label { color: #8a6000 !important; opacity: 1 !important; }
+    body.theme-day .example-box p { color: #1a2830 !important; }
+    body.theme-day .example-box strong { color: #0a1828 !important; }
+
+    /* ── Struct cards (ch3) ── */
+    body.theme-day .struct-card {
+      background: rgba(255,255,255,.88) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .struct-card.bull-card {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(255,255,255,.88)) !important;
+      border-color: rgba(21,122,50,.25) !important;
+    }
+    body.theme-day .struct-card.bear-card {
+      background: linear-gradient(135deg,rgba(176,48,32,.06),rgba(255,255,255,.88)) !important;
+      border-color: rgba(176,48,32,.22) !important;
+    }
+    body.theme-day .struct-card.side-card {
+      background: linear-gradient(135deg,rgba(26,101,168,.06),rgba(255,255,255,.88)) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+    body.theme-day .struct-title { color: #0a1828 !important; }
+    body.theme-day .struct-desc  { color: #1a3550 !important; }
+
+    /* ── Hi-Lo chips ── */
+    body.theme-day .hilo-hh { color: #a02818 !important; background:rgba(176,48,32,.1) !important; border-color:rgba(176,48,32,.3) !important; }
+    body.theme-day .hilo-hl { color: #7a3838 !important; background:rgba(176,80,80,.07) !important; border-color:rgba(176,80,80,.2) !important; }
+    body.theme-day .hilo-lh { color: #206840 !important; background:rgba(21,120,60,.07) !important; border-color:rgba(21,120,60,.2) !important; }
+    body.theme-day .hilo-ll { color: #157a32 !important; background:rgba(21,122,50,.1) !important; border-color:rgba(21,122,50,.3) !important; }
+
+    /* ── Vocab items ── */
+    body.theme-day .vocab-item {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.32) !important; }
+
+    /* ── Flow wrap ── */
+    body.theme-day .flow-wrap {
+      background: rgba(240,248,255,.75) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* ── Candle SVG backdrop cards ── */
+    body.theme-day .red-card  { background: rgba(255,240,240,.9) !important; border-color: rgba(176,48,32,.2) !important; }
+    body.theme-day .green-card{ background: rgba(235,255,240,.9) !important; border-color: rgba(21,122,50,.2) !important; }
+
+    /* ── Error analysis ── */
+    body.theme-day .error-analysis {
+      background: linear-gradient(135deg,rgba(176,48,32,.05),rgba(255,255,255,.88)) !important;
+      border-color: rgba(176,48,32,.2) !important;
+    }
+    body.theme-day .error-header { background: rgba(176,48,32,.07) !important; border-bottom-color: rgba(176,48,32,.15) !important; }
+
+    /* ── Breakout demo (ch4,ch9) ── */
+    body.theme-day .breakout-demo,
+    body.theme-day .pullback-demo {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .breakout-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .pullback-demo svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+
+    /* ── SVG grid lines: make visible on white ── */
+    body.theme-day svg line[stroke*="rgba(0,229,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day svg line[stroke*="rgba(255,255,255,.1"] { stroke: rgba(26,101,168,.12) !important; }
+
+    /* ── General: any SVG container with dark bg ── */
+    body.theme-day .section-card svg > rect:first-child,
+    body.theme-day .section-body svg > rect:first-child {
+      fill: rgba(240,248,255,.5) !important;
+    }
+
+    /* ── SVG defs grid pattern: day mode ── */
+    body.theme-day svg pattern rect { fill: transparent !important; }
+    body.theme-day svg pattern line { stroke: rgba(26,101,168,.06) !important; }
+
+
+
+    /* ─── SVG 圖表容器：白天模式統一修復 ─── */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .svg-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,229,255,.3"] { fill: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(0,230,118,.3"] { fill: #157a32 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,214,0,.3"] { fill: #8a6000 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(178,102,255,.3"] { fill: #6640c0 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.5"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="rgba(255,61,90,.3"] { fill: #a02818 !important; opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,229,255,.2"],
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,229,255,.1"] { stroke: rgba(26,101,168,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(0,230,118,.2"] { stroke: rgba(21,122,50,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(255,214,0,.2"] { stroke: rgba(160,110,0,.2) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke*="rgba(255,255,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day .svg-chart-wrap svg > rect:first-child { fill: transparent !important; }
+
+    /* ── 九章整合框架 SVG (ch10) 專屬修復 ── */
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(0,229,255"] { 
+      fill: rgba(26,101,168,.08) !important; 
+      stroke: rgba(26,101,168,.3) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(0,230,118"] { 
+      fill: rgba(21,122,50,.07) !important; 
+      stroke: rgba(21,122,50,.28) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(255,214,0"] { 
+      fill: rgba(160,110,0,.07) !important; 
+      stroke: rgba(160,110,0,.28) !important;
+    }
+    body.theme-day .svg-chart-wrap svg rect[fill*="rgba(178,102,255"] { 
+      fill: rgba(102,64,192,.06) !important; 
+      stroke: rgba(102,64,192,.25) !important;
+    }
+
+    /* ── var(--accent) text in SVG: override for day ── */
+    body.theme-day .svg-chart-wrap svg text[fill="var(--accent)"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--green)"]  { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--yellow)"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--purple)"] { fill: #6640c0 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="var(--red)"]    { fill: #a02818 !important; }
+
+    /* ── RSI gauge 完整修復 ── */
+    body.theme-day .rsi-gauge-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border: 1px solid rgba(26,101,168,.15) !important;
+      border-radius: 12px !important;
+      padding: 8px !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .rsi-gauge-wrap svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(255,255,255,.0"] { fill: rgba(26,101,168,.08) !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(0,230,118"] { fill: rgba(21,122,50,.18) !important; }
+    body.theme-day .rsi-gauge-wrap svg rect[fill*="rgba(255,61,90"] { fill: rgba(176,48,32,.18) !important; }
+    body.theme-day .rsi-gauge-wrap svg text { opacity: 1 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .rsi-gauge-wrap svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+
+    /* ── Vol chart wrap (ch8) ── */
+    body.theme-day .vol-chart-wrap {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .vol-chart-title { color: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text { opacity: 1 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(178,102,255"] { fill: #6640c0 !important; }
+    body.theme-day .vol-chart-wrap svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .vol-chart-wrap svg line[stroke*="rgba(255,255,255"] { stroke: rgba(26,101,168,.12) !important; }
+    body.theme-day .vol-chart-wrap svg line[stroke*="rgba(0,229,255"] { stroke: rgba(26,101,168,.25) !important; }
+
+    /* ── Trend visual (ch3) ── */
+    body.theme-day .trend-visual {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 4px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .trend-visual-title { color: #1265a8 !important; opacity: 1 !important; }
+    body.theme-day .trend-visual svg text { opacity: 1 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .trend-visual svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .trend-visual svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255,.0"] { stroke: rgba(26,101,168,.08) !important; }
+    body.theme-day .trend-visual svg line[stroke*="rgba(255,255,255,.1"] { stroke: rgba(26,101,168,.12) !important; }
+
+    /* ── Anatomy SVG col (ch5) ── */
+    body.theme-day .anatomy-svg-col svg > rect:first-child { fill: transparent !important; }
+    body.theme-day .anatomy-svg-col svg text { opacity: 1 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,255,255"] { fill: #1a3550 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,61,90"] { fill: #a02818 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .anatomy-svg-col svg text[fill*="rgba(255,214,0"] { fill: #8a6000 !important; }
+
+    /* ── Standalone SVG (not in named wrapper) day mode ── */
+    body.theme-day .section-body > div[style*="display:flex"] > svg > rect:first-child,
+    body.theme-day .section-body > div[style*="justify-content:center"] > svg > rect:first-child {
+      fill: rgba(240,248,255,.5) !important;
+    }
+
+
+
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE FIX — 手機版完整修復
+       統一適用所有章節，breakpoint: 480px & 640px
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── Tables: scroll on mobile ── */
+    .cmp-table,
+    .compare-table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Vol chart & sim canvas: ensure responsive ── */
+    .vol-chart-wrap,
+    .sim-canvas,
+    .rsi-gauge-wrap,
+    .tri-canvas,
+    .trend-visual,
+    .anatomy-svg-col,
+    .chart-demo,
+    .ma-visual,
+    .diverge-demo,
+    .ind-block,
+    .case-chart,
+    .cs-display,
+    .svg-chart-wrap {
+      width: 100%;
+      box-sizing: border-box;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── SVG: always scale to container ── */
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 640px) {
+
+      /* ─── Core Layout ─── */
+      body { font-size: 15px; }
+      main { padding: 20px 14px 80px !important; }
+      .section-card { padding: 0; border-radius: 16px; }
+      .section-body { padding: 18px 16px 20px !important; }
+      .card-body, .card-header { padding: 16px 16px !important; }
+
+      /* ─── Hero ─── */
+      .hero {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 22px 18px !important;
+        gap: 18px !important;
+      }
+      .hero-title { font-size: 1.1rem !important; line-height: 1.5 !important; }
+      .hero-sub   { font-size: .82rem !important; }
+      .hero-icon  { width: 70px !important; height: 70px !important; margin: 0 auto !important; }
+      .hero-jelly { width: 80px !important; height: 80px !important; margin: 0 auto !important; }
+
+      /* ─── Section Header ─── */
+      .section-header { padding: 16px 16px 12px !important; gap: 8px !important; }
+      .section-title  { font-size: .95rem !important; }
+      .section-num    { font-size: .62rem !important; padding: 3px 8px !important; }
+
+      /* ─── Prose & Text ─── */
+      .prose, .section-body p { font-size: .9rem !important; line-height: 1.75 !important; }
+      .prose strong { font-size: .9rem !important; }
+
+      /* ─── ALL GRIDS → single column on mobile ─── */
+      .stat-row,
+      .psych-grid,
+      .candle-showcase,
+      .pattern-grid,
+      .detector-grid,
+      .breakout-compare,
+      .struct-grid,
+      .sign-grid,
+      .before-after,
+      .ba-grid,
+      .signal-grid,
+      .role-grid,
+      .bk-compare,
+      .pm-grid,
+      .pm-entry-exit,
+      .rel-grid,
+      .anatomy-row,
+      .ma-grid,
+      .scenario-row,
+      .state-grid,
+      .combo-row,
+      .danger-grid,
+      .strategy-grid,
+      .case-grid,
+      .label-points,
+      .pattern-master-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* ─── Candle showcase: 2 per row on small mobile ─── */
+      .candle-showcase { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+      /* ─── Combo row: vertical stacking ─── */
+      .combo-row { grid-template-columns: 1fr !important; text-align: center !important; }
+      .combo-ind { justify-content: center !important; }
+
+      /* ─── Anatomy row ─── */
+      .anatomy-row { grid-template-columns: 1fr !important; }
+      .anatomy-svg-col { justify-content: center !important; }
+      .anatomy-svg-col svg { max-width: 100% !important; height: auto !important; }
+
+      /* ─── Flow steps ─── */
+      .flow-step { padding: 14px 14px !important; gap: 10px !important; }
+      .flow-heading { font-size: .88rem !important; }
+      .flow-sub { font-size: .8rem !important; }
+
+      /* ─── Cards padding ─── */
+      .candle-card, .pattern-card, .bk-card, .rel-card,
+      .mistake-card, .danger-card, .autopsy-card,
+      .ba-card, .vocab-item, .stat-card {
+        padding: 14px !important;
+      }
+
+      /* ─── Vol chart & charts ─── */
+      .vol-chart-wrap { margin: 12px 0 !important; border-radius: 10px !important; }
+      .vol-chart-title { font-size: .56rem !important; padding: 8px 12px 0 !important; }
+      .vol-chart-wrap svg,
+      .chart-demo svg,
+      .sim-canvas svg,
+      .trend-visual svg,
+      .tri-canvas svg {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      /* ─── Tables ─── */
+      .cmp-table, .compare-table {
+        font-size: .78rem !important;
+      }
+      .cmp-table th, .cmp-table td,
+      .compare-table th, .compare-table td {
+        padding: 8px 10px !important;
+        white-space: nowrap;
+      }
+
+      /* ─── Quiz ─── */
+      .quiz-opt { padding: 10px 14px !important; font-size: .86rem !important; }
+      .quiz-q   { font-size: .9rem !important; }
+      .quiz-letter { width: 26px !important; height: 26px !important; font-size: .72rem !important; min-width: 26px !important; }
+
+      /* ─── Check list ─── */
+      .check-item { padding: 12px 14px !important; gap: 10px !important; }
+      .check-text { font-size: .87rem !important; }
+
+      /* ─── Insight boxes ─── */
+      .insight-box, .key-concept,
+      .warn-box, .gold-box, .purple-box, .danger-box, .success-box {
+        padding: 14px 14px !important;
+      }
+      .insight-text { font-size: .87rem !important; }
+
+      /* ─── Chips ─── */
+      .chip { font-size: .68rem !important; padding: 2px 7px !important; }
+
+      /* ─── Nav tabs (pat-tab, tri-btn) ─── */
+      .pat-tab, .tri-btn, .picker-btn, .sim-btn, .strat-btn {
+        font-size: .68rem !important;
+        padding: 7px 10px !important;
+      }
+
+      /* ─── RSI gauge ─── */
+      .rsi-gauge-wrap { padding: 6px !important; }
+      .rsi-gauge-wrap svg { max-height: 100px !important; }
+
+      /* ─── Flow chart ─── */
+      .flow-chart { padding: 14px !important; gap: 6px !important; }
+      .flow-node, .flow-node-orange, .flow-node-red, .flow-node-green {
+        font-size: .75rem !important;
+        padding: 8px 10px !important;
+      }
+
+      /* ─── Sim canvas ─── */
+      .sim-canvas { height: 180px !important; }
+      .sim-controls { gap: 6px !important; }
+
+      /* ─── Trend visual ─── */
+      .trend-visual { padding: 16px !important; }
+      .trend-visual-title { font-size: .56rem !important; }
+
+      /* ─── Footer navigation ─── */
+      .footer-inner { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+      .fn-btn { justify-content: center !important; text-align: center !important; }
+      .footer-complete-text { font-size: .8rem !important; text-align: center !important; }
+
+      /* ─── Progress bar ─── */
+      .progress-label-sm { font-size: .62rem !important; }
+
+      /* ─── Sidenav hide on mobile ─── */
+      .chapter-sidenav { display: none !important; }
+
+      /* ─── TOC ─── */
+      .toc { display: none !important; }
+      .toc-strip { display: none !important; }
+
+      /* ─── Section divider ─── */
+      .sec-divider { font-size: .7rem !important; margin: 20px 0 !important; }
+      .sdiv { font-size: .68rem !important; }
+
+      /* ─── MA Visual ─── */
+      .ma-visual { min-height: 160px !important; }
+
+      /* ─── Case chart (ch10) ─── */
+      .case-chart { height: 180px !important; }
+      .case-selector { padding: 12px !important; }
+
+      /* ─── SOP steps ─── */
+      .sop-step { padding: 14px !important; }
+      .sop-title { font-size: .88rem !important; }
+      .sop-desc  { font-size: .82rem !important; }
+
+      /* ─── Error analysis ─── */
+      .error-analysis { padding: 0 !important; }
+      .error-header, .error-body { padding: 12px 14px !important; }
+
+      /* ─── Autopsy cards ─── */
+      .autopsy-head { padding: 12px 14px !important; }
+      .autopsy-body { padding: 14px !important; }
+
+      /* ─── Graduation badge ─── */
+      .graduation { padding: 20px 16px !important; }
+
+      /* ─── Image in jelly tip ─── */
+      .jelly-tip-mascot { display: none !important; }
+
+      /* ─── Chapter title watermark smaller ─── */
+      .hero::after { font-size: 4rem !important; }
+    }
+
+    @media (max-width: 400px) {
+      /* ─── Extra small phones ─── */
+      main { padding: 16px 10px 80px !important; }
+      .section-body { padding: 14px 12px 16px !important; }
+      .hero-title { font-size: 1rem !important; }
+      .candle-showcase { grid-template-columns: 1fr 1fr !important; }
+      .pat-tab, .tri-btn { font-size: .62rem !important; padding: 6px 8px !important; }
+      .cmp-table th, .cmp-table td { font-size: .72rem !important; padding: 6px 8px !important; }
+      .sim-canvas { height: 160px !important; }
+    }
+
+
+
+    #subClock {
+      font-family: 'Share Tech Mono', monospace; font-size: .75rem;
+      color: var(--accent); letter-spacing: .1em;
+      text-shadow: 0 0 10px rgba(0,229,255,.35);
+      background: rgba(0,229,255,.05);
+      border: 1px solid rgba(0,229,255,.14);
+      border-radius: 20px; padding: 5px 14px;
+      white-space: nowrap;
+    }
+    body.theme-day #subClock {
+      color: #0a3a7a; text-shadow: none;
+      background: rgba(10,60,160,.05);
+      border-color: rgba(10,60,160,.16);
+    }
+
+    /* ── site footer: day theme ── */
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(240,247,255,.97), rgba(228,240,255,.99)) !important;
+      border-top-color: rgba(26,101,168,.15) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span {
+      color: rgba(30,70,120,.65) !important;
+    }
+    body.theme-day #site-footer a {
+      color: rgba(18,101,168,.7) !important;
+    }
+    body.theme-day #site-footer a:hover {
+      color: #1265a8 !important;
+    }
+
+  
+    /* ── Google AdSense 廣告容器 ── */
+    .ad-unit {
+      display: block;
+      width: 100%;
+      margin: 28px 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    .ad-unit-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 4px;
+      opacity: .55;
+      text-transform: uppercase;
+    }
+    .ad-unit ins { display: block; margin: 0 auto; }
+    .ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 0 0 4px;
+    }
+    body.theme-day .ad-unit-label { color: #5a8ab8; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
+
+  </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "第3章：趨勢與結構（核心章節）",
+  "description": "用 HH／HL／LH／LL 精確定義趨勢，看懂市場結構才知道在哪裡買、在哪裡賣。",
+  "author": {
+    "@type": "Person",
+    "name": "果凍老師"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "JellyStock",
+    "url": "https://jellystock.com"
+  },
+  "isPartOf": {
+    "@type": "Book",
+    "name": "JellyStock 技術分析教學",
+    "numberOfPages": 10
+  },
+  "position": 3
+}
+</script>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+  <div class="bg-stars"></div>
+
+
+
+<!-- HEADER -->
+
+<!-- Chapter Side Nav -->
+<nav class="chapter-sidenav" aria-label="章節導覽">
+  <a class="ch-nav-item" href="/stock_site/features/chapter1.html"><span class="ch-num">01</span><span class="ch-label">市場與股票</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter2.html"><span class="ch-num">02</span><span class="ch-label">K棒解讀</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/features/chapter3.html"><span class="ch-num">03</span><span class="ch-label">趨勢結構</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter4.html"><span class="ch-num">04</span><span class="ch-label">支撐壓力</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter5.html"><span class="ch-num">05</span><span class="ch-label">型態識別</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter6.html"><span class="ch-num">06</span><span class="ch-label">均線系統</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter7.html"><span class="ch-num">07</span><span class="ch-label">技術指標</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter8.html"><span class="ch-num">08</span><span class="ch-label">量能籌碼</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter9.html"><span class="ch-num">09</span><span class="ch-label">交易策略</span></a>
+  <a class="ch-nav-item" href="/stock_site/features/chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰案例</span></a>
+</nav>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" style="width:46px;height:46px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-4px;left:-4px;" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">技術分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+        <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+    
+  </div>
+</header>
+
+
+
+<!-- MAIN -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky">
+    <div class="progress-fill-sticky" id="progressFill"></div>
+  </div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第三章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════ -->
+  <div class="hero">
+    <div class="hero-icon">
+      <!-- Trend & Structure icon: zigzag uptrend with HH/HL markers -->
+      <svg width="72" height="66" viewBox="0 0 72 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Uptrend zigzag -->
+        <polyline points="4,58 16,44 26,52 38,32 50,42 62,18" fill="none" stroke="#ffd600" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- HH dots (Higher Highs) -->
+        <circle cx="38" cy="32" r="3.5" fill="#ffd600" opacity="0.85">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="62" cy="18" r="3.5" fill="#ffd600" opacity="0.85">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+        </circle>
+        <!-- HL dots (Higher Lows) -->
+        <circle cx="16" cy="44" r="2.5" fill="rgba(255,214,0,0.5)"/>
+        <circle cx="50" cy="42" r="2.5" fill="rgba(255,214,0,0.5)"/>
+        <!-- Upward arrow at peak -->
+        <polyline points="58,14 62,18 66,14" fill="none" stroke="#ffd600" stroke-width="2" stroke-linecap="round"/>
+        <!-- HH label -->
+        <text x="40" y="28" font-size="7" fill="#ffd600" opacity="0.7" font-family="monospace">HH</text>
+        <!-- HL label -->
+        <text x="18" y="42" font-size="7" fill="rgba(255,214,0,0.6)" font-family="monospace">HL</text>
+        <!-- Baseline grid -->
+        <line x1="4" y1="62" x2="68" y2="62" stroke="rgba(255,214,0,0.15)" stroke-width="1" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">Chapter 03 · Trend &amp; Structure</div>
+      <h1 class="hero-title">趨勢與結構<br>核心章節 🔥</h1>
+      <p class="hero-desc">這章是整個技術分析的<strong style="color:var(--yellow)">靈魂</strong>。看懂趨勢，你才知道該做多還是做空；看懂結構，你才知道在哪裡買、在哪裡賣。這不是選擇性知識——這是必修課。</p>
+      <div class="hero-tags">
+        <span class="tag tag-yellow">🔥 核心章節</span>
+        <span class="tag tag-cyan">⏱ 60 分鐘</span>
+        <span class="tag tag-green">🎮 3個互動練習</span>
+        <span class="tag tag-orange">📐 6個主題</span>
+        <span class="tag tag-pink">💡 果凍老師帶路</span>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- ═══════════════════════════════════════════
+       SEC 1 ── 趨勢定義
+  ═══════════════════════════════════════════ -->
+
+  <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="3591909615"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+  <div class="section-card" id="sec1">
+    <div class="section-header">
+      <span class="section-num">SEC 01</span>
+      <span class="section-title">什麼是趨勢？——用高低點定義，不靠感覺</span>
+      <span class="section-icon">📐</span>
+    </div>
+    <div class="section-body">
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 80 80" class="jelly-wiggle">
+            <defs><radialGradient id="jm3a" cx="38%" cy="28%" r="65%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#ff9800"/></radialGradient></defs>
+            <ellipse cx="40" cy="75" rx="22" ry="4" fill="rgba(255,214,0,.15)"/>
+            <path d="M12,55 Q10,28 40,18 Q70,28 68,55 L64,66 Q58,76 40,76 Q22,76 16,66 Z" fill="url(#jm3a)" opacity=".9"/>
+            <ellipse cx="31" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <ellipse cx="49" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <circle cx="33.5" cy="46" r="2" fill="white"/><circle cx="51.5" cy="46" r="2" fill="white"/>
+            <path d="M33,60 Q40,67 47,60" stroke="#2a1500" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="24" cy="55" rx="7" ry="4" fill="rgba(255,180,50,.35)"/>
+            <ellipse cx="56" cy="55" rx="7" ry="4" fill="rgba(255,180,50,.35)"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          很多新手說「感覺在漲」或「感覺在跌」——這太主觀了！<br>
+          技術分析有<strong>客觀定義</strong>：<strong>上升趨勢 = 每次高點比上次高，每次低點也比上次高。</strong>就這樣，不靠感覺。如果你說「但它剛剛跌了一下」，沒關係——趨勢中本來就有回調！
+        </div>
+      </div>
+
+      <p class="prose">趨勢不是你眼睛掃一下覺得「在漲」或「在跌」，而是用<strong>高點（High）和低點（Low）</strong>的客觀規律來定義。這個方法由道氏理論（Dow Theory）奠基，至今仍是判斷趨勢最可靠的方式之一。</p>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--red)">高點 H</span>
+          <span class="vocab-def"><strong>High Point</strong>：一段時間內的相對高峰，之後開始下跌，左右兩側都比它低的價格位置。也稱「擺動高點」（Swing High）。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green)">低點 L</span>
+          <span class="vocab-def"><strong>Low Point</strong>：一段時間內的相對谷底，之後開始反彈，左右兩側都比它高的價格位置。也稱「擺動低點」（Swing Low）。</span>
+        </div>
+      </div>
+
+      <!-- SVG: Uptrend definition -->
+      <div class="trend-visual">
+        <div class="trend-visual-title">── 上升趨勢：每次高點＆低點都比上次高 ──</div>
+        <svg width="100%" height="180" viewBox="0 0 700 180" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid lines -->
+          <line x1="0" y1="40" x2="700" y2="40" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="80" x2="700" y2="80" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="700" y2="120" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="160" x2="700" y2="160" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <!-- Price path: uptrend staircase -->
+          <polyline points="30,155 100,100 150,120 230,65 280,90 360,35 420,60 500,20 560,44 640,8"
+            fill="none" stroke="#ff3d5a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Low points -->
+          <circle cx="150" cy="120" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="280" cy="90" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="420" cy="60" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="560" cy="44" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <!-- High points -->
+          <circle cx="100" cy="100" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="230" cy="65" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="360" cy="35" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="500" cy="20" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <!-- Labels HL -->
+          <text x="100" y="92" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H1</text>
+          <text x="150" y="136" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L1</text>
+          <text x="230" y="57" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H2↑</text>
+          <text x="280" y="106" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L2↑</text>
+          <text x="360" y="27" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H3↑</text>
+          <text x="420" y="76" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L3↑</text>
+          <text x="500" y="12" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H4↑</text>
+          <!-- Rising trend arrow -->
+          <text x="620" y="28" fill="rgba(255,214,0,.7)" font-size="11" font-family="Share Tech Mono,monospace">趨勢向上 →</text>
+          <!-- Low-low dashed line (upward sloping) -->
+          <line x1="150" y1="120" x2="560" y2="44" stroke="rgba(0,230,118,.3)" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="355" y="96" fill="rgba(0,230,118,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">低點越來越高（上升趨勢線）</text>
+        </svg>
+      </div>
+
+      <!-- SVG: Downtrend definition -->
+      <div class="trend-visual" style="margin-top:0">
+        <div class="trend-visual-title">── 下降趨勢：每次高點＆低點都比上次低 ──</div>
+        <svg width="100%" height="180" viewBox="0 0 700 180" preserveAspectRatio="xMidYMid meet">
+          <line x1="0" y1="40" x2="700" y2="40" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="80" x2="700" y2="80" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="700" y2="120" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <line x1="0" y1="160" x2="700" y2="160" stroke="rgba(0,229,255,.05)" stroke-width="1"/>
+          <!-- Price path: downtrend staircase -->
+          <polyline points="30,20 100,70 150,50 230,110 280,88 360,140 420,115 500,158 560,135 640,170"
+            fill="none" stroke="#00e676" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- High points (each lower) -->
+          <circle cx="100" cy="70" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="280" cy="88" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="420" cy="115" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <circle cx="560" cy="135" r="6" fill="rgba(255,61,90,.2)" stroke="#ff3d5a" stroke-width="1.5"/>
+          <!-- Low points (each lower) -->
+          <circle cx="150" cy="50" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="230" cy="110" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="360" cy="140" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <circle cx="500" cy="158" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5"/>
+          <!-- Labels -->
+          <text x="100" y="62" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H1</text>
+          <text x="150" y="43" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L1</text>
+          <text x="280" y="80" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H2↓</text>
+          <text x="230" y="126" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L2↓</text>
+          <text x="420" y="107" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">H3↓</text>
+          <text x="360" y="156" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">L3↓</text>
+          <!-- Trend text -->
+          <text x="590" y="165" fill="rgba(0,230,118,.7)" font-size="11" font-family="Share Tech Mono,monospace">趨勢向下 ↓</text>
+          <!-- High-high dashed line downward sloping -->
+          <line x1="100" y1="70" x2="560" y2="135" stroke="rgba(255,61,90,.3)" stroke-width="1" stroke-dasharray="6,4"/>
+          <text x="340" y="96" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">高點越來越低（下降趨勢線）</text>
+        </svg>
+      </div>
+
+      <div class="key-concept">
+        <div class="key-concept-label">── 核心觀念 01 ──</div>
+        <div class="key-concept-text">順勢操作：上升趨勢做多，下降趨勢做空。<br>「趨勢是你的朋友，直到它不再是。」</div>
+      </div>
+
+      <div class="insight-box">
+        <span class="insight-icon">💡</span>
+        <div class="insight-body">
+          <div class="insight-label">── 為什麼不要「抄底」接刀？ ──</div>
+          <div class="insight-text">在下降趨勢中，<strong>每一次反彈都只是「跌深逢低」</strong>，不是真正反轉。你以為你買到底，但它還在繼續創新低。<br><br>例子：台股某股從100跌到70，很多人說「便宜了！」繼續買，但它最後跌到40。<br><strong>下降趨勢確認結束之前，不要進場。等訊號，不等感覺。</strong></div>
+        </div>
+      </div>
+
+      <p class="prose">趨勢不是永遠存在的。它有<strong>時間框架</strong>的差異——日線可能在下跌，但週線可能仍在上升趨勢中。這叫做「多時間框架分析」，核心原則是：</p>
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--yellow)">大週期</span>
+          <span class="vocab-def">用週線或月線看<strong>大方向</strong>——我應該做多還是做空？</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--accent)">中週期</span>
+          <span class="vocab-def">用日線確認<strong>當前位置</strong>——這個趨勢現在在哪個階段？</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--pink)">小週期</span>
+          <span class="vocab-def">用小時線或15分線找<strong>進場點</strong>——在什麼價格進？</span>
+        </div>
+      </div>
+
+      <div class="quiz-block">
+        <div class="quiz-label">判斷練習 01</div>
+        <div class="quiz-q">小明看到某股票從 50 元漲到 80 元，中間有幾次回調，但每次回調後都創新高。之後股價從 80 回調到 72。這時，這支股票的趨勢是？</div>
+        <div class="quiz-options" id="q1">
+          <div class="quiz-opt" onclick="answerQ('q1',0,1)"><span class="quiz-letter">A</span>趨勢已反轉，開始下跌，應立刻賣出</div>
+          <div class="quiz-opt" onclick="answerQ('q1',1,1)"><span class="quiz-letter">B</span>仍在上升趨勢中，72 是正常回調，只要不跌破前低就沒問題</div>
+          <div class="quiz-opt" onclick="answerQ('q1',2,1)"><span class="quiz-letter">C</span>無法判斷趨勢，需要等更多K棒確認</div>
+          <div class="quiz-opt" onclick="answerQ('q1',3,1)"><span class="quiz-letter">D</span>成交量沒放大，所以是假上漲</div>
+        </div>
+        <div class="quiz-feedback" id="q1fb"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 2 ── HH / HL / LH / LL 結構
+  ═══════════════════════════════════════════ -->
+  <div class="section-card" id="sec2">
+    <div class="section-header">
+      <span class="section-num">SEC 02</span>
+      <span class="section-title">四個字母讀懂市場結構：HH / HL / LH / LL</span>
+      <span class="section-icon">🧱</span>
+    </div>
+    <div class="section-body">
+
+      <p class="prose">把趨勢的邏輯精確化，市場上每一個高低點都可以用四個代號來分類，這套系統叫做<strong>市場結構（Market Structure）</strong>，是進階技術分析師最常用的框架。</p>
+
+      <div class="hilo-row">
+        <div class="hilo-badge hilo-hh">HH｜Higher High 更高的高點</div>
+        <div class="hilo-badge hilo-hl">HL｜Higher Low 更高的低點</div>
+        <div class="hilo-badge hilo-lh">LH｜Lower High 更低的高點</div>
+        <div class="hilo-badge hilo-ll">LL｜Lower Low 更低的低點</div>
+      </div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--red);font-size:.78rem">HH</span>
+          <span class="vocab-def"><strong>Higher High（更高高點）</strong>：本次高點比上次高點更高。代表多方力量仍強，買盤積極推高價格。是上升趨勢的必要條件之一。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:#ff9999;font-size:.78rem">HL</span>
+          <span class="vocab-def"><strong>Higher Low（更高低點）</strong>：回調結束的低點比上次回調低點更高。代表就算跌，也沒跌到前次低點，多方在更高位接住了。這是<em>上升趨勢最重要的確認</em>。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:#88cc88;font-size:.78rem">LH</span>
+          <span class="vocab-def"><strong>Lower High（更低高點）</strong>：本次反彈高點沒超過上次高點就開始跌。代表多方反攻力道衰竭，空方在更低位就壓回了。是<em>下降趨勢的核心訊號</em>。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green);font-size:.78rem">LL</span>
+          <span class="vocab-def"><strong>Lower Low（更低低點）</strong>：本次低點比上次低點更低。代表空方持續施壓，每次跌破前低點。下降趨勢的確認。</span>
+        </div>
+      </div>
+
+      <!-- SVG: HH HL LL LH structure map -->
+      <div class="trend-visual">
+        <div class="trend-visual-title">── 完整結構轉折圖：從上升趨勢 → 轉折 → 下降趨勢 ──</div>
+        <svg width="100%" height="220" viewBox="0 0 760 220" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid -->
+          <line x1="0" y1="50" x2="760" y2="50" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+          <line x1="0" y1="100" x2="760" y2="100" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+          <line x1="0" y1="150" x2="760" y2="150" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+          <line x1="0" y1="200" x2="760" y2="200" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+          <!-- Uptrend segment -->
+          <polyline points="30,190 120,120 175,145 260,75 320,105 400,45"
+            fill="none" stroke="#ff3d5a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Transition / breakdown -->
+          <polyline points="400,45 460,80 510,60 570,130 620,100 680,155 730,125 760,175"
+            fill="none" stroke="#00e676" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Structure labels uptrend -->
+          <circle cx="120" cy="120" r="5" fill="#ff3d5a" opacity=".8"/>
+          <circle cx="175" cy="145" r="5" fill="#00e676" opacity=".8"/>
+          <circle cx="260" cy="75" r="5" fill="#ff3d5a" opacity=".8"/>
+          <circle cx="320" cy="105" r="5" fill="#00e676" opacity=".8"/>
+          <circle cx="400" cy="45" r="5" fill="#ff3d5a" opacity=".8"/>
+          <text x="120" y="111" fill="#ff3d5a" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">HH</text>
+          <text x="175" y="160" fill="#ff9999" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">HL</text>
+          <text x="260" y="66" fill="#ff3d5a" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">HH</text>
+          <text x="320" y="120" fill="#ff9999" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">HL</text>
+          <text x="400" y="36" fill="#ff3d5a" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">HH</text>
+          <!-- Transition label -->
+          <rect x="415" y="8" width="100" height="22" rx="5" fill="rgba(255,214,0,.1)" stroke="rgba(255,214,0,.3)" stroke-width="1"/>
+          <text x="465" y="23" fill="#ffd600" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">⚠ 結構轉折</text>
+          <!-- Downtrend structure labels -->
+          <circle cx="460" cy="80" r="5" fill="#88cc88" opacity=".8"/>
+          <circle cx="510" cy="60" r="5" fill="rgba(255,61,90,.6)" opacity=".8"/>
+          <circle cx="570" cy="130" r="5" fill="#00e676" opacity=".8"/>
+          <circle cx="620" cy="100" r="5" fill="#88cc88" opacity=".8"/>
+          <circle cx="680" cy="155" r="5" fill="#00e676" opacity=".8"/>
+          <text x="460" y="95" fill="#88cc88" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">LH</text>
+          <text x="510" y="51" fill="rgba(255,100,100,.8)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">LH</text>
+          <text x="570" y="145" fill="#00e676" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">LL</text>
+          <text x="620" y="115" fill="#88cc88" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">LH</text>
+          <text x="680" y="170" fill="#00e676" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">LL</text>
+          <!-- Region labels -->
+          <text x="215" y="210" fill="rgba(255,61,90,.5)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">上升趨勢 HH+HL</text>
+          <text x="590" y="210" fill="rgba(0,230,118,.5)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">下降趨勢 LH+LL</text>
+          <!-- Divider -->
+          <line x1="420" y1="0" x2="420" y2="210" stroke="rgba(255,214,0,.15)" stroke-dasharray="5,4"/>
+        </svg>
+      </div>
+
+      <div class="gold-box">
+        <span class="insight-icon">⚠️</span>
+        <div class="insight-body">
+          <div class="insight-label">── 結構轉折的關鍵訊號 ──</div>
+          <div class="insight-text"><strong>上升趨勢中，最重要的警訊是「低點不再更高（失去 HL）」</strong>：當回調破了前次低點，說明多方守不住了，可能開始反轉。<br><br>這比等什麼均線死亡交叉還要早、還要準。</div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-label">真實案例思考</div>
+        <p>台積電在某段上升趨勢中，歷經三次回調都守住了前次低點（HH + HL 結構完整），但第四次回調<strong>跌破了前次低點</strong>（HL 失效），隨後高點也沒過前高（出現 LH），這就是結構開始崩壞的早期訊號——而不是均線才死叉後你才知道出問題。</p>
+      </div>
+
+      <div class="quiz-block">
+        <div class="quiz-label">判斷練習 02</div>
+        <div class="quiz-q">在一段上升趨勢中，連續出現：HH → HL → HH → HL → HH。之後價格回調，這次的低點「比上次低點更低」了。根據市場結構，接下來你應該？</div>
+        <div class="quiz-options" id="q2">
+          <div class="quiz-opt" onclick="answerQ('q2',0,2)"><span class="quiz-letter">A</span>繼續持有，因為整體仍在高位</div>
+          <div class="quiz-opt" onclick="answerQ('q2',1,2)"><span class="quiz-letter">B</span>立刻全倉加碼，因為這是便宜買點</div>
+          <div class="quiz-opt" onclick="answerQ('q2',2,2)"><span class="quiz-letter">C</span>提高警覺，HL 結構失效，趨勢可能轉折，減倉或等待確認</div>
+          <div class="quiz-opt" onclick="answerQ('q2',3,2)"><span class="quiz-letter">D</span>看RSI是否超賣再決定</div>
+        </div>
+        <div class="quiz-feedback" id="q2fb"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 3 ── 盤整 vs 趨勢
+  ═══════════════════════════════════════════ -->
+  <div class="section-card" id="sec3">
+    <div class="section-header">
+      <span class="section-num">SEC 03</span>
+      <span class="section-title">盤整 vs 趨勢：怎麼分？為什麼重要？</span>
+      <span class="section-icon">⚖️</span>
+    </div>
+    <div class="section-body">
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 80 80">
+            <defs><radialGradient id="jm3b" cx="38%" cy="28%" r="65%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#ff9800"/></radialGradient></defs>
+            <ellipse cx="40" cy="75" rx="22" ry="4" fill="rgba(255,214,0,.15)"/>
+            <path d="M12,55 Q10,28 40,18 Q70,28 68,55 L64,66 Q58,76 40,76 Q22,76 16,66 Z" fill="url(#jm3b)" opacity=".9"/>
+            <ellipse cx="31" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <ellipse cx="49" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <circle cx="33.5" cy="46" r="2" fill="white"/><circle cx="51.5" cy="46" r="2" fill="white"/>
+            <!-- Confused expression -->
+            <path d="M33,62 Q36,59 40,61 Q44,63 47,60" stroke="#2a1500" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <text x="40" y="14" text-anchor="middle" fill="#ffd600" font-size="8" font-family="Share Tech Mono,monospace">？？？</text>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          新手最常犯的錯：把盤整當趨勢！看到股票「震盪了一陣子後往上衝」就說「我早知道要漲」——但你在盤整期間可能已經砍了三次又追了三次，每次都虧手續費和價差。<strong>辨別盤整最重要的功課之一，是學會「不動」。</strong>
+        </div>
+      </div>
+
+      <p class="prose">市場狀態只有三種：<span class="chip chip-red">上升趨勢</span> <span class="chip chip-green">下降趨勢</span> <span class="chip chip-yellow">盤整震盪</span>。絕大多數人虧錢，都是在<strong>盤整期用趨勢策略操作</strong>，或是<strong>在趨勢期用盤整策略操作</strong>，搞反了。</p>
+
+      <div class="struct-grid">
+        <div class="struct-card bull-card">
+          <div class="struct-card-title">📈 上升趨勢</div>
+          <svg width="100%" height="70" viewBox="0 0 200 70">
+            <polyline points="10,60 50,40 70,50 110,20 130,32 170,5 190,12"
+              fill="none" stroke="#ff3d5a" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          <div class="struct-card-desc">HH + HL 持續出現<br>策略：順勢做多，<br>回調時加碼</div>
+        </div>
+        <div class="struct-card bear-card">
+          <div class="struct-card-title">📉 下降趨勢</div>
+          <svg width="100%" height="70" viewBox="0 0 200 70">
+            <polyline points="10,8 50,28 70,16 110,50 130,38 170,60 190,55"
+              fill="none" stroke="#00e676" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          <div class="struct-card-desc">LH + LL 持續出現<br>策略：避開或做空，<br>反彈時放空</div>
+        </div>
+        <div class="struct-card side-card" style="grid-column:1/-1">
+          <div class="struct-card-title">↔️ 盤整震盪（橫盤）</div>
+          <svg width="100%" height="70" viewBox="0 0 400 70">
+            <line x1="10" y1="18" x2="390" y2="18" stroke="rgba(255,61,90,.3)" stroke-width="1" stroke-dasharray="6,4"/>
+            <line x1="10" y1="52" x2="390" y2="52" stroke="rgba(0,230,118,.3)" stroke-width="1" stroke-dasharray="6,4"/>
+            <polyline points="10,35 50,18 80,52 120,20 160,50 200,22 240,48 280,20 320,50 360,18 390,40"
+              fill="none" stroke="#ffd600" stroke-width="2" stroke-linejoin="round"/>
+            <text x="20" y="14" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace">壓力區</text>
+            <text x="20" y="65" fill="rgba(0,230,118,.6)" font-size="9" font-family="Share Tech Mono,monospace">支撐區</text>
+          </svg>
+          <div class="struct-card-desc">高點相近、低點相近，在一個「箱型區間」內震盪<br>策略：等待突破再決定方向，箱型內操作低買高賣</div>
+        </div>
+      </div>
+
+      <!-- How to identify consolidation -->
+      <div class="sec-divider">── 辨別盤整的3個判斷標準 ──</div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--yellow);font-size:.76rem">①&nbsp;高低點</span>
+          <span class="vocab-def">高點沒有持續創新高，低點也沒有持續創新低。價格在一個<strong>水平區間</strong>內來回震盪，這就是盤整。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--yellow);font-size:.76rem">②&nbsp;成交量</span>
+          <span class="vocab-def">盤整期間成交量通常<strong>持續萎縮</strong>——代表雙方都在等待，沒有明確方向，大資金不進場。突破時爆量才是真訊號。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--yellow);font-size:.76rem">③&nbsp;時間長度</span>
+          <span class="vocab-def">盤整時間<strong>越長，能量累積越大</strong>，後續爆發的走勢往往越猛烈。盤整3週後突破和盤整3個月後突破，意義完全不同。</span>
+        </div>
+      </div>
+
+      <div class="before-after">
+        <div class="ba-card before">
+          <div class="ba-label">❌ 新手做法</div>
+          <div class="ba-text">看到震盪就開始頻繁進出，「低點買，高點賣」，結果每次都差一點點，還要付手續費。最後累積虧損一大堆，還不知道哪裡出問題。</div>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-label">✅ 正確做法</div>
+          <div class="ba-text"><strong>辨認盤整 → 等待突破 → 確認方向 → 進場。</strong>盤整期間的最佳操作，往往是「什麼都不做」，留住子彈等待真正的機會。</div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-label">果凍老師的例子：颱風前的平靜</div>
+        <p>盤整就像颱風眼前的平靜——表面上沒什麼動靜，但底下能量在積累。股票在某個區間盤整了<strong>三個月</strong>，成交量越縮越小，最後某一天<strong>爆量突破</strong>——這一根K棒，往往是接下來一段大行情的起點。<br><br>盤整期的耐心等待，是技術分析的核心修練。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 4 ── 多空轉折早期訊號
+  ═══════════════════════════════════════════ -->
+  <div class="section-card" id="sec4">
+    <div class="section-header">
+      <span class="section-num">SEC 04</span>
+      <span class="section-title">多空轉折的早期訊號：在大家看見之前先知道</span>
+      <span class="section-icon">🔭</span>
+    </div>
+    <div class="section-body">
+
+      <p class="prose">趨勢轉折不是突然發生的。就像地震前有地殼移動，趨勢在真正轉折之前，市場會釋放出<strong>早期訊號</strong>。能提早看見這些訊號的人，可以比大眾更早佈局或出場。</p>
+
+      <div class="sec-divider">── 多轉空（頂部轉折）的早期訊號 ──</div>
+
+      <div class="collapse-check" id="topSignals">
+        <div class="cc-item" onclick="toggleCC(this)">
+          <div class="cc-box"></div>
+          <div class="cc-text"><strong>訊號1：高點不再創新高（HH 消失）</strong><br>上升趨勢中，本次反彈的高點<em>沒有超過</em>上次高點，出現了 LH（更低高點）。這是第一個警訊，多方的攻擊力開始衰竭。</div>
+        </div>
+        <div class="cc-item" onclick="toggleCC(this)">
+          <div class="cc-box"></div>
+          <div class="cc-text"><strong>訊號2：縮量漲、放量跌</strong><br>往上漲的時候成交量越來越小（多方信心不足），往下跌的時候成交量越來越大（空方積極賣出）。這叫「量價背離」，是資金正在撤退的跡象。</div>
+        </div>
+        <div class="cc-item" onclick="toggleCC(this)">
+          <div class="cc-box"></div>
+          <div class="cc-text"><strong>訊號3：高位長上影線K棒</strong><br>在高點出現上影線很長的K棒（射擊之星、墓碑十字），代表多方試圖繼續上攻，卻被空方大力壓回。高位出現這種K棒，成功率很高。</div>
+        </div>
+        <div class="cc-item" onclick="toggleCC(this)">
+          <div class="cc-box"></div>
+          <div class="cc-text"><strong>訊號4：跌破前次重要低點（HL 失效）</strong><br>當回調<em>跌破</em>了前次的重要低點，代表「每次低點都比上次高」的規律打破了。這是結構轉折的核心確認訊號——此時應高度警戒。</div>
+        </div>
+        <div class="cc-item" onclick="toggleCC(this)">
+          <div class="cc-box"></div>
+          <div class="cc-text"><strong>訊號5：大量出現（爆量後急跌）</strong><br>在高點出現爆量，但之後股價並沒有繼續上漲，反而急速下跌。這叫「出貨量」——主力借助利多消息或拉抬散戶追買，趁機大量賣出。</div>
+        </div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-faint);margin-top:8px;letter-spacing:.08em">👆 點擊每個訊號標記學習完成</div>
+
+      <div class="sec-divider">── 空轉多（底部轉折）的早期訊號 ──</div>
+
+      <div class="vocab-list">
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green);font-size:.76rem">訊號A</span>
+          <span class="vocab-def"><strong>低點不再創新低（LL 消失）</strong>：下降趨勢中，本次下跌的低點沒有跌破前次低點，出現了 HL（更高低點），空方力道開始衰竭。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green);font-size:.76rem">訊號B</span>
+          <span class="vocab-def"><strong>縮量跌（地量）</strong>：成交量萎縮到近期極低水平，代表願意賣的人越來越少，賣壓即將枯竭。「地量見地價」是市場常說的底部訊號。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green);font-size:.76rem">訊號C</span>
+          <span class="vocab-def"><strong>低位長下影線K棒</strong>：錘子線、蜻蜓十字在低位出現，代表空方試圖繼續下殺，但被多方強力承接拉回。底部出現這種型態配合量，可靠性很高。</span>
+        </div>
+        <div class="vocab-item">
+          <span class="vocab-term" style="color:var(--green);font-size:.76rem">訊號D</span>
+          <span class="vocab-def"><strong>爆量止跌後反彈不回測</strong>：放量大跌後，出現爆量止跌（恐慌性賣壓清洗），之後股價反彈，而且<em>不回測剛剛的低點</em>，代表底部可能確立。</span>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <span class="insight-icon">🎯</span>
+        <div class="insight-body">
+          <div class="insight-label">── 重要提醒：等確認，不要預測 ──</div>
+          <div class="insight-text">轉折訊號只是<strong>提高警覺</strong>的依據，不代表立即進場。真正的操作邏輯是：<br><br>看到訊號 → <strong>減倉保護</strong>（不是清倉）<br>等待結構確認 → <strong>再考慮反向佈局</strong><br><br>「預測頂部」和「確認頂部」是兩件完全不同的事。前者是賭，後者是策略。</div>
+        </div>
+      </div>
+
+      <!-- Flow: 如何判斷轉折 -->
+      <div class="sec-divider">── 趨勢轉折判斷流程 ──</div>
+      <div class="flow-wrap">
+        <div class="flow-node">看到下跌</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-decision">跌破前次低點？</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">是<br>HL 失效</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-decision">反彈能否過前高？</div>
+        <div class="flow-newline"></div>
+        <div class="flow-end-bad">否 → LH 形成<br>下降趨勢確立</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">執行<br>出場/空單</div>
+        <div style="flex-basis:100%"></div>
+        <div class="flow-end-good">跌破前低但立刻反彈過前高<br>→ 假突破，趨勢可能仍在</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 5 ── 趨勢崩壞3徵兆
+  ═══════════════════════════════════════════ -->
+  <div class="section-card" id="sec5">
+    <div class="section-header">
+      <span class="section-num">SEC 05</span>
+      <span class="section-title">趨勢崩壞的3個徵兆（進階預警系統）</span>
+      <span class="section-icon">🚨</span>
+    </div>
+    <div class="section-body">
+
+      <div class="warning-banner">
+        <div class="warning-icon">⚡</div>
+        <div class="warning-text">這個單元是本章的<strong>精華</strong>。大多數教學只教你看趨勢，卻沒有告訴你趨勢怎麼崩壞的。學會這3個徵兆，你就能比別人更早離場——不是等跌了30%才知道。</div>
+      </div>
+
+      <div class="sign-grid">
+        <div class="sign-card red-sign">
+          <div class="sign-icon">🐢</div>
+          <div class="sign-title">徵兆① 動能衰退</div>
+          <div class="sign-desc">每一波上漲的幅度越來越小。同樣的趨勢方向，但每波漲的「力道」越來越弱——漲100→漲60→漲30，這是動能正在枯竭的訊號。</div>
+        </div>
+        <div class="sign-card yellow-sign">
+          <div class="sign-icon">🎭</div>
+          <div class="sign-title">徵兆② 回調加深</div>
+          <div class="sign-desc">每一次回調的幅度越來越大。本來回調10%，後來回調20%，再後來回調30%。回調越來越深，代表多方守衛的力量越來越弱，空方開始佔上風。</div>
+        </div>
+        <div class="sign-card purple-sign">
+          <div class="sign-icon">⏳</div>
+          <div class="sign-title">徵兆③ 時間拉長</div>
+          <div class="sign-desc">完成一波上漲所需的時間越來越久。以前3天漲完，後來要7天，再後來要20天。時間拉長代表買盤的積極性在下降，趨勢開始「疲勞」。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">── 三徵兆同時出現 = 高度警戒 ──</div>
+
+      <!-- SVG: Momentum divergence illustration -->
+      <div class="trend-visual">
+        <div class="trend-visual-title">── 動能衰退示意圖：漲幅越來越小、回調越來越深 ──</div>
+        <svg width="100%" height="200" viewBox="0 0 700 200" preserveAspectRatio="xMidYMid meet">
+          <!-- Base line -->
+          <line x1="20" y1="180" x2="680" y2="180" stroke="rgba(0,229,255,.08)" stroke-width="1"/>
+          <!-- Price path: fading momentum -->
+          <polyline points="20,170 80,110 120,130 190,60 240,90 320,30 380,65 470,12 540,55 610,20 660,45"
+            fill="none" stroke="#ff3d5a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Wave annotations -->
+          <!-- Wave 1 -->
+          <line x1="80" y1="108" x2="80" y2="130" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <line x1="120" y1="108" x2="120" y2="130" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <text x="100" y="148" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">回調20pts</text>
+          <!-- Wave 2 -->
+          <line x1="240" y1="58" x2="240" y2="90" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <line x1="190" y1="58" x2="190" y2="90" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <text x="215" y="108" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">回調30pts</text>
+          <!-- Wave 3 -->
+          <line x1="380" y1="28" x2="380" y2="65" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <line x1="320" y1="28" x2="320" y2="65" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <text x="350" y="82" fill="rgba(255,61,90,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">回調37pts</text>
+          <!-- Upwaves label -->
+          <text x="55" y="102" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">▲60</text>
+          <text x="165" y="52" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">▲70</text>
+          <text x="290" y="22" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">▲60</text>
+          <text x="425" y="4" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle">▲53 ⬇衰退!</text>
+          <!-- Warning zone -->
+          <rect x="450" y="0" width="240" height="185" fill="rgba(255,61,90,.03)" stroke="rgba(255,61,90,.1)" stroke-width="1" rx="4"/>
+          <text x="570" y="95" fill="rgba(255,61,90,.4)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle">⚠ 警戒區</text>
+        </svg>
+      </div>
+
+      <div class="danger-box">
+        <span class="insight-icon">🚨</span>
+        <div class="insight-body">
+          <div class="insight-label">── 崩壞≠立刻反轉 ──</div>
+          <div class="insight-text">看到這三個徵兆，<strong>不代表趨勢立刻反轉</strong>，但代表你應該：<br>
+            ① 縮小倉位，保護既有獲利<br>
+            ② 把停損設得更緊<br>
+            ③ 不再加碼追高<br>
+            ④ 等待結構確認再做下一步決定<br><br>
+            趨勢可以慢慢崩壞很久，但你的應對策略應該從「進攻」切換為「防守」。</div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-label">實戰思考：你的停損在哪裡？</div>
+        <p>如果你持有一支股票，上升趨勢中每次回調大約10%，但最近一次回調達到了22%——根據「回調加深」的徵兆，你的停損應該要提前調整，<strong>不能用「等它反彈回來」的心態繼續持有，因為這可能是趨勢崩壞的開始。</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SEC 6 ── 互動練習：結構標記遊戲
+  ═══════════════════════════════════════════ -->
+  <div class="section-card" id="sec6">
+    <div class="section-header">
+      <span class="section-num">SEC 06</span>
+      <span class="section-title">互動練習：標記市場結構</span>
+      <span class="section-icon">🎮</span>
+    </div>
+    <div class="section-body">
+
+      <div class="jelly-tip">
+        <div class="jelly-tip-mascot">
+          <svg class="jelly-mini-svg" viewBox="0 0 80 80">
+            <defs><radialGradient id="jm3c" cx="38%" cy="28%" r="65%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#ff9800"/></radialGradient></defs>
+            <ellipse cx="40" cy="75" rx="22" ry="4" fill="rgba(255,214,0,.15)"/>
+            <path d="M12,55 Q10,28 40,18 Q70,28 68,55 L64,66 Q58,76 40,76 Q22,76 16,66 Z" fill="url(#jm3c)" opacity=".9"/>
+            <ellipse cx="31" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <ellipse cx="49" cy="48" rx="5.5" ry="6.5" fill="#2a1500" class="jelly-eye"/>
+            <circle cx="33.5" cy="46" r="2" fill="white"/><circle cx="51.5" cy="46" r="2" fill="white"/>
+            <path d="M33,60 Q40,67 47,60" stroke="#2a1500" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="jelly-tip-bubble">
+          <div class="jelly-tip-name">果凍老師說</div>
+          光看不練不行！現在我要考考你——下面每個點位，你能判斷它是 HH、HL、LH 還是 LL 嗎？點擊卡片看答案。<strong>自己先猜，再看答案，記憶才深刻！</strong>
+        </div>
+      </div>
+
+      <!-- Structure labeling game -->
+      <div class="label-game">
+        <div class="label-game-title">結構點位標記練習（點擊查看答案）</div>
+
+        <!-- Chart to refer to -->
+        <div class="trend-visual" style="margin-bottom:16px">
+          <div class="trend-visual-title">── 參考圖：請判斷 A～H 各點的結構類型 ──</div>
+          <svg width="100%" height="190" viewBox="0 0 700 190" preserveAspectRatio="xMidYMid meet">
+            <line x1="0" y1="50" x2="700" y2="50" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+            <line x1="0" y1="100" x2="700" y2="100" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+            <line x1="0" y1="150" x2="700" y2="150" stroke="rgba(0,229,255,.04)" stroke-width="1"/>
+            <!-- Price path with labels A-H -->
+            <!-- A=H, B=L, C=HH, D=HL, E=HH(top), F=LH, G=LL, H=LH -->
+            <polyline points="20,160 80,100 130,125 210,65 270,95 350,30 420,70 500,140 560,100 640,165"
+              fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Points -->
+            <circle cx="80" cy="100" r="7" fill="rgba(255,61,90,.25)" stroke="#ff3d5a" stroke-width="1.5"/>
+            <circle cx="130" cy="125" r="7" fill="rgba(0,230,118,.25)" stroke="#00e676" stroke-width="1.5"/>
+            <circle cx="210" cy="65" r="7" fill="rgba(255,61,90,.25)" stroke="#ff3d5a" stroke-width="1.5"/>
+            <circle cx="270" cy="95" r="7" fill="rgba(0,230,118,.25)" stroke="#00e676" stroke-width="1.5"/>
+            <circle cx="350" cy="30" r="7" fill="rgba(255,61,90,.25)" stroke="#ff3d5a" stroke-width="1.5"/>
+            <circle cx="420" cy="70" r="7" fill="rgba(178,102,255,.25)" stroke="#b266ff" stroke-width="1.5"/>
+            <circle cx="500" cy="140" r="7" fill="rgba(178,102,255,.25)" stroke="#b266ff" stroke-width="1.5"/>
+            <circle cx="560" cy="100" r="7" fill="rgba(178,102,255,.25)" stroke="#b266ff" stroke-width="1.5"/>
+            <circle cx="640" cy="165" r="7" fill="rgba(178,102,255,.25)" stroke="#b266ff" stroke-width="1.5"/>
+            <!-- Labels -->
+            <text x="80" y="91" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">A</text>
+            <text x="130" y="143" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">B</text>
+            <text x="210" y="56" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">C</text>
+            <text x="270" y="113" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">D</text>
+            <text x="350" y="21" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">E</text>
+            <text x="420" y="86" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">F</text>
+            <text x="500" y="158" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">G</text>
+            <text x="560" y="118" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">H</text>
+            <text x="640" y="183" fill="#ffd600" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="bold">I</text>
+          </svg>
+        </div>
+
+        <div class="label-points">
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點A</strong>：第一個高點，前面從低點上漲而來</div>
+            <div class="label-point-a">✅ HH（暫時高點，趨勢初步確立）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點B</strong>：A之後的回調低點</div>
+            <div class="label-point-a">✅ HL（比起點高，上升趨勢確立）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點C</strong>：B反彈後創出的高點，比A更高</div>
+            <div class="label-point-a">✅ HH（更高高點，趨勢持續向上）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點D</strong>：C後的回調，低點比B更高</div>
+            <div class="label-point-a">✅ HL（更高低點，上升結構完整）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點E</strong>：整段中最高點，比C更高</div>
+            <div class="label-point-a">✅ HH（最後一個更高高點）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點F</strong>：E之後反彈，但<u>沒超過E</u></div>
+            <div class="label-point-a">⚠️ LH（更低高點！結構轉折警訊）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點G</strong>：F之後下跌，<u>跌破了D的低點</u></div>
+            <div class="label-point-a">🚨 LL（更低低點，下降趨勢確立！）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點H</strong>：G之後反彈，但沒超過F</div>
+            <div class="label-point-a">📉 LH（更低高點，下降結構完整）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+          <div class="label-point-card" onclick="revealLabel(this)">
+            <div class="label-point-q"><strong>點I</strong>：H之後繼續跌，跌破G的低點</div>
+            <div class="label-point-a">📉 LL（持續更低低點，空方主導）</div>
+            <div class="label-hint">點擊查看答案</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz 3: final comprehensive -->
+      <div class="quiz-block">
+        <div class="quiz-label">綜合測驗 · 本章壓軸</div>
+        <div class="quiz-q">根據本章所學，以下哪個描述最精確地代表「上升趨勢的定義」？</div>
+        <div class="quiz-options" id="q3">
+          <div class="quiz-opt" onclick="answerQ('q3',0,3)"><span class="quiz-letter">A</span>均線向上排列，且股價在均線上方</div>
+          <div class="quiz-opt" onclick="answerQ('q3',1,3)"><span class="quiz-letter">B</span>連續10根以上的紅K棒</div>
+          <div class="quiz-opt" onclick="answerQ('q3',2,3)"><span class="quiz-letter">C</span>每一次高點都比前一次高點高，每一次低點也都比前一次低點高（HH + HL）</div>
+          <div class="quiz-opt" onclick="answerQ('q3',3,3)"><span class="quiz-letter">D</span>RSI 維持在50以上超過兩週</div>
+        </div>
+        <div class="quiz-feedback" id="q3fb"></div>
+      </div>
+
+      <!-- Chapter summary -->
+      <div style="margin-top:32px;padding:24px;background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,150,0,.03));border:1px solid rgba(255,214,0,.18);border-radius:16px">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--yellow);margin-bottom:14px">── 第三章重點整理 ──</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">①</span>
+            <span>趨勢不靠感覺，靠<strong style="color:var(--text)">高低點的客觀規律</strong>定義：上升＝HH+HL，下降＝LH+LL</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">②</span>
+            <span>結構轉折最重要的訊號：<strong style="color:var(--text)">HL 失效（低點跌破前低）</strong>，這比均線死叉更早發生</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">③</span>
+            <span>市場只有三種狀態：上升趨勢、下降趨勢、盤整震盪——<strong style="color:var(--text)">辨別狀態才能選對策略</strong></span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">④</span>
+            <span>盤整期間最好的操作往往是<strong style="color:var(--text)">什麼都不做</strong>，等待爆量突破訊號</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">⑤</span>
+            <span>趨勢崩壞三徵兆：<strong style="color:var(--text)">動能衰退、回調加深、時間拉長</strong>——出現兩個以上立刻從進攻切換防守</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.7">
+            <span style="color:var(--yellow);font-family:'Share Tech Mono',monospace;font-weight:700;flex-shrink:0">⑥</span>
+            <span>多時間框架原則：<strong style="color:var(--text)">大週期看方向，中週期看位置，小週期找進場點</strong></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  
+  <!-- ── CHAPTER FOOTER ── -->
+
+
+  <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="4405086385"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+  <div class="chapter-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="footer-complete-badge">✅</div>
+        <div class="footer-complete-text">
+          <div class="footer-complete-title">第3章完成</div>
+          <div class="footer-complete-desc">你已掌握趨勢的核心結構，能夠辨識上升、下降趨勢與高低點的真實含義。</div>
+          <div class="footer-next-hint">下一章：支撐壓力——讓你看見隱形的牆</div>
+        </div>
+      </div>
+      <div class="footer-right">
+        <a class="fn-btn home" href="/">
+          🏠 回首頁
+        </a>
+        <a class="fn-btn prev" href="/stock_site/features/chapter2.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          第2章
+        </a>
+        <a class="fn-btn next" href="/stock_site/features/chapter4.html">
+          第4章
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+</main>
+
+<script>
+// ── Quiz answers ──
+const answers = {
+  q1: { correct: 1, feedbacks: {
+    0: '❌ 不對。從80跌到72，並沒有跌破前次的重要低點，趨勢本身未被破壞，這只是正常回調。',
+    1: '✅ 正確！上升趨勢允許回調。只要這次低點比前次低點高（HL結構完整），趨勢就仍然有效。72若在前次低點之上，就是正常的回調，不代表反轉。',
+    2: '❌ 可以判斷。從50漲到80過程中持續出現 HH + HL，上升趨勢非常明確。72的回調沒有改變這個結構。',
+    3: '❌ 成交量沒放大不代表是假上漲，量縮價漲有時代表惜售，要結合趨勢結構一起判斷。'
+  }},
+  q2: { correct: 2, feedbacks: {
+    0: '❌ 「位置高」不能作為繼續持有的理由。HL 結構失效是結構性預警，不是短線雜訊。',
+    1: '❌ 這是非常危險的做法！HL 失效後加碼，是追跌的操作，虧損風險大幅增加。',
+    2: '✅ 正確！HL 結構失效代表上升趨勢的重要確認條件被打破，應該提高警覺、減少持倉、設緊停損，等待結構是否進一步崩壞（出現 LH），而不是躁進加碼。',
+    3: '❌ RSI 是輔助指標，不能替代結構分析。結構是主，指標是副。先看結構，再用指標輔助驗證。'
+  }},
+  q3: { correct: 2, feedbacks: {
+    0: '❌ 均線是滯後指標。均線向上排列代表趨勢已存在一段時間，但不是趨勢的「定義」。趨勢在均線顯示之前就已經發生了。',
+    1: '❌ 連續紅K棒不等於上升趨勢。10根紅K棒可能只是短暫急漲，之後立刻反轉——沒有結構支撐，這種漲法通常不持久。',
+    2: '✅ 完美！這就是上升趨勢的客觀定義：HH + HL 持續出現。這個定義不靠感覺，不靠指標，只看高低點的客觀關係——這是整個技術分析的核心基礎。',
+    3: '❌ RSI 在 50 以上是動能偏強的參考，不是趨勢的定義。它可能是盤整期維持在 50 以上，但那不叫上升趨勢。'
+  }}
+};
+
+function answerQ(qId, choice, qNum) {
+  const opts = document.querySelectorAll(`#${qId} .quiz-opt`);
+  opts.forEach(o => o.classList.add('disabled'));
+  const correct = answers[qId].correct;
+  opts[correct].classList.add('correct');
+  if (choice !== correct) opts[choice].classList.add('wrong');
+  const fb = document.getElementById(`${qId}fb`);
+  fb.textContent = answers[qId].feedbacks[choice];
+  fb.className = `quiz-feedback show ${choice === correct ? 'ok' : 'fail'}`;
+  updateProgress();
+}
+
+// ── Toggle collapse checklist ──
+function toggleCC(item) {
+  item.classList.toggle('checked');
+  const box = item.querySelector('.cc-box');
+  box.textContent = item.classList.contains('checked') ? '✓' : '';
+  updateProgress();
+}
+
+// ── Reveal label game cards ──
+function revealLabel(card) {
+  if (!card.classList.contains('revealed')) {
+    card.classList.add('revealed');
+    card.querySelector('.label-hint').style.display = 'none';
+    updateProgress();
+  }
+}
+
+// ── Progress tracking ──
+function updateProgress() {
+  const scrollPct = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
+  const pct = Math.round(scrollPct * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// ── TOC dots ──
+function scrollToSec(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const sections = ['sec1','sec2','sec3','sec4','sec5','sec6'];
+const tocDots = document.querySelectorAll('.toc-dot');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = sections.indexOf(e.target.id);
+      tocDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-60px 0px -40% 0px' });
+sections.forEach(id => { const el = document.getElementById(id); if(el) obs.observe(el); });
+
+// ── Reveal animation on scroll ──
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.section-card').forEach(c => revealObs.observe(c));
+
+// ── Boot progress ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = '0%';
+  }, 300);
+});
+</script>
+
+<script>
+(function() {
+  // ── 套用白天主題 ──────────────────────────────────────────────────────
+  function applyTheme(theme) {
+    if (theme === 'day') {
+      document.body.classList.add('theme-day');
+    } else {
+      document.body.classList.remove('theme-day');
+    }
+  }
+
+  // 讀取全域主題（與主頁共用 key）
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+
+  // 監聽其他分頁的主題切換（BroadcastChannel）
+  try {
+    var _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = function(e) {
+      if (e.data && e.data.theme) applyTheme(e.data.theme);
+    };
+  } catch(e) {}
+
+  // 快速偵測：若主頁在同一 session 更改了主題，這裡也會同步
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme') {
+      applyTheme(e.newValue || 'space');
+    }
+  });
+})();
+</script>
+
+
+<script>
+/* 白天模式 Logo 修復：使用 jelly.png 取代 logo.png，並同步圖片尺寸 */
+(function() {
+  var logoImg = document.querySelector('.logo-icon img');
+  if (logoImg) {
+    // 統一使用 jelly.png，並設定合適尺寸
+    logoImg.src = '/images/jelly.png';
+    logoImg.alt = 'JellyStock';
+    logoImg.onerror = function() { this.style.display = 'none'; };
+    logoImg.style.width = '46px';
+    logoImg.style.height = '46px';
+    logoImg.style.objectFit = 'contain';
+    logoImg.style.borderRadius = '9px';
+    logoImg.style.position = 'relative';
+    logoImg.style.top = '-4px';
+    logoImg.style.left = '-4px';
+  }
+})();
+</script>
+
+  
+
+  <script>
+  /* ── SVG Day Mode Complete Fix v2 ── */
+  (function() {
+    const DARK_BG_FILLS = ['#040b15','#050c1a','#030a12','#040d18','#020810','#03080f','#060d1a'];
+
+    function hexToRgb(hex) {
+      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+      return {r,g,b};
+    }
+
+    function isDarkColor(fill) {
+      if (!fill) return false;
+      const low = fill.toLowerCase();
+      if (DARK_BG_FILLS.includes(low)) return true;
+      const m = low.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (m) {
+        const r=+m[1],g=+m[2],b=+m[3];
+        return (r+g+b) < 60;
+      }
+      if (low.startsWith('#') && low.length >= 7) {
+        const {r,g,b} = hexToRgb(low);
+        return (r+g+b) < 60;
+      }
+      return false;
+    }
+
+    function isFaintColor(fill) {
+      if (!fill) return false;
+      const m = fill.match(/rgba?\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
+      return m && parseFloat(m[1]) <= 0.25;
+    }
+
+    function getReadableColor(fill) {
+      if (!fill) return null;
+      const low = fill.toLowerCase();
+      if (/rgba?\(0,\s*229,\s*255|rgba?\(0,\s*230,\s*255/.test(low)) return '#1265a8';
+      if (/rgba?\(0,\s*230,\s*118|rgba?\(0,\s*255,\s*118/.test(low)) return '#157a32';
+      if (/rgba?\(255,\s*61,\s*90|rgba?\(255,\s*0,\s*80/.test(low)) return '#a02818';
+      if (/rgba?\(255,\s*214,\s*0|rgba?\(255,\s*200,\s*0/.test(low)) return '#8a6000';
+      if (/rgba?\(178,\s*102,\s*255|rgba?\(160,\s*80,\s*255/.test(low)) return '#6640c0';
+      if (/rgba?\(255,\s*255,\s*255/.test(low)) return '#1a3550';
+      if (/rgba?\(0,\s*229,\s*176/.test(low)) return '#157a6a';
+      return null;
+    }
+
+    function fixSvgsForMode(isDay) {
+      /* 1. Fix dark background rects */
+      document.querySelectorAll('svg rect').forEach(r => {
+        const f = r.getAttribute('fill') || '';
+        if (!r.dataset.origFill) r.dataset.origFill = f;
+        const orig = r.dataset.origFill;
+
+        if (isDay) {
+          if (isDarkColor(orig)) {
+            r.setAttribute('fill', 'rgba(235,248,255,0.4)');
+          }
+        } else {
+          r.setAttribute('fill', orig);
+        }
+      });
+
+      /* 2. Fix faint / invisible SVG text */
+      document.querySelectorAll('svg text').forEach(t => {
+        const f = t.getAttribute('fill') || '';
+        if (!t.dataset.origFill) t.dataset.origFill = f;
+        const orig = t.dataset.origFill;
+
+        if (isDay) {
+          const readable = getReadableColor(orig);
+          if (readable) {
+            t.setAttribute('fill', readable);
+            t.style.opacity = '1';
+          } else if (isFaintColor(orig)) {
+            t.setAttribute('fill', '#1a3550');
+            t.style.opacity = '1';
+          } else if (isDarkColor(orig) || orig === 'white' || orig === '#fff') {
+            t.setAttribute('fill', '#1a3550');
+            t.style.opacity = '1';
+          }
+          /* CSS var overrides */
+          const cssVar = orig.match(/var\(--(\w+)\)/);
+          if (cssVar) {
+            const map = {accent:'#1265a8', green:'#157a32', red:'#a02818', yellow:'#8a6000', purple:'#6640c0', teal:'#157a6a'};
+            if (map[cssVar[1]]) { t.setAttribute('fill', map[cssVar[1]]); t.style.opacity='1'; }
+          }
+        } else {
+          t.setAttribute('fill', orig);
+          t.style.opacity = '';
+        }
+      });
+
+      /* 3. Fix faint SVG lines */
+      document.querySelectorAll('svg line, svg polyline').forEach(el => {
+        const s = el.getAttribute('stroke') || '';
+        if (!el.dataset.origStroke) el.dataset.origStroke = s;
+        const orig = el.dataset.origStroke;
+
+        if (isDay) {
+          if (/rgba?\(255,255,255,0?\.[0-1]/.test(orig)) {
+            el.setAttribute('stroke', 'rgba(26,101,168,0.15)');
+          }
+        } else {
+          el.setAttribute('stroke', orig);
+        }
+      });
+
+      /* 4. Fix SVG pattern (grid lines) */
+      document.querySelectorAll('svg pattern rect').forEach(r => {
+        if (isDay) r.setAttribute('fill', 'transparent');
+        else if (r.dataset.origFill) r.setAttribute('fill', r.dataset.origFill);
+      });
+      document.querySelectorAll('svg pattern line').forEach(l => {
+        if (!l.dataset.origStroke) l.dataset.origStroke = l.getAttribute('stroke') || '';
+        if (isDay) l.setAttribute('stroke', 'rgba(26,101,168,0.06)');
+        else l.setAttribute('stroke', l.dataset.origStroke);
+      });
+    }
+
+    function run() {
+      const isDay = document.body.classList.contains('theme-day');
+      fixSvgsForMode(isDay);
+    }
+
+    /* Hook theme toggle */
+    const origToggle = window.toggleTheme;
+    window.toggleTheme = function() {
+      if (origToggle) origToggle();
+      setTimeout(run, 30);
+    };
+
+    /* Also hook any custom draw functions to re-run fix after they render */
+    const origSetTimeout = window.setTimeout;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Initial run */
+      run();
+      /* Watch for class changes on body (theme switches) */
+      const obs = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'class') run();
+        });
+      });
+      obs.observe(document.body, { attributes: true });
+
+      /* Also watch for SVG content injection (JS-drawn charts) */
+      document.querySelectorAll('.tri-canvas, .sim-canvas, .vol-chart-wrap, .rsi-gauge-wrap, .cs-display, .case-chart').forEach(function(container) {
+        const svgObs = new MutationObserver(function() {
+          if (document.body.classList.contains('theme-day')) run();
+        });
+        svgObs.observe(container, { childList: true, subtree: true });
+      });
+    });
+  })();
+  </script>
+
+  <script>
+  /* ── Table Mobile Scroll Wrapper ── */
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("table.cmp-table, table.compare-table").forEach(function(table) {
+      if (table.parentElement.classList.contains("table-scroll-wrap")) return;
+      var wrapper = document.createElement("div");
+      wrapper.className = "table-scroll-wrap";
+      wrapper.style.cssText = "width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;";
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+  });
+  </script>
+
+<script>
+(function() {
+  function tick() {
+    var now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    var str = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    var el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+<!-- ── FOOTER ── -->
+<footer id="site-footer" style="
+  position: relative;
+  z-index: 10;
+  border-top: 1px solid rgba(0,229,255,.08);
+  background: linear-gradient(180deg, rgba(3,6,14,.97), rgba(2,4,10,.99));
+  box-shadow: 0 -2px 30px rgba(0,0,0,.4);
+  margin-top: 40px;
+">
+  <div style="padding: 20px 40px 24px; display: flex; flex-direction: column; gap: 8px;">
+    <p style="
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem;
+      color: rgba(122,154,184,.6);
+      line-height: 1.7;
+      text-align: center;
+    ">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    ">
+      <a href="/stock_site/legal/about.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">關於本站</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/privacy.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">隱私政策</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/disclaimer.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">免責聲明</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">聯絡我們</a>
+    </div>
+    <p style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(122,154,184,.3);margin-top:6px;">© 2025 JellyStock. All rights reserved.</p>
+  </div>
+</footer>
+
+
+<!-- ── 維護模式遮罩 ── -->
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+    <div style="margin-top:22px;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:rgba(0,229,255,.35);text-transform:uppercase;">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+  </div>
+</div>
+<script>
+/* ── 維護模式輪詢（所有子頁面共用）── */
+(function() {
+  const API_BASE = window.location.origin;
+  const overlay  = document.getElementById('maintenanceOverlay');
+  function check() {
+    fetch(API_BASE + '/api/maintenance?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var msg = document.getElementById('maintMsgText');
+        if (msg && d.message) msg.textContent = d.message;
+        if (d.enabled) {
+          overlay.style.display = 'flex';
+        } else {
+          overlay.style.display = 'none';
+        }
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(check, 30000); });
+  }
+  check();
+})();
+</script>
+
+</body>
+</html>

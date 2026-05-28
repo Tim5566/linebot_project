@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226"
+       crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>關於本站 — 盤後雷達 JellyStock</title>
+  <meta name="description" content="盤後雷達 JellyStock 是一個完全免費的台股三大法人買賣超查詢工具，提供上市上櫃個股法人動向查詢、大盤資訊與技術分析教學。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#04080f; --surface:#080f1c; --surface2:#0c1422;
+      --border:#0f1a2e; --border2:#172438;
+      --accent:#00e5ff; --accent2:#0099bb;
+      --green:#00e676; --red:#ff3d5a; --yellow:#ffd600;
+      --muted:#3a5070; --text:#ccdaf5; --text-dim:#7a9ab8; --text-faint:#4a6888;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .bg-layer-grid { background-image: linear-gradient(rgba(0,229,255,.022) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,.022) 1px, transparent 1px); background-size: 48px 48px; }
+    .bg-layer-vignette { background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,80,160,.1) 0%, transparent 55%), radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0,120,200,.08) 0%, transparent 60%); }
+    .bg-layer-scanlines { background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.055) 3px, rgba(0,0,0,.055) 4px); animation: scanShift 10s linear infinite; }
+    @keyframes scanShift { from { background-position: 0 0; } to { background-position: 0 120px; } }
+
+    header { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 16px; height: 58px; border-bottom: 1px solid rgba(0,229,255,.08); background: rgba(4,8,15,.96); backdrop-filter: blur(20px); }
+    header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.7) 20%, rgba(0,170,255,.9) 50%, rgba(0,229,255,.7) 80%, transparent 100%); background-size: 200% 100%; animation: hSweep 4s linear infinite; }
+    @keyframes hSweep { from { background-position: -100% 0; } to { background-position: 200% 0; } }
+    .header-left { display: flex; align-items: center; padding-left: 4px; }
+    .logo { display: flex; align-items: center; gap: 18px; margin-left: 6px; }
+    .logo-icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; position: relative; flex-shrink: 0; overflow: visible; }
+    .logo-icon img { width: 58px; height: 58px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 0 8px rgba(0,229,255,.4)); position: relative; top: -6px; left: -6px; }
+    .logo-text { font-family: 'Orbitron', monospace; font-size: 1.05rem; font-weight: 700; letter-spacing: .1em; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,.4); }
+    .logo-sub { font-family: 'Share Tech Mono', monospace; font-size: .58rem; color: var(--accent); letter-spacing: .22em; opacity: .65; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .btn-back { display: flex; align-items: center; gap: 7px; font-family: 'Share Tech Mono', monospace; font-size: .7rem; letter-spacing: .1em; color: var(--text-dim); text-decoration: none; background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.1); border-radius: 20px; padding: 5px 14px; transition: all .22s; }
+    .btn-back:hover { color: var(--accent); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.08); }
+    .btn-back svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    .page-wrap { position: relative; z-index: 1; max-width: 840px; margin: 0 auto; padding: 52px 32px 100px; }
+    .page-hero { margin-bottom: 50px; }
+    .page-tag { font-family: 'Share Tech Mono', monospace; font-size: .6rem; letter-spacing: .3em; color: var(--accent); opacity: .65; text-transform: uppercase; margin-bottom: 10px; }
+    .page-title { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: .06em; line-height: 1.2; text-shadow: 0 0 40px rgba(0,229,255,.2); margin-bottom: 16px; }
+    .page-title .hl { color: var(--accent); }
+    .page-intro { font-size: .95rem; color: var(--text-dim); line-height: 2; max-width: 620px; }
+
+    .mission-banner { background: linear-gradient(135deg, rgba(0,229,255,.06) 0%, rgba(0,100,200,.04) 100%); border: 1px solid rgba(0,229,255,.14); border-left: 3px solid var(--accent); border-radius: 0 16px 16px 0; padding: 26px 30px; margin-bottom: 44px; position: relative; overflow: hidden; }
+    .mission-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); opacity: .4; }
+    .mission-label { font-family: 'Share Tech Mono', monospace; font-size: .6rem; letter-spacing: .28em; color: var(--accent); opacity: .6; text-transform: uppercase; margin-bottom: 10px; }
+    .mission-text { font-family: 'Noto Sans TC', sans-serif; font-size: 1.05rem; color: var(--text); line-height: 1.85; font-weight: 500; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 44px; }
+    @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+    .feature-card { background: var(--surface); border: 1px solid rgba(0,229,255,.08); border-radius: 16px; padding: 24px 26px; position: relative; overflow: hidden; transition: all .3s cubic-bezier(.22,1,.36,1); }
+    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,229,255,.4), transparent); opacity: 0; transition: opacity .3s; }
+    .feature-card:hover { border-color: rgba(0,229,255,.2); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 0 20px rgba(0,229,255,.06); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { width: 42px; height: 42px; border-radius: 11px; background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.15); display: grid; place-items: center; margin-bottom: 16px; transition: all .3s; }
+    .feature-card:hover .feature-icon { background: rgba(0,229,255,.14); box-shadow: 0 0 16px rgba(0,229,255,.15); }
+    .feature-icon svg { width: 20px; height: 20px; color: var(--accent); }
+    .feature-title { font-family: 'Orbitron', monospace; font-size: .82rem; font-weight: 700; color: #fff; letter-spacing: .06em; margin-bottom: 10px; }
+    .feature-desc { font-size: .82rem; color: var(--text-dim); line-height: 1.8; }
+
+    .doc-card { background: var(--surface); border: 1px solid rgba(0,229,255,.08); border-radius: 18px; padding: 30px 34px; margin-bottom: 18px; position: relative; overflow: hidden; transition: border-color .3s; }
+    .doc-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,229,255,.35), transparent); opacity: 0; transition: opacity .3s; }
+    .doc-card:hover { border-color: rgba(0,229,255,.16); }
+    .doc-card:hover::before { opacity: 1; }
+    .doc-card::after { content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,229,255,.018), transparent); animation: cardSweep 8s ease-in-out infinite; pointer-events: none; }
+    @keyframes cardSweep { 0% { left: -60%; } 60%,100% { left: 120%; } }
+    .sec-num { font-family: 'Share Tech Mono', monospace; font-size: .58rem; letter-spacing: .24em; color: var(--accent); opacity: .5; margin-bottom: 7px; text-transform: uppercase; }
+    .sec-title { font-family: 'Orbitron', monospace; font-size: .98rem; font-weight: 700; color: #fff; letter-spacing: .06em; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+    .sec-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,.18), transparent); }
+    .doc-body { font-size: .88rem; color: var(--text-dim); line-height: 1.95; }
+    .doc-body p { margin-bottom: 13px; }
+    .doc-body p:last-child { margin-bottom: 0; }
+    .doc-body strong { color: var(--text); }
+    .doc-body ul { list-style: none; padding: 0; margin: 8px 0 13px; display: flex; flex-direction: column; gap: 7px; }
+    .doc-body li { display: flex; align-items: flex-start; gap: 10px; font-size: .86rem; line-height: 1.75; }
+    .doc-body li::before { content: '▸'; color: var(--accent); font-size: .7rem; flex-shrink: 0; margin-top: 5px; opacity: .65; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
+    @media (max-width: 480px) { .stats-row { grid-template-columns: 1fr; } }
+    .stat-box { background: rgba(0,229,255,.03); border: 1px solid rgba(0,229,255,.1); border-radius: 12px; padding: 18px; text-align: center; }
+    .stat-num { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px rgba(0,229,255,.3); margin-bottom: 5px; }
+    .stat-label { font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--text-faint); letter-spacing: .1em; }
+
+    .contact-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .contact-row { display: flex; align-items: center; gap: 16px; background: rgba(0,229,255,.03); border: 1px solid rgba(0,229,255,.1); border-radius: 12px; padding: 16px 22px; transition: background .2s, border-color .2s; }
+    .contact-row.clickable { cursor: pointer; }
+    .contact-row.clickable:hover { background: rgba(0,229,255,.07); border-color: rgba(0,229,255,.22); }
+    .c-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.16); display: grid; place-items: center; flex-shrink: 0; }
+    .c-icon svg { width: 18px; height: 18px; color: var(--accent); }
+    .c-label { font-size: .65rem; color: var(--text-faint); letter-spacing: .1em; margin-bottom: 3px; font-family: 'Share Tech Mono', monospace; }
+    .c-val { font-family: 'Share Tech Mono', monospace; font-size: .88rem; color: var(--text); }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid rgba(0,229,255,.06); background: rgba(4,8,15,.95); padding: 20px 40px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .footer-brand { font-family: 'Orbitron', monospace; font-size: .62rem; color: var(--accent); letter-spacing: .14em; opacity: .5; margin-bottom: 3px; }
+    .footer-copy { font-size: .68rem; color: var(--text-faint); }
+    .footer-unofficial { font-size: .62rem; color: var(--text-faint); opacity: .7; margin-top: 5px; line-height: 1.6; }
+    .footer-nav { display: flex; gap: 18px; flex-wrap: wrap; }
+    .footer-nav a { font-family: 'Share Tech Mono', monospace; font-size: .64rem; color: var(--text-faint); text-decoration: none; letter-spacing: .06em; transition: color .2s; }
+    .footer-nav a:hover, .footer-nav a.active { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      header { padding: 0 12px 0 10px; height: 54px; }
+      .logo-icon img { width: 46px; height: 46px; top: -3px; left: -3px; }
+      .logo-text { font-size: .88rem; } .logo-sub { font-size: .5rem; }
+      .page-wrap { padding: 28px 16px 80px; }
+      .page-title { font-size: 1.5rem; }
+      .doc-card { padding: 20px 18px; }
+      footer { padding: 16px 16px 20px; flex-direction: column; }
+    }
+
+    /* ══ 白天主題（theme-day）══════════════════════════════════════════════ */
+    body.theme-day {
+      --bg:#ddeaf6; --surface:#f0f7ff; --surface2:#e4f0fa;
+      --accent:#1a7bbf; --accent2:#1565a0;
+      --green:#1a8a3c; --red:#c0392b; --yellow:#d4a017;
+      --muted:#7a9cb8; --text:#0a2540; --text-dim:#1e4060; --text-faint:#4a7090;
+      background: linear-gradient(180deg,#a8d4f0 0%,#c8e4f8 30%,#ddeaf6 100%) !important;
+    }
+    body.theme-day .bg-layer-grid,
+    body.theme-day .bg-layer-vignette,
+    body.theme-day .bg-layer-scanlines { opacity:0 !important; }
+    body.theme-day header { background:rgba(255,255,255,.85) !important; backdrop-filter:blur(20px) saturate(1.8); border-bottom:1px solid rgba(26,123,191,.18) !important; box-shadow:0 2px 20px rgba(26,100,180,.1) !important; }
+    body.theme-day header::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.55),rgba(33,150,211,.75),rgba(26,123,191,.55),transparent) !important; background-size:200% 100%; opacity:.8; animation:hSweep 5s linear infinite; }
+    body.theme-day .logo-text { color:#0a2540 !important; text-shadow:none !important; }
+    body.theme-day .logo-sub { color:#1a7bbf !important; opacity:.85; }
+    body.theme-day .btn-back { color:#1e4060 !important; background:rgba(26,123,191,.07) !important; border-color:rgba(26,123,191,.22) !important; }
+    body.theme-day .btn-back:hover { color:#1a7bbf !important; border-color:rgba(26,123,191,.45) !important; background:rgba(26,123,191,.13) !important; }
+    body.theme-day .page-tag { color:#1a7bbf !important; opacity:.9; }
+    body.theme-day .page-title { color:#0a2540 !important; text-shadow:none !important; }
+    body.theme-day .page-title .hl { color:#1a7bbf !important; }
+    body.theme-day .page-intro { color:#1e4060 !important; }
+    body.theme-day .page-meta { color:#4a7090 !important; }
+    body.theme-day .page-meta b { color:#1e4060 !important; }
+    body.theme-day .doc-card { background:rgba(255,255,255,.93) !important; border-color:rgba(26,123,191,.18) !important; box-shadow:0 4px 24px rgba(26,100,180,.1) !important; }
+    body.theme-day .doc-card:hover { border-color:rgba(26,123,191,.35) !important; }
+    body.theme-day .doc-card::before { background:linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent) !important; animation:none !important; }
+    body.theme-day .doc-card::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.025),transparent) !important; animation:none !important; }
+    body.theme-day .sec-num { color:#1a7bbf !important; opacity:.85; }
+    body.theme-day .sec-title { color:#0a2540 !important; }
+    body.theme-day .sec-title::after { background:linear-gradient(90deg,rgba(26,123,191,.25),transparent) !important; }
+    body.theme-day .doc-body { color:#1e4060 !important; }
+    body.theme-day .doc-body p { color:#1e4060 !important; }
+    body.theme-day .doc-body strong { color:#0a2540 !important; }
+    body.theme-day .doc-body li { color:#1e4060 !important; }
+    body.theme-day .doc-body li::before { color:#1a7bbf !important; }
+    body.theme-day .doc-body a { color:#1a7bbf !important; border-bottom-color:rgba(26,123,191,.3) !important; }
+    body.theme-day .doc-body a:hover { color:#0a2540 !important; border-bottom-color:#1a7bbf !important; }
+    body.theme-day .hl-box { background:rgba(26,123,191,.06) !important; border-color:rgba(26,123,191,.2) !important; border-left-color:#1a7bbf !important; color:#1e4060 !important; }
+    body.theme-day .hl-box strong { color:#1a7bbf !important; }
+    body.theme-day .mission-banner { background:linear-gradient(135deg,rgba(26,123,191,.07),rgba(26,100,200,.04)) !important; border-color:rgba(26,123,191,.2) !important; border-left-color:#1a7bbf !important; }
+    body.theme-day .mission-label { color:#1a7bbf !important; }
+    body.theme-day .mission-text { color:#0a2540 !important; }
+    body.theme-day .feature-card { background:rgba(255,255,255,.88) !important; border-color:rgba(26,123,191,.14) !important; }
+    body.theme-day .feature-card:hover { border-color:rgba(26,123,191,.35) !important; box-shadow:0 8px 28px rgba(26,100,180,.12) !important; }
+    body.theme-day .feature-icon { background:rgba(26,123,191,.08) !important; border-color:rgba(26,123,191,.2) !important; }
+    body.theme-day .feature-icon svg { color:#1a7bbf !important; }
+    body.theme-day .feature-title { color:#0a2540 !important; }
+    body.theme-day .feature-desc { color:#1e4060 !important; }
+    body.theme-day .contact-row { background:rgba(26,123,191,.04) !important; border-color:rgba(26,123,191,.15) !important; }
+    body.theme-day .contact-row.clickable:hover { background:rgba(26,123,191,.1) !important; border-color:rgba(26,123,191,.3) !important; }
+    body.theme-day .contact-row:hover { background:rgba(26,123,191,.1) !important; border-color:rgba(26,123,191,.3) !important; }
+    body.theme-day .c-icon { background:rgba(26,123,191,.08) !important; border-color:rgba(26,123,191,.2) !important; }
+    body.theme-day .c-icon svg { color:#1a7bbf !important; }
+    body.theme-day .c-label { color:#4a7090 !important; }
+    body.theme-day .c-val { color:#0a2540 !important; }
+    body.theme-day footer { background:rgba(240,247,255,.97) !important; border-top-color:rgba(26,123,191,.14) !important; box-shadow:0 -2px 16px rgba(26,100,180,.07) !important; }
+    body.theme-day .footer-brand { color:#1a7bbf !important; opacity:.85; }
+    body.theme-day .footer-copy { color:#4a7090 !important; }
+    body.theme-day .footer-unofficial { color:#4a7090 !important; }
+    body.theme-day .footer-nav a { color:#4a7090 !important; }
+    body.theme-day .footer-nav a:hover,
+    body.theme-day .footer-nav a.active { color:#1a7bbf !important; }
+  </style>
+<script>
+/* ── 全站主題同步 ── */
+(function() {
+  function applyTheme(t) {
+    if (t === 'day') document.body.classList.add('theme-day');
+    else document.body.classList.remove('theme-day');
+  }
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ applyTheme(t); });
+  } else { applyTheme(t); }
+  try {
+    var bc = new BroadcastChannel('jellystock_theme');
+    bc.onmessage = function(e) {
+      if (e.data && e.data.theme) {
+        localStorage.setItem('jelly_global_theme', e.data.theme);
+        applyTheme(e.data.theme);
+      }
+    };
+  } catch(e) {}
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme' && e.newValue) applyTheme(e.newValue);
+  });
+})();
+</script>
+</head>
+<body>
+
+<div class="bg-layer bg-layer-grid"></div>
+<div class="bg-layer bg-layer-vignette"></div>
+<div class="bg-layer bg-layer-scanlines"></div>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock Logo" /></div>
+      <div>
+        <div class="logo-text">盤後雷達</div>
+        <div class="logo-sub">JellyStock</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="/" class="btn-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <div class="page-hero">
+    <div class="page-tag">· About · JellyStock ·</div>
+    <h1 class="page-title">關於<span class="hl">本站</span></h1>
+    <p class="page-intro">盤後雷達是一個台股法人動向查詢工具，專為需要快速掌握三大法人買賣超資訊的投資人而設計。核心查詢功能完全免費，本站以廣告收入維持營運。</p>
+    <div class="page-meta" style="margin-top:10px;">最後更新：<b>2026 年 5 月 16 日</b> &nbsp;·&nbsp; 適用網站：<b>盤後雷達 JellyStock</b></div>
+  </div>
+
+  <div class="mission-banner">
+    <div class="mission-label">Our Mission · 開站初衷</div>
+    <div class="mission-text">「官方盤後資料雖然公開，但分散在多個網站且不易快速閱讀。這個工具希望把每天必看的法人籌碼整合到同一個地方，讓查詢流程更直覺、更快速。」</div>
+    <div class="mission-text" style="margin-top:14px;font-size:.9rem;color:var(--text-dim);">接觸台股多年，每天盤後都要在 TWSE、TPEx 幾個官網之間來回切換查資料，覺得太麻煩——乾脆自己寫一個工具。從第一行程式碼到現在，JellyStock 一直是個人開發、個人維護的小網站，沒有團隊、沒有業配，只希望讓有同樣需求的投資人用起來方便。</div>
+  </div>
+
+  <div class="doc-card" style="margin-bottom:18px;">
+    <div class="sec-num">About · 00</div>
+    <div class="sec-title">關於開發者</div>
+    <div class="doc-body">
+      <div style="display:flex;align-items:center;gap:24px;margin-bottom:22px;flex-wrap:wrap;">
+        <div style="width:80px;height:80px;border-radius:50%;border:2px solid rgba(0,229,255,.3);overflow:hidden;flex-shrink:0;display:grid;place-items:center;background:rgba(0,229,255,.06);box-shadow:0 0 20px rgba(0,229,255,.15);">
+          <img src="/images/jelly.png" alt="果凍老師" style="width:72px;height:72px;object-fit:contain;display:block;margin:auto;"/>
+        </div>
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:.06em;margin-bottom:6px;">果凍老師</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.15em;opacity:.75;margin-bottom:8px;">JELLYSTOCK · FOUNDER &amp; DEVELOPER</div>
+          <div style="font-size:.84rem;color:var(--text-dim);line-height:1.8;">台股散戶出身，長期研究籌碼面與技術分析，深知資料查詢的痛點。白天上班，下班寫 code 維護這個網站。</div>
+        </div>
+      </div>
+      <p>JellyStock 盤後雷達於 <strong>2025 年正式上線</strong>，從規劃、設計、前後端開發到伺服器維運，全部由一個人完成。技術架構如下：</p>
+      <ul style="margin:12px 0 12px 20px;color:var(--text-dim);line-height:2;font-size:.88rem;">
+        <li><strong style="color:var(--text);">前端</strong> — 純靜態 HTML / CSS / JavaScript，部署於 Cloudflare，全球 CDN 加速</li>
+        <li><strong style="color:var(--text);">後端</strong> — Python Flask API，部署於 Render 雲端平台</li>
+        <li><strong style="color:var(--text);">資料庫</strong> — Firebase Realtime Database，作為盤後資料快取層</li>
+        <li><strong style="color:var(--text);">資料抓取</strong> — 每日盤後自動從 TWSE 與 TPEx 官方 API 抓取，同步至雲端後即時提供查詢</li>
+      </ul>
+      <p style="margin-top:12px;">除了查詢工具，網站內也附有一套完整的<strong>技術分析教學（共 10 章）</strong>，從股票本質、K棒解讀、趨勢結構到實戰案例，全部免費開放，希望對正在學習技術分析的朋友有所幫助。</p>
+      <div class="stats-row" style="margin-top:22px;">
+        <div class="stat-box"><div class="stat-num">10</div><div class="stat-label">技術分析教學章節</div></div>
+        <div class="stat-box"><div class="stat-num">9</div><div class="stat-label">每日資料更新次數</div></div>
+        <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">核心功能免費</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.04.033.05A19.9 19.9 0 0 0 6.045 20.1a.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      </div>
+      <div class="feature-title">Google 帳號登入</div>
+      <div class="feature-desc">以 Google 帳號登入後可啟用個股收藏清單，收藏的個股資料儲存於本機瀏覽器，登出即清除，不上傳至伺服器。</div>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">About · 01</div>
+    <div class="sec-title">資料來源</div>
+    <div class="doc-body">
+      <p>本網站所有台股資料均來自台灣官方金融機構之公開資訊，不涉及任何自行編製或預測性內容：</p>
+      <ul>
+        <li><strong>臺灣證券交易所（TWSE）</strong> — 上市個股三大法人買賣超、融資融券、處置股公告等資料</li>
+        <li><strong>櫃買中心（TPEx）</strong> — 上櫃個股三大法人買賣超、借券賣出等資料</li>
+      </ul>
+      <p>所有資料均於官方公告後自動抓取，更新時間依各機構發布排程而定，一般為盤後 15:00 至 21:30 分批更新。如官方網站延遲、異常或資料格式變更，本站資料亦可能因此受影響。</p>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num">2</div><div class="stat-label">官方資料來源</div></div>
+        <div class="stat-box"><div class="stat-num">9</div><div class="stat-label">每日更新次數</div></div>
+        <div class="stat-box"><div class="stat-num">上市+上櫃</div><div class="stat-label">全市場覆蓋</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">About · 02</div>
+    <div class="sec-title">服務說明</div>
+    <div class="doc-body">
+      <p>盤後雷達目前提供以下服務，所有<strong>查詢功能均免費</strong>使用，不設付費方案：</p>
+      <ul>
+        <li>上市 / 上櫃個股當日三大法人買賣超查詢（外資、投信、自營商）</li>
+        <li>個股借券賣出差額查詢</li>
+        <li>個股處置、注意股狀態查詢</li>
+        <li>上市 / 上櫃三大法人買賣超前 50 名排行榜</li>
+        <li>大盤三大法人合計買賣金額、融資增減、融資水位統計</li>
+      </ul>
+      <p>本站為個人開發維護之工具型網站，功能持續改善中。若有異常或建議，歡迎透過下方聯絡方式反映。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">About · 03</div>
+    <div class="sec-title">廣告聲明</div>
+    <div class="doc-body">
+      <p>為維持本站伺服器、頻寬及持續開發所需之營運成本，本網站目前或未來可能透過以下方式展示廣告：</p>
+      <ul>
+        <li><strong>Google AdSense</strong> — 由 Google 提供之上下文廣告服務，Google 可能依據您的瀏覽行為提供個人化廣告</li>
+        <li>其他經本站評估後引入之合規廣告聯盟服務</li>
+      </ul>
+      <p>廣告內容由第三方廣告服務商自動產生，<strong>不代表本站之立場、推薦或背書</strong>。本站不對廣告內容之準確性或合法性負責，用戶點擊廣告後所進行的任何行為，概由用戶自行承擔。</p>
+      <p>如對廣告個人化設定有疑慮，可至 <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google 廣告設定</a> 頁面調整，或透過瀏覽器安裝廣告攔截套件自行管理。</p>
+    </div>
+  </div>
+
+  <div class="doc-card">
+    <div class="sec-num">About · 04</div>
+    <div class="sec-title">聯絡方式</div>
+    <div class="doc-body">
+      <p>如有功能建議或錯誤回報，歡迎透過以下方式聯繫：</p>
+      <div class="contact-grid">
+        <div class="contact-row clickable" onclick="window.location.href='mailto:llowoll5566@gmail.com'" title="點擊寄送 Email">
+          <div class="c-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="c-label">EMAIL</div>
+            <div class="c-val" style="text-decoration:underline;text-underline-offset:3px;">llowoll5566@gmail.com</div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>
+    <div class="footer-brand">盤後雷達 · JELLYSTOCK</div>
+    <div class="footer-copy">© 2026 JellyStock. All rights reserved.</div>
+    <div class="footer-unofficial">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</div>
+  </div>
+  <nav class="footer-nav">
+    <a href="/stock_site/legal/about.html" class="active">關於本站</a>
+    <a href="/stock_site/legal/privacy.html">隱私政策</a>
+    <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+    <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com"  target="_blank" rel="noopener noreferrer">聯絡我們</a>
+  </nav>
+</footer>
+
+<script>
+// 跨頁面主題同步
+(function(){
+  function applyPageTheme(t){
+    if(t==='day') document.body.classList.add('theme-day');
+    else document.body.classList.remove('theme-day');
+  }
+  // 讀取已儲存的主題
+  try {
+    const uid = Object.keys(localStorage).find(k=>k.startsWith('jls_'));
+    if(uid){const s=JSON.parse(localStorage.getItem(uid)||'{}');if(s.theme)applyPageTheme(s.theme);}
+  } catch(e){}
+  // 監聽其他分頁切換
+  try {
+    const bc = new BroadcastChannel('jellystock_theme');
+    bc.onmessage = function(e){ if(e.data&&e.data.theme) applyPageTheme(e.data.theme); };
+  } catch(e){}
+})();
+</script>
+
+<script>
+/* ── JellyStock 全站主題同步（與 index.html 一致）── */
+(function() {
+  // 優先讀 jelly_global_theme（與 index.html 同一個 key）
+  const saved = localStorage.getItem('jelly_global_theme') ||
+                localStorage.getItem('jelly_theme') || 'space';
+  document.body.classList.remove('theme-day', 'theme-forest');
+  if (saved === 'day')    document.body.classList.add('theme-day');
+  if (saved === 'forest') document.body.classList.add('theme-forest');
+
+  // 監聽來自 index.html 的主題廣播
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const bc = new BroadcastChannel('jellystock_theme');
+      bc.onmessage = (e) => {
+        const theme = e.data && e.data.theme;
+        if (!theme) return;
+        document.body.classList.remove('theme-day', 'theme-forest');
+        if (theme === 'day')    document.body.classList.add('theme-day');
+        if (theme === 'forest') document.body.classList.add('theme-forest');
+        localStorage.setItem('jelly_global_theme', theme);
+      };
+    } catch(e) {}
+  }
+})();
+</script>
+
+<!-- ── 維護模式遮罩 ── -->
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+    <div style="margin-top:22px;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:rgba(0,229,255,.35);text-transform:uppercase;">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+  </div>
+</div>
+<script>
+/* ── 維護模式輪詢（所有子頁面共用）── */
+(function() {
+  const API_BASE = window.location.origin;
+  const overlay  = document.getElementById('maintenanceOverlay');
+  function check() {
+    fetch(API_BASE + '/api/maintenance?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var msg = document.getElementById('maintMsgText');
+        if (msg && d.message) msg.textContent = d.message;
+        if (d.enabled) {
+          overlay.style.display = 'flex';
+        } else {
+          overlay.style.display = 'none';
+        }
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(check, 30000); });
+  }
+  check();
+})();
+</script>
+
+</body>
+</html>

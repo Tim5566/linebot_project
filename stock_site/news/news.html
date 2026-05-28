@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226"
+       crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>重大訊息 — JellyStock 盤後雷達</title>
+  <meta name="description" content="台股上市上櫃今日重大訊息公告，資料來源 TWSE、TPEx 官方，即時更新。"/>
+  <meta property="og:title" content="重大訊息 — JellyStock 盤後雷達"/>
+  <meta property="og:description" content="台股上市上櫃今日重大訊息公告，資料來源 TWSE、TPEx 官方。"/>
+  <meta property="og:image" content="/images/jelly.png"/>
+  <link rel="icon" type="image/png" href="/images/jelly.png"/>
+  <link rel="apple-touch-icon" href="/images/jelly.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#03060d; --surface:#070d1a; --surface2:#0b1220;
+      --border:rgba(0,229,255,.1); --accent:#00e5ff; --green:#00e676;
+      --red:#ff3d5a; --yellow:#ffd600;
+      --text:#d4e4f7; --text-dim:#9ab8d4; --text-faint:#5a7a98;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html,body{ background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; min-height:100vh; overflow-x:hidden;
+      scrollbar-width:thin; scrollbar-color:rgba(0,229,255,.2) transparent; }
+    body::-webkit-scrollbar { width:5px; }
+    body::-webkit-scrollbar-thumb { background:rgba(0,229,255,.18); border-radius:4px; }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 16px; height: 58px;
+      border-bottom: 1px solid rgba(0,229,255,.09);
+      background: rgba(3,6,14,.97);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg,transparent 0%,rgba(0,229,255,.7) 20%,rgba(0,170,255,.9) 50%,rgba(0,229,255,.7) 80%,transparent 100%);
+      background-size: 200% 100%;
+      animation: headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep { from{background-position:-100% 0} to{background-position:200% 0} }
+    .header-left { display:flex; align-items:center; }
+    .header-right { display:flex; align-items:center; gap:12px; }
+    .logo { display:flex; align-items:center; gap:14px; margin-left:4px; }
+    .logo-icon { width:40px; height:40px; border-radius:9px; display:grid; place-items:center; position:relative; flex-shrink:0; overflow:visible; }
+    .logo-text { font-family:'Orbitron',monospace; font-size:.88rem; font-weight:700; letter-spacing:.08em; color:#fff; text-shadow:0 0 20px rgba(0,229,255,.4); }
+    .logo-sub { font-family:'Share Tech Mono',monospace; font-size:.5rem; color:var(--accent); letter-spacing:.22em; opacity:.65; margin-top:2px; }
+    .btn-back {
+      display:flex; align-items:center; gap:7px;
+      padding:6px 14px; border-radius:20px;
+      border:1px solid rgba(0,229,255,.18);
+      background:rgba(0,229,255,.05);
+      color:var(--text-dim); font-family:'Share Tech Mono',monospace;
+      font-size:.68rem; letter-spacing:.08em; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .btn-back:hover { color:var(--accent); border-color:rgba(0,229,255,.35); background:rgba(0,229,255,.1); }
+    .btn-back svg { width:14px; height:14px; }
+
+    #subClock {
+      font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      color:var(--accent); letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px; padding:5px 14px;
+      white-space:nowrap;
+    }
+    body.theme-day #subClock {
+      color:#0a3a7a; text-shadow:none;
+      background:rgba(10,60,160,.05);
+      border-color:rgba(10,60,160,.16);
+    }
+
+    /* Main */
+    main{ max-width:900px; margin:0 auto; padding:28px 16px 60px; }
+
+    /* Page Title */
+    .page-title-wrap{ margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(0,229,255,.12); }
+    .page-tag{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--accent); letter-spacing:.3em; opacity:.85; margin-bottom:6px; }
+    .page-title{ font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:.04em; text-shadow:0 0 40px rgba(0,229,255,.3); margin-bottom:6px; }
+    .page-desc{ font-size:.74rem; color:var(--text-faint); line-height:1.6; font-family:'Share Tech Mono',monospace; letter-spacing:.03em; }
+    .page-desc .sep { margin:0 6px; opacity:.4; }
+
+    /* Filter bar */
+    .filter-bar{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-btn{
+      font-family:'Share Tech Mono',monospace; font-size:.66rem; letter-spacing:.1em;
+      padding:6px 15px; border-radius:20px; cursor:pointer;
+      border:1px solid rgba(0,229,255,.14); background:rgba(0,229,255,.03); color:var(--text-dim);
+      transition:all .2s; line-height:1;
+    }
+    .filter-btn.active{ color:var(--accent); border-color:rgba(0,229,255,.4); background:rgba(0,229,255,.08); box-shadow:0 0 10px rgba(0,229,255,.1); }
+    .filter-btn:hover:not(.active){ color:var(--text); border-color:rgba(0,229,255,.25); background:rgba(0,229,255,.05); }
+    .mops-global-btn{
+      margin-left:auto; display:flex; align-items:center; gap:7px;
+      font-family:'Share Tech Mono',monospace; font-size:.64rem; letter-spacing:.08em;
+      padding:6px 14px; border-radius:20px; text-decoration:none; white-space:nowrap;
+      color:var(--accent); border:1px solid rgba(0,229,255,.28);
+      background:rgba(0,229,255,.05); line-height:1;
+      transition:all .2s;
+    }
+    .mops-global-btn:hover{ background:rgba(0,229,255,.11); border-color:rgba(0,229,255,.5); box-shadow:0 0 12px rgba(0,229,255,.15); }
+
+    /* Stats */
+    .stats-bar{
+      display:flex; gap:10px; align-items:center; margin-bottom:14px;
+      font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint);
+      letter-spacing:.05em; flex-wrap:wrap; padding:8px 2px;
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .stats-bar strong{ color:var(--accent); font-size:.68rem; }
+    .stats-divider{ color:rgba(0,229,255,.22); }
+
+    /* News list */
+    .news-list{ display:flex; flex-direction:column; gap:5px; }
+
+    .news-card{
+      display:flex; align-items:stretch;
+      border-radius:9px;
+      background:var(--surface); border:1px solid rgba(0,229,255,.06);
+      color:inherit; position:relative; overflow:hidden;
+      transition:transform .12s, border-color .15s, box-shadow .15s;
+      cursor:default;
+    }
+    .news-card:hover { border-color:rgba(0,229,255,.1); box-shadow:none; }
+
+    /* 左側彩色邊條 */
+    .news-card::before{
+      content:''; flex-shrink:0; width:3px; align-self:stretch;
+      background:var(--src-color,var(--accent));
+    }
+
+    .label-twse{ --src-color:#00e5ff; }
+    .label-otc { --src-color:#06d6a0; }
+
+    /* 左側欄 */
+    .card-left{
+      flex-shrink:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:5px; width:64px; padding:13px 0;
+      border-right:1px solid rgba(0,229,255,.07);
+    }
+    .card-code{
+      font-family:'Share Tech Mono',monospace; font-size:.88rem;
+      font-weight:700; color:#fff; letter-spacing:.04em;
+      text-shadow:0 0 10px rgba(0,229,255,.22);
+    }
+    .label-otc .card-code{ text-shadow:0 0 10px rgba(6,214,160,.22); }
+    .src-badge{
+      font-family:'Share Tech Mono',monospace; font-size:.46rem; letter-spacing:.1em;
+      padding:2px 5px; border-radius:3px;
+      color:var(--src-color,var(--accent));
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.16);
+      white-space:nowrap;
+    }
+    .label-otc .src-badge{ color:#06d6a0; background:rgba(6,214,160,.05); border-color:rgba(6,214,160,.2); }
+
+    .card-body{ flex:1; min-width:0; padding:13px 16px; }
+    .card-meta{ display:flex; align-items:baseline; gap:7px; margin-bottom:5px; flex-wrap:wrap; }
+    .card-name{ font-size:.86rem; font-weight:700; color:#fff; letter-spacing:.02em; }
+    .card-sep{ color:var(--text-faint); font-size:.65rem; }
+    .card-time{ font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); }
+    .card-title{ font-size:.8rem; color:var(--text-dim); line-height:1.62; }
+
+    /* State boxes */
+    .state-box{
+      text-align:center; padding:56px 20px;
+      font-family:'Share Tech Mono',monospace; font-size:.74rem; color:var(--text-faint); letter-spacing:.06em;
+      border:1px solid rgba(0,229,255,.07); border-radius:12px; background:var(--surface);
+    }
+    .state-icon{ font-size:2rem; margin-bottom:12px; }
+    .spinner{ width:26px; height:26px; margin:0 auto 14px; border:2px solid rgba(0,229,255,.13); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin{ to{transform:rotate(360deg)} }
+
+    /* Footer note */
+    .footer-note{
+      margin-top:24px; padding:12px 16px;
+      background:rgba(0,229,255,.03); border:1px solid rgba(0,229,255,.08); border-radius:8px;
+      font-family:'Share Tech Mono',monospace; font-size:.6rem; color:var(--text-faint); letter-spacing:.04em; line-height:1.75;
+    }
+
+    @media(max-width:600px){
+      header{ padding:0 12px; height:54px; }
+      .logo-text{ font-size:.72rem; }
+      .logo-sub{ display:none; }
+      .btn-back{ font-size:.62rem; padding:5px 10px; }
+      main{ padding:16px 12px 60px; }
+      .page-title{ font-size:1.05rem; }
+      .filter-btn{ font-size:.6rem; padding:5px 10px; }
+      .mops-global-btn{ font-size:.58rem; padding:5px 10px; }
+      .card-left{ width:54px; }
+      .card-code{ font-size:.8rem; }
+      .src-badge{ font-size:.43rem; }
+      .card-body{ padding:10px 12px; }
+      .card-name{ font-size:.82rem; }
+      .card-title{ font-size:.76rem; }
+    }
+
+    /* ═══ 白天主題 ═══ */
+    body.theme-day {
+      --bg:#b8d4ec; --surface:rgba(255,255,255,.96); --surface2:rgba(232,246,255,.94);
+      --border:rgba(10,60,120,.18); --accent:#0a52a0; --green:#0d6e2a;
+      --red:#a02818; --text:#071628; --text-dim:#1a3a5c; --text-faint:#3a6080;
+      background: linear-gradient(170deg,#5aaee0 0%,#7dcaf5 22%,#a8dcfc 45%,#c8eefa 65%,#daf4f0 85%,#e6f8ec 100%);
+    }
+    body.theme-day header { background:rgba(255,255,255,.88); backdrop-filter:blur(24px) saturate(2); border-bottom:1px solid rgba(10,80,160,.14); box-shadow:0 2px 24px rgba(10,60,140,.12); }
+    body.theme-day header::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.7),rgba(26,123,191,.5),transparent); background-size:200% 100%; }
+    body.theme-day .logo-text { color:#050f1e; text-shadow:none; }
+    body.theme-day .logo-sub  { color:#0a52a0; opacity:.9; }
+    body.theme-day .btn-back  { background:rgba(10,80,160,.08); border-color:rgba(10,80,160,.22); color:#0a3060; }
+    body.theme-day .btn-back:hover { background:rgba(10,80,160,.16); border-color:rgba(10,80,160,.42); color:#061830; }
+    body.theme-day .page-title-wrap { border-bottom-color:rgba(10,60,120,.16); }
+    body.theme-day .page-tag   { color:#0a3a70; font-weight:700; }
+    body.theme-day .page-title { color:#040e1c; text-shadow:none; }
+    body.theme-day .page-desc  { color:#3a6080; }
+    body.theme-day .filter-btn { color:#0a2a4a; border-color:rgba(10,60,120,.24); background:rgba(255,255,255,.6); }
+    body.theme-day .filter-btn.active { color:#fff; border-color:#0a4a8a; background:#0a4a8a; box-shadow:0 2px 12px rgba(10,74,138,.3); }
+    body.theme-day .filter-btn:hover:not(.active) { color:#071628; background:rgba(255,255,255,.85); }
+    body.theme-day .mops-global-btn { color:#0a4a8a; border-color:rgba(10,74,138,.35); background:rgba(10,74,138,.08); }
+    body.theme-day .mops-global-btn:hover { background:rgba(10,74,138,.15); border-color:rgba(10,74,138,.55); }
+    body.theme-day .stats-bar { color:#2a5070; border-bottom-color:rgba(10,60,120,.12); }
+    body.theme-day .stats-bar strong { color:#0a3a7a; }
+    body.theme-day .stats-divider { color:rgba(10,60,120,.25); }
+    body.theme-day .news-card { background:rgba(255,255,255,.97); border-color:rgba(10,60,120,.12); box-shadow:0 1px 4px rgba(10,40,100,.06); }
+    body.theme-day .news-card:hover { border-color:rgba(10,60,120,.12); box-shadow:none; }
+    body.theme-day .label-twse { --src-color:#0a52a0; }
+    body.theme-day .label-otc  { --src-color:#0a7030; }
+    body.theme-day .card-left { border-right-color:rgba(10,60,120,.1); }
+    body.theme-day .card-code { color:#071628; text-shadow:none; font-weight:800; }
+    body.theme-day .src-badge { color:#0a52a0; background:rgba(10,82,160,.08); border-color:rgba(10,82,160,.25); }
+    body.theme-day .label-otc .src-badge { color:#0a7030; background:rgba(10,112,48,.08); border-color:rgba(10,112,48,.25); }
+    body.theme-day .card-name  { color:#040e1c; }
+    body.theme-day .card-sep   { color:#6090b8; }
+    body.theme-day .card-time  { color:#3a6080; }
+    body.theme-day .card-title { color:#1a3a5c; }
+    body.theme-day .state-box  { background:rgba(255,255,255,.92); border-color:rgba(10,60,120,.12); color:#2a5070; }
+    body.theme-day .footer-note { background:rgba(255,255,255,.45); border-color:rgba(10,60,120,.12); color:#3a6080; }
+  
+    /* ── Site-wide footer (sf-*) ── */
+    #site-footer { position:relative; z-index:10; border-top:1px solid rgba(0,229,255,.08); background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99)); box-shadow:0 -2px 30px rgba(0,0,0,.4); margin-top:40px; }
+    .sf-inner { padding:20px 40px 24px; display:flex; flex-direction:column; gap:8px; }
+    .sf-disclaimer { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:rgba(122,154,184,.6); line-height:1.7; text-align:center; margin:0; }
+    .sf-links { display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; margin-top:4px; }
+    .sf-links a { color:rgba(0,229,255,.6); font-size:.7rem; font-family:'Share Tech Mono',monospace; text-decoration:none; transition:color .2s; }
+    .sf-links a:hover { color:#00e5ff; }
+    .sf-sep { color:rgba(0,229,255,.2); }
+    .sf-copy { text-align:center; font-family:'Share Tech Mono',monospace; font-size:.6rem; color:rgba(122,154,184,.3); margin:6px 0 0; }
+    /* Day theme overrides */
+    body.theme-day #site-footer { background:rgba(240,247,255,.97) !important; border-top-color:rgba(26,123,191,.14) !important; box-shadow:0 -2px 16px rgba(26,100,180,.07) !important; }
+    body.theme-day .sf-disclaimer { color:#4a7090 !important; }
+    body.theme-day .sf-links a { color:#1a7bbf !important; }
+    body.theme-day .sf-links a:hover { color:#0d5fa0 !important; }
+    body.theme-day .sf-sep { color:rgba(26,123,191,.3) !important; }
+    body.theme-day .sf-copy { color:#7a9cb8 !important; }
+
+    /* ── Google AdSense 廣告容器 ── */
+    .ad-unit {
+      display: block;
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+    }
+    /* 標準 margin 版本（章節頁、資訊頁） */
+    .ad-unit-gap { margin: 28px 0; }
+    /* 輕量版：工具頁面，廣告間距更緊湊，不影響工具操作感 */
+    .ad-unit-tool { margin: 20px 0; }
+    .ad-unit-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 4px;
+      opacity: .5;
+      text-transform: uppercase;
+    }
+    .ad-unit ins { display: block; margin: 0 auto; }
+    /* 淡分隔線 */
+    .ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 0 0 4px;
+    }
+    body.theme-day .ad-unit-label { color: #5a8ab8; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" style="width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">重大訊息公告</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="page-title-wrap">
+    <div class="page-tag">MAJOR ANNOUNCEMENT · 重大訊息</div>
+    <div class="page-title">今日重大訊息公告</div>
+    <div class="page-desc">
+      資料來源：TWSE 上市 / TPEx 上櫃 官方公告
+      <span class="sep">·</span>
+      點擊可至公開資訊觀測站查看詳細內容
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterNews('all', this)">全部</button>
+    <button class="filter-btn" onclick="filterNews('TWSE', this)">上市（TWSE）</button>
+    <button class="filter-btn" onclick="filterNews('OTC', this)">上櫃（OTC）</button>
+    <a class="mops-global-btn" href="https://mopsov.twse.com.tw/mops/web/t05sr01_1" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      MOPS 查詢站
+    </a>
+  </div>
+
+  <div class="stats-bar">
+    <span>共 <strong id="newsCount">--</strong> 則公告</span>
+    <span class="stats-divider">·</span>
+    <span>日期：<strong id="newsDate">--</strong></span>
+  </div>
+
+
+  <div class="news-list" id="newsList">
+    <div class="state-box">
+      <div class="spinner"></div>
+      正在載入今日重大訊息...
+    </div>
+  </div>
+
+
+</main>
+
+<script>
+let _allNews = [];
+let _activeFilter = 'all';
+let _renderedCount = 0;
+const PAGE_SIZE = 50;
+
+// ── 前端 sessionStorage 快取（同一個 tab 不重複打 API）──────────
+// 後端 /api/news 建議也做 server-side 快取（memory 或檔案），
+// 每 5 分鐘更新一次，這樣不管多少用戶進來都只打一次上游 TWSE/TPEx。
+const CACHE_KEY   = 'jelly_news_cache';
+const CACHE_TTL   = 5 * 60 * 1000; // 5 分鐘
+const REFRESH_MS  = 20 * 60 * 1000;
+let _refreshTimer = null;
+
+async function loadNews(forceRefresh = false) {
+  // 嘗試從 sessionStorage 讀快取
+  if (!forceRefresh) {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const cache = JSON.parse(raw);
+        if (Date.now() - cache.ts < CACHE_TTL) {
+          _allNews = cache.data;
+          setDate(cache.date);
+          renderNews();
+          clearTimeout(_refreshTimer);
+          _refreshTimer = setTimeout(() => loadNews(true), REFRESH_MS);
+          return; // 命中快取，直接返回
+        }
+      }
+    } catch(e) {}
+  }
+
+  document.getElementById('newsList').innerHTML = `
+    <div class="state-box"><div class="spinner"></div>正在載入今日重大訊息...</div>`;
+  try {
+    const res  = await fetch('/api/news');
+    const data = await res.json();
+
+    _allNews = data.data || [];
+
+    // 寫入 sessionStorage 快取
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        ts: Date.now(), data: _allNews, date: data.date || ''
+      }));
+    } catch(e) {}
+
+    setDate(data.date || '');
+    renderNews();
+  } catch(e) {
+    document.getElementById('newsList').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">⚠️</div>
+        載入失敗，請稍後再試
+      </div>`;
+  }
+
+  clearTimeout(_refreshTimer);
+  _refreshTimer = setTimeout(() => loadNews(true), REFRESH_MS);
+}
+
+function setDate(d) {
+  if (d && d.length === 8) {
+    document.getElementById('newsDate').textContent =
+      `${d.slice(0,4)}/${d.slice(4,6)}/${d.slice(6,8)}`;
+  }
+}
+
+function getFilteredList() {
+  return _activeFilter === 'all'
+    ? _allNews
+    : _allNews.filter(n => n.source === _activeFilter);
+}
+
+function cardHTML(n, globalIdx) {
+  return `
+    <div class="news-card label-${n.source.toLowerCase()}">
+      <div class="card-left">
+        <span class="card-code">${n.code || '--'}</span>
+        <span class="src-badge">${n.label}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-name">${n.name || '--'}</span>
+          <span class="card-sep">·</span>
+          <span class="card-time">${n.time || ''}</span>
+        </div>
+        <div class="card-title">${n.title || '--'}</div>
+      </div>
+    </div>`;
+}
+
+function renderNews() {
+  const list = getFilteredList();
+  _renderedCount = 0;
+
+  document.getElementById('newsCount').textContent = list.length;
+
+  if (!list.length) {
+    document.getElementById('newsList').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">📭</div>
+        今日尚無重大訊息公告
+      </div>`;
+    return;
+  }
+
+  const batch = list.slice(0, PAGE_SIZE);
+  _renderedCount = batch.length;
+  document.getElementById('newsList').innerHTML =
+    batch.map((n, i) => cardHTML(n, i)).join('') +
+    (_renderedCount < list.length ? `<div id="load-sentinel" style="height:40px;"></div>` : '');
+
+  setupSentinel(list);
+}
+
+function appendMore(list) {
+  const sentinel = document.getElementById('load-sentinel');
+  if (!sentinel) return;
+
+  const batch = list.slice(_renderedCount, _renderedCount + PAGE_SIZE);
+  if (!batch.length) { sentinel.remove(); return; }
+
+  const startIdx = _renderedCount;
+  batch.forEach((n, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = cardHTML(n, startIdx + i);
+    sentinel.before(div.firstElementChild);
+  });
+  _renderedCount += batch.length;
+
+  if (_renderedCount >= list.length) sentinel.remove();
+}
+
+function setupSentinel(list) {
+  const sentinel = document.getElementById('load-sentinel');
+  if (!sentinel) return;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) appendMore(list);
+  }, { rootMargin: '200px' });
+  obs.observe(sentinel);
+}
+
+function filterNews(id, btn) {
+  _activeFilter = id;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNews();
+}
+
+
+
+// 開啟 MOPS 單筆公告（前端 POST，從用戶瀏覽器直接送出）
+function openDetail(idx) {
+  const list = _activeFilter === 'all'
+    ? _allNews
+    : _allNews.filter(n => n.source === _activeFilter);
+  const n = list[idx];
+  if (!n) return;
+
+  const skey = n.skey || '';
+
+  // 有 skey 才用 POST 開單筆，否則開公司列表（舊版 MOPS 格式）
+  if (!skey) {
+    // 用舊版 mopsov 網址，直接帶 co_id 查詢該公司今日公告
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://mopsov.twse.com.tw/mops/web/t05sr01_1';
+    form.target = '_blank';
+    const fields = {
+      step: '0', firstin: 'true', off: '1',
+      TYPEK: 'all', newstuff: '1',
+      co_id: n.code, COMPANY_ID: n.code,
+      COMPANY_NAME: n.name, stp: '1',
+    };
+    Object.entries(fields).forEach(([k,v]) => {
+      const inp = document.createElement('input');
+      inp.type='hidden'; inp.name=k; inp.value=v;
+      form.appendChild(inp);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    return;
+  }
+
+  // 解析 skey 取得各參數
+  const co_id     = n.code;
+  const spokeTime = (n.time || '').replace(/:/g, '');
+  // skey 格式：公司代號 + 日期8碼 + 序號
+  const dateStart = co_id.length;
+  const spokeDate = skey.slice(dateStart, dateStart + 8);
+  const seqNo     = skey.slice(dateStart + 8) || '1';
+
+  // 動態建立 POST 表單，從瀏覽器直接送出到 MOPS
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://mopsov.twse.com.tw/mops/web/ajax_t05sr01_1';
+  form.target = '_blank';
+
+  const fields = {
+    step:         '1',
+    firstin:      'true',
+    off:          '1',
+    TYPEK:        'all',
+    co_id:        co_id,
+    COMPANY_ID:   co_id,
+    COMPANY_NAME: n.name,
+    SPOKE_DATE:   spokeDate,
+    SPOKE_TIME:   spokeTime,
+    SEQ_NO:       seqNo,
+    skey:         skey,
+    newstuff:     '1',
+    hhc_co_name:  n.name,
+    stp:          '1',
+  };
+
+  Object.entries(fields).forEach(([k, v]) => {
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = k; inp.value = v;
+    form.appendChild(inp);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
+// ── 主題同步（與主站、chapter 頁共用）──────────────────────────
+(function() {
+  function applyTheme(theme) {
+    if (theme === 'day') {
+      document.body.classList.add('theme-day');
+    } else {
+      document.body.classList.remove('theme-day');
+    }
+  }
+
+  // 讀取全域主題（與主頁共用 key）
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+
+  // 監聽其他分頁的主題切換（BroadcastChannel）
+  try {
+    var _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = function(e) {
+      if (e.data && e.data.theme) applyTheme(e.data.theme);
+    };
+  } catch(e) {}
+
+  // storage 事件：同 session 其他頁更改主題時同步
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme') {
+      applyTheme(e.newValue || 'space');
+    }
+  });
+})();
+
+loadNews();
+</script>
+<script>
+(function() {
+  function tick() {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const pad = n => String(n).padStart(2, '0');
+    const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+<!-- ── FOOTER ── -->
+
+<!-- ── AdSense 廣告位：重大訊息 — 頁面底部、footer 之前 ── -->
+<div class="ad-unit ad-unit-gap">
+  <p class="ad-unit-label">贊助商廣告</p>
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-8975741363002226"
+       data-ad-slot="2468050115"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+<hr class="ad-divider">
+<footer id="site-footer">
+  <div class="sf-inner">
+    <p class="sf-disclaimer">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div class="sf-links">
+      <a href="/stock_site/legal/about.html">關於本站</a>
+      <span class="sf-sep">·</span>
+      <a href="/stock_site/legal/privacy.html">隱私政策</a>
+      <span class="sf-sep">·</span>
+      <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+      <span class="sf-sep">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
+    </div>
+    <p class="sf-copy">© 2026 JellyStock. All rights reserved.</p>
+  </div>
+</footer>
+
+
+<!-- ── 維護模式遮罩 ── -->
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+    <div style="margin-top:22px;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:rgba(0,229,255,.35);text-transform:uppercase;">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+  </div>
+</div>
+<script>
+/* ── 維護模式輪詢（所有子頁面共用）── */
+(function() {
+  const API_BASE = window.location.origin;
+  const overlay  = document.getElementById('maintenanceOverlay');
+  function check() {
+    fetch(API_BASE + '/api/maintenance?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var msg = document.getElementById('maintMsgText');
+        if (msg && d.message) msg.textContent = d.message;
+        if (d.enabled) {
+          overlay.style.display = 'flex';
+        } else {
+          overlay.style.display = 'none';
+        }
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(check, 30000); });
+  }
+  check();
+})();
+</script>
+
+</body>
+</html>
