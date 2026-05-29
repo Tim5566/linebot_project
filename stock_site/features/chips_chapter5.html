@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="apple-touch-icon" href="/images/jelly.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第五章：自營商的避險與裸部位判讀 — 籌碼分析教學</title>
+  <meta name="description" content="自行買賣 vs 避險帳戶分拆解讀。掌握自營商真實方向判讀，學會從裸部位變化識別機構對後市的隱性態度。籌碼分析教學第五章。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ch-color: var(--accent);
+      --ch-rgb: 0,229,255;
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;
+      --red:       #ff3d5a;
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+    }
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle { 0%{opacity:.6}50%{opacity:.85}100%{opacity:.7} }
+
+    .sticky-progress {
+      position:sticky;top:58px;z-index:190;
+      background:rgba(3,6,14,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{
+      height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));
+      box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;
+    }
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:36px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero-icon {
+      flex-shrink:0;width:110px;height:110px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);
+      border-radius:20px;position:relative;overflow:hidden;
+    }
+    .hero-content{flex:1;min-width:0;}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--accent);text-transform:uppercase;
+      opacity:.8;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(0,229,255,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;
+      border:1px solid;cursor:default;transition:all .2s;
+    }
+    .tag:hover{transform:translateY(-1px);filter:brightness(1.15);}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);
+      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+      transition:transform .25s,box-shadow .3s,border-color .3s;
+    }
+    .section-card:hover{transform:translateY(-2px);box-shadow:0 12px 50px rgba(0,0,0,.55),0 0 30px rgba(0,229,255,.06);border-color:rgba(0,229,255,.18);}
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .5s,transform .5s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .section-header {
+      display:flex;align-items:center;gap:16px;
+      padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);
+      position:relative;
+    }
+    .section-header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.35),transparent);
+    }
+    .section-num {
+      font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.22);border-radius:8px;
+      padding:4px 10px;letter-spacing:.1em;white-space:nowrap;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+      color:#fff;letter-spacing:.06em;
+    }
+    .section-icon{margin-left:auto;font-size:1.4rem;opacity:.7;}
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--accent);font-style:normal;font-weight:500;}
+
+    /* ── BOXES ── */
+    .insight-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(0,170,255,.03));
+      border:1px solid rgba(0,229,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+    .warn-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warn-box .insight-label{color:var(--red);}
+    .gold-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,200,0,.03));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow);}
+    .purple-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));
+      border:1px solid rgba(178,102,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .purple-box .insight-label{color:var(--purple);}
+    .success-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,200,90,.02));
+      border:1px solid rgba(0,230,118,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .success-box .insight-label{color:var(--green);}
+    .cyan-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.02));
+      border:1px solid rgba(0,229,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .cyan-box .insight-label{color:var(--accent);}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{
+      background:rgba(0,229,255,.07);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+      padding:12px 16px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;
+    }
+    .cmp-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+      color:var(--text-dim);vertical-align:top;line-height:1.6;
+    }
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .cmp-table .val-red{color:var(--red);font-weight:600;}
+    .cmp-table .val-green{color:var(--green);font-weight:600;}
+    .cmp-table .val-yellow{color:var(--yellow);font-weight:600;}
+    .cmp-table .val-cyan{color:var(--accent);font-weight:600;}
+    .cmp-table .val-purple{color:var(--purple);font-weight:600;}
+    .cmp-table .val-orange{color:var(--orange);font-weight:600;}
+
+    /* ── FORCE METER ── */
+    .force-meter-wrap{margin:24px 0;}
+    .force-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .force-label{font-size:.82rem;color:var(--text-dim);min-width:160px;}
+    .force-bar-bg{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;}
+    .force-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+    .force-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);min-width:36px;text-align:right;}
+
+    /* ── SHADOW LINE ── */
+    .shadow-line{
+      display:flex;align-items:stretch;gap:0;
+      margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,229,255,.1);
+    }
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.up{background:linear-gradient(180deg,var(--red),rgba(255,61,90,.4));}
+    .sl-side.dn{background:linear-gradient(180deg,var(--green),rgba(0,230,118,.4));}
+    .sl-side.neu{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.4));}
+    .sl-side.pu{background:linear-gradient(180deg,var(--purple),rgba(178,102,255,.4));}
+    .sl-side.cy{background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.4));}
+    .sl-body{padding:16px 20px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;margin-bottom:6px;}
+    .sl-top.up{color:var(--red);}
+    .sl-top.dn{color:var(--green);}
+    .sl-top.neu{color:var(--yellow);}
+    .sl-top.pu{color:var(--purple);}
+    .sl-top.cy{color:var(--accent);}
+    .sl-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+    .sl-text strong{color:var(--text);}
+
+    /* ── DIVIDER ── */
+    .sec-divider{
+      text-align:center;margin:28px 0 22px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.3em;color:var(--text-faint);
+      display:flex;align-items:center;gap:14px;
+    }
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── CHIP ── */
+    .chip{
+      display:inline-block;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;
+      padding:3px 10px;border-radius:6px;letter-spacing:.05em;
+      vertical-align:middle;margin:0 2px;
+    }
+    .chip-red{background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .chip-orange{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+
+    /* ── FLOW STEP ── */
+    .flow-step {
+      display:flex;align-items:flex-start;gap:18px;
+      padding:18px 20px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.1);background:rgba(0,0,0,.2);
+      margin:10px 0;transition:all .22s;
+    }
+    .flow-step:hover{border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.04);}
+    .flow-num{
+      flex-shrink:0;width:32px;height:32px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',monospace;font-size:.68rem;font-weight:700;
+    }
+    .cn{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .rn{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .gn{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.28);color:var(--green);}
+    .yn{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.28);color:var(--yellow);}
+    .pn{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.28);color:var(--purple);}
+    .flow-content{flex:1;}
+    .flow-heading{font-weight:700;color:var(--text);font-size:.9rem;margin-bottom:4px;}
+    .flow-sub{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── SIGNAL GRID ── */
+    .signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0;}
+    .signal-card{
+      border-radius:14px;padding:18px 20px;
+      background:rgba(0,0,0,.2);
+      border:1px solid rgba(0,229,255,.1);
+      transition:all .22s;
+    }
+    .signal-card:hover{border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.04);}
+    .signal-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .signal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .signal-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;}
+    .signal-body{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── ACCOUNT SPLIT CARD ── */
+    .acct-split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0;}
+    .acct-card{
+      border-radius:16px;padding:22px 18px;
+      position:relative;overflow:hidden;transition:all .25s;
+    }
+    .acct-card:hover{transform:translateY(-3px);}
+    .acct-card.self{
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.02));
+      border:1px solid rgba(0,229,255,.22);
+    }
+    .acct-card.hedge{
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,200,0,.02));
+      border:1px solid rgba(255,214,0,.22);
+    }
+    .acct-icon{font-size:2rem;margin-bottom:12px;}
+    .acct-name{font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;margin-bottom:6px;letter-spacing:.06em;}
+    .acct-card.self .acct-name{color:var(--accent);}
+    .acct-card.hedge .acct-name{color:var(--yellow);}
+    .acct-en{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;opacity:.6;margin-bottom:10px;}
+    .acct-desc{font-size:.82rem;color:var(--text-dim);line-height:1.65;}
+    .acct-tag{
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      padding:3px 8px;border-radius:6px;display:inline-block;margin-top:10px;
+    }
+    .self .acct-tag{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.22);color:var(--accent);}
+    .hedge .acct-tag{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.22);color:var(--yellow);}
+
+    /* ── QUIZ ── */
+    .quiz-wrap{margin:24px 0;background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:22px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:16px;line-height:1.65;}
+    .quiz-opts{display:flex;flex-direction:column;gap:8px;}
+    .quiz-opt{
+      display:flex;align-items:center;gap:12px;
+      padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(0,229,255,.12);background:rgba(0,229,255,.03);
+      cursor:pointer;transition:all .18s cubic-bezier(.22,1,.36,1);
+      font-size:.88rem;color:var(--text-dim);
+    }
+    .quiz-opt:hover:not(.disabled){border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);color:var(--text);}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08);color:var(--green);}
+    .quiz-opt.wrong{border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.06);color:var(--red);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-letter{
+      width:28px;height:28px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.72rem;font-weight:700;
+      border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.06);color:var(--accent);
+      min-width:28px;
+    }
+    .quiz-feedback{
+      margin-top:14px;padding:12px 16px;border-radius:10px;
+      font-size:.84rem;line-height:1.7;display:none;
+    }
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ── SVG CHART WRAP ── */
+    .svg-chart-wrap{
+      width:100%;border-radius:14px;overflow:hidden;
+      border:1px solid rgba(0,229,255,.1);margin:20px 0;
+    }
+
+    /* ── NAKED POSITION GRID ── */
+    .naked-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+    .naked-card{
+      border-radius:14px;padding:18px 16px;text-align:center;
+      background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.07);
+      transition:all .22s;
+    }
+    .naked-card:hover{transform:translateY(-2px);}
+    .naked-card.bull{border-color:rgba(0,230,118,.25);background:rgba(0,230,118,.05);}
+    .naked-card.bear{border-color:rgba(255,61,90,.25);background:rgba(255,61,90,.05);}
+    .naked-card.neut{border-color:rgba(255,214,0,.2);background:rgba(255,214,0,.04);}
+    .naked-val{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;margin:8px 0;}
+    .naked-card.bull .naked-val{color:var(--green);}
+    .naked-card.bear .naked-val{color:var(--red);}
+    .naked-card.neut .naked-val{color:var(--yellow);}
+    .naked-title{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--text-faint);margin-bottom:6px;}
+    .naked-desc{font-size:.75rem;color:var(--text-dim);line-height:1.5;margin-top:8px;}
+
+    /* ── TIMELINE ── */
+    .timeline{position:relative;padding-left:28px;margin:24px 0;}
+    .timeline::before{
+      content:'';position:absolute;left:10px;top:8px;bottom:8px;width:2px;
+      background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.1));
+      border-radius:2px;
+    }
+    .tl-item{position:relative;margin-bottom:24px;}
+    .tl-dot{
+      position:absolute;left:-24px;top:4px;
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid;flex-shrink:0;background:var(--bg);
+    }
+    .tl-dot.cy{border-color:var(--accent);box-shadow:0 0 8px rgba(0,229,255,.5);}
+    .tl-dot.gn{border-color:var(--green);box-shadow:0 0 8px rgba(0,230,118,.5);}
+    .tl-dot.rd{border-color:var(--red);box-shadow:0 0 8px rgba(255,61,90,.5);}
+    .tl-dot.yn{border-color:var(--yellow);box-shadow:0 0 8px rgba(255,214,0,.4);}
+    .tl-dot.pu{border-color:var(--purple);box-shadow:0 0 8px rgba(178,102,255,.5);}
+    .tl-head{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.1em;margin-bottom:5px;}
+    .tl-head.cy{color:var(--accent);}
+    .tl-head.gn{color:var(--green);}
+    .tl-head.rd{color:var(--red);}
+    .tl-head.yn{color:var(--yellow);}
+    .tl-head.pu{color:var(--purple);}
+    .tl-body{font-size:.84rem;color:var(--text-dim);line-height:1.65;}
+    .tl-body strong{color:var(--text);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer {
+      margin-top:64px;padding:0;
+      background:linear-gradient(135deg,rgba(6,12,26,.99),rgba(4,8,18,.99));
+      border:1.5px solid rgba(0,229,255,.16);
+      border-radius:20px;overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 30px rgba(0,229,255,.04);
+    }
+    .chapter-footer::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,229,255,.6),var(--accent),transparent);
+    }
+    .footer-inner{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:28px 32px;gap:20px;flex-wrap:wrap;
+    }
+    .footer-left{display:flex;align-items:center;gap:18px;flex:1;min-width:0;}
+    .footer-complete-badge{
+      flex-shrink:0;width:42px;height:42px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(0,229,255,.14),rgba(0,229,255,.06));
+      border:1px solid rgba(0,229,255,.3);
+      display:grid;place-items:center;font-size:1.3rem;
+    }
+    .footer-complete-text{flex:1;min-width:0;}
+    .footer-complete-title{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:#fff;letter-spacing:.04em;margin-bottom:4px;}
+    .footer-complete-desc{font-size:.8rem;color:#7a9ab8;line-height:1.6;}
+    .footer-next-hint{font-size:.73rem;color:rgba(0,229,255,.8);margin-top:3px;font-family:'Share Tech Mono',monospace;letter-spacing:.04em;opacity:.75;}
+    .footer-right{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+    .fn-btn{display:flex;align-items:center;gap:9px;padding:11px 20px;border-radius:12px;font-family:'Share Tech Mono',monospace;font-size:.74rem;letter-spacing:.07em;cursor:pointer;text-decoration:none;transition:all .22s;white-space:nowrap;border:1.5px solid;}
+    .fn-btn svg{width:14px;height:14px;flex-shrink:0;}
+    .fn-btn.home{color:var(--purple);border-color:rgba(178,102,255,.35);background:rgba(178,102,255,.06);}
+    .fn-btn.home:hover{color:#c97fff;border-color:rgba(178,102,255,.6);background:rgba(178,102,255,.12);box-shadow:0 0 14px rgba(178,102,255,.2);}
+    .fn-btn.prev{color:#a0c8e8;border-color:rgba(0,229,255,.2);background:rgba(0,229,255,.05);}
+    .fn-btn.prev:hover{color:var(--accent);border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.12);box-shadow:0 0 14px rgba(0,229,255,.18);}
+    .fn-btn.next{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .fn-btn.next:hover{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.6);box-shadow:0 0 18px rgba(0,229,255,.22);}
+    @media(max-width:600px){.footer-inner{flex-direction:column;align-items:stretch;}.footer-right{justify-content:center;}.fn-btn{justify-content:center;}}
+
+    /* ══ UNIFIED HEADER ══ */
+    header{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 20px 0 14px;height:58px;
+      border-bottom:1px solid rgba(0,229,255,.09);
+      background:rgba(3,6,14,.97);
+      backdrop-filter:blur(24px);
+      box-shadow:0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--accent) 20%,rgba(0,170,255,.9) 50%,var(--accent) 80%,transparent);
+      background-size:200% 100%;animation:headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .header-left{display:flex;align-items:center;gap:0;}
+    .logo{display:flex;align-items:center;gap:12px;margin-left:2px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.92rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .btn-back{
+      display:flex;align-items:center;gap:7px;
+      padding:6px 16px;border-radius:20px;
+      border:1px solid rgba(0,229,255,.22);
+      background:rgba(0,229,255,.06);
+      color:#ffffff;font-family:'Share Tech Mono',monospace;
+      font-size:.7rem;letter-spacing:.07em;cursor:pointer;
+      text-decoration:none;transition:all .2s;
+    }
+    .btn-back:hover{color:var(--accent);background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 16px rgba(0,229,255,.2);}
+    .btn-back svg{width:12px;height:12px;flex-shrink:0;}
+    #subClock{
+      font-family:'Share Tech Mono',monospace;font-size:.75rem;
+      color:var(--accent);letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px;padding:5px 14px;
+      white-space:nowrap;
+    }
+
+    /* ══ SIDENAV ══ */
+    .chapter-sidenav {
+      position:fixed;left:0;top:50%;transform:translateY(-50%);
+      z-index:150;display:flex;flex-direction:column;
+      background:rgba(2,5,14,.98);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+      border:1.5px solid rgba(0,229,255,.28);border-left:none;
+      border-radius:0 18px 18px 0;overflow:hidden;
+      box-shadow:6px 0 40px rgba(0,0,0,.65),0 0 28px rgba(0,229,255,.08);
+      transition:box-shadow .3s,border-color .3s;min-width:48px;
+    }
+    .chapter-sidenav:hover{box-shadow:8px 0 50px rgba(0,0,0,.7),0 0 40px rgba(0,229,255,.12);border-color:rgba(0,229,255,.35);}
+    .chapter-sidenav::before{content:'';display:block;height:2px;flex-shrink:0;background:linear-gradient(90deg,transparent,rgba(0,229,255,.9),rgba(0,170,255,.5),transparent);}
+    .chapter-sidenav::after{content:'';display:block;height:2px;flex-shrink:0;margin-top:auto;background:linear-gradient(90deg,transparent,rgba(0,170,255,.5),rgba(0,170,255,.2),transparent);}
+    .ch-nav-item{
+      display:flex;align-items:center;padding:10px 14px 10px 12px;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.06em;
+      color:rgba(200,220,240,.85);text-decoration:none;cursor:pointer;
+      border-left:2.5px solid transparent;transition:all .22s ease;white-space:nowrap;
+      border-bottom:1px solid rgba(0,229,255,.06);position:relative;overflow:hidden;min-width:148px;
+    }
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.66rem;font-weight:700;flex-shrink:0;min-width:20px;color:rgba(180,210,235,.9);}
+    .ch-nav-item .ch-label{max-width:160px;overflow:hidden;font-size:.7rem;letter-spacing:.04em;color:rgba(220,235,250,.9);padding-left:8px;}
+    .ch-nav-item:hover{color:var(--accent);border-left-color:rgba(0,229,255,.6);background:rgba(0,229,255,.05);}
+    .ch-nav-item.current-ch{color:var(--accent);border-left-color:var(--accent);background:rgba(0,229,255,.08);}
+    .ch-nav-item.current-ch .ch-num{color:var(--accent);}
+    .ch-nav-item.current-ch::after{content:'';position:absolute;right:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+    .ch-nav-item.locked{opacity:.28;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MOBILE ── */
+    @media(max-width:640px){
+      body{font-size:15px;}
+      main{padding:20px 14px 80px !important;}
+      .hero{flex-direction:column !important;text-align:center !important;padding:22px 18px !important;gap:18px !important;}
+      .hero-title{font-size:1.1rem !important;}
+      .hero-icon{width:70px !important;height:70px !important;margin:0 auto !important;}
+      .section-body{padding:18px 16px 20px !important;}
+      .acct-split,.signal-grid,.naked-grid{grid-template-columns:1fr !important;}
+      .prose{font-size:.9rem !important;}
+      .flow-step{padding:14px 14px !important;}
+      .cmp-table{font-size:.78rem !important;}
+      .cmp-table th,.cmp-table td{padding:8px 10px !important;}
+      .chapter-sidenav{display:none !important;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+<div class="bg-stars"></div>
+
+<!-- SIDENAV -->
+<nav class="chapter-sidenav" aria-label="章節導覽">
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter1.html"><span class="ch-num">01</span><span class="ch-label">籌碼本質</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter2.html"><span class="ch-num">02</span><span class="ch-label">三大法人</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter3.html"><span class="ch-num">03</span><span class="ch-label">外資布局</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter4.html"><span class="ch-num">04</span><span class="ch-label">投信季底</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/chips/chips_chapter5.html"><span class="ch-num">05</span><span class="ch-label">自營避險</span></a>
+  <a class="ch-nav-item locked" href="#"><span class="ch-num">06</span><span class="ch-label">融資融券</span></a>
+  <a class="ch-nav-item locked" href="#"><span class="ch-num">07</span><span class="ch-label">借券賣出</span></a>
+  <a class="ch-nav-item locked" href="#"><span class="ch-num">08</span><span class="ch-label">主力散戶</span></a>
+  <a class="ch-nav-item locked" href="#"><span class="ch-num">09</span><span class="ch-label">法人背離</span></a>
+  <a class="ch-nav-item locked" href="#"><span class="ch-num">10</span><span class="ch-label">實戰選股</span></a>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" style="width:46px;height:46px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-4px;left:-4px;" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">籌碼分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky">
+    <div class="progress-fill-sticky" id="progressFill"></div>
+  </div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第五章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-icon">
+    <svg width="72" height="80" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- Shield with split: hedge vs self -->
+      <path d="M36 6 L62 18 L62 44 Q62 62 36 74 Q10 62 10 44 L10 18 Z" fill="none" stroke="rgba(0,229,255,.3)" stroke-width="1.5"/>
+      <!-- Left half (hedge - yellow) -->
+      <path d="M36 6 L10 18 L10 44 Q10 62 36 74 Z" fill="rgba(255,214,0,.08)" stroke="rgba(255,214,0,.4)" stroke-width="1"/>
+      <!-- Right half (self - cyan) -->
+      <path d="M36 6 L62 18 L62 44 Q62 62 36 74 Z" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.4)" stroke-width="1"/>
+      <!-- Center divider -->
+      <line x1="36" y1="6" x2="36" y2="74" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+      <!-- Hedge side icon -->
+      <text x="22" y="42" fill="rgba(255,214,0,.85)" font-size="14" text-anchor="middle">⚖</text>
+      <!-- Self side icon -->
+      <text x="50" y="42" fill="rgba(0,229,255,.85)" font-size="14" text-anchor="middle">🎯</text>
+      <!-- Labels -->
+      <text x="22" y="58" fill="rgba(255,214,0,.7)" font-size="5.5" font-family="Share Tech Mono, monospace" text-anchor="middle">避險</text>
+      <text x="50" y="58" fill="rgba(0,229,255,.7)" font-size="5.5" font-family="Share Tech Mono, monospace" text-anchor="middle">自行</text>
+      <!-- Glow pulse -->
+      <circle cx="36" cy="40" r="28" fill="none" stroke="rgba(0,229,255,.08)" stroke-width="2">
+        <animate attributeName="r" values="26;30;26" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".3;.7;.3" dur="3s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">CHAPTER 05 · 自營商解碼篇</div>
+    <div class="hero-title">自營商的避險<br/>與裸部位判讀</div>
+    <div class="hero-desc">自營商每天的買賣超數字，表面看似簡單，實則暗藏兩套截然不同的邏輯——<em>自行買賣帳戶</em>代表主動方向判斷，<em>避險帳戶</em>卻只是衍生品的機械對沖。本章教你拆解數字背後的真相，從「裸部位」的增減讀出機構對後市的隱性態度。</div>
+    <div class="hero-tags">
+      <span class="tag tag-cyan">自行帳戶</span>
+      <span class="tag tag-yellow">避險帳戶</span>
+      <span class="tag tag-green">裸部位</span>
+      <span class="tag tag-red">方向陷阱</span>
+      <span class="tag tag-purple">認購權證</span>
+      <span class="tag tag-pink">Delta避險</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-1</div>
+    <div class="section-title">自營商到底是誰？</div>
+    <div class="section-icon">🏦</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">自營商（Proprietary Dealer）是台灣證券市場中的一類法人，指的是<strong>券商以自有資金直接進行股票買賣</strong>的業務部門。他們不像外資管理客戶資產，也不像投信管理基金，而是用「自家的錢」交易。</p>
+    <p class="prose">台灣每家具備自營業務的券商，旗下都設有自營部，人數從數人到數十人不等。自營部的考核目標是<em>自營帳戶的獲利</em>，因此其買賣行為直接反映該機構對市場的看法。</p>
+
+    <div class="insight-box">
+      <div class="insight-icon">🔍</div>
+      <div class="insight-body">
+        <div class="insight-label">核心概念</div>
+        <div class="insight-text">自營商在 TWSE 公開資訊觀測站每日揭露的「自營商買賣超」，實際上是<strong>兩個截然不同帳戶的合計數字</strong>：「自行買賣帳戶」與「避險帳戶」。把兩者混在一起看，往往會得出錯誤結論。</div>
+      </div>
+    </div>
+
+    <div class="acct-split">
+      <div class="acct-card self">
+        <div class="acct-icon">🎯</div>
+        <div class="acct-name">自行買賣帳戶</div>
+        <div class="acct-en">PROPRIETARY TRADING</div>
+        <div class="acct-desc">自營部主動判斷市場方向，用自有資金買進或賣出股票。這個帳戶的動作<strong>代表機構對後市的真實觀點</strong>，是籌碼分析的關鍵訊號。</div>
+        <span class="acct-tag">✅ 有方向意義</span>
+      </div>
+      <div class="acct-card hedge">
+        <div class="acct-icon">⚖️</div>
+        <div class="acct-name">避險帳戶</div>
+        <div class="acct-en">HEDGING ACCOUNT</div>
+        <div class="acct-desc">當券商發行認購/認售權證後，為對沖 Delta 風險而進行的<strong>機械式股票買賣</strong>。與市場方向判斷完全無關，純屬風險管理操作。</div>
+        <span class="acct-tag">❌ 無方向意義</span>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <div class="insight-icon">⚠️</div>
+      <div class="insight-body">
+        <div class="insight-label">最常見的誤讀</div>
+        <div class="insight-text">許多散戶看到「自營商大買超 +5億」就認為機構看多，但若這 5 億全來自避險帳戶（例如認購權證大量成交後的 Delta 補倉），則自營商對後市的看法其實是<strong>中立甚至看空</strong>的，完全不代表看多訊號。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-2</div>
+    <div class="section-title">避險帳戶的運作原理</div>
+    <div class="section-icon">⚖️</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">要理解避險帳戶，必須先了解<em>權證（Warrant）</em>的發行機制。當券商發行認購權證後，投資人買進認購證，等於向券商購買了一個「以固定價格買進正股」的權利。券商因此承擔了正股上漲的風險。</p>
+
+    <div class="gold-box">
+      <div class="insight-icon">📘</div>
+      <div class="insight-body">
+        <div class="insight-label">Delta 避險機制</div>
+        <div class="insight-text"><strong>Delta</strong> 是衡量權證價格對正股價格變動敏感度的指標。Delta = 0.5 意味著正股漲1元，認購證漲0.5元。券商為中和風險，會在避險帳戶買進約 Delta × 總張數 的正股，隨正股價格波動動態調整——這個過程叫做 <strong>Delta Hedging（Delta 避險）</strong>。</div>
+      </div>
+    </div>
+
+    <div class="sec-divider">DELTA HEDGING 流程</div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot cy"></div>
+        <div class="tl-head cy">STEP 1 ── 發行認購權證</div>
+        <div class="tl-body">券商發行某檔股票的認購權證，投資人買進。券商收取權利金，同時承擔正股上漲損失的義務。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot yn"></div>
+        <div class="tl-head yn">STEP 2 ── 計算初始 Delta</div>
+        <div class="tl-body">根據 Black-Scholes 模型或內部定價，算出認購證的 Delta 值（例如 0.6），券商在避險帳戶<strong>買進 60% 的標的正股</strong>作為初始對沖。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot gn"></div>
+        <div class="tl-head gn">STEP 3 ── 股價上漲時（買進正股）</div>
+        <div class="tl-body">正股上漲 → 認購證 Delta 值上升（例如從 0.6 升到 0.75）→ 券商需<strong>追加買進</strong>正股以維持對沖比例。此時避險帳戶「買超」，但這不代表看多，只是機械補倉。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot rd"></div>
+        <div class="tl-head rd">STEP 4 ── 股價下跌時（賣出正股）</div>
+        <div class="tl-body">正股下跌 → Delta 下降（例如從 0.6 降到 0.45）→ 券商需<strong>賣出</strong>正股降低持倉比例。此時避險帳戶「賣超」，但同樣不代表看空，只是機械減倉。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot pu"></div>
+        <div class="tl-head pu">STEP 5 ── 認售權證（反向操作）</div>
+        <div class="tl-body">若券商發行的是<strong>認售權證（Put Warrant）</strong>，Delta 為負值，券商需在避險帳戶<strong>賣出</strong>正股對沖。投資人大量買進認售證時，自營商避險帳戶反而呈現「賣超」。</div>
+      </div>
+    </div>
+
+    <div class="shadow-line">
+      <div class="sl-side cy"></div>
+      <div class="sl-body">
+        <div class="sl-top cy">實戰結論</div>
+        <div class="sl-text">當天認購/認售權證<strong>成交量大</strong>的個股，其自營商數據中的避險帳戶波動會特別大。這類個股的「自營商買賣超」往往被避險帳戶主導，參考意義低。若想讀方向，<strong>必須單獨查自行帳戶的數字</strong>。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-3</div>
+    <div class="section-title">如何查閱自行買賣 vs 避險數據</div>
+    <div class="section-icon">🖥️</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">台灣證券交易所（TWSE）每日下午3點後，在公開資訊觀測站及證交所網站公布三大法人明細，其中自營商的數據<em>分別揭露自行與避險兩個帳戶</em>，讓投資人能夠進行拆解分析。</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>資料維度</th>
+          <th>查詢來源</th>
+          <th>重點欄位</th>
+          <th>實用度</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>市場整體自營買賣超</td>
+          <td>TWSE 三大法人統計</td>
+          <td>自行買超 / 避險買超（分開列示）</td>
+          <td class="val-cyan">★★★★★</td>
+        </tr>
+        <tr>
+          <td>個股自營細項</td>
+          <td>個股三大法人分點資料</td>
+          <td>自行買超 vs 避險買超（個股層級）</td>
+          <td class="val-cyan">★★★★★</td>
+        </tr>
+        <tr>
+          <td>各券商自營部位</td>
+          <td>分點進出明細</td>
+          <td>各分點成交量及買賣差額</td>
+          <td class="val-green">★★★★</td>
+        </tr>
+        <tr>
+          <td>權證發行明細</td>
+          <td>TWSE 權證查詢系統</td>
+          <td>發行量、行使比例、到期日</td>
+          <td class="val-yellow">★★★</td>
+        </tr>
+        <tr>
+          <td>當日合計（含避險）</td>
+          <td>一般財經App</td>
+          <td>自營商總買賣超（混合）</td>
+          <td class="val-red">★★（易誤導）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="flow-step">
+      <div class="flow-num cn">1</div>
+      <div class="flow-content">
+        <div class="flow-heading">進入 TWSE 三大法人查詢頁</div>
+        <div class="flow-sub">網址：twse.com.tw → 市場資訊 → 三大法人 → 三大法人買賣超日報。頁面會分別顯示「自行買賣」與「避險」兩欄，加總才是「自營商合計」。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num cn">2</div>
+      <div class="flow-content">
+        <div class="flow-heading">個股查詢：點選個股代碼 → 三大法人</div>
+        <div class="flow-sub">各大看盤軟體（籌碼K線、XQ、CMoney）的個股籌碼頁，通常會拆開顯示「自行買超」與「避險買超」。若只顯示合計，需手動比對原始資料。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">3</div>
+      <div class="flow-content">
+        <div class="flow-heading">關鍵判斷：避險佔比高的個股要排除</div>
+        <div class="flow-sub">若某股自營商合計買超 3000 張，但其中避險帳戶佔了 2800 張，自行帳戶僅 200 張，則實質方向訊號微弱，不應視為「自營商看多」的依據。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num rn">!</div>
+      <div class="flow-content">
+        <div class="flow-heading">注意：台指期與ETF的避險干擾</div>
+        <div class="flow-sub">自營商除了個股權證避險，也會用台指期、ETF進行組合避險。這部分的買賣行為同樣不代表方向，特別是在盤整期大量使用選擇權策略時，個股的避險數字會特別大。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-4</div>
+    <div class="section-title">裸部位（Naked Position）的判讀邏輯</div>
+    <div class="section-icon">📊</div>
+  </div>
+  <div class="section-body">
+    <p class="prose"><em>裸部位</em>是指<strong>自行帳戶的淨持股變化</strong>——即扣除避險需求後，自營商主動承擔的方向性部位。裸部位增加代表自營部看多，裸部位減少（甚至轉負）代表看空。</p>
+
+    <div class="naked-grid">
+      <div class="naked-card bull">
+        <div class="naked-title">裸多部位 LONG</div>
+        <div class="naked-val">↑</div>
+        <div class="naked-desc">自行帳戶持續淨買入，自營商主動看多，願意承擔正股上漲風險。連續5日以上更具參考性。</div>
+      </div>
+      <div class="naked-card neut">
+        <div class="naked-title">中性部位 NEUTRAL</div>
+        <div class="naked-val">—</div>
+        <div class="naked-desc">自行帳戶變化不大，自營商對後市無強烈偏向，可能正在觀察或等待事件觸發。</div>
+      </div>
+      <div class="naked-card bear">
+        <div class="naked-title">裸空部位 SHORT</div>
+        <div class="naked-val">↓</div>
+        <div class="naked-desc">自行帳戶持續淨賣出，自營商主動減倉或建立空頭部位，視為看空訊號，需搭配其他指標確認。</div>
+      </div>
+    </div>
+
+    <div class="sec-divider">裸部位計算公式</div>
+
+    <div class="insight-box">
+      <div class="insight-icon">🧮</div>
+      <div class="insight-body">
+        <div class="insight-label">計算方式</div>
+        <div class="insight-text">
+          <strong>裸部位變化 = 自行帳戶買超 − 自行帳戶賣超</strong><br/>
+          <br/>
+          例如：某股當日自行帳戶買 1200 張、賣 400 張，裸部位淨增加 800 張。<br/>
+          若連續 5 個交易日均呈正值，累積裸多部位已達 3500 張，代表自營商有明確的方向性押注。
+        </div>
+      </div>
+    </div>
+
+    <!-- SVG Chart: Naked Position Over Time -->
+    <div class="svg-chart-wrap">
+      <svg viewBox="0 0 840 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#050a18;">
+        <!-- Grid -->
+        <line x1="60" y1="30" x2="60" y2="240" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+        <line x1="60" y1="240" x2="800" y2="240" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+        <line x1="60" y1="180" x2="800" y2="180" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="135" x2="800" y2="135" stroke="rgba(255,255,255,.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="90" x2="800" y2="90" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- Y axis labels -->
+        <text x="50" y="244" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="end">0</text>
+        <text x="50" y="184" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="end">+1000</text>
+        <text x="50" y="139" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="end">+2000</text>
+        <text x="50" y="94" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="end">+3000</text>
+        <!-- Title -->
+        <text x="420" y="20" fill="rgba(0,229,255,.8)" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="2">自行帳戶裸部位 累積變化（張）</text>
+
+        <!-- Bars: day data (cyan for positive) -->
+        <!-- Day 1: +800 -->
+        <rect x="80" y="196" width="50" height="44" rx="4" fill="rgba(0,230,118,.7)"/>
+        <text x="105" y="192" fill="var(--green)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+800</text>
+        <!-- Day 2: +600 -->
+        <rect x="160" y="207" width="50" height="33" rx="4" fill="rgba(0,230,118,.65)"/>
+        <text x="185" y="203" fill="var(--green)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+600</text>
+        <!-- Day 3: +900 -->
+        <rect x="240" y="189" width="50" height="51" rx="4" fill="rgba(0,230,118,.8)"/>
+        <text x="265" y="185" fill="var(--green)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+900</text>
+        <!-- Day 4: +1100 -->
+        <rect x="320" y="178" width="50" height="62" rx="4" fill="rgba(0,229,255,.7)"/>
+        <text x="345" y="174" fill="var(--accent)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+1100</text>
+        <!-- Day 5: +1200 -->
+        <rect x="400" y="171" width="50" height="69" rx="4" fill="rgba(0,229,255,.8)"/>
+        <text x="425" y="167" fill="var(--accent)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+1200</text>
+        <!-- Day 6: -200 (red) -->
+        <rect x="480" y="240" width="50" height="11" rx="4" fill="rgba(255,61,90,.5)"/>
+        <text x="505" y="264" fill="var(--red)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">-200</text>
+        <!-- Day 7: -500 -->
+        <rect x="560" y="240" width="50" height="27" rx="4" fill="rgba(255,61,90,.65)"/>
+        <text x="585" y="280" fill="var(--red)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">-500</text>
+        <!-- Day 8: -300 -->
+        <rect x="640" y="240" width="50" height="17" rx="4" fill="rgba(255,61,90,.55)"/>
+        <text x="665" y="270" fill="var(--red)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">-300</text>
+        <!-- Day 9: +400 -->
+        <rect x="720" y="218" width="50" height="22" rx="4" fill="rgba(0,230,118,.6)"/>
+        <text x="745" y="214" fill="var(--green)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">+400</text>
+
+        <!-- X axis labels -->
+        <text x="105" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D1</text>
+        <text x="185" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D2</text>
+        <text x="265" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D3</text>
+        <text x="345" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D4</text>
+        <text x="425" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D5</text>
+        <text x="505" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D6</text>
+        <text x="585" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D7</text>
+        <text x="665" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D8</text>
+        <text x="745" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">D9</text>
+
+        <!-- Annotation: bullish zone -->
+        <rect x="72" y="60" width="216" height="22" rx="5" fill="rgba(0,230,118,.08)" stroke="rgba(0,230,118,.2)" stroke-width="1"/>
+        <text x="80" y="75" fill="var(--green)" font-size="9" font-family="Share Tech Mono, monospace">D1-D5 持續裸多 → 看多訊號</text>
+        <!-- Arrow -->
+        <line x1="180" y1="82" x2="265" y2="188" stroke="rgba(0,230,118,.35)" stroke-width="1" stroke-dasharray="4,3"/>
+
+        <!-- Annotation: bearish zone -->
+        <rect x="478" y="40" width="190" height="22" rx="5" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.2)" stroke-width="1"/>
+        <text x="486" y="55" fill="var(--red)" font-size="9" font-family="Share Tech Mono, monospace">D6-D8 裸部位轉負 → 警示</text>
+      </svg>
+    </div>
+
+    <p class="prose" style="margin-top:16px;">上圖模擬一檔個股的自行帳戶裸部位變化。D1～D5 連續五日裸多部位累積，是<strong>相當可靠的看多訊號</strong>。D6 突然轉為賣超，往往是機構先知先覺的警示，此時若你仍持有，應提高警覺。</p>
+  </div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-5</div>
+    <div class="section-title">自營商操作特性與慣性</div>
+    <div class="section-icon">🧭</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">理解自營商的操作慣性，能幫助你判斷其籌碼動作的持續性。自營商不像外資有長線持股框架，也不像投信有季底壓力，其操作風格相對<em>短線靈活、追求絕對報酬</em>。</p>
+
+    <div class="signal-grid">
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--accent)"></div>
+          <div class="signal-label" style="color:var(--accent)">持股週期短</div>
+        </div>
+        <div class="signal-body">自營商持股通常以<strong>天~週</strong>為單位，鮮少持有超過一個月。若自行帳戶連續買超超過 10 個交易日，屬於少見且高度有效的訊號。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--purple)"></div>
+          <div class="signal-label" style="color:var(--purple)">追技術面觸發</div>
+        </div>
+        <div class="signal-body">自營部技術面分析能力強，常在<strong>突破關鍵壓力</strong>或<strong>放量帶量拉升</strong>後進場，而非提前布局，因此其買超往往出現在股價已有動能之後。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--green)"></div>
+          <div class="signal-label" style="color:var(--green)">偏好流動性佳的標的</div>
+        </div>
+        <div class="signal-body">自營商傾向操作日均量大的個股，避免流動性不足導致滑價。<strong>小型股的自行帳戶訊號</strong>相對罕見，一旦出現往往更有意義。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--yellow)"></div>
+          <div class="signal-label" style="color:var(--yellow)">盤中頻繁調整</div>
+        </div>
+        <div class="signal-body">自營部當日可多次買賣同一標的，收盤前的<strong>尾盤部位</strong>才是真正方向性的留倉，而非當日最高累積量。查看收盤淨部位更準確。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--red)"></div>
+          <div class="signal-label" style="color:var(--red)">大盤修正期主動做空</div>
+        </div>
+        <div class="signal-body">自營商是三大法人中<strong>唯一可以主動做空個股</strong>的機構（透過借券賣出+自行帳戶放空），在系統性風險升高時，自行帳戶持續賣超是重要警示訊號。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--pink)"></div>
+          <div class="signal-label" style="color:var(--pink)">事件驅動偏好</div>
+        </div>
+        <div class="signal-body">財報公布前後、重要指數調整、政策消息等<strong>事件驅動</strong>場景是自營商最活躍的時間點，此時的自行帳戶動作方向性最強，值得重點關注。</div>
+      </div>
+    </div>
+
+    <div class="force-meter-wrap" style="margin-top:28px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.18em;color:var(--text-faint);margin-bottom:18px;">自行帳戶訊號可靠度評分</div>
+      <div class="force-row">
+        <div class="force-label">連續5日以上自行買超</div>
+        <div class="force-bar-bg"><div class="force-bar-fill" style="width:92%;background:linear-gradient(90deg,var(--accent),var(--green));"></div></div>
+        <div class="force-val">92%</div>
+      </div>
+      <div class="force-row">
+        <div class="force-label">大量且連續（3日）</div>
+        <div class="force-bar-bg"><div class="force-bar-fill" style="width:75%;background:linear-gradient(90deg,var(--accent),rgba(0,200,255,.8));"></div></div>
+        <div class="force-val">75%</div>
+      </div>
+      <div class="force-row">
+        <div class="force-label">單日大買超</div>
+        <div class="force-bar-bg"><div class="force-bar-fill" style="width:45%;background:linear-gradient(90deg,var(--yellow),var(--orange));"></div></div>
+        <div class="force-val">45%</div>
+      </div>
+      <div class="force-row">
+        <div class="force-label">避險帳戶主導的合計買超</div>
+        <div class="force-bar-bg"><div class="force-bar-fill" style="width:12%;background:linear-gradient(90deg,var(--red),rgba(200,20,40,.6));"></div></div>
+        <div class="force-val">12%</div>
+      </div>
+      <div class="force-row">
+        <div class="force-label">合計（含避險）單日買超</div>
+        <div class="force-bar-bg"><div class="force-bar-fill" style="width:20%;background:linear-gradient(90deg,rgba(255,61,90,.5),rgba(200,20,40,.4));"></div></div>
+        <div class="force-val">20%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-6</div>
+    <div class="section-title">自營商與外資、投信的協同判讀</div>
+    <div class="section-icon">🔗</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">自營商訊號單獨使用時效果有限，真正的威力在於<em>與外資、投信協同判讀</em>。不同機構的同步行為，代表更廣泛的市場共識，勝率遠高於單一機構的信號。</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>情境組合</th>
+          <th>外資</th>
+          <th>投信</th>
+          <th>自營（自行）</th>
+          <th>訊號解讀</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>三強共振</td>
+          <td class="val-green">買超</td>
+          <td class="val-green">買超</td>
+          <td class="val-green">買超</td>
+          <td class="val-green">最強多頭訊號，高度有效</td>
+        </tr>
+        <tr>
+          <td>外資+投信雙買</td>
+          <td class="val-green">買超</td>
+          <td class="val-green">買超</td>
+          <td class="val-yellow">中性/小賣</td>
+          <td class="val-cyan">強多頭，自營觀望不礙事</td>
+        </tr>
+        <tr>
+          <td>自營先行</td>
+          <td class="val-yellow">中性</td>
+          <td class="val-yellow">中性</td>
+          <td class="val-green">連續買超</td>
+          <td class="val-yellow">可能先行佈局，觀察外資跟進</td>
+        </tr>
+        <tr>
+          <td>外資獨買</td>
+          <td class="val-green">買超</td>
+          <td class="val-red">賣超</td>
+          <td class="val-red">賣超</td>
+          <td class="val-cyan">外資長線佈局為主，短線不確定</td>
+        </tr>
+        <tr>
+          <td>三大齊賣</td>
+          <td class="val-red">賣超</td>
+          <td class="val-red">賣超</td>
+          <td class="val-red">賣超</td>
+          <td class="val-red">最強空頭訊號，大幅降低持股</td>
+        </tr>
+        <tr>
+          <td>外資賣+投信買</td>
+          <td class="val-red">賣超</td>
+          <td class="val-green">買超</td>
+          <td class="val-yellow">中性</td>
+          <td class="val-purple">籌碼轉換，短線不明，風險升高</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="shadow-line">
+      <div class="sl-side dn"></div>
+      <div class="sl-body">
+        <div class="sl-top dn">最佳實戰組合</div>
+        <div class="sl-text">外資<strong>連續5日以上</strong>買超 + 投信<strong>持續加碼</strong> + 自營自行帳戶<strong>由賣轉買</strong> = 三大機構共識形成的黃金訊號。這種組合在歷史上出現後，個股在接下來 10~20 個交易日上漲的機率遠高於平均。</div>
+      </div>
+    </div>
+
+    <div class="purple-box">
+      <div class="insight-icon">💡</div>
+      <div class="insight-body">
+        <div class="insight-label">進階技巧</div>
+        <div class="insight-text">觀察<strong>自營商「由賣轉買」的拐點</strong>時機：若外資、投信均已連續買超一段時間，突然出現自營自行帳戶由連續賣超轉為買超，往往是上漲加速段的啟動訊號。自營短線敏感度高，其加入等於給行情「加油」。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-7</div>
+    <div class="section-title">常見陷阱與實戰注意事項</div>
+    <div class="section-icon">🚧</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">自營商的數據解讀是三大法人中<em>最容易被誤用</em>的部分。以下整理最常見的四大陷阱，幫助你在實戰中避開雜訊。</p>
+
+    <div class="flow-step">
+      <div class="flow-num rn">✗</div>
+      <div class="flow-content">
+        <div class="flow-heading">陷阱一：看到「自營買超」就認為看多</div>
+        <div class="flow-sub">前文已強調，若買超主要來自避險帳戶，完全不代表方向判斷。使用任何訊號前，<strong>必須先確認自行帳戶的數字</strong>，而非合計。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num rn">✗</div>
+      <div class="flow-content">
+        <div class="flow-heading">陷阱二：把單日自行帳戶當確認訊號</div>
+        <div class="flow-sub">自營商短線靈活，單日買超可能隔天就反手賣出。<strong>至少需要連續3日</strong>的自行帳戶同向買超，才能視為初步訊號；連續5日以上才具高度可信度。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num rn">✗</div>
+      <div class="flow-content">
+        <div class="flow-heading">陷阱三：忽視大盤環境</div>
+        <div class="flow-sub">當大盤處於系統性下跌（如 Fed 升息恐慌、地緣政治事件），自行帳戶的小量買超抵不過市場的賣壓。<strong>個股的自營訊號必須在大盤相對穩定</strong>時才有效，逆勢操作效果打折。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num rn">✗</div>
+      <div class="flow-content">
+        <div class="flow-heading">陷阱四：認為自營做空就一定跌</div>
+        <div class="flow-sub">自營商放空有時是對沖整體部位的手段，並非對特定股票的強烈看空。若該股同時有外資與投信大量買超，<strong>自營做空可能被強力軋空</strong>，股價反而急漲。需綜合其他機構行為才能下結論。</div>
+      </div>
+    </div>
+
+    <div class="sec-divider">正確使用自營商訊號的核查清單</div>
+
+    <div class="flow-step">
+      <div class="flow-num gn">✓</div>
+      <div class="flow-content">
+        <div class="flow-heading">步驟一：確認數據來源為「自行帳戶」</div>
+        <div class="flow-sub">使用的數據必須是自行買賣帳戶，而非含避險的自營商合計。若來源只有合計，需再查原始資料比對。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">✓</div>
+      <div class="flow-content">
+        <div class="flow-heading">步驟二：確認連續性（至少3日）</div>
+        <div class="flow-sub">計算連續幾個交易日均呈同向，並統計累積張數。連續性越高，訊號越可靠。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">✓</div>
+      <div class="flow-content">
+        <div class="flow-heading">步驟三：對照外資與投信動向</div>
+        <div class="flow-sub">若外資、投信同向，訊號強度大幅提升。若三者背離，需謹慎，優先相信外資（持倉最重、資金最大）的方向。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">✓</div>
+      <div class="flow-content">
+        <div class="flow-heading">步驟四：確認標的無大量權證干擾</div>
+        <div class="flow-sub">若個股是熱門權證標的（可在 TWSE 查詢發行量大的認購/認售證），其避險帳戶數字波動大，需特別當心合計數字的干擾。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 8: QUIZ -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-8</div>
+    <div class="section-title">本章學習測驗</div>
+    <div class="section-icon">🧠</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">完成以下四題，測試你對本章核心概念的掌握程度。</p>
+
+    <!-- Q1 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q1｜某檔個股當日自營商合計買超 4000 張，其中避險帳戶買超 3800 張，自行帳戶僅買超 200 張。以下哪個說法正確？</div>
+      <div class="quiz-opts" id="q1opts">
+        <div class="quiz-opt" onclick="answerQ('q1',this,'A')"><span class="quiz-letter">A</span>自營商強烈看多，可大膽跟進</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'B')"><span class="quiz-letter">B</span>自行帳戶方向訊號微弱，合計數字主要反映避險操作，不應解讀為看多</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'C')"><span class="quiz-letter">C</span>自營商買超就是多頭確認，來源不重要</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'D')"><span class="quiz-letter">D</span>避險帳戶比例高代表券商看好該股的衍生品市場</div>
+      </div>
+      <div class="quiz-feedback" id="q1fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q2｜關於 Delta 避險，以下哪個描述最準確？</div>
+      <div class="quiz-opts" id="q2opts">
+        <div class="quiz-opt" onclick="answerQ('q2',this,'A')"><span class="quiz-letter">A</span>Delta 避險是自營商對後市看多時的主動加倉策略</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'B')"><span class="quiz-letter">B</span>Delta 避險是發行權證的券商為中和方向性風險而進行的機械式股票買賣，與方向判斷無關</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'C')"><span class="quiz-letter">C</span>Delta 避險只在股票下跌時才會出現買超</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'D')"><span class="quiz-letter">D</span>Delta 避險帳戶的買賣超與自行帳戶完全相同</div>
+      </div>
+      <div class="quiz-feedback" id="q2fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q3｜自營商「自行帳戶」訊號可靠度最高的情況是？</div>
+      <div class="quiz-opts" id="q3opts">
+        <div class="quiz-opt" onclick="answerQ('q3',this,'A')"><span class="quiz-letter">A</span>單日大量買超 5000 張以上</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'B')"><span class="quiz-letter">B</span>在大盤系統性崩跌時連續買超</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'C')"><span class="quiz-letter">C</span>連續5日以上自行帳戶同向買超，且外資、投信同步配合</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><span class="quiz-letter">D</span>自營商合計買超大於外資買超</div>
+      </div>
+      <div class="quiz-feedback" id="q3fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q4｜若某個股外資連續10日買超，投信持續加碼，而自營自行帳戶從連續賣超轉為連續買超，這個轉變最可能代表？</div>
+      <div class="quiz-opts" id="q4opts">
+        <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><span class="quiz-letter">A</span>行情即將反轉向下，應賣出</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><span class="quiz-letter">B</span>三大機構出現共識，自營的加入可能是上漲加速段的啟動訊號</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><span class="quiz-letter">C</span>自營加入代表散戶應立刻追高</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><span class="quiz-letter">D</span>自營短線，轉買只是避險調整，無參考意義</div>
+      </div>
+      <div class="quiz-feedback" id="q4fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 9: SUMMARY -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-9</div>
+    <div class="section-title">本章重點總整理</div>
+    <div class="section-icon">✅</div>
+  </div>
+  <div class="section-body">
+    <div class="flow-step">
+      <div class="flow-num cn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">自營商 = 自行帳戶 + 避險帳戶，兩者性質截然不同</div>
+        <div class="flow-sub">只看「自營商合計」是最大誤區。務必分開查閱，以自行帳戶為方向判讀的唯一依據。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num cn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">避險帳戶 = Delta Hedging，是機械操作，不代表方向</div>
+        <div class="flow-sub">認購/認售權證成交量大的股票，其避險帳戶數字波動大，干擾嚴重，更需要分開查閱。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">裸部位：連續累積才有意義</div>
+        <div class="flow-sub">自行帳戶連續5日以上同向，才視為高可靠度訊號。單日大量但隔日即反手，不具追蹤意義。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">自營+外資+投信三強共振 = 最強訊號</div>
+        <div class="flow-sub">三大法人自行帳戶（自營）、外資、投信同時連續同向，是籌碼分析中最具爆發力的共振訊號。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num pn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">自營「由賣轉買」是行情加速的觸發器</div>
+        <div class="flow-sub">在外資、投信已建倉的情況下，自營自行帳戶的轉向往往是行情進入加速段的重要信號，是最值得追蹤的拐點之一。</div>
+      </div>
+    </div>
+
+    <div class="insight-box" style="margin-top:28px;">
+      <div class="insight-icon">🚀</div>
+      <div class="insight-body">
+        <div class="insight-label">下一章預告</div>
+        <div class="insight-text">第六章將深入探討<strong>融資增減與軋空行情</strong>——融資維持率、斷頭潮的籌碼意義、融券回補時機，教你讀懂市場槓桿結構的警訊與機會。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER FOOTER -->
+<div class="chapter-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-complete-badge">✅</div>
+      <div class="footer-complete-text">
+        <div class="footer-complete-title">第5章完成</div>
+        <div class="footer-complete-desc">你已掌握自營商避險與裸部位的完整判讀邏輯</div>
+        <div class="footer-next-hint">下一章：融資增減與軋空行情</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <a class="fn-btn home" href="/">
+        🏠 回首頁
+      </a>
+      <a class="fn-btn prev" href="/stock_site/chips/chips_chapter4.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        第4章
+      </a>
+      <a class="fn-btn next" href="#">
+        第6章
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;">
+  <div style="padding:20px 40px 24px;display:flex;flex-direction:column;gap:8px;">
+    <p style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:rgba(122,154,184,.6);line-height:1.7;text-align:center;">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px;">
+      <a href="/stock_site/legal/about.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">關於本站</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/privacy.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">隱私政策</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/disclaimer.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">免責聲明</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">聯絡我們</a>
+    </div>
+    <p style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(122,154,184,.3);margin-top:6px;">© 2025 JellyStock. All rights reserved.</p>
+  </div>
+</footer>
+
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+  </div>
+</div>
+
+<script>
+/* ── Clock ── */
+(function() {
+  function tick() {
+    var now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    var str = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    var el = document.getElementById('subClock');
+    if (el) el.textContent = str;
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* ── Scroll Progress ── */
+(function() {
+  function updateProgress() {
+    var doc = document.documentElement;
+    var scrollTop = window.pageYOffset || doc.scrollTop;
+    var scrollHeight = doc.scrollHeight - doc.clientHeight;
+    var pct = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+    var fill = document.getElementById('progressFill');
+    var label = document.getElementById('progressPct');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+})();
+
+/* ── Reveal on Scroll ── */
+(function() {
+  var cards = document.querySelectorAll('.section-card.reveal');
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.08 });
+  cards.forEach(function(c) { obs.observe(c); });
+})();
+
+/* ── Quiz ── */
+var answers = { q1: 'B', q2: 'B', q3: 'C', q4: 'B' };
+var feedbacks = {
+  q1: {
+    B: '✅ 正確！避險帳戶佔 95%，自行帳戶僅 5%，這種情況下「自營合計買超」幾乎完全反映機械避險操作，對後市方向判斷毫無意義。務必單獨查自行帳戶。',
+    default: '❌ 不對。當避險帳戶主導合計數字時，自營買超完全不代表看多方向，正確做法是只參考自行帳戶的 200 張買超，且單日訊號也不足以下結論。'
+  },
+  q2: {
+    B: '✅ 正確！Delta Hedging 是中性的風險管理工具。券商發行認購權證後，為了不承擔正股方向性風險，用 Delta 比例買入正股對沖，整個過程與「看多」或「看空」完全無關。',
+    default: '❌ 不對。Delta 避險是機械式的風控操作，發生在券商發行衍生品後，不論市場漲跌都會自動調整，根本不涉及方向判斷。'
+  },
+  q3: {
+    C: '✅ 完全正確！連續性是自行帳戶訊號可靠度的關鍵，5日以上同向 + 外資/投信配合，是最高等級的自營方向訊號，可靠度超過 90%。',
+    default: '❌ 不對。單日大量、逆勢買超、或只看合計數字，都容易造成誤判。自行帳戶的連續性（5日+）搭配其他機構的協同，才是判讀自營訊號的正確方式。'
+  },
+  q4: {
+    B: '✅ 正確！這是「三強共振」的形成時刻。自營在外資、投信已建倉後才加入，往往是行情進入加速段的信號。自營短線敏感，其「由賣轉買」代表短線資金也開始認可這波行情，可視為催化劑。',
+    default: '❌ 不對。三大法人形成共識後，自營自行帳戶的轉向是非常重要的訊號——不是賣出訊號，也不是單純的避險調整，而是行情加速的潛在觸發器。'
+  }
+};
+window.answerQ = function(qid, el, choice) {
+  var opts = document.querySelectorAll('#' + qid + 'opts .quiz-opt');
+  opts.forEach(function(o) { o.classList.add('disabled'); });
+  var fb = document.getElementById(qid + 'fb');
+  var isCorrect = choice === answers[qid];
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (fb) {
+    fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'fail');
+    fb.innerHTML = feedbacks[qid][choice] || feedbacks[qid]['default'];
+  }
+};
+
+/* ── Maintenance ── */
+(function() {
+  var API_BASE = window.location.origin;
+  var overlay = document.getElementById('maintenanceOverlay');
+  function check() {
+    fetch(API_BASE + '/api/maintenance?t=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var msg = document.getElementById('maintMsgText');
+        if (msg && d.message) msg.textContent = d.message;
+        overlay.style.display = d.enabled ? 'flex' : 'none';
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(check, 30000); });
+  }
+  check();
+})();
+</script>
+
+</body>
+</html>
