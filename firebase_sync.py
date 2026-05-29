@@ -86,12 +86,21 @@ def _fetch(url, retries=3, delay=2.0):
             _time.sleep(delay)
     return None
 
-def _fetch_with_date_check(url: str, today: str, label: str = ""):
-    for attempt in range(1, MAX_DATE_RETRIES + 1):
+def _fetch_with_date_check(url: str, today: str, label: str = "", max_retries: int = None):
+    retries = max_retries if max_retries is not None else MAX_DATE_RETRIES
+    for attempt in range(1, retries + 1):
         data = _fetch(url)
         if data is None:
             print(f"[{label}] 第{attempt}次請求失敗")
-            if attempt < MAX_DATE_RETRIES:
+            if attempt < retries:
+                print(f"[{label}] 等待 {DATE_RETRY_WAIT} 秒後重試...")
+                _time.sleep(DATE_RETRY_WAIT)
+            continue
+
+        # stat 不是 OK（含 TWSE 自營商的特殊錯誤訊息）→ 視為資料未就緒，重試
+        if isinstance(data, dict) and data.get("stat") not in (None, "", "OK"):
+            print(f"[{label}] 第{attempt}次 stat={data.get('stat')}，資料未就緒，重試中...")
+            if attempt < retries:
                 print(f"[{label}] 等待 {DATE_RETRY_WAIT} 秒後重試...")
                 _time.sleep(DATE_RETRY_WAIT)
             continue
@@ -110,14 +119,15 @@ def _fetch_with_date_check(url: str, today: str, label: str = ""):
             return data
 
         print(f"[{label}] 第{attempt}次資料日期={raw_date}，今天={today}，尚未更新")
-        if attempt < MAX_DATE_RETRIES:
+        if attempt < retries:
             print(f"[{label}] 等待 {DATE_RETRY_WAIT} 秒後重試...")
             _time.sleep(DATE_RETRY_WAIT)
 
-    print(f"[{label}] 超過最大重試次數，放棄寫入 ⚠️")
+    print(f"[{label}] 超過最大重試次數({retries})，放棄寫入 ⚠️")
     return None
 
 def _check_twse_stat(data, today: str, label: str):
+    # stat 已在 _fetch_with_date_check 過濾，這裡只做最後防線
     if data is None:
         return None
     if data.get("stat") != "OK":
@@ -129,10 +139,10 @@ def _check_twse_stat(data, today: str, label: str):
         return None
     return data
 
-def _fetch_twse_institutional(today: str) -> dict:
+def _fetch_twse_institutional(today: str, max_retries: int = None) -> dict:
     def _parse_foreign():
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT38U?response=json&date={today}"
-        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市外資"), today, "上市外資")
+        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市外資", max_retries=max_retries), today, "上市外資")
         if not data: return {}
         out = {}
         for row in data.get("data", []):
@@ -143,7 +153,7 @@ def _fetch_twse_institutional(today: str) -> dict:
 
     def _parse_trust():
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT44U?response=json&date={today}"
-        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市投信"), today, "上市投信")
+        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市投信", max_retries=max_retries), today, "上市投信")
         if not data: return {}
         out = {}
         for row in data.get("data", []):
@@ -154,7 +164,7 @@ def _fetch_twse_institutional(today: str) -> dict:
 
     def _parse_proprietary():
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
-        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市自營商"), today, "上市自營商")
+        data = _check_twse_stat(_fetch_with_date_check(url, today, "上市自營商", max_retries=max_retries), today, "上市自營商")
         if not data: return {}
         out = {}
         for row in data.get("data", []):
@@ -336,10 +346,11 @@ def _write_batch(ref_path: str, data: dict, chunk_size: int = 500):
 
 # ── 公開同步函式 ───────────────────────────────────────────────────────────────
 
-def sync_institutional(today: str = None):
+def sync_institutional(today: str = None, max_retries: int = None):
     if today is None: today = get_today()
-    print(f"[sync] 開始同步 TWSE 三大法人 date={today}")
-    twse_inst = _fetch_twse_institutional(today)
+    retries_info = f"（max_retries={max_retries}）" if max_retries else ""
+    print(f"[sync] 開始同步 TWSE 三大法人 date={today}{retries_info}")
+    twse_inst = _fetch_twse_institutional(today, max_retries=max_retries)
     _init_firebase()
     if twse_inst:
         _write_batch(f"stock_data/{today}/twse", twse_inst)
@@ -593,7 +604,8 @@ def sync_all(today: str = None, label: int = None):
 
         elif label == 3:
             # 16:10 — 重跑 TWSE 三大法人（補外資 + 自營商）
-            sync_institutional(today)
+            # max_retries=6：stat 不是 OK 也會重試，最多等約 2.5 分鐘
+            sync_institutional(today, max_retries=6)
 
         elif label == 7:
             # 21:10 — 大盤融資金額（重跑 market，融資資料此時才出）

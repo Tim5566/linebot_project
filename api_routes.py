@@ -162,6 +162,27 @@ def register_api(app):
     def page_chapter10():
         return send_from_directory('stock_site/features', 'chapter10.html')
 
+    # ── 籌碼分析教學章節 ────────────────────────────────────────────────────────
+    @app.route("/stock_site/features/chips_chapter1.html")
+    def page_chips_chapter1():
+        return send_from_directory('stock_site/features', 'chips_chapter1.html')
+    
+    @app.route("/stock_site/features/chips_chapter2.html")
+    def page_chips_chapter2():
+        return send_from_directory('stock_site/features', 'chips_chapter2.html')
+    
+    @app.route("/stock_site/features/chips_chapter3.html")
+    def page_chips_chapter3():
+        return send_from_directory('stock_site/features', 'chips_chapter3.html')
+    
+    @app.route("/stock_site/features/chips_chapter4.html")
+    def page_chips_chapter4():
+        return send_from_directory('stock_site/features', 'chips_chapter4.html')
+    
+    @app.route("/stock_site/features/chips_chapter5.html")
+    def page_chips_chapter5():
+        return send_from_directory('stock_site/features', 'chips_chapter5.html')
+
     # ── 公司重大訊息 API ───────────────────────────────────────────────────────
     @app.route("/api/news")
     def api_news():

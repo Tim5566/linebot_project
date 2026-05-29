@@ -28,22 +28,23 @@ register_api(app)  # 建立網站
 start_scheduler(line_bot_api)
 
 
-# ── 自我 ping，防止 Render 休眠（取代 UptimeRobot）────────────────────────────
+# ── 自我 ping，防止 Render 休眠（完全不依賴 UptimeRobot）───────────────────────
 def _self_ping():
-    """每 10 分鐘 ping 自己一次，讓 Render 不休眠。"""
-    # 從環境變數讀服務網址，例如 https://your-app.onrender.com
+    """啟動 30 秒後立刻 ping 自己，之後每 10 分鐘一次。
+    Render 免費方案閒置 15 分鐘才會休眠，10 分鐘間隔足以保持常駐。"""
     base_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
     if not base_url:
         print("[self-ping] 未設定 RENDER_EXTERNAL_URL，自我 ping 停用")
         return
 
+    time.sleep(30)  # 等 server 啟動完成再開始 ping
     while True:
-        time.sleep(10 * 60)   # 等 10 分鐘
         try:
             resp = _req.get(f"{base_url}/ping", timeout=10)
             print(f"[self-ping] {resp.status_code} OK")
         except Exception as e:
             print(f"[self-ping] 失敗: {e}")
+        time.sleep(10 * 60)  # ping 完等 10 分鐘（Render 閒置 15 分鐘才休眠）
 
 # daemon=True：主程式結束時這條 thread 自動跟著結束，不會卡住 gunicorn
 _ping_thread = threading.Thread(target=_self_ping, daemon=True)
