@@ -87,17 +87,20 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%, transparent 55%),
-        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%, transparent 50%),
-        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%, transparent 40%);
-      animation: nebulaFloat 28s ease-in-out infinite alternate;
+        radial-gradient(ellipse 80% 50% at 12% 18%,  rgba(18,55,160,.30) 0%, rgba(8,20,80,.10) 45%, transparent 65%),
+        radial-gradient(ellipse 65% 55% at 48% 58%,  rgba(85,20,160,.22) 0%, rgba(50,10,100,.08) 50%, transparent 70%),
+        radial-gradient(ellipse 50% 42% at 88% 72%,  rgba(0,120,90,.18)  0%, rgba(0,60,50,.06)  48%, transparent 65%),
+        radial-gradient(ellipse 35% 28% at 78% 22%,  rgba(80,120,255,.18) 0%, rgba(40,60,180,.06) 40%, transparent 60%),
+        radial-gradient(ellipse 42% 32% at 8%  82%,  rgba(160,30,40,.14) 0%, rgba(80,10,20,.05)  45%, transparent 62%),
+        radial-gradient(ellipse 110% 60% at 50% 0%,  rgba(5,15,55,.28)   0%, transparent 60%);
+      animation: nebulaFloat 32s ease-in-out infinite alternate;
     }
     @keyframes nebulaFloat {
-      0%   { opacity:.7; transform: scale(1)    translateX(0px); }
-      33%  { opacity:1;  transform: scale(1.03) translateX(6px); }
-      66%  { opacity:.8; transform: scale(.98)  translateX(-4px); }
-      100% { opacity:1;  transform: scale(1.02) translateX(2px); }
+      0%   { opacity:.72; transform: scale(1)    translateX(0px)  translateY(0px); }
+      25%  { opacity:.90; transform: scale(1.04) translateX(8px)  translateY(-4px); }
+      50%  { opacity:1;   transform: scale(1.02) translateX(4px)  translateY(3px); }
+      75%  { opacity:.82; transform: scale(.97)  translateX(-5px) translateY(-2px); }
+      100% { opacity:.95; transform: scale(1.03) translateX(3px)  translateY(5px); }
     }
     /* 極細掃描線保留質感 */
     .bg-scanlines {
@@ -5229,8 +5232,13 @@ const API_BASE = (() => {
       twinklePhase: Math.random() * Math.PI * 2,
       twinkleSpeed: .008 + Math.random() * .018,
       layer,
-      color: Math.random() > .85
-        ? (Math.random() > .5 ? 'rgba(160,200,255,' : 'rgba(200,220,255,')
+      color: Math.random() > .72
+        ? (Math.random() > .6
+            ? 'rgba(160,200,255,'
+            : Math.random() > .5
+              ? 'rgba(255,210,140,'
+              : 'rgba(255,160,130,'
+          )
         : 'rgba(255,255,255,',
     };
   }
@@ -5788,6 +5796,81 @@ const API_BASE = (() => {
   function draw() {
     ctx.clearRect(0, 0, W, H);
     frame++;
+
+    // ── 深空星雲（動態脈動色彩雲氣）────────────────────────────────────
+    const nebPulse = 0.5 + Math.sin(frame * 0.0025) * 0.5;
+    const NEBULAE = [
+      [0.38, 0.55, 0.38, 0.22, 80,  30, 160, 0.055],
+      [0.65, 0.30, 0.28, 0.18, 0,   80, 180, 0.048],
+      [0.12, 0.68, 0.22, 0.14, 160, 20, 60,  0.042],
+      [0.80, 0.72, 0.18, 0.12, 20,  120,100, 0.038],
+      [0.50, 0.15, 0.15, 0.10, 100, 60, 200, 0.032],
+    ];
+    NEBULAE.forEach(([xf,yf,rxf,ryf,r,g,b,ma]) => {
+      const nx=W*xf, ny=H*yf, rx=W*rxf, ry=H*ryf;
+      const alpha = ma * (0.55 + nebPulse * 0.45);
+      ctx.save();
+      ctx.scale(1, ry/rx);
+      const ng = ctx.createRadialGradient(nx, ny*(rx/ry), 0, nx, ny*(rx/ry), rx);
+      ng.addColorStop(0,    `rgba(${r},${g},${b},${alpha})`);
+      ng.addColorStop(0.35, `rgba(${r},${g},${b},${alpha*0.55})`);
+      ng.addColorStop(0.70, `rgba(${r},${g},${b},${alpha*0.18})`);
+      ng.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+      ctx.fillStyle = ng;
+      ctx.beginPath();
+      ctx.arc(nx, ny*(rx/ry), rx, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // ── 黑洞（右下，吸積盤 + 事件視界 + 光子環）────────────────────────
+    {
+      const bhx=W*0.72, bhy=H*0.78, bhR=Math.min(W,H)*0.065;
+      const accP = 0.5 + Math.sin(frame*0.006)*0.5;
+      ctx.save();
+      ctx.translate(bhx, bhy);
+      ctx.rotate(-0.28);
+      for (let ring=0; ring<4; ring++) {
+        const rs=1+ring*0.55, ra=(0.10-ring*0.022)*(0.6+accP*0.4);
+        const dg=ctx.createRadialGradient(0,0,bhR*0.7*rs, 0,0,bhR*1.8*rs);
+        dg.addColorStop(0,   'rgba(255,160,40,0)');
+        dg.addColorStop(0.3, `rgba(255,140,20,${ra})`);
+        dg.addColorStop(0.6, `rgba(200,80,10,${ra*0.5})`);
+        dg.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle=dg;
+        ctx.save(); ctx.scale(1,0.3);
+        ctx.beginPath(); ctx.arc(0,0,bhR*1.8*rs,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+      ctx.rotate(frame*0.003);
+      ctx.scale(1,0.28);
+      const dm=ctx.createRadialGradient(0,0,bhR*0.72, 0,0,bhR*1.65);
+      dm.addColorStop(0,    'rgba(255,220,120,0)');
+      dm.addColorStop(0.25, `rgba(255,190,60,${0.55+accP*0.3})`);
+      dm.addColorStop(0.55, `rgba(255,120,20,${0.38+accP*0.2})`);
+      dm.addColorStop(0.85, 'rgba(180,60,5,.10)');
+      dm.addColorStop(1,    'rgba(0,0,0,0)');
+      ctx.fillStyle=dm;
+      ctx.beginPath(); ctx.arc(0,0,bhR*1.65,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 事件視界
+      const lg=ctx.createRadialGradient(bhx,bhy,bhR*0.78, bhx,bhy,bhR*2.2);
+      lg.addColorStop(0,    'rgba(0,0,0,1)');
+      lg.addColorStop(0.55, 'rgba(0,0,0,.92)');
+      lg.addColorStop(0.72, 'rgba(40,20,80,.45)');
+      lg.addColorStop(0.85, 'rgba(60,20,100,.18)');
+      lg.addColorStop(1,    'rgba(0,0,0,0)');
+      ctx.fillStyle=lg;
+      ctx.beginPath(); ctx.arc(bhx,bhy,bhR*2.2,0,Math.PI*2); ctx.fill();
+      // 光子環
+      const rg=ctx.createRadialGradient(bhx,bhy,bhR*0.88, bhx,bhy,bhR*1.18);
+      rg.addColorStop(0,    'rgba(255,200,100,0)');
+      rg.addColorStop(0.45, `rgba(255,210,120,${0.28+accP*0.18})`);
+      rg.addColorStop(0.70, `rgba(255,180,60,${0.15+accP*0.10})`);
+      rg.addColorStop(1,    'rgba(0,0,0,0)');
+      ctx.fillStyle=rg;
+      ctx.beginPath(); ctx.arc(bhx,bhy,bhR*1.18,0,Math.PI*2); ctx.fill();
+    }
 
     // ── 太陽遠場光（左上角大範圍暖光）──────────────────────────────────
     const sunFieldPulse = 1 + Math.sin(frame * .008) * .04;
@@ -7554,92 +7637,119 @@ setTimeout(() => {
       mctx.restore();
     });
 
-    // ── 四隻行走的白羊 ──────────────────────────────────────────────────
+    // ── 四隻行走的白羊（完全重寫，正確朝向）────────────────────────────
     sheepData.forEach(sp => {
-      // 更新位置
       sp.x += sp.xv;
-      if (sp.x > 1.12) { sp.x = -0.12; sp.xv = Math.abs(sp.xv); }
-      if (sp.x < -0.12) { sp.x = 1.12; sp.xv = -Math.abs(sp.xv); }
-      sp.legPhase += 0.07;
+      if (sp.x > 1.12) { sp.x = -0.12; sp.xv =  Math.abs(sp.xv); }
+      if (sp.x < -0.12){ sp.x =  1.12; sp.xv = -Math.abs(sp.xv); }
+      sp.legPhase += 0.08;
 
-      const sx = sp.x * MW;
-      const sy = baseY + MH * 0.033;
-      const s  = sp.s;
-      const dir = sp.xv > 0 ? 1 : -1; // 朝向
+      const sx  = sp.x * MW;
+      const sy  = baseY + MH * 0.028;
+      const s   = sp.s * 1.15;         // 稍微放大
+      const dir = sp.xv >= 0 ? 1 : -1; // 1=向右  -1=向左
+      // 頭在前方：向右時頭在右(+)，向左時頭在左(-)
+      const headDX = dir * 20 * s;
 
       mctx.save();
-      mctx.globalAlpha = 0.78;
-      mctx.scale(dir, 1); // 翻轉朝向
-      const sxFlipped = dir > 0 ? sx : -sx;
+      mctx.globalAlpha = 0.82;
 
-      // 身體陰影（地面投影）
-      mctx.globalAlpha = 0.14;
+      // ── 地面投影
+      mctx.globalAlpha = 0.12;
       mctx.beginPath();
-      mctx.ellipse(sxFlipped, sy + 13*s, 16*s, 4*s, 0, 0, Math.PI*2);
-      mctx.fillStyle = 'rgba(60,90,60,1)';
+      mctx.ellipse(sx, sy + 14*s, 18*s, 4.5*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(40,80,40,1)';
       mctx.fill();
-      mctx.globalAlpha = 0.78;
+      mctx.globalAlpha = 0.82;
 
-      // 四條腿（交替擺動）
-      const legOffsets = [[-9,-3], [-3,-1], [3,-1], [9,-3]];
-      legOffsets.forEach(([dx, ldx], li) => {
-        const swing = Math.sin(sp.legPhase + li * Math.PI * 0.5) * 5 * s;
+      // ── 四條腿（前後各兩條，交替擺動）
+      // 前腿靠頭方向，後腿在身體後
+      const legDefs = [
+        { bx: headDX*0.55,  phase: 0          },  // 前右腿
+        { bx: headDX*0.30,  phase: Math.PI     },  // 前左腿
+        { bx: -headDX*0.35, phase: Math.PI*0.5 },  // 後右腿
+        { bx: -headDX*0.60, phase: Math.PI*1.5 },  // 後左腿
+      ];
+      mctx.strokeStyle = 'rgba(215,222,232,.95)';
+      mctx.lineWidth   = 2.8 * s;
+      mctx.lineCap     = 'round';
+      legDefs.forEach(({bx, phase}) => {
+        const swing  = Math.sin(sp.legPhase + phase) * 5 * s;
+        const footX  = swing * 0.4; // 腳掌前後擺
         mctx.beginPath();
-        mctx.moveTo(sxFlipped + dx*s, sy + 9*s);
-        mctx.lineTo(sxFlipped + (dx + ldx)*s, sy + 21*s + swing);
-        mctx.strokeStyle = 'rgba(200,210,225,.9)';
-        mctx.lineWidth = 2.5*s;
-        mctx.lineCap = 'round';
+        mctx.moveTo(sx + bx, sy + 8*s);
+        mctx.quadraticCurveTo(sx + bx + footX*0.5, sy + 15*s, sx + bx + footX, sy + 22*s);
         mctx.stroke();
       });
 
-      // 身體（橢圓）
+      // ── 身體（主橢圓 + 毛茸茸小圓）
       mctx.beginPath();
-      mctx.ellipse(sxFlipped, sy, 18*s, 12*s, 0, 0, Math.PI*2);
-      mctx.fillStyle = 'rgba(245,248,252,.97)';
+      mctx.ellipse(sx, sy, 19*s, 12*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(244,248,252,.97)';
       mctx.fill();
-      mctx.strokeStyle = 'rgba(180,195,215,.65)';
-      mctx.lineWidth = .8;
-      mctx.stroke();
-
-      // 毛茸茸（幾個小圓）
-      [[-10,-4], [0,-8], [10,-4], [-6,2], [6,2]].forEach(([ddx,ddy]) => {
+      // 毛絨感：5個小圓蓬鬆排布
+      [[-11,-3],[-4,-9],[4,-9],[11,-3],[0,1]].forEach(([ddx,ddy]) => {
         mctx.beginPath();
-        mctx.arc(sxFlipped + ddx*s, sy + ddy*s, 7*s, 0, Math.PI*2);
-        mctx.fillStyle = 'rgba(252,254,255,.9)';
+        mctx.arc(sx + ddx*s, sy + ddy*s, 7.5*s, 0, Math.PI*2);
+        mctx.fillStyle = 'rgba(250,253,255,.92)';
         mctx.fill();
       });
-
-      // 頭部
-      const hx2 = sxFlipped + 19*s, hy2 = sy - 7*s;
+      // 身體輪廓
       mctx.beginPath();
-      mctx.arc(hx2, hy2, 7*s, 0, Math.PI*2);
-      mctx.fillStyle = 'rgba(238,242,250,.97)';
-      mctx.fill();
-      mctx.strokeStyle = 'rgba(170,185,205,.55)';
-      mctx.lineWidth = .8;
+      mctx.ellipse(sx, sy, 19*s, 12*s, 0, 0, Math.PI*2);
+      mctx.strokeStyle = 'rgba(175,192,212,.50)';
+      mctx.lineWidth = 0.8;
       mctx.stroke();
 
-      // 耳朵
+      // ── 頭部
+      const hx = sx + headDX;
+      const hy = sy - 8*s;
       mctx.beginPath();
-      mctx.ellipse(hx2 - 4*s, hy2 - 8*s, 3*s, 5*s, -0.3, 0, Math.PI*2);
-      mctx.fillStyle = 'rgba(225,232,242,.95)';
+      mctx.ellipse(hx, hy, 7.5*s, 6.5*s, 0, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(240,244,250,.97)';
+      mctx.fill();
+      mctx.strokeStyle = 'rgba(165,182,202,.45)';
+      mctx.lineWidth = 0.8;
+      mctx.stroke();
+
+      // 耳朵（前耳在朝向那側，後耳在另側）
+      const earFX = dir *  4.5 * s;
+      const earBX = dir * -4.5 * s;
+      mctx.beginPath();
+      mctx.ellipse(hx + earFX, hy - 8*s, 3*s, 5.5*s, -dir*0.3, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(228,235,245,.95)';
       mctx.fill();
       mctx.beginPath();
-      mctx.ellipse(hx2 + 4*s, hy2 - 8*s, 3*s, 5*s, 0.3, 0, Math.PI*2);
-      mctx.fillStyle = 'rgba(225,232,242,.95)';
+      mctx.ellipse(hx + earBX, hy - 8*s, 3*s, 5.5*s, dir*0.3, 0, Math.PI*2);
+      mctx.fillStyle = 'rgba(228,235,245,.90)';
       mctx.fill();
 
-      // 眼睛 + 眨眼（隨機）
-      mctx.fillStyle = 'rgba(60,80,110,.75)';
+      // 眼睛（朝向那側）
+      const eyeX = hx + dir * 2.5*s;
+      mctx.fillStyle = 'rgba(45,65,100,.80)';
       mctx.beginPath();
-      mctx.arc(hx2 + 2*s, hy2 - 1*s, 1.3*s, 0, Math.PI*2);
+      mctx.arc(eyeX, hy - 0.5*s, 1.5*s, 0, Math.PI*2);
       mctx.fill();
-      // 嘴巴小弧線
-      mctx.strokeStyle = 'rgba(140,120,110,.5)';
-      mctx.lineWidth = .8*s;
+      // 眼神光
+      mctx.fillStyle = 'rgba(255,255,255,.85)';
       mctx.beginPath();
-      mctx.arc(hx2 + 4*s, hy2 + 2*s, 2.5*s, 0.2, Math.PI * 0.75);
+      mctx.arc(eyeX + 0.5*s, hy - 1.2*s, 0.5*s, 0, Math.PI*2);
+      mctx.fill();
+
+      // 鼻子（兩個小圓孔）
+      mctx.fillStyle = 'rgba(180,150,140,.55)';
+      mctx.beginPath();
+      mctx.arc(hx + dir*6.0*s,  hy + 2.5*s, 1.2*s, 0, Math.PI*2);
+      mctx.fill();
+      mctx.beginPath();
+      mctx.arc(hx + dir*7.5*s, hy + 2.0*s, 1.0*s, 0, Math.PI*2);
+      mctx.fill();
+
+      // 嘴巴（朝向那側的小弧線）
+      mctx.strokeStyle = 'rgba(150,130,120,.50)';
+      mctx.lineWidth = 0.9*s;
+      mctx.beginPath();
+      mctx.arc(hx + dir*6.8*s, hy + 3.5*s, 2.2*s, dir > 0 ? 0.15 : Math.PI-0.15, dir > 0 ? Math.PI*0.75 : Math.PI*0.25);
       mctx.stroke();
 
       mctx.restore();
@@ -7745,171 +7855,294 @@ setTimeout(() => {
 })();
 </script>
 
-<!-- SKY CANVAS（白天主題雲朵 + 飛鳥動畫）-->
+<!-- SKY CANVAS（白天主題：積雲 + 真實鳥群 Boids 算法）-->
 <script>
 (function() {
   const cv  = document.getElementById('skyCanvas');
   if (!cv) return;
   const ctx = cv.getContext('2d');
-  let W, H, clouds = [], birds = [], lightParts = [];
+  let W, H;
 
   function resize() {
     W = cv.width  = window.innerWidth;
     H = cv.height = window.innerHeight;
+    if (!boidsInited && W > 0 && H > 0) initBoids();
   }
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { resize(); });
 
-  // 建立雲朵（更豐富立體感）
-  function mkCloud(x) {
-    const scale = .7 + Math.random() * 1.2;
+  // ════════════════════════════════════════════════════
+  //  ☁  積雲系統（分高空捲雲 / 中空積雲 / 低積雲）
+  // ════════════════════════════════════════════════════
+  const clouds = [];
+
+  function mkCloud(startX) {
+    const scale  = 0.8 + Math.random() * 1.6;
+    const tierRnd = Math.random();
+    const isHigh  = tierRnd < 0.22;
+    const isMid   = tierRnd < 0.60;
+    const yFrac   = isHigh ? 0.02 + Math.random() * 0.10
+                 : isMid  ? 0.08 + Math.random() * 0.18
+                           : 0.20 + Math.random() * 0.16;
+    const puffN   = isHigh ? 3 + Math.floor(Math.random()*3)
+                 : isMid  ? 5 + Math.floor(Math.random()*4)
+                           : 6 + Math.floor(Math.random()*5);
+    const baseR   = isHigh ? 13 : isMid ? 26 : 34;
+    const speed   = isHigh ? 0.22 + Math.random() * 0.18
+                 : isMid  ? 0.10 + Math.random() * 0.12
+                           : 0.05 + Math.random() * 0.07;
     return {
-      x: x ?? Math.random() * W * 1.4 - W * .2,
-      y: H * (.03 + Math.random() * .30),
-      scale,
-      speed: .10 + Math.random() * .20,
-      alpha: .55 + Math.random() * .30,
-      puffs: Array.from({length: 6 + Math.floor(Math.random()*5)}, (_, i) => ({
-        dx: (i - 2.5) * 40 * scale,
-        dy: Math.sin(i * 1.0) * 16 * scale,
-        r:  (30 + Math.random() * 28) * scale,
-      })),
+      x: startX ?? Math.random() * (W + 800) - 400,
+      y: H * yFrac,
+      scale, speed,
+      alpha: isHigh ? 0.28 + Math.random()*0.18 : isMid ? 0.60 + Math.random()*0.25 : 0.76 + Math.random()*0.18,
+      tier: isHigh ? 0 : isMid ? 1 : 2,
+      bobPhase: Math.random() * Math.PI * 2,
+      bobAmp: isHigh ? 0.3 : isMid ? 0.7 : 1.1,
+      puffs: Array.from({length: puffN}, (_, i) => {
+        const spread = (i - (puffN-1)/2) / (puffN-1);
+        return {
+          dx: spread * puffN * baseR * 0.88 * scale,
+          dy: (-0.3 + Math.abs(spread)*0.65 + Math.sin(i*1.3)*0.22) * baseR * scale,
+          r:  (baseR + Math.random()*baseR*0.65) * scale * (1 - Math.abs(spread)*0.38),
+        };
+      }),
     };
   }
+  for (let i = 0; i < 18; i++) clouds.push(mkCloud());
 
-  // 建立光粒子
-  function mkPart() {
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: .8 + Math.random() * 1.6,
-      a: .08 + Math.random() * .20,
-      vx: (Math.random() - .5) * .12,
-      vy: -Math.random() * .06,
-      phase: Math.random() * Math.PI * 2,
-    };
-  }
-
-  // 建立鳥（更大更明顯）
-  function mkBird(fromLeft) {
-    return {
-      x: fromLeft !== false ? -60 : W + 60,
-      dir: fromLeft !== false ? 1 : -1,
-      y: H * (.04 + Math.random() * .28),
-      speed: .6 + Math.random() * .8,
-      wingPhase: Math.random() * Math.PI * 2,
-      scale: .9 + Math.random() * 1.0,
-      flock: Math.floor(Math.random() * 3),  // 鳥群偏移
-    };
-  }
-
-  // 初始化
-  for (let i = 0; i < 14; i++) clouds.push(mkCloud());
-  for (let i = 0; i < 50; i++) lightParts.push(mkPart());
-  // 初始多隻鳥
-  for (let i = 0; i < 4; i++) {
-    const b = mkBird();
-    b.x = Math.random() * W;
-    b.y = H * (.04 + Math.random() * .28);
-    birds.push(b);
-  }
-
-  let frame = 0;
-
-  function drawCloud(c) {
+  function drawCloud(c, t) {
+    const bob = Math.sin(c.bobPhase + t * 0.0004) * c.bobAmp;
+    const cx = c.x, cy = c.y + bob;
     ctx.save();
-    // 底部陰影（立體感）
-    ctx.globalAlpha = c.alpha * 0.18;
+    // 底部陰影（立體）
+    ctx.globalAlpha = c.alpha * 0.20;
     c.puffs.forEach(p => {
-      ctx.fillStyle = 'rgba(160,190,230,.6)';
+      ctx.fillStyle = 'rgba(140,175,215,.5)';
       ctx.beginPath();
-      ctx.ellipse(c.x + p.dx + 4, c.y + p.dy + 8, p.r * 0.9, p.r * 0.5, 0, 0, Math.PI*2);
+      ctx.ellipse(cx+p.dx+3, cy+p.dy+p.r*0.40, p.r*0.92, p.r*0.40, 0, 0, Math.PI*2);
       ctx.fill();
     });
-    ctx.globalAlpha = c.alpha;
-    c.puffs.forEach(p => {
+    // 主體（由低到高堆疊）
+    const sorted = [...c.puffs].sort((a,b)=>a.dy-b.dy);
+    sorted.forEach(p => {
+      ctx.globalAlpha = c.alpha;
       const grd = ctx.createRadialGradient(
-        c.x + p.dx - p.r * .25, c.y + p.dy - p.r * .25, p.r * .05,
-        c.x + p.dx, c.y + p.dy, p.r
+        cx+p.dx-p.r*0.20, cy+p.dy-p.r*0.28, p.r*0.04,
+        cx+p.dx+p.r*0.05, cy+p.dy+p.r*0.08, p.r
       );
-      grd.addColorStop(0,   'rgba(255,255,255,1)');
-      grd.addColorStop(.4,  'rgba(245,252,255,.95)');
-      grd.addColorStop(.75, 'rgba(225,242,255,.7)');
-      grd.addColorStop(1,   'rgba(200,228,255,.1)');
+      if (c.tier === 0) {
+        grd.addColorStop(0,   'rgba(240,248,255,.82)');
+        grd.addColorStop(.55, 'rgba(218,236,255,.48)');
+        grd.addColorStop(1,   'rgba(200,225,255,0)');
+      } else {
+        grd.addColorStop(0,   'rgba(255,255,255,1)');
+        grd.addColorStop(.38, 'rgba(248,252,255,.96)');
+        grd.addColorStop(.68, 'rgba(228,244,255,.80)');
+        grd.addColorStop(.90, 'rgba(198,228,248,.48)');
+        grd.addColorStop(1,   'rgba(175,210,240,.04)');
+      }
       ctx.fillStyle = grd;
       ctx.beginPath();
-      ctx.arc(c.x + p.dx, c.y + p.dy, p.r, 0, Math.PI * 2);
+      ctx.arc(cx+p.dx, cy+p.dy, p.r, 0, Math.PI*2);
       ctx.fill();
     });
+    // 迎光高光
+    if (c.tier > 0) {
+      const top = sorted[sorted.length-1];
+      ctx.globalAlpha = c.alpha * 0.32;
+      const hg = ctx.createRadialGradient(
+        cx+top.dx-top.r*0.08, cy+top.dy-top.r*0.52, 0,
+        cx+top.dx, cy+top.dy, top.r*0.68
+      );
+      hg.addColorStop(0, 'rgba(255,255,255,.9)');
+      hg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = hg;
+      ctx.beginPath();
+      ctx.arc(cx+top.dx, cy+top.dy, top.r*0.68, 0, Math.PI*2);
+      ctx.fill();
+    }
     ctx.restore();
   }
 
-  function drawBird(b) {
-    b.wingPhase += .10;
-    const wy = Math.sin(b.wingPhase) * 7 * b.scale;
-    // 鳥群偏移
-    const fx = b.flock * 18 * b.scale;
-    const fy = b.flock * 9 * b.scale;
+  // ════════════════════════════════════════════════════
+  //  🐦  真實鳥群 Boids（分離 / 對齊 / 聚合 + 漂移）
+  //      — 初始化在 resize 後保證 W/H 已定 —
+  // ════════════════════════════════════════════════════
+  const FLOCK  = 32;
+  const boids  = [];
+  let boidsInited = false;
+
+  function mkBoid(scattered) {
+    const angle = scattered
+      ? (-0.25 + Math.random() * 0.50)   // 大致向右
+      : (Math.random() > 0.5 ? -0.20 + Math.random()*0.40
+                              : Math.PI + (-0.20 + Math.random()*0.40));
+    const spd = 0.52 + Math.random() * 0.52;
+    return {
+      x: scattered ? W * (0.05 + Math.random()*0.90) : (Math.random()>0.5 ? -40 : W+40),
+      y: H * (0.04 + Math.random() * 0.30),
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd,
+      wingPhase: Math.random() * Math.PI * 2,
+      wingSpeed: 0.085 + Math.random() * 0.055,
+      size: 4.2 + Math.random() * 3.2,
+    };
+  }
+
+  function initBoids() {
+    boids.length = 0;
+    for (let i = 0; i < FLOCK; i++) boids.push(mkBoid(true));
+    boidsInited = true;
+  }
+
+  // Boids 規則參數
+  const SEP_R=26, SEP_F=0.065;
+  const ALI_R=62, ALI_F=0.013;
+  const COH_R=78, COH_F=0.0055;
+  const MAX_SPD=1.35, MIN_SPD=0.32;
+  const DRIFT_VX=0.20;  // 整體右移漂移
+  const TOP_Y_FRAC=0.03, BOT_Y_FRAC=0.42; // 鳥群垂直活動範圍
+
+  function updateBoids() {
+    const topY = H * TOP_Y_FRAC;
+    const botY = H * BOT_Y_FRAC;
+    boids.forEach((b, i) => {
+      let sx=0,sy=0,sn=0, ax=0,ay=0,an=0, cx=0,cy=0,cn=0;
+      boids.forEach((o,j) => {
+        if (i===j) return;
+        const dx=o.x-b.x, dy=o.y-b.y, d2=dx*dx+dy*dy;
+        if (d2 < SEP_R*SEP_R && d2>0.01) { const d=Math.sqrt(d2); sx-=dx/d; sy-=dy/d; sn++; }
+        if (d2 < ALI_R*ALI_R) { ax+=o.vx; ay+=o.vy; an++; }
+        if (d2 < COH_R*COH_R) { cx+=o.x;  cy+=o.y;  cn++; }
+      });
+      if (sn) { b.vx+=(sx/sn)*SEP_F; b.vy+=(sy/sn)*SEP_F; }
+      if (an) { b.vx+=((ax/an)-b.vx)*ALI_F; b.vy+=((ay/an)-b.vy)*ALI_F; }
+      if (cn) { b.vx+=((cx/cn)-b.x)*COH_F;  b.vy+=((cy/cn)-b.y)*COH_F; }
+
+      // 向右漂移 + 垂直邊界軟回
+      b.vx += (DRIFT_VX - b.vx) * 0.003;
+      if (b.y < topY) b.vy += 0.04;
+      if (b.y > botY) b.vy -= 0.04;
+
+      // 限速
+      const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+      if (spd > MAX_SPD) { b.vx=b.vx/spd*MAX_SPD; b.vy=b.vy/spd*MAX_SPD; }
+      if (spd < MIN_SPD && spd>0) { b.vx=b.vx/spd*MIN_SPD; b.vy=b.vy/spd*MIN_SPD; }
+
+      b.x += b.vx;
+      b.y += b.vy;
+      b.wingPhase += b.wingSpeed;
+
+      // 水平環繞
+      if (b.x > W+80) { b.x=-80; b.y=H*(TOP_Y_FRAC+Math.random()*(BOT_Y_FRAC-TOP_Y_FRAC)); }
+      if (b.x < -80)  { b.x=W+80; b.y=H*(TOP_Y_FRAC+Math.random()*(BOT_Y_FRAC-TOP_Y_FRAC)); }
+    });
+  }
+
+  // 繪製單隻鳥（燕子剪影：身體 + 弧形翅膀 + 叉尾）
+  function drawBoid(b) {
+    const angle = Math.atan2(b.vy, b.vx);
+    const wing  = Math.sin(b.wingPhase);   // -1..1
+    const wUp   = wing * b.size * 1.10;
+    const s     = b.size;
+    // 透明度隨翅膀動作微變，讓鳥更有生命感
     ctx.save();
-    ctx.globalAlpha = .55;
-    ctx.strokeStyle = '#1a3860';
-    ctx.lineWidth   = 1.8 * b.scale;
-    ctx.lineCap     = 'round';
-    ctx.lineJoin    = 'round';
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    ctx.globalAlpha = 0.52 + Math.abs(wing) * 0.32;
+
+    const col = '#1b2d42';
+
+    // 左翼（上翼面）
     ctx.beginPath();
-    const bx = b.x + fx, by = b.y + fy;
-    const s  = b.scale * (b.dir < 0 ? -1 : 1);
-    // 左翼
-    ctx.moveTo(bx - 14 * s, by + wy);
-    ctx.quadraticCurveTo(bx - 7 * s, by - 5 * b.scale, bx, by);
-    // 右翼
-    ctx.moveTo(bx + 14 * s, by + wy);
-    ctx.quadraticCurveTo(bx + 7 * s, by - 5 * b.scale, bx, by);
-    ctx.stroke();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-s*0.18, -wUp*0.32, -s*1.05, -wUp*0.82, -s*1.52, -wUp);
+    ctx.bezierCurveTo(-s*0.95, -wUp*0.48, -s*0.28, s*0.07, 0, 0);
+    ctx.fillStyle = col;
+    ctx.fill();
+
+    // 右翼（下翼面）
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-s*0.18, wUp*0.32, -s*1.05, wUp*0.82, -s*1.52, wUp);
+    ctx.bezierCurveTo(-s*0.95, wUp*0.48, -s*0.28, -s*0.07, 0, 0);
+    ctx.fillStyle = col;
+    ctx.fill();
+
+    // 身體（紡錘形）
+    ctx.beginPath();
+    ctx.ellipse(s*0.18, 0, s*0.68, s*0.20, 0, 0, Math.PI*2);
+    ctx.fillStyle = '#192738';
+    ctx.fill();
+
+    // 叉尾
+    ctx.beginPath();
+    ctx.moveTo(s*0.80, 0);
+    ctx.lineTo(s*1.52,  s*0.25);
+    ctx.lineTo(s*1.12,  0);
+    ctx.lineTo(s*1.52, -s*0.25);
+    ctx.closePath();
+    ctx.fillStyle = col;
+    ctx.fill();
+
+    // 頭
+    ctx.beginPath();
+    ctx.arc(-s*0.45, 0, s*0.26, 0, Math.PI*2);
+    ctx.fillStyle = '#192738';
+    ctx.fill();
+
     ctx.restore();
   }
+
+  // ════════════════════════════════════════════════════
+  //  ✨  光塵粒子
+  // ════════════════════════════════════════════════════
+  const lightParts = Array.from({length: 55}, () => ({
+    x: Math.random() * 1920,
+    y: Math.random() * 1080,
+    r: 0.6 + Math.random() * 1.4,
+    a: 0.05 + Math.random() * 0.15,
+    vx: (Math.random()-0.5)*0.10,
+    vy: -0.04 - Math.random()*0.04,
+    phase: Math.random()*Math.PI*2,
+  }));
+
+  let frame = 0;
 
   function tick() {
     if (!document.body.classList.contains('theme-day')) {
       requestAnimationFrame(tick);
       return;
     }
-
     ctx.clearRect(0, 0, W, H);
     frame++;
 
     // 雲
     clouds.forEach((c, i) => {
       c.x += c.speed;
-      if (c.x > W + 400) clouds[i] = mkCloud(-420);
-      drawCloud(c);
+      if (c.x > W + 520) clouds[i] = mkCloud(-520);
+      drawCloud(c, frame);
     });
 
-    // 光粒子
+    // 光塵
     lightParts.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.phase += .018;
-      if (p.y < -5) p.y = H + 5;
-      if (p.x < -5) p.x = W + 5;
-      if (p.x > W + 5) p.x = -5;
-      const tw = .5 + Math.sin(p.phase) * .5;
-      ctx.globalAlpha = p.a * tw;
-      ctx.fillStyle = 'rgba(255,245,180,1)';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
+      p.x+=p.vx; p.y+=p.vy; p.phase+=0.016;
+      if (p.y<-5) p.y=H+5;
+      if (p.x<-5) p.x=W+5;
+      if (p.x>W+5) p.x=-5;
+      const tw=0.42+Math.sin(p.phase)*0.58;
+      ctx.globalAlpha=p.a*tw;
+      ctx.fillStyle='rgba(255,245,185,1)';
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
     });
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
 
-    // 鳥
-    birds.forEach((b, i) => {
-      b.x += b.speed * b.dir;
-      if (b.x > W + 100 || b.x < -100) {
-        birds[i] = mkBird(b.dir < 0 ? true : false);
-      }
-      drawBird(b);
-    });
-    // 定期補鳥（最多8隻）
-    if (frame % 600 === 0 && birds.length < 8) birds.push(mkBird());
+    // 鳥群
+    if (boidsInited) {
+      updateBoids();
+      boids.forEach(b => drawBoid(b));
+    }
 
     requestAnimationFrame(tick);
   }
