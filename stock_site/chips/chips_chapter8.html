@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="apple-touch-icon" href="/images/jelly.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第八章：主力散戶比：股票的「健康度」— 籌碼分析教學</title>
+  <meta name="description" content="集保戶數變化、大戶持股比例增減判讀。從主力集中度解讀籌碼健康度，掌握大戶進出的隱性訊號。籌碼分析教學第八章。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ch-color: var(--accent);
+      --ch-rgb: 0,229,255;
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;
+      --red:       #ff3d5a;
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+    }
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+    .bg-stars {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle { 0%{opacity:.6}50%{opacity:.85}100%{opacity:.7} }
+
+    .sticky-progress {
+      position:sticky;top:58px;z-index:190;
+      background:rgba(3,6,14,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{
+      height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));
+      box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;
+    }
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:36px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero-icon {
+      flex-shrink:0;width:110px;height:110px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);
+      border-radius:20px;position:relative;overflow:hidden;
+    }
+    .hero-content{flex:1;min-width:0;}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--accent);text-transform:uppercase;
+      opacity:.8;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(0,229,255,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;
+      border:1px solid;cursor:default;transition:all .2s;
+    }
+    .tag:hover{transform:translateY(-1px);filter:brightness(1.15);}
+    .tag-cyan  {color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink  {color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green {color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red   {color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);
+      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+      transition:transform .25s,box-shadow .3s,border-color .3s;
+    }
+    .section-card:hover{transform:translateY(-2px);box-shadow:0 12px 50px rgba(0,0,0,.55),0 0 30px rgba(0,229,255,.06);border-color:rgba(0,229,255,.18);}
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .5s,transform .5s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .section-header {
+      display:flex;align-items:center;gap:16px;
+      padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);
+      position:relative;
+    }
+    .section-header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.35),transparent);
+    }
+    .section-num {
+      font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.22);border-radius:8px;
+      padding:4px 10px;letter-spacing:.1em;white-space:nowrap;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+      color:#fff;letter-spacing:.06em;
+    }
+    .section-icon{margin-left:auto;font-size:1.4rem;opacity:.7;}
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--accent);font-style:normal;font-weight:500;}
+
+    /* ── BOXES ── */
+    .insight-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.03));
+      border:1px solid rgba(0,229,255,.2);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+    .warn-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warn-box .insight-label{color:var(--red);}
+    .gold-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,200,0,.03));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow);}
+    .purple-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));
+      border:1px solid rgba(178,102,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .purple-box .insight-label{color:var(--purple);}
+    .success-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,200,90,.02));
+      border:1px solid rgba(0,230,118,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .success-box .insight-label{color:var(--green);}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{
+      background:rgba(0,229,255,.07);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+      padding:12px 16px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;
+    }
+    .cmp-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+      color:var(--text-dim);vertical-align:top;line-height:1.6;
+    }
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .cmp-table .val-red   {color:var(--red);font-weight:600;}
+    .cmp-table .val-green {color:var(--green);font-weight:600;}
+    .cmp-table .val-yellow{color:var(--yellow);font-weight:600;}
+    .cmp-table .val-cyan  {color:var(--accent);font-weight:600;}
+    .cmp-table .val-purple{color:var(--purple);font-weight:600;}
+    .cmp-table .val-orange{color:var(--orange);font-weight:600;}
+
+    /* ── FORCE METER ── */
+    .force-meter-wrap{margin:24px 0;}
+    .force-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .force-label{font-size:.82rem;color:var(--text-dim);min-width:160px;}
+    .force-bar-bg{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;}
+    .force-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);}
+    .force-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);min-width:36px;text-align:right;}
+
+    /* ── SHADOW LINE ── */
+    .shadow-line{
+      display:flex;align-items:stretch;
+      margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,229,255,.1);
+    }
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.up {background:linear-gradient(180deg,var(--red),rgba(255,61,90,.4));}
+    .sl-side.dn {background:linear-gradient(180deg,var(--green),rgba(0,230,118,.4));}
+    .sl-side.neu{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.4));}
+    .sl-side.pu {background:linear-gradient(180deg,var(--purple),rgba(178,102,255,.4));}
+    .sl-side.cy {background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.4));}
+    .sl-body{padding:16px 20px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;margin-bottom:6px;}
+    .sl-top.up {color:var(--red);}
+    .sl-top.dn {color:var(--green);}
+    .sl-top.neu{color:var(--yellow);}
+    .sl-top.pu {color:var(--purple);}
+    .sl-top.cy {color:var(--accent);}
+    .sl-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+    .sl-text strong{color:var(--text);}
+
+    /* ── DIVIDER ── */
+    .sec-divider{
+      text-align:center;margin:28px 0 22px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.3em;color:var(--text-faint);
+      display:flex;align-items:center;gap:14px;
+    }
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── CHIP ── */
+    .chip{
+      display:inline-block;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;
+      padding:3px 10px;border-radius:6px;letter-spacing:.05em;
+      vertical-align:middle;margin:0 2px;
+    }
+    .chip-red   {background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green {background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan  {background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .chip-orange{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+
+    /* ── FLOW STEP ── */
+    .flow-step {
+      display:flex;align-items:flex-start;gap:18px;
+      padding:18px 20px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.1);background:rgba(0,0,0,.2);
+      margin:10px 0;transition:all .22s;
+    }
+    .flow-step:hover{border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.04);}
+    .flow-num{
+      flex-shrink:0;width:32px;height:32px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',monospace;font-size:.68rem;font-weight:700;
+    }
+    .cn{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .rn{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .gn{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.28);color:var(--green);}
+    .yn{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.28);color:var(--yellow);}
+    .pn{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.28);color:var(--purple);}
+    .flow-content{flex:1;}
+    .flow-heading{font-weight:700;color:var(--text);font-size:.9rem;margin-bottom:4px;}
+    .flow-sub{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── SIGNAL GRID ── */
+    .signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0;}
+    .signal-card{
+      border-radius:14px;padding:18px 20px;
+      background:rgba(0,0,0,.2);
+      border:1px solid rgba(0,229,255,.1);
+      transition:all .22s;
+    }
+    .signal-card:hover{border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.04);}
+    .signal-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .signal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .signal-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;}
+    .signal-body{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── ROLE CARDS (re-used for bracket tiers) ── */
+    .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:24px 0;}
+    .role-card{
+      border-radius:16px;padding:22px 18px;
+      position:relative;overflow:hidden;transition:all .25s;
+    }
+    .role-card:hover{transform:translateY(-3px);}
+    .role-card.whale{background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(0,170,255,.02));border:1px solid rgba(0,229,255,.22);}
+    .role-card.mid  {background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(255,200,0,.02));border:1px solid rgba(255,214,0,.22);}
+    .role-card.retail{background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.22);}
+    .role-icon{font-size:2rem;margin-bottom:12px;}
+    .role-name{font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;margin-bottom:6px;letter-spacing:.06em;}
+    .role-card.whale  .role-name{color:var(--accent);}
+    .role-card.mid    .role-name{color:var(--yellow);}
+    .role-card.retail .role-name{color:var(--red);}
+    .role-en{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;opacity:.6;margin-bottom:10px;}
+    .role-desc{font-size:.82rem;color:var(--text-dim);line-height:1.65;}
+    .role-scale{
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      padding:3px 8px;border-radius:6px;display:inline-block;margin-top:10px;
+    }
+    .whale  .role-scale{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.22);color:var(--accent);}
+    .mid    .role-scale{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.22);color:var(--yellow);}
+    .retail .role-scale{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.25);color:var(--red);}
+
+    /* ── SVG CHART WRAP ── */
+    .svg-chart-wrap{
+      width:100%;border-radius:14px;overflow:hidden;
+      border:1px solid rgba(0,229,255,.1);margin:20px 0;
+    }
+
+    /* ── HEALTH METER ── */
+    .health-meter{
+      border-radius:16px;padding:24px 26px;margin:24px 0;
+      background:rgba(0,0,0,.22);border:1px solid rgba(0,229,255,.1);
+    }
+    .hm-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.18em;color:var(--text-faint);margin-bottom:18px;}
+    .hm-row{display:grid;grid-template-columns:140px 1fr 60px;align-items:center;gap:14px;margin-bottom:12px;}
+    .hm-label{font-size:.82rem;color:var(--text-dim);}
+    .hm-bar-bg{height:12px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;position:relative;}
+    .hm-bar-fill{height:100%;border-radius:6px;transition:width 1.4s cubic-bezier(.22,1,.36,1);}
+    .hm-val{font-family:'Share Tech Mono',monospace;font-size:.72rem;text-align:right;}
+
+    /* ── TIMELINE ── */
+    .timeline{position:relative;padding-left:28px;margin:24px 0;}
+    .timeline::before{
+      content:'';position:absolute;left:10px;top:8px;bottom:8px;width:2px;
+      background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.1));border-radius:2px;
+    }
+    .tl-item{position:relative;margin-bottom:24px;}
+    .tl-dot{
+      position:absolute;left:-24px;top:4px;
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid;background:var(--bg);
+    }
+    .tl-dot.cy{border-color:var(--accent);box-shadow:0 0 8px rgba(0,229,255,.5);}
+    .tl-dot.gn{border-color:var(--green);box-shadow:0 0 8px rgba(0,230,118,.5);}
+    .tl-dot.rd{border-color:var(--red);box-shadow:0 0 8px rgba(255,61,90,.5);}
+    .tl-dot.yn{border-color:var(--yellow);box-shadow:0 0 8px rgba(255,214,0,.4);}
+    .tl-dot.pu{border-color:var(--purple);box-shadow:0 0 8px rgba(178,102,255,.5);}
+    .tl-head{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.1em;margin-bottom:5px;}
+    .tl-head.cy{color:var(--accent);}
+    .tl-head.gn{color:var(--green);}
+    .tl-head.rd{color:var(--red);}
+    .tl-head.yn{color:var(--yellow);}
+    .tl-head.pu{color:var(--purple);}
+    .tl-body{font-size:.84rem;color:var(--text-dim);line-height:1.65;}
+    .tl-body strong{color:var(--text);}
+
+    /* ── QUIZ ── */
+    .quiz-wrap{margin:24px 0;background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:22px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:16px;line-height:1.65;}
+    .quiz-opts{display:flex;flex-direction:column;gap:8px;}
+    .quiz-opt{
+      display:flex;align-items:center;gap:12px;
+      padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(0,229,255,.12);background:rgba(0,229,255,.03);
+      cursor:pointer;transition:all .18s cubic-bezier(.22,1,.36,1);
+      font-size:.88rem;color:var(--text-dim);
+    }
+    .quiz-opt:hover:not(.disabled){border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);color:var(--text);}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08);color:var(--green);}
+    .quiz-opt.wrong  {border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.06);color:var(--red);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-letter{
+      width:28px;height:28px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.72rem;font-weight:700;
+      border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.06);color:var(--accent);
+      min-width:28px;
+    }
+    .quiz-feedback{
+      margin-top:14px;padding:12px 16px;border-radius:10px;
+      font-size:.84rem;line-height:1.7;display:none;
+    }
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok  {background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ══ CHAPTER FOOTER ══ */
+    .chapter-footer {
+      margin-top:64px;padding:0;
+      background:linear-gradient(135deg,rgba(6,12,26,.99),rgba(4,8,18,.99));
+      border:1.5px solid rgba(0,229,255,.16);
+      border-radius:20px;overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 30px rgba(0,229,255,.04);
+    }
+    .chapter-footer::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,229,255,.6),var(--accent),transparent);
+    }
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;padding:28px 32px;gap:20px;flex-wrap:wrap;}
+    .footer-left{display:flex;align-items:center;gap:18px;flex:1;min-width:0;}
+    .footer-complete-badge{
+      flex-shrink:0;width:42px;height:42px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(0,229,255,.14),rgba(0,229,255,.06));
+      border:1px solid rgba(0,229,255,.3);
+      display:grid;place-items:center;font-size:1.3rem;
+    }
+    .footer-complete-text{flex:1;min-width:0;}
+    .footer-complete-title{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:#fff;letter-spacing:.04em;margin-bottom:4px;}
+    .footer-complete-desc{font-size:.8rem;color:#7a9ab8;line-height:1.6;}
+    .footer-next-hint{font-size:.73rem;color:rgba(0,229,255,.8);margin-top:3px;font-family:'Share Tech Mono',monospace;letter-spacing:.04em;opacity:.75;}
+    .footer-right{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+    .fn-btn{display:flex;align-items:center;gap:9px;padding:11px 20px;border-radius:12px;font-family:'Share Tech Mono',monospace;font-size:.74rem;letter-spacing:.07em;cursor:pointer;text-decoration:none;transition:all .22s;white-space:nowrap;border:1.5px solid;}
+    .fn-btn svg{width:14px;height:14px;flex-shrink:0;}
+    .fn-btn.home{color:var(--purple);border-color:rgba(178,102,255,.35);background:rgba(178,102,255,.06);}
+    .fn-btn.home:hover{color:#c97fff;border-color:rgba(178,102,255,.6);background:rgba(178,102,255,.12);box-shadow:0 0 14px rgba(178,102,255,.2);}
+    .fn-btn.prev{color:#a0c8e8;border-color:rgba(0,229,255,.2);background:rgba(0,229,255,.05);}
+    .fn-btn.prev:hover{color:var(--accent);border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.12);box-shadow:0 0 14px rgba(0,229,255,.18);}
+    .fn-btn.next{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .fn-btn.next:hover{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.6);box-shadow:0 0 18px rgba(0,229,255,.22);}
+    @media(max-width:600px){.footer-inner{flex-direction:column;align-items:stretch;}.footer-right{justify-content:center;}.fn-btn{justify-content:center;}}
+
+    /* ══ HEADER ══ */
+    header{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 20px 0 14px;height:58px;
+      border-bottom:1px solid rgba(0,229,255,.09);
+      background:rgba(3,6,14,.97);
+      backdrop-filter:blur(24px);
+      box-shadow:0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--accent) 20%,rgba(0,170,255,.9) 50%,var(--accent) 80%,transparent);
+      background-size:200% 100%;animation:headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .header-left{display:flex;align-items:center;}
+    .logo{display:flex;align-items:center;gap:12px;margin-left:2px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.92rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .btn-back{
+      display:flex;align-items:center;gap:7px;
+      padding:6px 16px;border-radius:20px;
+      border:1px solid rgba(0,229,255,.22);
+      background:rgba(0,229,255,.06);
+      color:#ffffff;font-family:'Share Tech Mono',monospace;
+      font-size:.7rem;letter-spacing:.07em;cursor:pointer;
+      text-decoration:none;transition:all .2s;
+    }
+    .btn-back:hover{color:var(--accent);background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 16px rgba(0,229,255,.2);}
+    .btn-back svg{width:12px;height:12px;flex-shrink:0;}
+    #subClock{
+      font-family:'Share Tech Mono',monospace;font-size:.75rem;
+      color:var(--accent);letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px;padding:5px 14px;
+      white-space:nowrap;
+    }
+
+    /* ══ SIDENAV ══ */
+    .chapter-sidenav {
+      position:fixed;left:0;top:50%;transform:translateY(-50%);
+      z-index:150;display:flex;flex-direction:column;
+      background:rgba(2,5,14,.98);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+      border:1.5px solid rgba(0,229,255,.28);border-left:none;
+      border-radius:0 18px 18px 0;overflow:hidden;
+      box-shadow:6px 0 40px rgba(0,0,0,.65),0 0 28px rgba(0,229,255,.08);
+      transition:box-shadow .3s,border-color .3s;min-width:48px;
+    }
+    .chapter-sidenav:hover{box-shadow:8px 0 50px rgba(0,0,0,.7),0 0 40px rgba(0,229,255,.12);border-color:rgba(0,229,255,.35);}
+    .chapter-sidenav::before{content:'';display:block;height:2px;flex-shrink:0;background:linear-gradient(90deg,transparent,rgba(0,229,255,.9),rgba(0,170,255,.5),transparent);}
+    .chapter-sidenav::after{content:'';display:block;height:2px;flex-shrink:0;margin-top:auto;background:linear-gradient(90deg,transparent,rgba(0,170,255,.5),rgba(0,170,255,.2),transparent);}
+    .ch-nav-item{
+      display:flex;align-items:center;padding:10px 14px 10px 12px;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.06em;
+      color:rgba(200,220,240,.85);text-decoration:none;cursor:pointer;
+      border-left:2.5px solid transparent;transition:all .22s ease;white-space:nowrap;
+      border-bottom:1px solid rgba(0,229,255,.06);position:relative;overflow:hidden;min-width:148px;
+    }
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.66rem;font-weight:700;flex-shrink:0;min-width:20px;color:rgba(180,210,235,.9);}
+    .ch-nav-item .ch-label{max-width:160px;overflow:hidden;font-size:.7rem;letter-spacing:.04em;color:rgba(220,235,250,.9);padding-left:8px;}
+    .ch-nav-item:hover{color:var(--accent);border-left-color:rgba(0,229,255,.6);background:rgba(0,229,255,.05);}
+    .ch-nav-item.current-ch{color:var(--accent);border-left-color:var(--accent);background:rgba(0,229,255,.08);}
+    .ch-nav-item.current-ch .ch-num{color:var(--accent);}
+    .ch-nav-item.current-ch::after{content:'';position:absolute;right:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+    .ch-nav-item.locked{opacity:.28;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── MOBILE ── */
+    @media(max-width:640px){
+      body{font-size:15px;}
+      main{padding:20px 14px 80px !important;}
+      .hero{flex-direction:column !important;text-align:center !important;padding:22px 18px !important;gap:18px !important;}
+      .hero-title{font-size:1.1rem !important;}
+      .hero-icon{width:70px !important;height:70px !important;margin:0 auto !important;}
+      .section-body{padding:18px 16px 20px !important;}
+      .role-grid,.signal-grid{grid-template-columns:1fr !important;}
+      .prose{font-size:.9rem !important;}
+      .flow-step{padding:14px 14px !important;}
+      .cmp-table{font-size:.78rem !important;}
+      .cmp-table th,.cmp-table td{padding:8px 10px !important;}
+      .chapter-sidenav{display:none !important;}
+      .hm-row{grid-template-columns:100px 1fr 44px !important;}
+    }
+  
+    /* ── Google AdSense 廣告容器 ── */
+    .ad-unit {
+      display: block;
+      width: 100%;
+      margin: 28px 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    .ad-unit-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 4px;
+      opacity: .55;
+      text-transform: uppercase;
+    }
+    .ad-unit ins { display: block; margin: 0 auto; }
+    .ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 0 0 4px;
+    }
+    body.theme-day .ad-unit-label { color: #5a8ab8; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
+
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
+       ═══════════════════════════════════════════════════════════════ */
+
+    body.theme-day {
+      --bg:         #cce0f2;
+      --surface:    rgba(255,255,255,.88);
+      --surface2:   rgba(232,246,255,.92);
+      --border:     rgba(26,101,168,.18);
+      --border2:    rgba(26,101,168,.30);
+      --accent:     #1265a8;
+      --accent2:    #0d5090;
+      --accent3:    #1a88cc;
+      --green:      #157a32;
+      --red:        #b03020;
+      --yellow:     #b8880e;
+      --purple:     #6640c0;
+      --pink:       #c03080;
+      --muted:      #6a90b0;
+      --text:       #0c1c2e;
+      --text-dim:   #1a3550;
+      --text-faint: #3a6080;
+      --glow:       0 2px 14px rgba(26,101,168,.18);
+    }
+    body.theme-day {
+      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 80%,#e8f8f0 100%);
+      scrollbar-color: rgba(26,123,191,.3) transparent;
+    }
+    body.theme-day .bg-nebula,
+    body.theme-day .bg-scanlines { opacity:0; pointer-events:none; }
+    body.theme-day .bg-stars { opacity: 0; pointer-events: none; }
+    body.theme-day header {
+      background: rgba(255,255,255,.88) !important;
+      box-shadow: 0 2px 28px rgba(26,80,160,.12) !important;
+    }
+    body.theme-day header::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.55) 30%,rgba(33,150,211,.75) 50%,rgba(26,123,191,.55) 70%,transparent);
+    }
+    body.theme-day .logo-text { color:#0a1828; text-shadow:0 1px 4px rgba(26,80,160,.18); }
+    body.theme-day .logo-sub  { color:#1265a8; opacity:.85; }
+    body.theme-day .btn-back { background:rgba(26,123,191,.09); border-color:rgba(26,101,168,.3); color:#1a3a60; }
+    body.theme-day .btn-back:hover { background:rgba(26,123,191,.16); border-color:rgba(26,101,168,.52); color:#0d3560; }
+    body.theme-day .chapter-badge { background:rgba(26,123,191,.12); border-color:rgba(26,101,168,.35); color:#1265a8; }
+    body.theme-day .sticky-progress { background:rgba(255,255,255,.92); border-bottom:1px solid rgba(26,123,191,.18); box-shadow:0 2px 12px rgba(26,80,160,.08); }
+    body.theme-day .progress-track-sticky { background:rgba(26,101,168,.12); }
+    body.theme-day .progress-fill-sticky { background:linear-gradient(90deg,#1265a8,#1a88cc); box-shadow:0 0 8px rgba(26,101,168,.4); }
+    body.theme-day .progress-label-sm { color:#2a4a68; font-weight:500; }
+    body.theme-day .progress-pct-sm { color:#1265a8; font-weight:700; }
+    body.theme-day .hero { background:rgba(255,255,255,.9) !important; border-color:rgba(26,123,191,.22); box-shadow:0 8px 40px rgba(26,80,160,.12) !important; }
+    body.theme-day .hero::before { background:linear-gradient(90deg,transparent,rgba(26,123,191,.45),rgba(33,150,211,.6),rgba(26,123,191,.45),transparent); }
+    body.theme-day .hero-label { color:#1265a8; }
+    body.theme-day .hero-title { background:linear-gradient(90deg,#0a2d50 0%,#1265a8 55%,#1a88cc 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    body.theme-day .hero-desc { color:#1a3550; }
+    body.theme-day .tag-cyan   { color:#0d6ea8; border-color:rgba(13,110,168,.3); background:rgba(13,110,168,.08); }
+    body.theme-day .tag-green  { color:#157a32; border-color:rgba(21,122,50,.3); background:rgba(21,122,50,.07); }
+    body.theme-day .tag-yellow { color:#8a6000; border-color:rgba(138,96,0,.3); background:rgba(138,96,0,.07); }
+    body.theme-day .tag-purple { color:#6640c0; border-color:rgba(102,64,192,.3); background:rgba(102,64,192,.07); }
+    body.theme-day .tag-pink   { color:#b0206a; border-color:rgba(176,32,106,.3); background:rgba(176,32,106,.07); }
+    body.theme-day .section-card { background:rgba(255,255,255,.92) !important; border-color:rgba(26,101,168,.15) !important; box-shadow:0 8px 36px rgba(26,60,140,.1),inset 0 1px 0 rgba(255,255,255,.95) !important; }
+    body.theme-day .section-card::before { background:linear-gradient(90deg,transparent,rgba(26,123,191,.35),transparent); animation:none; opacity:.6; }
+    body.theme-day .section-header { border-bottom-color:rgba(26,123,191,.12); }
+    body.theme-day .section-title { color:#0a1828; }
+    body.theme-day .section-num { color:#1265a8; background:rgba(26,123,191,.1); }
+    body.theme-day .prose { color:#1a3550; }
+    body.theme-day .prose strong { color:#0a1828; }
+    body.theme-day em.hl  { color:#0d6ea8; }
+    body.theme-day em.hlg { color:#157a32; }
+    body.theme-day em.hlr { color:#a02818; }
+    body.theme-day em.hly { color:#8a6000; }
+    body.theme-day em.hlp { color:#6640c0; }
+    body.theme-day em.hlo { color:#a05000; }
+    body.theme-day .insight-box { background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.05)); border-color:rgba(26,123,191,.25); }
+    body.theme-day .warn-box { background:linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03)); border-color:rgba(176,48,32,.22); }
+    body.theme-day .gold-box { background:linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03)); border-color:rgba(184,136,14,.22); }
+    body.theme-day .green-box { background:linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03)); border-color:rgba(21,122,50,.22); }
+    body.theme-day .insight-text { color:#1a2d40; }
+    body.theme-day .key-concept { background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,123,191,.03)); border-color:rgba(26,123,191,.22); }
+    body.theme-day .key-concept::after { background:linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent); animation:none; opacity:.65; }
+    body.theme-day .key-concept-label { color:#1265a8; }
+    body.theme-day .key-concept-text { color:#1265a8; }
+    body.theme-day .vocab-item { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
+    body.theme-day .vocab-item:hover { border-color:rgba(26,101,168,.32) !important; }
+    body.theme-day .vocab-term { color:#1265a8 !important; }
+    body.theme-day .vocab-def { color:#1a3550 !important; }
+    body.theme-day .example-box { background:linear-gradient(135deg,rgba(255,245,210,.9),rgba(255,248,225,.8)) !important; border-color:rgba(184,136,14,.28) !important; }
+    body.theme-day .example-label { color:#8a6000 !important; opacity:1 !important; }
+    body.theme-day .example-box p { color:#1a2830 !important; }
+    body.theme-day .chapter-footer { background:rgba(255,255,255,.92); border-color:rgba(26,101,168,.22); box-shadow:0 6px 32px rgba(26,80,160,.1); }
+    body.theme-day .chapter-footer::before { background:linear-gradient(90deg,transparent,rgba(26,123,191,.5),rgba(33,150,211,.65),rgba(26,123,191,.5),transparent); animation:none; opacity:.7; }
+    body.theme-day .footer-complete-badge { background:linear-gradient(135deg,rgba(26,123,191,.14),rgba(26,80,160,.08)); border-color:rgba(26,101,168,.3); }
+    body.theme-day .footer-complete-title { color:#0a1828; }
+    body.theme-day .footer-complete-desc { color:#2a5070; }
+    body.theme-day .footer-next-hint { color:#1265a8; opacity:.85; }
+    body.theme-day .fn-btn.prev { color:#2a5080; border-color:rgba(26,101,168,.25); background:rgba(26,123,191,.07); }
+    body.theme-day .fn-btn.prev:hover { color:#0d3560; border-color:rgba(26,101,168,.5); background:rgba(26,123,191,.13); box-shadow:0 2px 12px rgba(26,101,168,.15); }
+    body.theme-day .fn-btn.next { color:#1265a8; border-color:rgba(26,101,168,.35); background:rgba(26,123,191,.1); }
+    body.theme-day .fn-btn.next:hover { color:#fff; background:#1265a8; border-color:#1265a8; box-shadow:0 4px 18px rgba(26,101,168,.3); }
+    body.theme-day .fn-btn.home { color:#2a5080; border-color:rgba(26,101,168,.2); background:rgba(26,123,191,.05); }
+    body.theme-day .fn-btn.home:hover { color:#1265a8; border-color:rgba(26,123,191,.45); background:rgba(26,123,191,.12); }
+    body.theme-day .fn-btn.locked { color:#8ab0d0; border-color:rgba(26,101,168,.15); background:rgba(26,123,191,.04); }
+    body.theme-day .chapter-sidenav { background:rgba(255,255,255,.96); backdrop-filter:blur(20px) saturate(1.8); border-color:rgba(26,101,168,.35); box-shadow:4px 0 28px rgba(26,80,160,.18); }
+    body.theme-day .ch-nav-item { color:#1a3a60; border-bottom-color:rgba(26,101,168,.1); }
+    body.theme-day .ch-nav-item .ch-num { color:#2a5080; }
+    body.theme-day .ch-nav-item .ch-label { color:#1a3a60; }
+    body.theme-day .ch-nav-item:hover { color:#0d3d7a; border-left-color:rgba(26,101,168,.55); background:rgba(26,123,191,.07); }
+    body.theme-day .ch-nav-item.current-ch { color:#1265a8; border-left-color:#1265a8; background:rgba(26,123,191,.1); }
+    body.theme-day .cmp-table th,.compare-table th { background:rgba(26,123,191,.06); color:#1265a8; border-bottom-color:rgba(26,123,191,.2); }
+    body.theme-day .cmp-table td,.compare-table td { color:#1a3550; border-bottom-color:rgba(26,101,168,.08); }
+    body.theme-day strong { color:#0a1828; }
+    body.theme-day .section-body { color:#0c1c2e; }
+    body.theme-day #site-footer { background:linear-gradient(180deg,rgba(240,247,255,.97),rgba(228,240,255,.99)) !important; border-top-color:rgba(26,101,168,.15) !important; }
+    body.theme-day #site-footer p, body.theme-day #site-footer span { color:rgba(30,70,120,.65) !important; }
+    body.theme-day #site-footer a { color:rgba(18,101,168,.7) !important; }
+    body.theme-day #subClock { color:#0a3a7a; text-shadow:none; background:rgba(10,60,160,.05); border-color:rgba(10,60,160,.16); }
+    /* SOP steps chips_specific */
+    body.theme-day .sop-step { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
+    body.theme-day .sop-title { color:#0a1828; }
+    body.theme-day .sop-desc { color:#1a3550; }
+    body.theme-day .score-card { background:rgba(255,255,255,.88) !important; border-color:rgba(26,101,168,.18) !important; }
+    body.theme-day .score-label { color:#1a3550; }
+    body.theme-day .law-card { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
+    body.theme-day .law-title { color:#0a1828; }
+    body.theme-day .quiz-block { background:linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04)); border-color:rgba(102,64,192,.2); }
+    body.theme-day .quiz-label { color:#6640c0; }
+    body.theme-day .quiz-q { color:#0a1828; }
+    body.theme-day .quiz-opt { background:rgba(102,64,192,.04); border-color:rgba(102,64,192,.15); color:#1a2d40; }
+    body.theme-day .quiz-opt:hover:not(.disabled) { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.35); color:#0a1828; }
+    body.theme-day .quiz-opt.correct { border-color:rgba(21,122,50,.5)!important; background:rgba(21,122,50,.1)!important; color:#157a32!important; }
+    body.theme-day .quiz-opt.wrong { border-color:rgba(176,48,32,.5)!important; background:rgba(176,48,32,.1)!important; color:#b03020!important; }
+    body.theme-day .quiz-feedback.ok { background:rgba(21,122,50,.08); border-color:rgba(21,122,50,.25); color:#157a32; }
+    body.theme-day .quiz-feedback.fail { background:rgba(176,48,32,.08); border-color:rgba(176,48,32,.25); color:#b03020; }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       SPACE MODE VISUAL ENHANCEMENTS — 統一增強版
+       ═══════════════════════════════════════════════════════════ */
+
+    .bg-nebula {
+      animation: nebulaFloat 28s ease-in-out infinite alternate !important;
+    }
+    @keyframes nebulaFloat {
+      0%   { opacity:.75; transform:scale(1) translateX(0); }
+      50%  { opacity:.9; transform:scale(1.015) translateX(3px); }
+      100% { opacity:1;  transform:scale(1.025) translateX(-3px); }
+    }
+
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle { 0%{opacity:.6}50%{opacity:.85}100%{opacity:.7} }
+    body.theme-day .bg-stars { opacity: 0; pointer-events: none; }
+
+    .section-card {
+      transition: transform .25s, box-shadow .3s, border-color .3s !important;
+    }
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 30px rgba(0,229,255,.06) !important;
+      border-color: rgba(0,229,255,.18) !important;
+    }
+    body.theme-day .section-card:hover {
+      box-shadow: 0 12px 40px rgba(26,80,160,.15) !important;
+      border-color: rgba(26,123,191,.3) !important;
+      transform: translateY(-2px);
+    }
+
+    /* ── Day theme sky & sun ── */
+    body.theme-day {
+      background:
+        radial-gradient(ellipse 60% 25% at 20% 15%, rgba(255,255,255,.5) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 75% 10%, rgba(255,255,255,.45) 0%, transparent 55%),
+        linear-gradient(180deg,
+          #4fa8de 0%, #6bbcec 12%, #8bd0f5 28%, #a8dff8 45%,
+          #c2edfb 62%, #d5f3f8 78%, #e4f8f2 100%
+        ) !important;
+    }
+    body.theme-day::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 180px 35px at 15% 18%, rgba(255,255,255,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 220px 40px at 45% 12%, rgba(255,255,255,.5) 0%, transparent 70%),
+        radial-gradient(ellipse 160px 30px at 72% 22%, rgba(255,255,255,.45) 0%, transparent 65%);
+      animation: cloudDrift 40s ease-in-out infinite alternate;
+    }
+    @keyframes cloudDrift {
+      0%   { transform: translateX(0); opacity: .8; }
+      100% { transform: translateX(18px); opacity: 1; }
+    }
+    body.theme-day::after {
+      content: '';
+      position: fixed; top: -60px; right: -60px; width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,100,.38) 0%, rgba(255,200,50,.15) 40%, transparent 70%);
+      z-index: 0; pointer-events: none;
+      animation: sunPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0%   { opacity: .7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+    body.theme-day .bg-nebula { opacity: 0 !important; animation: none !important; }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE FIX — 手機版完整修復
+       ═══════════════════════════════════════════════════════════ */
+
+    .cmp-table, .compare-table {
+      display: block; width: 100%;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    svg { max-width: 100%; height: auto; }
+
+    @media (max-width: 640px) {
+      body { font-size: 15px; }
+      main { padding: 20px 14px 80px !important; }
+      .section-card { padding: 0; border-radius: 16px; }
+      .section-body { padding: 18px 16px 20px !important; }
+      .hero { flex-direction: column !important; text-align: center !important; padding: 22px 18px !important; gap: 18px !important; }
+      .hero-title { font-size: 1.1rem !important; line-height: 1.5 !important; }
+      .hero-icon  { width: 70px !important; height: 70px !important; margin: 0 auto !important; }
+      .section-header { padding: 16px 16px 12px !important; gap: 8px !important; }
+      .section-title  { font-size: .95rem !important; }
+      .prose, .section-body p { font-size: .9rem !important; line-height: 1.75 !important; }
+      .insight-box, .key-concept, .warn-box, .gold-box, .green-box { padding: 14px 14px !important; }
+      .cmp-table, .compare-table { font-size: .78rem !important; }
+      .quiz-opt { padding: 10px 14px !important; font-size: .86rem !important; }
+      .quiz-q   { font-size: .9rem !important; }
+      .footer-inner { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+      .fn-btn { justify-content: center !important; text-align: center !important; }
+      .chapter-sidenav { display: none !important; }
+      .toc { display: none !important; }
+      .sop-step { padding: 14px !important; }
+    }
+    @media (max-width: 400px) {
+      main { padding: 16px 10px 80px !important; }
+      .hero-title { font-size: 1rem !important; }
+    }
+
+  </style>
+
+  <!-- ☀️ Comprehensive Day Theme Patch — from chapter5 unified style -->
+  <style>
+       ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── CSS 變數覆蓋 ── */
+    body.theme-day {
+      --bg:         #cce0f2;
+      --surface:    rgba(255,255,255,.88);
+      --surface2:   rgba(232,246,255,.92);
+      --border:     rgba(26,101,168,.18);
+      --border2:    rgba(26,101,168,.30);
+      --accent:     #1265a8;
+      --accent2:    #0d5090;
+      --accent3:    #1a88cc;
+      --green:      #157a32;
+      --red:        #b03020;
+      --yellow:     #b8880e;
+      --purple:     #6640c0;
+      --pink:       #c03080;
+      --muted:      #6a90b0;
+      --text:       #0c1c2e;
+      --text-dim:   #1a3550;
+      --text-faint: #3a6080;
+      --jelly-cyan: #1265a8;
+      --jelly-pink: #c03080;
+      --glow:       0 2px 14px rgba(26,101,168,.18);
+    }
+
+    /* ── 背景：藍天漸層 ── */
+    body.theme-day {
+      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 80%,#e8f8f0 100%);
+      scrollbar-color: rgba(26,123,191,.3) transparent;
+    }
+    body.theme-day .bg-nebula,
+    body.theme-day .bg-scanlines { opacity:0; pointer-events:none; }
+
+    /* ── Header ── */
+    body.theme-day header {
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(26,123,191,.15);
+      box-shadow: 0 2px 20px rgba(26,100,180,.1);
+    }
+    body.theme-day header::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.55) 30%,rgba(33,150,211,.75) 50%,rgba(26,123,191,.55) 70%,transparent);
+    }
+    body.theme-day .logo-text { color:#0a1828; text-shadow:0 1px 4px rgba(26,80,160,.18); }
+    body.theme-day .logo-sub  { color:#1265a8; opacity:.85; }
+    body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(26,100,180,.2)); }
+
+    /* ── 返回按鈕 / 章節 badge ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.15);
+      border-color: rgba(26,123,191,.4);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.28);
+      color: #1265a8;
+    }
+
+    /* ── 進度條 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,123,191,.12);
+    }
+    body.theme-day .progress-track-sticky { background: rgba(26,123,191,.1); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #c03080);
+      box-shadow: 0 0 8px rgba(26,123,191,.35);
+    }
+    body.theme-day .progress-label-sm { color: #5a8ab8; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; }
+
+    /* ── Hero 區塊 ── */
+    body.theme-day .hero {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,123,191,.22);
+      box-shadow: 0 8px 40px rgba(26,80,160,.12), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    body.theme-day .hero::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.45),rgba(33,150,211,.6),rgba(26,123,191,.45),transparent);
+    }
+    body.theme-day .hero-label  { color: #1265a8; }
+    body.theme-day .hero-title  {
+      background: linear-gradient(90deg,#0a2d50 0%,#1265a8 55%,#1a88cc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.4));
+    }
+    body.theme-day .hero-desc { color: #1a3550; }
+
+    /* ── Tags ── */
+    body.theme-day .tag-cyan   { color:#0d6ea8; border-color:rgba(13,110,168,.3); background:rgba(13,110,168,.08); }
+    body.theme-day .tag-pink   { color:#b0206a; border-color:rgba(176,32,106,.3); background:rgba(176,32,106,.07); }
+    body.theme-day .tag-green  { color:#157a32; border-color:rgba(21,122,50,.3); background:rgba(21,122,50,.07); }
+    body.theme-day .tag-yellow { color:#8a6000; border-color:rgba(138,96,0,.3); background:rgba(138,96,0,.07); }
+
+    /* ── Section Card ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.75);
+      animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    body.theme-day .section-card::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.35),transparent);
+      animation: none;
+      opacity: .6;
+    }
+    body.theme-day .card-header {
+      background: rgba(26,123,191,.04);
+      border-bottom-color: rgba(26,123,191,.1);
+    }
+    body.theme-day .card-icon {
+      background: linear-gradient(135deg,rgba(26,123,191,.12),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .card-num   { color: #1265a8; opacity: .8; }
+    body.theme-day .card-title { color: #0a1828; }
+    body.theme-day .card-body  { }
+
+    /* ── 內文 ── */
+    body.theme-day .content-para { color: #0c1c2e; }
+    body.theme-day em.hl        { color: #0d6ea8; }
+    body.theme-day em.hl-pink   { color: #b0206a; }
+    body.theme-day em.hl-yellow { color: #8a6000; }
+    body.theme-day em.hl-green  { color: #157a32; }
+
+    /* ── Insight Box ── */
+    body.theme-day .insight-box {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.05));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .insight-text  { color: #1a2d40; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Mistake Box ── */
+    body.theme-day .mistake-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-box .insight-text { color: #2a1818; }
+
+    /* ── Example Box ── */
+    body.theme-day .example-box {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .example-label { color: #8a6000; }
+    body.theme-day .example-box p { color: #2a3040; }
+
+    /* ── Compare Table ── */
+    body.theme-day .compare-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .compare-table td {
+      color: #1a2d40;
+      border-bottom-color: rgba(26,123,191,.07);
+    }
+    body.theme-day .compare-table tr:hover td { background: rgba(26,123,191,.04); }
+    body.theme-day .compare-table .val-up { color: #a02818; }
+    body.theme-day .compare-table .val-dn { color: #126e28; }
+
+    /* ── Flow Chart ── */
+    body.theme-day .flow-chart {
+      background: rgba(255,255,255,.65);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.3);
+      color: #0a1828;
+    }
+    body.theme-day .flow-arrow { color: #1265a8; }
+    body.theme-day .flow-decision {
+      background: linear-gradient(135deg,rgba(138,96,0,.1),rgba(120,80,0,.05));
+      border-color: rgba(138,96,0,.3);
+      color: #8a6000;
+    }
+
+    /* ── Quiz ── */
+    body.theme-day .quiz-block {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04));
+      border-color: rgba(102,64,192,.2);
+    }
+    body.theme-day .quiz-label { color: #6640c0; }
+    body.theme-day .quiz-q     { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(102,64,192,.04);
+      border-color: rgba(102,64,192,.15);
+      color: #1a2d40;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(102,64,192,.1);
+      border-color: rgba(102,64,192,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-opt.correct { border-color:rgba(21,122,50,.5)!important; background:rgba(21,122,50,.1)!important; color:#157a32!important; }
+    body.theme-day .quiz-opt.wrong   { border-color:rgba(176,48,32,.5)!important; background:rgba(176,48,32,.1)!important; color:#b03020!important; }
+    body.theme-day .quiz-letter {
+      border-color: rgba(102,64,192,.3);
+      color: #6640c0;
+      background: rgba(102,64,192,.08);
+    }
+    body.theme-day .quiz-feedback.ok   { background:rgba(21,122,50,.08); border-color:rgba(21,122,50,.25); color:#157a32; }
+    body.theme-day .quiz-feedback.fail { background:rgba(176,48,32,.08); border-color:rgba(176,48,32,.25); color:#b03020; }
+
+    /* ── Jelly Tip Bubble ── */
+    body.theme-day .jelly-tip {
+      background: linear-gradient(135deg,rgba(26,123,191,.06),rgba(192,48,128,.03));
+      border-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+    body.theme-day .jelly-tip-bubble::before { border-right-color: rgba(26,123,191,.22); }
+    body.theme-day .jelly-tip-name { color: #1265a8; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,123,191,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent);
+      animation: none; opacity: .65;
+    }
+    body.theme-day .key-concept-label { color: #1265a8; opacity: .85; }
+    body.theme-day .key-concept-text  { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+
+    /* ── Vocab List ── */
+    body.theme-day .vocab-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.28); }
+    body.theme-day .vocab-term { color: #1265a8; }
+    body.theme-day .vocab-def  { color: #1a3550; }
+
+    /* ── Chapter Footer ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .footer-info        { color: #5a8ab8; }
+    body.theme-day .footer-info strong { color: #2a4a68; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.07);
+      border-color: rgba(26,123,191,.22);
+      color: #2a4a78;
+    }
+
+    /* ── Timeline ── */
+    body.theme-day .timeline::before {
+      background: linear-gradient(180deg,#157a32,#1265a8,#b03020,#b8880e);
+    }
+    body.theme-day .timeline-dot { background: #daeeff; }
+    body.theme-day .timeline-dot.bull { border-color:#157a32; box-shadow:0 0 6px rgba(21,122,50,.4); }
+    body.theme-day .timeline-dot.bear { border-color:#b03020; box-shadow:0 0 6px rgba(176,48,32,.4); }
+    body.theme-day .timeline-dot.side { border-color:#b8880e; box-shadow:0 0 6px rgba(184,136,14,.4); }
+    body.theme-day .timeline-phase.bull { color: #157a32; }
+    body.theme-day .timeline-phase.bear { color: #b03020; }
+    body.theme-day .timeline-phase.side { color: #b8880e; }
+    body.theme-day .timeline-title      { color: #0a1828; }
+    body.theme-day .timeline-desc       { color: #1a3550; }
+
+    /* ── Stat Cards ── */
+    body.theme-day .stat-card {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+    body.theme-day .stat-card:hover { border-color: rgba(26,101,168,.3); }
+    body.theme-day .stat-label { color: #2a4a68; }
+
+    /* ── Case Study ── */
+    body.theme-day .case-study {
+      background: linear-gradient(135deg,rgba(138,96,0,.06),rgba(120,80,0,.02));
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .case-header {
+      background: rgba(138,96,0,.07);
+      border-bottom-color: rgba(138,96,0,.14);
+    }
+    body.theme-day .case-badge {
+      background: rgba(138,96,0,.1);
+      border-color: rgba(138,96,0,.25);
+      color: #8a6000;
+    }
+    body.theme-day .case-title { color: #0a1828; }
+    body.theme-day .case-body p { color: #2a3040; }
+    body.theme-day .case-lesson {
+      background: rgba(138,96,0,.07);
+      border-color: rgba(138,96,0,.2);
+      color: #8a6000;
+    }
+
+    /* ── Psychology Cards ── */
+    body.theme-day .psych-card.danger { background:rgba(255,255,255,.75); border-color:rgba(176,48,32,.22); }
+    body.theme-day .psych-card.warn   { background:rgba(255,255,255,.75); border-color:rgba(184,136,14,.22); }
+    body.theme-day .psych-name        { color: #0a1828; }
+    body.theme-day .psych-desc        { color: #1a3550; }
+    body.theme-day .psych-example     { color: #3a5070; background:rgba(0,0,0,.04); }
+
+    /* ── Kbar Demo ── */
+    body.theme-day .kbar-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .kbar-demo-title { color: #1265a8; }
+
+    /* ── Chart Demo ── */
+    body.theme-day .chart-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+
+    /* ── Emotion Strip ── */
+    body.theme-day .emotion-strip { border-color: rgba(26,101,168,.14); }
+
+    /* ── 強制移除白天模式閃爍 ── */
+    body.theme-day .section-card::before { animation: none !important; }
+    body.theme-day header::after          { animation: headerSweep 6s linear infinite; opacity: .6; }
+
+    /* ── 通用 scrollbar ── */
+    body.theme-day { scrollbar-color: rgba(26,123,191,.3) transparent; }
+    body.theme-day::-webkit-scrollbar-thumb { background: rgba(26,123,191,.25); }
+
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 — 全面修復補丁 v2
+       修復項目：
+         1. 側邊欄 (chapter-sidenav) — 白底深藍文字，清晰邊框
+         2. 進度導覽條 (toc-strip / toc-dot) — 深色圓圈文字，高對比
+         3. 章節底部 footer — 白底清晰文字，按鈕明顯
+         4. Header logo — 使用 jelly.png
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 1. 左側章節目錄 sidenav ── */
+    body.theme-day .chapter-sidenav {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-color: rgba(26,101,168,.35);
+      box-shadow: 4px 0 28px rgba(26,80,160,.18), 0 0 12px rgba(26,123,191,.08);
+    }
+    body.theme-day .chapter-sidenav:hover {
+      border-color: rgba(26,101,168,.5);
+      box-shadow: 6px 0 36px rgba(26,80,160,.22), 0 0 18px rgba(26,123,191,.1);
+    }
+    body.theme-day .chapter-sidenav::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.7), rgba(33,150,211,.5), transparent);
+    }
+    body.theme-day .chapter-sidenav::after {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.35), rgba(26,123,191,.2), transparent);
+    }
+    /* ch-nav-item 基礎：深藍文字 */
+    body.theme-day .ch-nav-item {
+      color: #1a3a60;
+      border-bottom-color: rgba(26,101,168,.1);
+      border-left-color: transparent;
+    }
+    body.theme-day .ch-nav-item::before {
+      background: linear-gradient(90deg, rgba(26,123,191,.0), rgba(26,123,191,.08));
+    }
+    body.theme-day .ch-nav-item .ch-num {
+      color: #2a5080;
+      font-weight: 700;
+    }
+    body.theme-day .ch-nav-item .ch-label {
+      color: #1a3a60;
+    }
+    /* hover 狀態 */
+    body.theme-day .ch-nav-item:hover {
+      color: #0d3d7a;
+      border-left-color: rgba(26,101,168,.55);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .ch-nav-item:hover .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item:hover .ch-label { color: #0d3d7a; }
+    /* 當前章節 */
+    body.theme-day .ch-nav-item.current-ch {
+      color: #1265a8;
+      border-left-color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    body.theme-day .ch-nav-item.current-ch .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item.current-ch .ch-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .ch-nav-item.current-ch::after {
+      background: #1265a8;
+      box-shadow: 0 0 6px rgba(26,101,168,.5);
+    }
+
+    /* ── 2. 進度導覽條 (toc-strip) ── */
+    body.theme-day .toc-strip {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .toc-item:hover {
+      background: rgba(26,123,191,.08);
+    }
+    /* toc-dot：深色圓圈，數字清晰可見 */
+    body.theme-day .toc-dot {
+      border-color: rgba(26,101,168,.35);
+      color: #1a3a60;
+      background: rgba(255,255,255,.9);
+      font-weight: 700;
+    }
+    body.theme-day .toc-dot.active {
+      border-color: #1265a8;
+      background: rgba(26,123,191,.15);
+      color: #1265a8;
+      box-shadow: 0 0 10px rgba(26,101,168,.3);
+    }
+    body.theme-day .toc-item:hover .toc-dot {
+      border-color: rgba(26,101,168,.6);
+      color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    /* toc-lbl：深色標籤文字 */
+    body.theme-day .toc-lbl {
+      color: #2a4a68;
+      font-weight: 500;
+    }
+    body.theme-day .toc-item:hover .toc-lbl { color: #0d3560; }
+    /* toc-connector：藍色連線 */
+    body.theme-day .toc-connector {
+      background: rgba(26,101,168,.2);
+    }
+
+    /* ── 3. 章節底部 footer (unified footer) ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(26,101,168,.22);
+      box-shadow: 0 6px 32px rgba(26,80,160,.1);
+    }
+    body.theme-day .chapter-footer::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), rgba(33,150,211,.65), rgba(26,123,191,.5), transparent);
+      animation: none;
+      opacity: .7;
+    }
+    /* footer 左側完成標章 */
+    body.theme-day .footer-complete-badge {
+      background: linear-gradient(135deg, rgba(26,123,191,.14), rgba(26,80,160,.08));
+      border-color: rgba(26,101,168,.3);
+    }
+    /* footer 標題 */
+    body.theme-day .footer-complete-title { color: #0a1828; }
+    body.theme-day .footer-complete-desc  { color: #2a5070; }
+    body.theme-day .footer-next-hint      { color: #1265a8; opacity: .85; }
+    /* fn-btn 上一章 */
+    body.theme-day .fn-btn.prev {
+      color: #2a5080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #0d3560;
+      border-color: rgba(26,101,168,.5);
+      background: rgba(26,123,191,.13);
+      box-shadow: 0 2px 12px rgba(26,101,168,.15);
+    }
+    /* fn-btn 下一章 (accent) */
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,101,168,.35);
+      background: rgba(26,123,191,.1);
+      font-weight: 600;
+    }
+    body.theme-day .fn-btn.next:hover {
+      color: #fff;
+      background: #1265a8;
+      border-color: #1265a8;
+      box-shadow: 0 4px 18px rgba(26,101,168,.3);
+    }
+    body.theme-day .fn-btn.locked {
+      color: #8ab0d0;
+      border-color: rgba(26,101,168,.15);
+      background: rgba(26,123,191,.04);
+    }
+
+    /* ── 舊版 footer (chapter1 樣式相容) ── */
+    body.theme-day .footer-info        { color: #2a4a68; }
+    body.theme-day .footer-info strong { color: #0a1828; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.28);
+      color: #1265a8;
+      font-weight: 600;
+    }
+    body.theme-day .next-btn:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.5);
+    }
+    body.theme-day .prev-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #2a5080;
+    }
+
+    /* ── 4. Header logo 圖片亮度 ── */
+    body.theme-day .logo-icon img {
+      filter: drop-shadow(0 2px 8px rgba(26,80,160,.25));
+      opacity: 1;
+    }
+    body.theme-day .logo-text {
+      color: #0a1828;
+      text-shadow: 0 1px 3px rgba(26,80,160,.15);
+      font-weight: 700;
+    }
+    body.theme-day .logo-sub { color: #1265a8; opacity: .9; font-weight: 600; }
+
+    /* ── 5. sticky progress bar 文字明顯化 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(26,123,191,.18);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .progress-label-sm { color: #2a4a68; font-weight: 500; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; font-weight: 700; }
+    body.theme-day .progress-track-sticky { background: rgba(26,101,168,.12); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #1a88cc);
+      box-shadow: 0 0 8px rgba(26,101,168,.4);
+    }
+
+    /* ── 6. back-btn / chapter-badge 明顯化 ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.3);
+      color: #1a3a60;
+      font-weight: 500;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.52);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,101,168,.35);
+      color: #1265a8;
+      font-weight: 700;
+    }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       COMPREHENSIVE DAY THEME PATCH — ALL MISSING COMPONENTS
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 通用：黑色背景容器 ── */
+    body.theme-day .rhythm-row,
+    body.theme-day .tri-canvas,
+    body.theme-day .pat-nav-wrap,
+    body.theme-day .sim-wrap,
+    body.theme-day .detector-wrap,
+    body.theme-day .rr-bar,
+    body.theme-day .strat-picker,
+    body.theme-day .sl-body,
+    body.theme-day .pat-output,
+    body.theme-day .tri-result,
+    body.theme-day .picker-result {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .jelly-bubble,
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+
+    /* ── 段落與 Prose ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+    body.theme-day .prose em { color: #1265a8; }
+    body.theme-day .section-title { color: #0a1828; }
+    body.theme-day .section-num { color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .section-header { border-bottom-color: rgba(26,123,191,.12); }
+    body.theme-day .section-header::after { background: linear-gradient(90deg,transparent,rgba(26,123,191,.3),transparent); }
+
+    /* ── 蠟燭卡片 ── */
+    body.theme-day .candle-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .candle-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .candle-name { color: #1265a8; }
+    body.theme-day .candle-desc { color: #1a3550; }
+
+    /* ── Insight Boxes (warn, gold, purple) ── */
+    body.theme-day .warn-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .warn-box .insight-text { color: #2a1818; }
+    body.theme-day .gold-box {
+      background: linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03));
+      border-color: rgba(184,136,14,.22);
+    }
+    body.theme-day .gold-box .insight-text { color: #2a2010; }
+    body.theme-day .purple-box {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.03));
+      border-color: rgba(102,64,192,.22);
+    }
+    body.theme-day .purple-box .insight-text { color: #1a1028; }
+    body.theme-day .danger-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .danger-box .insight-text { color: #2a1818; }
+    body.theme-day .success-box {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03));
+      border-color: rgba(21,122,50,.22);
+    }
+    body.theme-day .success-box .insight-text { color: #102018; }
+    body.theme-day .insight-box-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.07),rgba(160,80,0,.03));
+      border-color: rgba(184,100,0,.22);
+    }
+    body.theme-day .insight-box-orange .insight-label { color: #a05000; }
+    body.theme-day .insight-body .insight-text { color: #0c1c2e; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Force Meter ── */
+    body.theme-day .force-label { color: #1a3550; }
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .force-val { color: #3a5070; }
+
+    /* ── Pattern Cards ── */
+    body.theme-day .pattern-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .pattern-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .pattern-name { color: #0a1828; }
+    body.theme-day .pattern-desc { color: #1a3550; }
+    body.theme-day .pattern-key { color: #1265a8; }
+    body.theme-day .pb-bull { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .pb-bear { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .pb-warn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .pb-neutral { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+
+    /* ── Detector ── */
+    body.theme-day .detector-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .detector-title { color: #1265a8; }
+    body.theme-day .detector-item {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .detector-item:hover { background: rgba(26,123,191,.08); }
+    body.theme-day .detector-item.selected { background: rgba(26,123,191,.12); border-color: rgba(26,123,191,.35); }
+    body.theme-day .di-label { color: #1a3550; }
+    body.theme-day .detector-output {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #0a1828;
+    }
+    body.theme-day .detector-output strong { color: #1265a8; }
+
+    /* ── Sim Wrap ── */
+    body.theme-day .sim-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .sim-title { color: #1265a8; }
+    body.theme-day .sim-canvas { background: rgba(200,230,245,.5); border-color: rgba(26,101,168,.2); }
+    body.theme-day .sim-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .sim-btn:hover { background: rgba(26,123,191,.14); border-color: rgba(26,123,191,.4); }
+    body.theme-day .sim-result { color: #1a3550; }
+
+    /* ── Breakout Compare (bc-card) ── */
+    body.theme-day .bc-card.true {
+      background: rgba(176,48,32,.06);
+      border-color: rgba(176,48,32,.25);
+    }
+    body.theme-day .bc-card.false {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+    }
+    body.theme-day .bc-points { color: #1a3550; }
+
+    /* ── Flow Steps ── */
+    body.theme-day .flow-step {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .flow-step:hover { background: rgba(255,255,255,.92); border-color: rgba(26,123,191,.35); }
+    body.theme-day .flow-heading { color: #0a1828; }
+    body.theme-day .flow-sub { color: #1a3550; }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+    body.theme-day .flow-num.cn { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .flow-num.rn { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .flow-num.gn { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .flow-num.yn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .flow-num.pn { background:rgba(176,32,106,.1); border-color:rgba(176,32,106,.3); color:#b0206a; }
+    body.theme-day .flow-content .flow-sub strong { color: #0a1828; }
+
+    /* ── Shadow Lines ── */
+    body.theme-day .shadow-line,
+    body.theme-day .sl-wrap {
+      border-color: rgba(26,101,168,.15);
+      background: transparent;
+    }
+    body.theme-day .sl-body {
+      background: rgba(255,255,255,.72);
+    }
+    body.theme-day .sl-text { color: #1a3550; }
+    body.theme-day .sl-text strong { color: #0a1828; }
+
+    /* ── Chip ── */
+    body.theme-day .chip-red    { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-green  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-cyan   { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .chip-yellow { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .chip-purple { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+    body.theme-day .chip-orange { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.3); color:#a05000; }
+    body.theme-day .chip-support  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-resist   { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-neutral  { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+
+    /* ── Sec Divider ── */
+    body.theme-day .sec-divider { color: #5a8ab8; }
+    body.theme-day .sec-divider::before,
+    body.theme-day .sec-divider::after { background: rgba(26,123,191,.18); }
+
+    /* ── Val Colors ── */
+    body.theme-day .val-red,  body.theme-day .val-r { color: #a02818; }
+    body.theme-day .val-green, body.theme-day .val-g { color: #157a32; }
+    body.theme-day .val-yellow, body.theme-day .val-y { color: #8a6000; }
+    body.theme-day .val-cyan, body.theme-day .val-c { color: #0d6ea8; }
+    body.theme-day .val-purple, body.theme-day .val-p { color: #6640c0; }
+    body.theme-day .val-orange, body.theme-day .val-o { color: #a05000; }
+    body.theme-day .td-bull { color: #157a32 !important; }
+    body.theme-day .td-bear { color: #a02818 !important; }
+    body.theme-day .td-warn { color: #8a6000 !important; }
+
+    /* ── CMP/Compare Tables ── */
+    body.theme-day .cmp-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.2);
+    }
+    body.theme-day .cmp-table td {
+      color: #1a3550;
+      border-bottom-color: rgba(26,101,168,.08);
+    }
+    body.theme-day .cmp-table tr:hover td { background: rgba(26,123,191,.04); }
+
+    /* ── Quiz (all variants) ── */
+    body.theme-day .quiz-section {
+      background: linear-gradient(135deg,rgba(102,64,192,.06),rgba(26,80,160,.03));
+      border-color: rgba(102,64,192,.18);
+    }
+    body.theme-day .quiz-section-title { color: #0a1828; }
+    body.theme-day .quiz-q { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-letter {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.3);
+      color: #1265a8;
+    }
+
+    /* ── Checklist ── */
+    body.theme-day .check-item,
+    body.theme-day .check-list .check-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .check-text { color: #0a1828; }
+    body.theme-day .check-text strong { color: #1265a8; }
+
+    /* ── Before/After (ba-card) ── */
+    body.theme-day .ba-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .ba-label { color: #3a6080; }
+    body.theme-day .ba-text { color: #0a1828; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.07),rgba(26,80,160,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept-label { color: #1265a8; }
+    body.theme-day .key-concept-text { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+
+    /* ── Section Cards (general) ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    /* ── Pat Nav Tabs ── */
+    body.theme-day .pat-nav-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-nav-title { color: #1265a8; }
+    body.theme-day .pat-tab {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .pat-tab:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .pat-tab.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .pat-output {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-out-name { color: #0a1828; }
+    body.theme-day .pat-out-essence { color: #b0206a; }
+    body.theme-day .pat-out-body { color: #1a3550; }
+    body.theme-day .pat-out-body strong { color: #0a1828; }
+
+    /* ── Triangle Sim ── */
+    body.theme-day .tri-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .tri-title { color: #1265a8; }
+    body.theme-day .tri-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .tri-btn:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .tri-btn.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .tri-canvas { background: rgba(200,230,248,.6); border-color: rgba(26,101,168,.2); }
+    body.theme-day .tri-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .tri-result strong { color: #1265a8; }
+
+    /* ── Reliability Meter ── */
+    body.theme-day .rel-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rel-name { color: #0a1828; }
+    body.theme-day .rel-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .rel-pct { color: #3a6080; }
+
+    /* ── Mistake Cards ── */
+    body.theme-day .mistake-card {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-title { color: #a02818; }
+    body.theme-day .mistake-body { color: #2a1818; }
+    body.theme-day .mistake-fix {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+      color: #157a32;
+    }
+
+    /* ── Anatomy / SVG Col ── */
+    body.theme-day .anatomy-row { border-color: rgba(26,101,168,.15); }
+
+    /* ── BK Cards (支撐壓力) ── */
+    body.theme-day .bk-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .bk-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .bk-body { color: #1a3550; }
+    body.theme-day .bk-check { color: #157a32; }
+    body.theme-day .bk-icon { color: #1265a8; }
+    body.theme-day .bk-compare {
+      background: rgba(240,248,255,.7);
+      border-color: rgba(26,101,168,.15);
+    }
+
+    /* ── Danger Cards ── */
+    body.theme-day .danger-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.18);
+    }
+    body.theme-day .danger-title { color: #a02818; }
+    body.theme-day .danger-body { color: #2a2020; }
+
+    /* ── CS/Strength chips ── */
+    body.theme-day .cs-high { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.28); color:#a02818; }
+    body.theme-day .cs-med  { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.28); color:#8a6000; }
+    body.theme-day .cs-low  { background:rgba(13,110,168,.08); border-color:rgba(13,110,168,.22); color:#0d6ea8; }
+
+    /* ── Combo Row ── */
+    body.theme-day .combo-row {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .combo-ind { color: #1265a8; }
+    body.theme-day .combo-desc { color: #1a3550; }
+
+    /* ── Risk Reward Visual ── */
+    body.theme-day .rr-bar {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rr-label { color: #3a6080; }
+    body.theme-day .rr-track { background: rgba(26,80,160,.1); }
+    body.theme-day .rr-ratio-badge {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+    }
+    body.theme-day .rr-ratio-label { color: #5a8ab8; }
+
+    /* ── Error Analysis ── */
+    body.theme-day .error-analysis {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .error-header {
+      background: rgba(176,48,32,.07);
+      border-bottom-color: rgba(176,48,32,.15);
+    }
+    body.theme-day .error-title { color: #0a1828; }
+    body.theme-day .error-body p { color: #2a1818; }
+    body.theme-day .error-lesson {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.22);
+      color: #157a32;
+    }
+
+    /* ── Strategy Picker ── */
+    body.theme-day .strat-picker {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .strat-picker-title { color: #1265a8; }
+    body.theme-day .picker-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.22);
+      color: #1a3550;
+    }
+    body.theme-day .picker-btn:hover { border-color: rgba(26,123,191,.45); color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .picker-btn.active-btn { border-color: #1265a8; color: #1265a8; background: rgba(26,123,191,.14); }
+    body.theme-day .picker-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .picker-result strong { color: #0a1828; }
+
+    /* ── SOP Steps (ch10) ── */
+    body.theme-day .sop-title { color: #0a1828; }
+    body.theme-day .sop-desc { color: #1a3550; }
+    body.theme-day .sop-line { background: rgba(26,101,168,.15); }
+    body.theme-day .sc-c { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.4); color:#0d6ea8; }
+    body.theme-day .sc-g { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.35); color:#157a32; }
+    body.theme-day .sc-y { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.35); color:#8a6000; }
+    body.theme-day .sc-r { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.35); color:#a02818; }
+    body.theme-day .sc-p { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.35); color:#6640c0; }
+    body.theme-day .sc-o { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.35); color:#a05000; }
+
+    /* ── Autopsy Cards (ch10) ── */
+    body.theme-day .autopsy-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .autopsy-head {
+      background: rgba(26,123,191,.05);
+      border-bottom-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .autopsy-num { color: #3a6080; }
+    body.theme-day .autopsy-title { color: #0a1828; }
+    body.theme-day .autopsy-scene { color: #1a3550; }
+    body.theme-day .autopsy-why { color: #1265a8; }
+    body.theme-day .autopsy-fix { color: #157a32; }
+    body.theme-day .autopsy-body { color: #1a3550; }
+
+    /* ── Case Selectors (ch10) ── */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-panel {
+      background: rgba(240,248,255,.75);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .case-step { color: #1a3550; }
+
+    /* ── Graduation Badge ── */
+    body.theme-day .graduation {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(102,64,192,.05));
+      border-color: rgba(26,123,191,.22);
+    }
+
+    /* ── Flow Nodes (various) ── */
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+      color: #0a1828;
+    }
+    body.theme-day .flow-node-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.1),rgba(160,80,0,.05));
+      border-color: rgba(184,100,0,.28);
+      color: #a05000;
+    }
+    body.theme-day .flow-node-red {
+      background: linear-gradient(135deg,rgba(176,48,32,.1),rgba(150,20,10,.05));
+      border-color: rgba(176,48,32,.28);
+      color: #a02818;
+    }
+    body.theme-day .flow-node-green {
+      background: linear-gradient(135deg,rgba(21,122,50,.08),rgba(0,90,40,.04));
+      border-color: rgba(21,122,50,.28);
+      color: #157a32;
+    }
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+
+    /* ── CC Box (趨勢) ── */
+    body.theme-day .cc-box {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .cc-item { color: #1a3550; }
+    body.theme-day .cc-text { color: #0a1828; }
+
+    /* ── Before/After Cards ── */
+    body.theme-day .before-after { border-color: rgba(26,101,168,.15); }
+    body.theme-day .bull-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .bear-card {
+      background: rgba(21,122,50,.05);
+      border-color: rgba(21,122,50,.2);
+    }
+
+    /* ── Footer Buttons (fn-btn) ── */
+    body.theme-day .fn-btn.prev {
+      color: #3a6080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.06);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.45);
+      background: rgba(26,123,191,.12);
+    }
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.35);
+      background: rgba(26,123,191,.08);
+    }
+    body.theme-day .fn-btn.next:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,123,191,.55);
+    }
+    body.theme-day .footer-complete-text { color: #1a3550; }
+
+    /* ── RSI Gauge ── */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; }
+
+    /* ── Teal theme (ch9) day mode ── */
+    body.theme-day .tag-teal { color:#157a6a; border-color:rgba(21,122,106,.3); background:rgba(21,122,106,.07); }
+    body.theme-day .rr-ratio-num { color: #1265a8; }
+
+    /* ── Hero Icon border colors ── */
+    body.theme-day .hero-icon {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.25);
+      box-shadow: 0 4px 20px rgba(26,80,160,.1);
+    }
+
+    /* ── General text fixes ── */
+    body.theme-day strong { color: #0a1828; }
+    body.theme-day .section-body { color: #0c1c2e; }
+
+
+  </style>
+
+  <!-- ☀️ Chips-Specific Day Theme Supplement -->
+  <style>
+
+    /* ════════════════════════════════════════════════════════
+       ☀️ CHIPS-SPECIFIC DAY THEME SUPPLEMENT
+       Covers all chips-unique component classes
+       ════════════════════════════════════════════════════════ */
+
+    /* ── SVG Chart Wrap (外資機構組成示意 etc.) ── */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(230,245,255,.75) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* ── Concentration Visual (籌碼集中度) ── */
+    body.theme-day .conc-visual {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .conc-title { color: #1265a8; }
+    body.theme-day .conc-bar-track { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .conc-bar-label { color: #1a3550; }
+    body.theme-day .conc-bar-pct { color: #3a6080; }
+
+    /* ── Stage Cards (投信季底行為等) ── */
+    body.theme-day .stage-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      box-shadow: 0 4px 16px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .stage-num { color: #1265a8; }
+    body.theme-day .stage-title { color: #0a1828; }
+    body.theme-day .stage-desc { color: #1a3550; }
+    body.theme-day .stage-grid { gap: inherit; }
+
+    /* ── Signal Cards ── */
+    body.theme-day .signal-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .signal-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .signal-body { color: #1a3550; }
+    body.theme-day .signal-label { color: #3a6080; }
+    body.theme-day .signal-dot { }
+
+    /* ── Role Cards (三大法人角色) ── */
+    body.theme-day .role-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .role-name { color: #0a1828; }
+    body.theme-day .role-desc { color: #1a3550; }
+    body.theme-day .role-en { color: #5a8ab8; }
+    body.theme-day .role-scale { color: #3a6080; }
+
+    /* ── Season Cards (季節性行為) ── */
+    body.theme-day .season-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .season-badge { }
+    body.theme-day .season-month { color: #1265a8; }
+    body.theme-day .season-desc { color: #1a3550; }
+    body.theme-day .season-intensity { color: #3a6080; }
+
+    /* ── Naked Cards (裸K等) ── */
+    body.theme-day .naked-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .naked-title { color: #1265a8; }
+    body.theme-day .naked-desc { color: #1a3550; }
+    body.theme-day .naked-val { color: #0a1828; }
+
+    /* ── ADR Meter ── */
+    body.theme-day .adr-meter {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .adr-title { color: #1265a8; }
+    body.theme-day .adr-label { color: #1a3550; }
+    body.theme-day .adr-bar { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .adr-zones { color: #3a6080; }
+    body.theme-day .adr-scale { color: #5a8ab8; }
+
+    /* ── Stock Cards ── */
+    body.theme-day .stock-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .stock-name { color: #0a1828; }
+    body.theme-day .stock-desc { color: #1a3550; }
+    body.theme-day .stock-label { color: #5a8ab8; }
+    body.theme-day .stock-icon { }
+
+    /* ── Cal Grid (calendar) ── */
+    body.theme-day .cal-grid { border-color: rgba(26,101,168,.15); }
+    body.theme-day .cal-cell {
+      background: rgba(255,255,255,.75) !important;
+      border-color: rgba(26,101,168,.1) !important;
+      color: #1a3550;
+    }
+    body.theme-day .cal-cell.buy { background: rgba(176,48,32,.08) !important; border-color: rgba(176,48,32,.2) !important; }
+    body.theme-day .cal-cell.sell { background: rgba(21,122,50,.08) !important; border-color: rgba(21,122,50,.2) !important; }
+
+    /* ── Timeline (tl-*) ── */
+    body.theme-day .tl-item { border-color: rgba(26,101,168,.15); }
+    body.theme-day .tl-dot {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.4);
+    }
+    body.theme-day .tl-head { color: #1265a8; }
+    body.theme-day .tl-body { color: #1a3550; }
+
+    /* ── Account Cards (acct-*) ── */
+    body.theme-day .acct-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .acct-name { color: #0a1828; }
+    body.theme-day .acct-desc { color: #1a3550; }
+    body.theme-day .acct-tag { }
+    body.theme-day .acct-split { border-color: rgba(26,101,168,.1); }
+    body.theme-day .acct-en { color: #5a8ab8; }
+
+    /* ── Health Meter ── */
+    body.theme-day .health-meter {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .hm-title { color: #1265a8; }
+    body.theme-day .hm-label { color: #1a3550; }
+    body.theme-day .hm-bar-bg { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .hm-val { color: #3a6080; }
+
+    /* ── SOP Steps ── */
+    body.theme-day .sop-wrap {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .sop-step {
+      background: rgba(255,255,255,.72) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .sop-num { color: #1265a8; }
+    body.theme-day .sop-heading { color: #0a1828; }
+    body.theme-day .sop-body { color: #1a3550; }
+
+    /* ── Filter Row ── */
+    body.theme-day .filter-row {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .filter-title { color: #1265a8; }
+    body.theme-day .filter-desc { color: #1a3550; }
+
+    /* ── FB Cards (避免/必做) ── */
+    body.theme-day .fb-must {
+      background: rgba(21,122,50,.06) !important;
+      border-color: rgba(21,122,50,.22) !important;
+      color: #157a32;
+    }
+    body.theme-day .fb-avoid {
+      background: rgba(176,48,32,.06) !important;
+      border-color: rgba(176,48,32,.22) !important;
+      color: #a02818;
+    }
+    body.theme-day .fb-plus {
+      background: rgba(26,123,191,.06) !important;
+      border-color: rgba(26,123,191,.22) !important;
+      color: #1265a8;
+    }
+
+    /* ── Intensity Dots ── */
+    body.theme-day .intensity-label { color: #3a6080; }
+
+    /* ── Jelly Mini SVG ── */
+    body.theme-day .jelly-mini-svg { opacity: .85; }
+
+    /* ── Psych Grid container ── */
+    body.theme-day .psych-grid { }
+    body.theme-day .psych-icon { }
+
+    /* ── Stat Row / Stat Num ── */
+    body.theme-day .stat-row { border-color: rgba(26,101,168,.08); }
+    body.theme-day .stat-num { color: #1265a8; }
+
+    /* ── Emotion Segment ── */
+    body.theme-day .emotion-seg { border-color: rgba(26,101,168,.15); }
+
+    /* ── Insight icon/label ── */
+    body.theme-day .insight-icon { }
+    body.theme-day .insight-label { color: #1265a8; }
+
+    /* ── Cyan Box ── */
+    body.theme-day .cyan-box {
+      background: linear-gradient(135deg,rgba(13,110,168,.07),rgba(0,90,140,.03)) !important;
+      border-color: rgba(13,110,168,.22) !important;
+    }
+    body.theme-day .cyan-box .insight-text { color: #0a2840; }
+
+    /* ── Section icon opacity ── */
+    body.theme-day .section-icon { opacity: 1 !important; }
+
+    /* ── Any dark inline background overrides (via style attribute) ── */
+    /* Force all remaining dark containers to light in day mode */
+    body.theme-day .section-body > div[style*="rgba(0,0,0"] {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .section-body > div[style*="background:#0"] {
+      background: rgba(255,255,255,.78) !important;
+    }
+    body.theme-day .section-body > div[style*="background: #0"] {
+      background: rgba(255,255,255,.78) !important;
+    }
+
+    /* ── Tag red (used in chips files) ── */
+    body.theme-day .tag-red { color:#a02818; border-color:rgba(160,40,24,.3); background:rgba(160,40,24,.07); }
+
+    /* ── Shadow Line (sl-*) ── */
+    body.theme-day .sl-top { border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .sl-side { border-color: rgba(26,101,168,.15); }
+
+    /* ── Badge variants ── */
+    body.theme-day .badge-buy { background: rgba(176,48,32,.1); color: #a02818; border-color: rgba(176,48,32,.25); }
+    body.theme-day .badge-sell { background: rgba(21,122,50,.1); color: #157a32; border-color: rgba(21,122,50,.25); }
+    body.theme-day .badge-hot { background: rgba(184,136,14,.1); color: #8a6000; border-color: rgba(184,136,14,.25); }
+    body.theme-day .badge-end { background: rgba(102,64,192,.1); color: #6640c0; border-color: rgba(102,64,192,.25); }
+
+    /* ── General: any div with inline dark bg inside section-card ── */
+    body.theme-day .section-card p { color: #0c1c2e; }
+    body.theme-day .section-card span { }
+    body.theme-day .section-card li { color: #0c1c2e; }
+
+    /* ── CMP Table wrap ── */
+    body.theme-day .cmp-table-wrap { overflow: auto; }
+
+    /* ── Prose text ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+
+    /* ── Site footer ── */
+    body.theme-day #site-footer {
+      background: rgba(230,245,255,.95);
+      border-top: 1px solid rgba(26,101,168,.18);
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span { color: #3a6080; }
+    body.theme-day #site-footer a { color: #1265a8; }
+    body.theme-day #site-footer a:hover { color: #0d3560; }
+
+
+  </style>
+
+  <!-- ☀️ Day Mode Final Fixes: Quiz, SVG wrappers, dark divs -->
+  <style>
+    /* quiz-wrap light background */
+    body.theme-day .quiz-wrap {
+      background: rgba(245,250,255,.92) !important;
+      border-color: rgba(26,101,168,.2) !important;
+    }
+    body.theme-day .quiz-wrap .quiz-q { color: #0a1828 !important; }
+    body.theme-day .quiz-wrap .quiz-opt {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      color: #1a3550 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1) !important;
+      border-color: rgba(26,123,191,.35) !important;
+      color: #0a1828 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-letter {
+      background: rgba(26,123,191,.1) !important;
+      border-color: rgba(26,123,191,.25) !important;
+      color: #1265a8 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-feedback { color: #1a3550 !important; }
+
+    /* svg-chart-wrap light */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(220,238,252,.35) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* line-chart containers */
+    body.theme-day .line-chart-wrap,
+    body.theme-day .bar-chart-wrap,
+    body.theme-day .chart-canvas-wrap {
+      background: rgba(220,238,252,.35) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* dark section-body sub-containers */
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.18)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0, .18)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.2)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.3)"] {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* maintenance overlay - keep dark (it's a modal) */
+    #maintenanceOverlay { /* intentionally no override */ }
+
+    /* chapter-footer dark background */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+
+    /* force-bar-fill stays colorful but track is light */
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1) !important; }
+  </style>
+
+  <!-- ☀️ Footer Day Mode Fix -->
+  <style>
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(220,240,255,.95), rgba(200,230,250,.98)) !important;
+      border-top: 1px solid rgba(26,101,168,.18) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span,
+    body.theme-day #site-footer div { color: #3a6080 !important; }
+    body.theme-day #site-footer a { color: #1265a8 !important; }
+    body.theme-day #site-footer a:hover { color: #0d3560 !important; }
+  </style>
+</head>
+<body>
+<script>
+(function() {
+  function applyTheme(theme) {
+    if (theme === 'day') {
+      document.body.classList.add('theme-day');
+    } else {
+      document.body.classList.remove('theme-day');
+    }
+  }
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+  try {
+    var _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = function(e) {
+      if (e.data && e.data.theme) applyTheme(e.data.theme);
+    };
+  } catch(e) {}
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme') {
+      applyTheme(e.newValue || 'space');
+    }
+  });
+})();
+</script>
+
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+<div class="bg-stars"></div>
+
+<!-- SIDENAV -->
+<nav class="chapter-sidenav" aria-label="章節導覽">
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter1.html"><span class="ch-num">01</span><span class="ch-label">籌碼本質</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter2.html"><span class="ch-num">02</span><span class="ch-label">三大法人</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter3.html"><span class="ch-num">03</span><span class="ch-label">外資布局</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter4.html"><span class="ch-num">04</span><span class="ch-label">投信季底</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter5.html"><span class="ch-num">05</span><span class="ch-label">自營避險</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter6.html"><span class="ch-num">06</span><span class="ch-label">融資融券</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter7.html"><span class="ch-num">07</span><span class="ch-label">借券賣出</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/chips/chips_chapter8.html"><span class="ch-num">08</span><span class="ch-label">主力散戶</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter9.html"><span class="ch-num">09</span><span class="ch-label">法人背離</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰選股</span></a>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" style="width:46px;height:46px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-4px;left:-4px;" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">籌碼分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky">
+    <div class="progress-fill-sticky" id="progressFill"></div>
+  </div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第八章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-icon">
+    <svg width="72" height="80" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pyramid of holders: whale at top, retail at base -->
+      <!-- Base (retail) -->
+      <rect x="4"  y="58" width="64" height="14" rx="3" fill="rgba(255,61,90,.25)" stroke="rgba(255,61,90,.5)" stroke-width="1"/>
+      <!-- Mid tier -->
+      <rect x="14" y="40" width="44" height="14" rx="3" fill="rgba(255,214,0,.25)" stroke="rgba(255,214,0,.5)" stroke-width="1"/>
+      <!-- Whale top -->
+      <rect x="24" y="22" width="24" height="14" rx="3" fill="rgba(0,229,255,.3)" stroke="rgba(0,229,255,.6)" stroke-width="1"/>
+      <!-- Labels -->
+      <text x="36" y="68" fill="rgba(255,61,90,.9)" font-size="6.5" font-family="Share Tech Mono,monospace" text-anchor="middle">散戶 400張以下</text>
+      <text x="36" y="50" fill="rgba(255,214,0,.9)" font-size="6.5" font-family="Share Tech Mono,monospace" text-anchor="middle">中實戶 400~800張</text>
+      <text x="36" y="32" fill="rgba(0,229,255,.9)" font-size="6.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大戶 800張+</text>
+      <!-- Health dot -->
+      <circle cx="36" cy="12" r="6" fill="rgba(0,230,118,.15)" stroke="rgba(0,230,118,.6)" stroke-width="1.5">
+        <animate attributeName="r" values="5;7;5" dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".6;1;.6" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
+      <text x="36" y="15" fill="rgba(0,230,118,.9)" font-size="6" font-family="Share Tech Mono,monospace" text-anchor="middle">♥</text>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">CHAPTER 08 · 籌碼健康度篇</div>
+    <div class="hero-title">主力散戶比<br/>股票的「健康度」</div>
+    <div class="hero-desc">集保戶數每週更新，是台股獨有的籌碼透明機制。透過<em>大戶持股比例</em>與<em>散戶戶數變化</em>，你可以判斷一檔股票的籌碼是否集中、主力是否持續吸籌或出貨、以及當前籌碼結構是否支撐進一步上漲。本章教你讀懂這把看穿「股票健康度」的量尺。</div>
+    <div class="hero-tags">
+      <span class="tag tag-cyan">集保戶數</span>
+      <span class="tag tag-green">大戶持股比例</span>
+      <span class="tag tag-yellow">中實戶</span>
+      <span class="tag tag-red">散戶分布</span>
+      <span class="tag tag-purple">籌碼集中度</span>
+      <span class="tag tag-pink">健康度判讀</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1 -->
+  <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="2321848525"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-1</div>
+    <div class="section-title">集保戶數是什麼？為何重要？</div>
+    <div class="section-icon">🏛️</div>
+  </div>
+  <div class="section-body">
+    <p class="prose"><em>集保結算所</em>（TDCC）是台灣集中保管有價證券的官方機構，所有在台股持股的投資人，其股票都記錄在集保帳戶中。每週五收盤後，集保結算所公布<strong>各持股區間的戶數與張數統計</strong>，這就是俗稱的「集保戶數」或「股東人數分佈」資料。</p>
+
+    <div class="insight-box">
+      <div class="insight-icon">📋</div>
+      <div class="insight-body">
+        <div class="insight-label">資料特性</div>
+        <div class="insight-text">集保戶數以<strong>每週為單位</strong>更新（通常週五盤後，週二前公布），時間頻率低於三大法人的每日揭露，但提供了三大法人數據所沒有的資訊：<strong>所有持股人的籌碼分佈狀況</strong>，包含外資之外的所有自然人與法人帳戶。</div>
+      </div>
+    </div>
+
+    <p class="prose">集保資料按<strong>持股張數</strong>分為多個區間，最常被分析的是以下幾個關鍵級距：</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>持股區間</th><th>常見稱呼</th><th>市場含義</th><th>觀察重點</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 ~ 99 張</td><td class="val-red">散戶</td><td>一般小額投資人</td><td>戶數增加代表散戶進場（常見頭部訊號）</td></tr>
+        <tr><td>100 ~ 399 張</td><td class="val-yellow">小中實戶</td><td>有一定資金的個人投資者</td><td>此區間擴大代表籌碼往中型資金移動</td></tr>
+        <tr><td>400 ~ 799 張</td><td class="val-yellow">中實戶</td><td>中型資金、部分法人分倉</td><td>集中在此代表主力分散持倉</td></tr>
+        <tr><td>800 ~ 999 張</td><td class="val-cyan">準大戶</td><td>大型個人投資者或小型法人</td><td>增加代表準大戶加碼，籌碼向上集中</td></tr>
+        <tr><td>1000 張以上</td><td class="val-cyan">大戶／主力</td><td>主力法人、大戶</td><td>此區間持股比例是籌碼集中度的核心指標</td></tr>
+      </tbody>
+    </table>
+
+    <div class="shadow-line">
+      <div class="sl-side cy"></div>
+      <div class="sl-body">
+        <div class="sl-top cy">為何這是台股獨有優勢</div>
+        <div class="sl-text">多數國際市場不強制揭露如此細緻的持股人分布，台灣的集保制度讓散戶得以窺見<strong>主力與散戶之間的籌碼消長</strong>，是判斷「誰在賣給誰」的直接依據，在全球市場屬罕見的透明資訊。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-2</div>
+    <div class="section-title">三種持股者的行為邏輯</div>
+    <div class="section-icon">👥</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">在分析集保數據前，必須先理解不同級距的持股者，其行為動機與操作邏輯截然不同。讀懂他們的「習慣」，才能正確解讀戶數與張數的變化方向。</p>
+
+    <div class="role-grid">
+      <div class="role-card whale">
+        <div class="role-icon">🐋</div>
+        <div class="role-name">大戶／主力</div>
+        <div class="role-en">1000 SHARES+</div>
+        <div class="role-desc">持股量大，進出成本高，通常<strong>提前佈局、最後出貨</strong>。大戶增加代表主動吸籌，是籌碼面最強看多信號；大戶減少往往先於股價下跌。</div>
+        <span class="role-scale">領先指標</span>
+      </div>
+      <div class="role-card mid">
+        <div class="role-icon">🐟</div>
+        <div class="role-name">中實戶</div>
+        <div class="role-en">400–799 SHARES</div>
+        <div class="role-desc">介於大戶與散戶之間，部分為資深個人投資者，部分為機構分倉。<strong>中實戶持續增加</strong>代表有穩定資金願意承接，籌碼結構健康。</div>
+        <span class="role-scale">同步指標</span>
+      </div>
+      <div class="role-card retail">
+        <div class="role-icon">🦐</div>
+        <div class="role-name">散戶</div>
+        <div class="role-en">1–399 SHARES</div>
+        <div class="role-desc">反應偏慢，常在高點追買、低點殺跌。<strong>散戶戶數大幅增加</strong>往往是主力出貨的配合動作，在上漲末段出現散戶蜂擁是警示訊號。</div>
+        <span class="role-scale">反向參考</span>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <div class="insight-icon">⚠️</div>
+      <div class="insight-body">
+        <div class="insight-label">常見誤解</div>
+        <div class="insight-text">「股東人數增加」在很多人眼中是利多，實際上需要看<strong>增加的是哪個區間</strong>：若散戶（1~99張）戶數大增而大戶（1000張以上）戶數減少，代表籌碼正在<strong>從主力流向散戶</strong>，這是典型的出貨格局，而非利多。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-3</div>
+    <div class="section-title">籌碼集中度的計算與判讀</div>
+    <div class="section-icon">📐</div>
+  </div>
+  <div class="section-body">
+    <p class="prose"><em>籌碼集中度</em>是指持股量較大的投資人（大戶＋中實戶）佔全部流通股的百分比。集中度越高，代表籌碼越集中在少數人手上，這些人的決策對股價的影響力越大。</p>
+
+    <div class="insight-box">
+      <div class="insight-icon">🧮</div>
+      <div class="insight-body">
+        <div class="insight-label">核心公式</div>
+        <div class="insight-text">
+          <strong>大戶持股比例 = 1000張以上區間持股張數總計 ÷ 全體流通在外股數 × 100%</strong><br/><br/>
+          進階版：<strong>廣義集中度 = (400張以上各級距持股張數合計) ÷ 全體流通股 × 100%</strong><br/><br/>
+          一般而言，大戶持股比例超過 60% 且呈上升趨勢，代表籌碼高度集中，股價上漲動能強；低於 40% 且持續下降，籌碼鬆散，股價易受壓。
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Meter -->
+    <div class="health-meter">
+      <div class="hm-title">籌碼集中度健康指數評級（以某週資料為例）</div>
+      <div class="hm-row">
+        <div class="hm-label">大戶持股比例</div>
+        <div class="hm-bar-bg"><div class="hm-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--accent),var(--green));"></div></div>
+        <div class="hm-val" style="color:var(--green);">72%</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-label">中實戶比例</div>
+        <div class="hm-bar-bg"><div class="hm-bar-fill" style="width:54%;background:linear-gradient(90deg,var(--accent),rgba(0,200,255,.8));"></div></div>
+        <div class="hm-val" style="color:var(--accent);">54%</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-label">散戶戶數成長率</div>
+        <div class="hm-bar-bg"><div class="hm-bar-fill" style="width:18%;background:linear-gradient(90deg,rgba(255,214,0,.8),rgba(255,152,0,.6));"></div></div>
+        <div class="hm-val" style="color:var(--yellow);">+18%</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-label">大戶週增加戶數</div>
+        <div class="hm-bar-bg"><div class="hm-bar-fill" style="width:65%;background:linear-gradient(90deg,var(--green),rgba(0,180,100,.7));"></div></div>
+        <div class="hm-val" style="color:var(--green);">+128</div>
+      </div>
+      <div class="hm-row">
+        <div class="hm-label">散戶週增加戶數</div>
+        <div class="hm-bar-bg"><div class="hm-bar-fill" style="width:30%;background:linear-gradient(90deg,rgba(255,61,90,.5),rgba(200,20,40,.4));"></div></div>
+        <div class="hm-val" style="color:var(--red);">+540</div>
+      </div>
+    </div>
+
+    <p class="prose">上例中，大戶持股比例高達72%且本週大戶戶數增加128戶，同時散戶雖增加540戶但相對比例低，屬於<strong>健康的吸籌格局</strong>——大戶仍在進場，散戶只是少量跟進，尚未到出貨尾聲。</p>
+
+    <div class="sec-divider">集中度趨勢判讀矩陣</div>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>大戶比例</th><th>大戶戶數變化</th><th>散戶戶數變化</th><th>籌碼解讀</th><th>操作意涵</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="val-green">持續升高</td>
+          <td class="val-green">增加</td>
+          <td>穩定或微增</td>
+          <td class="val-green">主力積極吸籌</td>
+          <td>可考慮跟進持有</td>
+        </tr>
+        <tr>
+          <td class="val-cyan">高位維持</td>
+          <td>穩定</td>
+          <td>微增</td>
+          <td class="val-cyan">籌碼穩定，整理格局</td>
+          <td>持股等待突破</td>
+        </tr>
+        <tr>
+          <td class="val-yellow">高位後開始下滑</td>
+          <td>減少</td>
+          <td class="val-red">大幅增加</td>
+          <td class="val-red">主力出貨，散戶接手</td>
+          <td>警示，準備減碼</td>
+        </tr>
+        <tr>
+          <td class="val-red">持續下滑</td>
+          <td class="val-red">大幅減少</td>
+          <td class="val-red">快速增加</td>
+          <td class="val-red">籌碼嚴重鬆散</td>
+          <td>出清，迴避</td>
+        </tr>
+        <tr>
+          <td class="val-yellow">低位</td>
+          <td class="val-green">開始增加</td>
+          <td>穩定或減少</td>
+          <td class="val-cyan">主力悄悄進場，底部吸籌</td>
+          <td>觀察確認，機會</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-4</div>
+    <div class="section-title">大戶持股比例的週變化解讀</div>
+    <div class="section-icon">📈</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">集保資料最大的應用價值，在於觀察<strong>週與週之間的變化方向</strong>，而非單一週的數字。連續多週的趨勢，才是判斷主力意圖最可靠的依據。</p>
+
+    <!-- SVG Chart: Whale % and stock price -->
+    <div class="svg-chart-wrap">
+      <svg viewBox="0 0 840 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#050a18;">
+        <!-- Grid -->
+        <line x1="70" y1="30"  x2="70"  y2="240" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+        <line x1="70" y1="240" x2="810" y2="240" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+        <line x1="70" y1="190" x2="810" y2="190" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="70" y1="140" x2="810" y2="140" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="70" y1="90"  x2="810" y2="90"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- Y labels (left: stock price) -->
+        <text x="58" y="244" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="end">$80</text>
+        <text x="58" y="194" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="end">$100</text>
+        <text x="58" y="144" fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="end">$120</text>
+        <text x="58" y="94"  fill="rgba(122,154,184,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="end">$140</text>
+        <!-- Y labels (right: whale %) -->
+        <text x="820" y="244" fill="rgba(0,229,255,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="start">55%</text>
+        <text x="820" y="194" fill="rgba(0,229,255,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="start">62%</text>
+        <text x="820" y="144" fill="rgba(0,229,255,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="start">70%</text>
+        <text x="820" y="94"  fill="rgba(0,229,255,.5)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="start">78%</text>
+        <!-- Title -->
+        <text x="420" y="20" fill="rgba(0,229,255,.8)" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">股價 vs 大戶持股比例（12週趨勢）</text>
+        <!-- X labels (weeks) -->
+        <text x="118" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W1</text>
+        <text x="183" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W2</text>
+        <text x="248" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W3</text>
+        <text x="313" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W4</text>
+        <text x="378" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W5</text>
+        <text x="443" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W6</text>
+        <text x="508" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W7</text>
+        <text x="573" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W8</text>
+        <text x="638" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W9</text>
+        <text x="703" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W10</text>
+        <text x="768" y="256" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">W11</text>
+
+        <!-- Stock price line (red→green) -->
+        <!-- Price data: 82,84,87,88,91,96,104,112,122,130,128,125 mapped to y: 234,229,221,218,211,196,171,141,111,81,86,91 -->
+        <polyline points="118,234 183,229 248,221 313,218 378,211 443,196 508,171 573,141 638,111 703,81 768,86" fill="none" stroke="rgba(255,61,90,.7)" stroke-width="2" stroke-linejoin="round"/>
+        <!-- Price dots -->
+        <circle cx="118" cy="234" r="3" fill="var(--red)" opacity=".8"/>
+        <circle cx="248" cy="221" r="3" fill="var(--red)" opacity=".8"/>
+        <circle cx="443" cy="196" r="3" fill="rgba(255,152,0,.9)"/>
+        <circle cx="638" cy="111" r="3" fill="var(--green)" opacity=".8"/>
+        <circle cx="703" cy="81"  r="4" fill="var(--green)"/>
+        <circle cx="768" cy="86"  r="3" fill="rgba(255,214,0,.9)"/>
+
+        <!-- Whale % line (cyan) -->
+        <!-- Whale data: 56,58,60,62,64,67,70,72,74,72,70,67 mapped roughly -->
+        <!-- 55%=240, 78%=90 → range 150px for 23%, so 1%=6.5px; base at y=240+55*6.5=... recalc: 55%→240, 78%→90, diff=150 for 23%=6.52px/% -->
+        <!-- W1:56%→233, W2:58%→220, W3:60%→207, W4:62%→194, W5:65%→175, W6:68%→156, W7:71%→136, W8:73%→123, W9:74%→117, W10:72%→130, W11:69%→149 -->
+        <polyline points="118,233 183,220 248,207 313,194 378,175 443,156 508,136 573,123 638,117 703,130 768,149" fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2" stroke-dasharray="6,3" stroke-linejoin="round"/>
+        <circle cx="118" cy="233" r="3" fill="var(--accent)" opacity=".8"/>
+        <circle cx="378" cy="175" r="3" fill="var(--accent)" opacity=".8"/>
+        <circle cx="638" cy="117" r="4" fill="var(--accent)"/>
+        <circle cx="703" cy="130" r="3" fill="rgba(255,214,0,.9)"/>
+        <circle cx="768" cy="149" r="3" fill="rgba(255,214,0,.9)"/>
+
+        <!-- Phase annotations -->
+        <rect x="80" y="35" width="115" height="20" rx="4" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.2)" stroke-width="1"/>
+        <text x="138" y="49" fill="var(--accent)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大戶持續吸籌</text>
+
+        <rect x="600" y="35" width="100" height="20" rx="4" fill="rgba(255,214,0,.08)" stroke="rgba(255,214,0,.2)" stroke-width="1"/>
+        <text x="650" y="49" fill="var(--yellow)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大戶開始減碼</text>
+
+        <!-- Legend -->
+        <line x1="300" y1="270" x2="330" y2="270" stroke="rgba(255,61,90,.7)" stroke-width="2"/>
+        <text x="335" y="274" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono,monospace">股價</text>
+        <line x1="390" y1="270" x2="420" y2="270" stroke="rgba(0,229,255,.8)" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="425" y="274" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono,monospace">大戶持股比例</text>
+      </svg>
+    </div>
+
+    <p class="prose">圖中可見：W1～W9 大戶比例持續上升，股價同步走揚，兩者高度正相關。W10 開始大戶比例轉降，股價雖仍高但出現鬆動——這是<strong>大戶領先出貨的典型形態</strong>，是最重要的提前警示。</p>
+
+    <div class="gold-box">
+      <div class="insight-icon">⭐</div>
+      <div class="insight-body">
+        <div class="insight-label">黃金規律</div>
+        <div class="insight-text">大戶持股比例的<strong>方向領先股價</strong>。當大戶比例轉折向下時，股價通常滯後1～4週才出現明顯跌幅。掌握這個時間差，是集保分析給你最珍貴的提前訊號。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-5</div>
+    <div class="section-title">散戶戶數的反向指標邏輯</div>
+    <div class="section-icon">🦐</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">在籌碼分析中，散戶的行為常被視為<em>反向指標</em>——不是因為散戶永遠錯，而是因為散戶整體進出時機的系統性偏差：<strong>追高殺低的傾向</strong>使其成為主力出貨的配合者。</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot cy"></div>
+        <div class="tl-head cy">第一階段 ── 底部吸籌（無人關注）</div>
+        <div class="tl-body">主力悄悄在低位建倉，集保資料顯示大戶戶數緩慢增加，散戶戶數<strong>持續減少或持平</strong>（散戶在跌勢中認賠殺出）。此階段股價橫盤或小幅震盪，成交量低迷。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot gn"></div>
+        <div class="tl-head gn">第二階段 ── 啟動拉升（少數人跟進）</div>
+        <div class="tl-body">股價開始上漲，成交量放大，媒體開始報導。集保資料顯示大戶持股比例繼續上升，<strong>中實戶戶數開始增加</strong>，但散戶尚未大規模進場。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot yn"></div>
+        <div class="tl-head yn">第三階段 ── 加速衝高（散戶跟風）</div>
+        <div class="tl-body">股價大漲，媒體熱烈報導。<strong>散戶戶數急速增加</strong>，散戶買進的同時，大戶持股比例開始悄悄下滑——主力借助散戶的買盤進行出貨，股票從強手轉移到弱手。</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot rd"></div>
+        <div class="tl-head rd">第四階段 ── 高位出貨（散戶接盤）</div>
+        <div class="tl-body">集保資料清楚顯示：<strong>大戶持股比例快速下降 + 散戶戶數持續大增</strong>。股票從集中轉為分散，籌碼「解放」，一旦散戶失去信心開始殺跌，流動性驟降，股價崩跌。</div>
+      </div>
+    </div>
+
+    <div class="shadow-line">
+      <div class="sl-side up"></div>
+      <div class="sl-body">
+        <div class="sl-top up">危險訊號</div>
+        <div class="sl-text">任何個股出現以下組合，需高度警戒：<br/>
+        <strong>散戶單週戶數增加超過 500 戶 + 大戶持股比例週減幅超過 1% + 股價接近歷史高點</strong>。這三個條件同時成立，是主力出貨的強烈訊號，不宜追高。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-6</div>
+    <div class="section-title">如何查詢集保戶數資料</div>
+    <div class="section-icon">🖥️</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">掌握查詢方法，才能在每週資料公布後第一時間做出判斷。以下整理主要查詢管道與各自優劣。</p>
+
+    <div class="flow-step">
+      <div class="flow-num cn">1</div>
+      <div class="flow-content">
+        <div class="flow-heading">集保結算所官方網站（TDCC）</div>
+        <div class="flow-sub">網址：tdcc.com.tw → 個人投資者專區 → 股東結構統計。可查詢任一上市櫃股票的持股級距分布，<strong>資料最完整、最原始</strong>，但介面較陽春，需手動下載或逐一查詢。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num cn">2</div>
+      <div class="flow-content">
+        <div class="flow-heading">籌碼K線（台灣本土工具）</div>
+        <div class="flow-sub">整合集保戶數、三大法人、融資券等資料，提供<strong>視覺化週趨勢圖</strong>，直接顯示大戶比例走勢曲線，是目前最方便的集保分析工具之一，適合日常監控。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num cn">3</div>
+      <div class="flow-content">
+        <div class="flow-heading">XQ 全球贏家 / CMoney</div>
+        <div class="flow-sub">提供集保戶數的歷史回溯與篩選功能，可用<strong>條件選股</strong>找出「大戶持續增加且散戶戶數穩定」的個股，進行批量掃描效率高。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">最佳工作流程建議</div>
+        <div class="flow-sub">每週二～三（集保新資料公布後）：① 用籌碼K線快速掃描自選股集保變化 → ② 鎖定大戶比例轉折或異常戶數增減的個股 → ③ 交叉比對三大法人同期動向 → ④ 做出持倉調整決策。</div>
+      </div>
+    </div>
+
+    <table class="cmp-table" style="margin-top:20px;">
+      <thead>
+        <tr><th>工具</th><th>更新頻率</th><th>視覺化</th><th>歷史回溯</th><th>批次篩選</th><th>費用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TDCC 官網</td><td class="val-green">週更</td><td class="val-red">無</td><td class="val-cyan">完整</td><td class="val-red">無</td><td class="val-green">免費</td></tr>
+        <tr><td>籌碼K線</td><td class="val-green">週更</td><td class="val-green">優</td><td class="val-green">3年+</td><td class="val-yellow">基本版有限</td><td class="val-yellow">訂閱制</td></tr>
+        <tr><td>XQ 全球贏家</td><td class="val-green">週更</td><td class="val-green">優</td><td class="val-green">完整</td><td class="val-green">強</td><td class="val-red">訂閱制（較貴）</td></tr>
+        <tr><td>CMoney</td><td class="val-green">週更</td><td class="val-cyan">良</td><td class="val-cyan">3年+</td><td class="val-cyan">中</td><td class="val-yellow">部分免費</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-7</div>
+    <div class="section-title">結合三大法人的進階判讀</div>
+    <div class="section-icon">🔗</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">集保戶數是<em>週頻資料</em>，三大法人是<em>日頻資料</em>，兩者結合能形成更完整的籌碼全貌：短期籌碼流向（三大法人）與中長期籌碼結構（集保）的雙重確認，大幅提升訊號可靠度。</p>
+
+    <div class="signal-grid">
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--green)"></div>
+          <div class="signal-label" style="color:var(--green)">最強買進格局</div>
+        </div>
+        <div class="signal-body">集保：大戶比例連升3週以上 + 三大法人：外資＋投信連續買超。<strong>週頻結構健康 + 日頻方向一致</strong>，是進場最佳條件。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--red)"></div>
+          <div class="signal-label" style="color:var(--red)">最強賣出警示</div>
+        </div>
+        <div class="signal-body">集保：大戶比例連降 + 散戶大增 + 三大法人：外資連續賣超。<strong>結構惡化 + 日頻法人出逃</strong>，立即減碼。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--yellow)"></div>
+          <div class="signal-label" style="color:var(--yellow)">矛盾訊號（需謹慎）</div>
+        </div>
+        <div class="signal-body">集保：大戶比例上升（吸籌） + 三大法人：外資賣超。可能是外資換倉、或主力（非外資）正在建倉。<strong>持股觀察，不追高</strong>。</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-head">
+          <div class="signal-dot" style="background:var(--cyan)"></div>
+          <div class="signal-label" style="color:var(--accent)">底部反轉訊號</div>
+        </div>
+        <div class="signal-body">集保：大戶比例低位後開始轉升 + 散戶戶數觸頂後微減 + 三大法人：由賣轉買。<strong>三重共振的底部訊號</strong>，勝率高。</div>
+      </div>
+    </div>
+
+    <div class="success-box">
+      <div class="insight-icon">🎯</div>
+      <div class="insight-body">
+        <div class="insight-label">實戰精髓</div>
+        <div class="insight-text">集保資料最有價值的使用方式是<strong>排除法</strong>：當一檔股票三大法人看似看多，但集保顯示大戶比例已連降數週、散戶急速湧入，就應對「法人看多」的訊號打折扣——因為籌碼結構顯示主力正在悄悄出逃，三大法人的買超可能只是短線，或者其中一部分機構其實就是在出貨。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 8: QUIZ -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-8</div>
+    <div class="section-title">本章學習測驗</div>
+    <div class="section-icon">🧠</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">測試你對集保戶數與籌碼集中度的理解程度。</p>
+
+    <!-- Q1 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q1｜集保戶數資料顯示某股「股東人數增加 2000 人」，在判斷這是利多還是利空之前，最關鍵的判斷依據是？</div>
+      <div class="quiz-opts" id="q1opts">
+        <div class="quiz-opt" onclick="answerQ('q1',this,'A')"><span class="quiz-letter">A</span>成交量是否放大</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'B')"><span class="quiz-letter">B</span>增加的是哪個持股區間的戶數（大戶還是散戶）</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'C')"><span class="quiz-letter">C</span>當日股價漲跌幅</div>
+        <div class="quiz-opt" onclick="answerQ('q1',this,'D')"><span class="quiz-letter">D</span>股東總數相比同業的高低</div>
+      </div>
+      <div class="quiz-feedback" id="q1fb"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q2｜觀察集保資料時，以下哪種組合最可能代表主力正在出貨的「分配格局」？</div>
+      <div class="quiz-opts" id="q2opts">
+        <div class="quiz-opt" onclick="answerQ('q2',this,'A')"><span class="quiz-letter">A</span>大戶持股比例上升，散戶戶數減少</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'B')"><span class="quiz-letter">B</span>大戶持股比例下降，散戶戶數大幅增加</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'C')"><span class="quiz-letter">C</span>大戶與散戶戶數同步增加</div>
+        <div class="quiz-opt" onclick="answerQ('q2',this,'D')"><span class="quiz-letter">D</span>所有區間戶數均減少</div>
+      </div>
+      <div class="quiz-feedback" id="q2fb"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q3｜大戶持股比例的變化與股價的關係，通常呈現以下哪種規律？</div>
+      <div class="quiz-opts" id="q3opts">
+        <div class="quiz-opt" onclick="answerQ('q3',this,'A')"><span class="quiz-letter">A</span>大戶比例完全同步股價，沒有領先或落後關係</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'B')"><span class="quiz-letter">B</span>大戶比例通常落後股價，確認後才能參考</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'C')"><span class="quiz-letter">C</span>大戶比例通常領先股價，其轉折方向可作為提前警示</div>
+        <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><span class="quiz-letter">D</span>大戶比例與股價無關，只需觀察散戶戶數</div>
+      </div>
+      <div class="quiz-feedback" id="q3fb"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q4｜若某股「集保大戶比例連升4週 + 外資連續買超 + 投信持續加碼」，此時最恰當的操作策略是？</div>
+      <div class="quiz-opts" id="q4opts">
+        <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><span class="quiz-letter">A</span>立即全倉追買，不怕任何價位</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><span class="quiz-letter">B</span>三重共振確認，在合理位置分批佈局，並設定停損</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><span class="quiz-letter">C</span>訊號太多容易假，反而應該迴避</div>
+        <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><span class="quiz-letter">D</span>集保是週資料，太慢了，只用三大法人就夠</div>
+      </div>
+      <div class="quiz-feedback" id="q4fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 9: SUMMARY -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">8-9</div>
+    <div class="section-title">本章重點總整理</div>
+    <div class="section-icon">✅</div>
+  </div>
+  <div class="section-body">
+    <div class="flow-step">
+      <div class="flow-num cn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">集保戶數 = 台股獨有的籌碼透視鏡</div>
+        <div class="flow-sub">每週更新的集保資料揭示所有投資人的持股分布，是判斷「誰持有這檔股票」最直接的依據，是三大法人日頻資料之外的重要補充。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num cn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">看的不是總戶數，是各區間的方向</div>
+        <div class="flow-sub">大戶（1000張以上）持股比例上升 = 籌碼集中 = 健康；散戶（1~99張）戶數大增 = 籌碼鬆散 = 警戒。同一檔股，看對區間才能做出正確判斷。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">大戶比例領先股價 1～4 週</div>
+        <div class="flow-sub">大戶比例的轉折通常領先股價變化，是最有價值的提前訊號。大戶比例在高點轉降時，即使股價仍在高位，也應開始降低持倉。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num gn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">散戶戶數大增是反向警示</div>
+        <div class="flow-sub">股價高位期間，散戶急速湧入是主力出貨的配合信號。「人多的地方不去」在集保分析中有實際數據支撐。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num pn">★</div>
+      <div class="flow-content">
+        <div class="flow-heading">集保 + 三大法人 = 最強籌碼分析組合</div>
+        <div class="flow-sub">週頻集保資料確認中長期籌碼結構，日頻三大法人確認短期資金方向。兩者方向一致時，訊號可靠度最高；兩者背離時，以集保（結構）為優先判斷基準。</div>
+      </div>
+    </div>
+
+    <div class="insight-box" style="margin-top:28px;">
+      <div class="insight-icon">🚀</div>
+      <div class="insight-body">
+        <div class="insight-label">下一章預告</div>
+        <div class="insight-text">第九章將深入探討<strong>法人買賣超與股價背離訊號</strong>——股價漲但法人賣、價跌量縮但投信默默買，這些看似矛盾的訊號背後，隱藏著哪些機構的佈局邏輯？</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="1893335041"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+
+  <!-- CHAPTER FOOTER -->
+<div class="chapter-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-complete-badge">✅</div>
+      <div class="footer-complete-text">
+        <div class="footer-complete-title">第8章完成</div>
+        <div class="footer-complete-desc">你已掌握集保戶數變化、大戶持股比例增減判讀</div>
+        <div class="footer-next-hint">下一章：法人買賣超與股價背離訊號</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <a class="fn-btn home" href="/">🏠 回首頁</a>
+      <a class="fn-btn prev" href="/stock_site/chips/chips_chapter7.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        第7章
+      </a>
+      <a class="fn-btn next" href="#">
+        第9章
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;" data-dark-footer="1">
+  <div style="padding:20px 40px 24px;display:flex;flex-direction:column;gap:8px;">
+    <p style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:rgba(122,154,184,.6);line-height:1.7;text-align:center;">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px;">
+      <a href="/stock_site/legal/about.html"      style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">關於本站</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/privacy.html"    style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">隱私政策</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/disclaimer.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">免責聲明</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">聯絡我們</a>
+    </div>
+    <p style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(122,154,184,.3);margin-top:6px;">© 2025 JellyStock. All rights reserved.</p>
+  </div>
+</footer>
+
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+  </div>
+</div>
+
+<script>
+/* ── Clock ── */
+(function(){
+  function tick(){
+    var now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
+    var pad=function(n){return String(n).padStart(2,'0');};
+    var el=document.getElementById('subClock');
+    if(el) el.textContent=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  }
+  tick();setInterval(tick,1000);
+})();
+
+/* ── Scroll Progress ── */
+(function(){
+  function updateProgress(){
+    var doc=document.documentElement;
+    var scrollTop=window.pageYOffset||doc.scrollTop;
+    var scrollHeight=doc.scrollHeight-doc.clientHeight;
+    var pct=scrollHeight>0?Math.round((scrollTop/scrollHeight)*100):0;
+    var fill=document.getElementById('progressFill');
+    var label=document.getElementById('progressPct');
+    if(fill)fill.style.width=pct+'%';
+    if(label)label.textContent=pct+'%';
+  }
+  window.addEventListener('scroll',updateProgress,{passive:true});
+  updateProgress();
+})();
+
+/* ── Reveal on Scroll ── */
+(function(){
+  var cards=document.querySelectorAll('.section-card.reveal');
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');}});
+  },{threshold:0.08});
+  cards.forEach(function(c){obs.observe(c);});
+})();
+
+/* ── Quiz ── */
+var answers={q1:'B',q2:'B',q3:'C',q4:'B'};
+var feedbacks={
+  q1:{
+    B:'✅ 正確！股東人數增加的意義完全取決於是哪個區間增加。大戶增加 = 吸籌利多；散戶大增 = 出貨警示。總戶數本身不代表任何方向。',
+    default:'❌ 不對。判斷集保戶數的關鍵不是總數或股價當日漲跌，而是各持股區間（大戶vs散戶）的增減方向，這才是籌碼流向的核心資訊。'
+  },
+  q2:{
+    B:'✅ 正確！大戶持股比例下降（主力在賣）+ 散戶戶數大幅增加（散戶在買），就是典型的「主力出貨、散戶接盤」分配格局，是強烈的減碼或出清訊號。',
+    default:'❌ 不對。分配格局的特徵是：主力減少持股同時散戶大量接手，導致大戶比例下滑而散戶戶數激增。這是籌碼從強手流向弱手的過程。'
+  },
+  q3:{
+    C:'✅ 正確！大戶比例的方向通常領先股價 1～4 週。當大戶開始悄悄減碼，股價可能仍在高位，但籌碼已在轉移。這個「時間差」是集保分析給散戶最寶貴的提前訊號。',
+    default:'❌ 不對。大戶比例的最大價值就是其領先性。大戶進出成本高，決策謹慎，其行為往往比股價本身更早反映基本面的變化，是值得高度重視的先行指標。'
+  },
+  q4:{
+    B:'✅ 正確！三重訊號共振（集保大戶吸籌 + 外資買超 + 投信加碼）是高勝率的佈局機會，但仍應在合理位置分批進場並設定停損——任何強訊號都不代表零風險，資金管理永遠優先。',
+    default:'❌ 不對。三重共振是難得的高確信度訊號，但追高不設停損、或以為訊號強就能全倉押注，都是危險做法。正確態度是「有紀律地分批進場 + 設好停損」。'
+  }
+};
+window.answerQ=function(qid,el,choice){
+  var opts=document.querySelectorAll('#'+qid+'opts .quiz-opt');
+  opts.forEach(function(o){o.classList.add('disabled');});
+  var fb=document.getElementById(qid+'fb');
+  var isCorrect=choice===answers[qid];
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(fb){
+    fb.className='quiz-feedback show '+(isCorrect?'ok':'fail');
+    fb.innerHTML=feedbacks[qid][choice]||feedbacks[qid]['default'];
+  }
+};
+
+/* ── Maintenance ── */
+(function(){
+  var API_BASE=window.location.origin;
+  var overlay=document.getElementById('maintenanceOverlay');
+  function check(){
+    fetch(API_BASE+'/api/maintenance?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var msg=document.getElementById('maintMsgText');
+        if(msg&&d.message)msg.textContent=d.message;
+        overlay.style.display=d.enabled?'flex':'none';
+      })
+      .catch(function(){})
+      .finally(function(){setTimeout(check,30000);});
+  }
+  check();
+})();
+</script>
+
+
+<script>
+/* 白天模式 Logo 修復 */
+(function() {
+  var logoImg = document.querySelector('.logo-icon img');
+  if (logoImg) {
+    logoImg.src = '/images/jelly.png';
+    logoImg.alt = 'JellyStock';
+    logoImg.onerror = function() { this.style.display = 'none'; };
+    logoImg.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:9px;position:relative;top:-4px;left:-4px;';
+  }
+})();
+</script>
+
+
+<script>
+/* ── Comprehensive Day Mode Fix v2 ── */
+(function() {
+  const DARK_FILLS = new Set([
+    '#040b15','#050c1a','#030a12','#040d18','#020810','#03080f','#060d1a',
+    '#08060a','#04080f','#050a18','#04080e','#03060d','#070d1a','#0b1220'
+  ]);
+
+  function isDarkHex(c) {
+    if (!c) return false;
+    const low = c.toLowerCase().trim();
+    if (DARK_FILLS.has(low)) return true;
+    // any hex like #0XX or #1XX that's very dark
+    const hex = low.match(/^#([0-9a-f]{6})$/);
+    if (hex) {
+      const r=parseInt(hex[1].slice(0,2),16),g=parseInt(hex[1].slice(2,4),16),b=parseInt(hex[1].slice(4,6),16);
+      return (r+g+b) < 80;
+    }
+    return false;
+  }
+  function isDarkRgba(c) {
+    if (!c) return false;
+    const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (m) return (+m[1]+ +m[2]+ +m[3]) < 60;
+    return false;
+  }
+  function isFaintRgba(c) {
+    if (!c) return false;
+    const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
+    return m && parseFloat(m[1]) <= 0.25;
+  }
+  function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
+
+  // Map neon colors → readable day colors
+  function mapNeon(c) {
+    if (!c) return null;
+    const low = c.toLowerCase();
+    if (/rgba?\(0,\s*229,\s*255/.test(low) || low === '#00e5ff') return '#1265a8';
+    if (/rgba?\(0,\s*230,\s*118/.test(low) || /rgba?\(0,\s*232,\s*118/.test(low) || low === '#00e676') return '#157a32';
+    if (/rgba?\(255,\s*61,\s*90/.test(low) || low === '#ff3d5a') return '#a02818';
+    if (/rgba?\(255,\s*214,\s*0/.test(low) || low === '#ffd600') return '#8a6000';
+    if (/rgba?\(178,\s*102,\s*255/.test(low) || low === '#b266ff') return '#6640c0';
+    if (/rgba?\(255,\s*110,\s*180/.test(low) || low === '#ff6eb4') return '#b0206a';
+    if (/rgba?\(255,\s*152,\s*0/.test(low) || low === '#ff9800') return '#a05000';
+    if (/rgba?\(0,\s*184,\s*212/.test(low) || low === '#00b8d4') return '#0d6ea8';
+    if (/rgba?\(255,\s*255,\s*255/.test(low) || low === '#fff' || low === 'white') return '#1a3550';
+    return null;
+  }
+  function mapNeonStroke(c) {
+    if (!c) return null;
+    // faint white grid lines -> light grey visible on white bg
+    if (isFaintRgba(c) && /rgba\(255,\s*255,\s*255/.test(c)) return 'rgba(26,101,168,.12)';
+    if (/rgba?\(0,\s*229,\s*255/.test(c)) return 'rgba(18,101,168,.4)';
+    return null;
+  }
+
+  function fixSvgsForMode(isDay) {
+    // 1. Fix SVG elements with inline style="background:..."
+    document.querySelectorAll('svg[style]').forEach(svg => {
+      if (!svg.dataset.origStyle) svg.dataset.origStyle = svg.getAttribute('style') || '';
+      if (isDay) {
+        const s = svg.dataset.origStyle;
+        if (s.includes('background:#') || s.includes('background: #') ||
+            s.includes('background:rgba(0,0,0') || s.includes('background: rgba(0,0,0')) {
+          svg.style.background = 'rgba(220,238,252,0.5)';
+          svg.style.borderRadius = '10px';
+        }
+      } else {
+        svg.setAttribute('style', svg.dataset.origStyle);
+      }
+    });
+
+    // 2. Fix SVG rect fills
+    document.querySelectorAll('svg rect').forEach(r => {
+      const f = r.getAttribute('fill') || '';
+      if (!r.dataset.origFill) r.dataset.origFill = f;
+      const orig = r.dataset.origFill;
+      if (isDay) {
+        if (isDark(orig)) r.setAttribute('fill', 'rgba(210,235,252,0.45)');
+      } else r.setAttribute('fill', orig);
+    });
+
+    // 3. Fix SVG text fills (neon -> readable day)
+    document.querySelectorAll('svg text, svg tspan').forEach(t => {
+      const f = t.getAttribute('fill') || '';
+      if (!t.dataset.origFill) t.dataset.origFill = f;
+      const orig = t.dataset.origFill;
+      if (isDay) {
+        const mapped = mapNeon(orig);
+        if (mapped) { t.setAttribute('fill', mapped); t.style.opacity = '1'; }
+        else if (isFaintRgba(orig) || isDark(orig)) {
+          t.setAttribute('fill', '#1a3550'); t.style.opacity = '1';
+        }
+        // CSS var
+        const v = orig.match(/var\(--(\w[\w-]*)\)/);
+        if (v) {
+          const cm={accent:'#1265a8',green:'#157a32',red:'#a02818',yellow:'#8a6000',purple:'#6640c0',pink:'#b0206a',orange:'#a05000'};
+          if (cm[v[1]]) { t.setAttribute('fill', cm[v[1]]); t.style.opacity='1'; }
+        }
+      } else { t.setAttribute('fill', orig); t.style.opacity = ''; }
+    });
+
+    // 4. Fix SVG line/path strokes
+    document.querySelectorAll('svg line, svg path, svg polyline').forEach(el => {
+      const s = el.getAttribute('stroke') || '';
+      if (!el.dataset.origStroke) el.dataset.origStroke = s;
+      const orig = el.dataset.origStroke;
+      if (isDay && orig) {
+        const mapped = mapNeonStroke(orig);
+        if (mapped) el.setAttribute('stroke', mapped);
+        else {
+          const nm = mapNeon(orig);
+          if (nm) el.setAttribute('stroke', nm);
+        }
+      } else if (!isDay && orig) el.setAttribute('stroke', orig);
+    });
+
+    // 5. Fix SVG circle fills
+    document.querySelectorAll('svg circle, svg ellipse').forEach(el => {
+      const f = el.getAttribute('fill') || '';
+      if (!el.dataset.origFill) el.dataset.origFill = f;
+      const orig = el.dataset.origFill;
+      if (isDay) {
+        const mapped = mapNeon(orig);
+        if (mapped) el.setAttribute('fill', mapped);
+        else if (isDark(orig)) el.setAttribute('fill', 'rgba(210,235,252,0.45)');
+      } else el.setAttribute('fill', orig);
+    });
+
+    // 6. Fix svg-chart-wrap inline border color
+    document.querySelectorAll('.svg-chart-wrap').forEach(w => {
+      if (isDay) {
+        w.style.borderColor = 'rgba(26,101,168,.2)';
+        w.style.background = 'rgba(220,238,252,0.3)';
+      } else {
+        w.style.borderColor = '';
+        w.style.background = '';
+      }
+    });
+  }
+
+  function run() { fixSvgsForMode(document.body.classList.contains('theme-day')); }
+  const origToggle = window.toggleTheme;
+  window.toggleTheme = function() { if (origToggle) origToggle(); setTimeout(run, 30); };
+  document.addEventListener('DOMContentLoaded', function() {
+    run();
+    const obs = new MutationObserver(function(m) {
+      m.forEach(function(x){ if(x.attributeName==='class') run(); });
+    });
+    obs.observe(document.body, { attributes: true });
+  });
+  // Also run immediately if DOM already ready
+  if (document.readyState !== 'loading') setTimeout(run, 50);
+})();
+</script>
+
+</body>
+</html>

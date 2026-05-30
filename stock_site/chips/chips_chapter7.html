@@ -1,0 +1,3253 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="scroll-behavior:smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226" crossorigin="anonymous"></script>
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="apple-touch-icon" href="/images/jelly.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>第七章：借券賣出的深層意義 — 籌碼分析教學</title>
+  <meta name="description" content="借券來源、大股東出貨手法、借券增加的警示。深度解析借券賣出如何揭露主力意圖，學會從借券數據預判大行情反轉。籌碼分析教學第七章。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ch-color: var(--accent);
+      --ch-rgb: 0,229,255;
+      --bg:        #03060d;
+      --surface:   #070d1a;
+      --surface2:  #0b1220;
+      --border:    #0e1828;
+      --border2:   #152234;
+      --accent:    #00e5ff;
+      --accent2:   #0099bb;
+      --accent3:   #00aaff;
+      --green:     #00e676;
+      --red:       #ff3d5a;
+      --yellow:    #ffd600;
+      --purple:    #b266ff;
+      --pink:      #ff6eb4;
+      --orange:    #ff9800;
+      --muted:     #3a5070;
+      --text:      #d4e4f7;
+      --text-dim:  #7a9ab8;
+      --text-faint:#4a6888;
+      --glow:      0 0 32px rgba(0,229,255,.25);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,229,255,.2) transparent;
+    }
+    body::-webkit-scrollbar{width:5px}
+    body::-webkit-scrollbar-track{background:transparent}
+    body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:4px}
+
+    .bg-nebula {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 20%, rgba(10,40,120,.22) 0%,transparent 55%),
+        radial-gradient(ellipse 55% 40% at 85% 75%, rgba(0,80,60,.15) 0%,transparent 50%),
+        radial-gradient(ellipse 90% 50% at 50% 0%,  rgba(0,60,140,.18) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 30% at 75% 25%, rgba(60,0,120,.1)  0%,transparent 40%);
+    }
+    .bg-scanlines {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);
+    }
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle { 0%{opacity:.6}50%{opacity:.85}100%{opacity:.7} }
+
+    .sticky-progress {
+      position:sticky;top:58px;z-index:190;
+      background:rgba(3,6,14,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(0,229,255,.07);
+    }
+    .progress-track-sticky{height:3px;width:100%;background:rgba(0,229,255,.07);}
+    .progress-fill-sticky{
+      height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));
+      box-shadow:0 0 10px rgba(0,229,255,.5);transition:width .4s ease;width:0%;
+    }
+    .progress-info-row{display:flex;align-items:center;justify-content:space-between;padding:5px 24px;}
+    .progress-label-sm{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:var(--text-faint);}
+    .progress-pct-sm{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.08em;}
+
+    main {
+      position:relative;z-index:1;
+      max-width:900px;margin:0 auto;
+      padding:36px 28px 120px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display:flex;align-items:center;gap:36px;
+      margin-bottom:56px;
+      background:linear-gradient(135deg,rgba(8,15,30,.98),rgba(4,10,22,.98));
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:24px;padding:36px 40px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,var(--accent),rgba(0,170,255,.9),var(--accent),transparent);
+      background-size:300% 100%;animation:edgeSweep 3s ease-in-out infinite;
+    }
+    @keyframes edgeSweep{0%,100%{background-position:-100% 0;opacity:.6}50%{background-position:200% 0;opacity:1}}
+    .hero-icon {
+      flex-shrink:0;width:110px;height:110px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);
+      border-radius:20px;position:relative;overflow:hidden;
+    }
+    .hero-content{flex:1;min-width:0;}
+    .hero-label {
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.35em;color:var(--accent);text-transform:uppercase;
+      opacity:.8;margin-bottom:8px;
+    }
+    .hero-title {
+      font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+      line-height:1.25;letter-spacing:.04em;margin-bottom:12px;
+      background:linear-gradient(90deg,#fff 50%,rgba(0,229,255,.85));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(0,229,255,.2));
+    }
+    .hero-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    .tag {
+      font-family:'Share Tech Mono',monospace;font-size:.65rem;
+      padding:4px 12px;border-radius:20px;letter-spacing:.08em;
+      border:1px solid;cursor:default;transition:all .2s;
+    }
+    .tag:hover{transform:translateY(-1px);filter:brightness(1.15);}
+    .tag-cyan{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .tag-pink{color:var(--pink);border-color:rgba(255,110,180,.3);background:rgba(255,110,180,.07);}
+    .tag-green{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.07);}
+    .tag-yellow{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.07);}
+    .tag-red{color:var(--red);border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.07);}
+    .tag-orange{color:var(--orange);border-color:rgba(255,152,0,.3);background:rgba(255,152,0,.07);}
+    .tag-purple{color:var(--purple);border-color:rgba(178,102,255,.3);background:rgba(178,102,255,.07);}
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background:linear-gradient(135deg,rgba(8,15,30,.97),rgba(6,12,24,.98));
+      border:1px solid rgba(0,229,255,.12);
+      border-radius:20px;margin-bottom:32px;
+      overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 40px rgba(0,229,255,.03);
+      animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+      transition:transform .25s,box-shadow .3s,border-color .3s;
+    }
+    .section-card:hover{transform:translateY(-2px);box-shadow:0 12px 50px rgba(0,0,0,.55),0 0 30px rgba(0,229,255,.06);border-color:rgba(0,229,255,.18);}
+    .section-card.reveal{opacity:0;transform:translateY(22px);}
+    .section-card.reveal.visible{opacity:1;transform:translateY(0);transition:opacity .5s,transform .5s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    .section-header {
+      display:flex;align-items:center;gap:16px;
+      padding:22px 28px;border-bottom:1px solid rgba(0,229,255,.08);
+      position:relative;
+    }
+    .section-header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,229,255,.35),transparent);
+    }
+    .section-num {
+      font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;
+      color:var(--accent);background:rgba(0,229,255,.08);
+      border:1px solid rgba(0,229,255,.2);border-radius:8px;
+      padding:4px 10px;letter-spacing:.1em;white-space:nowrap;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+      color:#fff;letter-spacing:.06em;
+    }
+    .section-icon{margin-left:auto;font-size:1.4rem;opacity:.7;}
+    .section-body{padding:28px;}
+
+    /* ── PROSE ── */
+    .prose{font-size:.9rem;color:var(--text-dim);line-height:1.85;margin-bottom:16px;}
+    .prose strong{color:var(--text);font-weight:600;}
+    .prose em{color:var(--accent);font-style:normal;font-weight:500;}
+
+    /* ── BOXES ── */
+    .insight-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.03));
+      border:1px solid rgba(0,229,255,.2);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .insight-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px;}
+    .insight-body{flex:1;}
+    .insight-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--accent);margin-bottom:6px;}
+    .insight-text{font-size:.88rem;color:var(--text);line-height:1.75;}
+    .warn-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.03));
+      border:1px solid rgba(255,61,90,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .warn-box .insight-label{color:var(--red);}
+    .gold-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.03));
+      border:1px solid rgba(255,214,0,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .gold-box .insight-label{color:var(--yellow);}
+    .purple-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(178,102,255,.02));
+      border:1px solid rgba(178,102,255,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .purple-box .insight-label{color:var(--purple);}
+    .success-box {
+      display:flex;gap:16px;align-items:flex-start;
+      background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(0,200,90,.02));
+      border:1px solid rgba(0,230,118,.22);border-radius:14px;
+      padding:18px 22px;margin:20px 0;
+    }
+    .success-box .insight-label{color:var(--green);}
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.84rem;}
+    .cmp-table th{
+      background:rgba(0,229,255,.07);color:var(--accent);
+      font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+      padding:12px 16px;border-bottom:1px solid rgba(0,229,255,.15);text-align:left;
+    }
+    .cmp-table td{
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+      color:var(--text-dim);vertical-align:top;line-height:1.6;
+    }
+    .cmp-table tr:hover td{background:rgba(0,229,255,.03);}
+    .cmp-table .val-red{color:var(--red);font-weight:600;}
+    .cmp-table .val-green{color:var(--green);font-weight:600;}
+    .cmp-table .val-yellow{color:var(--yellow);font-weight:600;}
+    .cmp-table .val-cyan{color:var(--accent);font-weight:600;}
+    .cmp-table .val-purple{color:var(--purple);font-weight:600;}
+    .cmp-table .val-orange{color:var(--orange);font-weight:600;}
+
+    /* ── FORCE METER ── */
+    .force-meter-wrap{margin:24px 0;}
+    .force-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .force-label{font-size:.82rem;color:var(--text-dim);min-width:140px;}
+    .force-bar-bg{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden;}
+    .force-bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.22,1,.36,1);width:0%;}
+    .force-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);min-width:36px;text-align:right;}
+
+    /* ── SHADOW LINE ── */
+    .shadow-line{
+      display:flex;align-items:stretch;gap:0;
+      margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(0,229,255,.1);
+    }
+    .sl-side{width:4px;flex-shrink:0;}
+    .sl-side.up{background:linear-gradient(180deg,var(--red),rgba(255,61,90,.4));}
+    .sl-side.dn{background:linear-gradient(180deg,var(--green),rgba(0,230,118,.4));}
+    .sl-side.neu{background:linear-gradient(180deg,var(--yellow),rgba(255,214,0,.4));}
+    .sl-side.pu{background:linear-gradient(180deg,var(--purple),rgba(178,102,255,.4));}
+    .sl-side.cy{background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.4));}
+    .sl-body{padding:16px 20px;background:rgba(0,0,0,.2);flex:1;}
+    .sl-top{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.12em;margin-bottom:6px;}
+    .sl-top.up{color:var(--red);}
+    .sl-top.dn{color:var(--green);}
+    .sl-top.neu{color:var(--yellow);}
+    .sl-top.pu{color:var(--purple);}
+    .sl-top.cy{color:var(--accent);}
+    .sl-text{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+    .sl-text strong{color:var(--text);}
+
+    /* ── DIVIDER ── */
+    .sec-divider{
+      text-align:center;margin:28px 0 22px;
+      font-family:'Share Tech Mono',monospace;font-size:.6rem;
+      letter-spacing:.3em;color:var(--text-faint);
+      display:flex;align-items:center;gap:14px;
+    }
+    .sec-divider::before,.sec-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.1);}
+
+    /* ── CHIP ── */
+    .chip{
+      display:inline-block;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;
+      padding:3px 10px;border-radius:6px;letter-spacing:.05em;
+      vertical-align:middle;margin:0 2px;
+    }
+    .chip-red{background:rgba(255,61,90,.15);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .chip-green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);}
+    .chip-cyan{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .chip-yellow{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--yellow);}
+    .chip-purple{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.3);color:var(--purple);}
+    .chip-orange{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3);color:var(--orange);}
+
+    /* ── SIGNAL GRID ── */
+    .signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:24px 0;}
+    .signal-card{
+      border-radius:14px;padding:18px 20px;
+      background:rgba(0,0,0,.2);
+      border:1px solid rgba(0,229,255,.1);
+      transition:all .22s;
+    }
+    .signal-card:hover{border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.04);}
+    .signal-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .signal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .signal-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.1em;}
+    .signal-body{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── ROLE CARDS (借券版) ── */
+    .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:24px 0;}
+    .role-card{border-radius:16px;padding:22px 18px;position:relative;overflow:hidden;transition:all .25s;}
+    .role-card:hover{transform:translateY(-3px);}
+    .role-card.type-a{background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.22);}
+    .role-card.type-b{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,170,255,.02));border:1px solid rgba(0,229,255,.22);}
+    .role-card.type-c{background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(255,152,0,.02));border:1px solid rgba(255,214,0,.22);}
+    .role-icon{font-size:2rem;margin-bottom:12px;}
+    .role-name{font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;margin-bottom:6px;letter-spacing:.06em;}
+    .role-card.type-a .role-name{color:var(--red);}
+    .role-card.type-b .role-name{color:var(--accent);}
+    .role-card.type-c .role-name{color:var(--yellow);}
+    .role-en{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.12em;opacity:.6;margin-bottom:10px;}
+    .role-desc{font-size:.82rem;color:var(--text-dim);line-height:1.65;}
+    .role-scale{font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:10px;}
+    .type-a .role-scale{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.25);color:var(--red);}
+    .type-b .role-scale{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.22);color:var(--accent);}
+    .type-c .role-scale{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.22);color:var(--yellow);}
+
+    /* ── FLOW STEP ── */
+    .flow-step {
+      display:flex;align-items:flex-start;gap:18px;
+      padding:18px 20px;border-radius:14px;
+      border:1px solid rgba(0,229,255,.1);background:rgba(0,0,0,.2);
+      margin:10px 0;transition:all .22s;
+    }
+    .flow-step:hover{border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.04);}
+    .flow-num{
+      flex-shrink:0;width:32px;height:32px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',monospace;font-size:.68rem;font-weight:700;
+    }
+    .cn{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--accent);}
+    .rn{background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.3);color:var(--red);}
+    .gn{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.28);color:var(--green);}
+    .yn{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.28);color:var(--yellow);}
+    .pn{background:rgba(178,102,255,.1);border:1px solid rgba(178,102,255,.28);color:var(--purple);}
+    .flow-content{flex:1;}
+    .flow-heading{font-weight:700;color:var(--text);font-size:.9rem;margin-bottom:4px;}
+    .flow-sub{font-size:.83rem;color:var(--text-dim);line-height:1.65;}
+
+    /* ── SVG CHART WRAP ── */
+    .svg-chart-wrap {
+      width:100%;border-radius:14px;overflow:hidden;
+      border:1px solid rgba(0,229,255,.1);margin:20px 0;
+    }
+
+    /* ── QUIZ ── */
+    .quiz-wrap{margin:24px 0;background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:22px;}
+    .quiz-q{font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:16px;line-height:1.65;}
+    .quiz-opts{display:flex;flex-direction:column;gap:8px;}
+    .quiz-opt{
+      display:flex;align-items:center;gap:12px;
+      padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(0,229,255,.12);background:rgba(0,229,255,.03);
+      cursor:pointer;transition:all .18s cubic-bezier(.22,1,.36,1);
+      font-size:.88rem;color:var(--text-dim);
+    }
+    .quiz-opt:hover:not(.disabled){border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);color:var(--text);}
+    .quiz-opt.correct{border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08);color:var(--green);}
+    .quiz-opt.wrong{border-color:rgba(255,61,90,.3);background:rgba(255,61,90,.06);color:var(--red);}
+    .quiz-opt.disabled{cursor:default;}
+    .quiz-letter{
+      width:28px;height:28px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Share Tech Mono',monospace;font-size:.72rem;font-weight:700;
+      border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.06);color:var(--accent);
+      min-width:28px;
+    }
+    .quiz-feedback{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.84rem;line-height:1.7;display:none;}
+    .quiz-feedback.show{display:block;}
+    .quiz-feedback.ok{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.25);color:var(--green);}
+    .quiz-feedback.fail{background:rgba(255,61,90,.07);border:1px solid rgba(255,61,90,.2);color:var(--text-dim);}
+
+    /* ── TIMELINE ── */
+    .timeline{position:relative;padding-left:28px;margin:24px 0;}
+    .timeline::before{
+      content:'';position:absolute;left:10px;top:8px;bottom:8px;width:2px;
+      background:linear-gradient(180deg,var(--accent),rgba(0,229,255,.1));border-radius:2px;
+    }
+    .tl-item{position:relative;margin-bottom:24px;}
+    .tl-dot{
+      position:absolute;left:-24px;top:4px;
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid;background:var(--bg);
+    }
+    .tl-dot.cy{border-color:var(--accent);box-shadow:0 0 8px rgba(0,229,255,.5);}
+    .tl-dot.gn{border-color:var(--green);box-shadow:0 0 8px rgba(0,230,118,.5);}
+    .tl-dot.rd{border-color:var(--red);box-shadow:0 0 8px rgba(255,61,90,.5);}
+    .tl-dot.yn{border-color:var(--yellow);box-shadow:0 0 8px rgba(255,214,0,.4);}
+    .tl-dot.pu{border-color:var(--purple);box-shadow:0 0 8px rgba(178,102,255,.5);}
+    .tl-head{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.1em;margin-bottom:5px;}
+    .tl-head.cy{color:var(--accent);}
+    .tl-head.gn{color:var(--green);}
+    .tl-head.rd{color:var(--red);}
+    .tl-head.yn{color:var(--yellow);}
+    .tl-head.pu{color:var(--purple);}
+    .tl-body{font-size:.84rem;color:var(--text-dim);line-height:1.65;}
+    .tl-body strong{color:var(--text);}
+
+    /* ── CHAPTER FOOTER ── */
+    .chapter-footer {
+      margin-top:64px;padding:0;
+      background:linear-gradient(135deg,rgba(6,12,26,.99),rgba(4,8,18,.99));
+      border:1.5px solid rgba(0,229,255,.16);
+      border-radius:20px;overflow:hidden;position:relative;
+      box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 30px rgba(0,229,255,.04);
+    }
+    .chapter-footer::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--ch-color,var(--accent)),rgba(0,229,255,.6),var(--ch-color,var(--accent)),transparent);
+      background-size:300% 100%;animation:footerEdge 4s ease-in-out infinite;
+    }
+    @keyframes footerEdge{0%,100%{background-position:-100% 0;opacity:.5}50%{background-position:200% 0;opacity:1}}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;gap:20px;flex-wrap:wrap;}
+    .footer-left{display:flex;align-items:center;gap:14px;flex:1;min-width:0;}
+    .footer-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+    .footer-complete-badge{
+      flex-shrink:0;width:42px;height:42px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(0,229,255,.14),rgba(0,229,255,.06));
+      border:1px solid rgba(0,229,255,.3);
+      display:grid;place-items:center;font-size:1.3rem;
+    }
+    .footer-complete-text{flex:1;min-width:0;}
+    .footer-complete-title{font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:#fff;letter-spacing:.04em;margin-bottom:4px;}
+    .footer-complete-desc{font-size:.8rem;color:#7a9ab8;line-height:1.6;}
+    .footer-next-hint{font-size:.73rem;color:rgba(0,229,255,.8);margin-top:3px;font-family:'Share Tech Mono',monospace;letter-spacing:.04em;opacity:.75;}
+    .fn-btn{display:flex;align-items:center;gap:9px;padding:11px 20px;border-radius:12px;font-family:'Share Tech Mono',monospace;font-size:.74rem;letter-spacing:.07em;cursor:pointer;text-decoration:none;transition:all .22s;white-space:nowrap;border:1.5px solid;}
+    .fn-btn svg{width:14px;height:14px;flex-shrink:0;}
+    .fn-btn.home{color:var(--purple);border-color:rgba(178,102,255,.35);background:rgba(178,102,255,.06);}
+    .fn-btn.home:hover{color:#c97fff;border-color:rgba(178,102,255,.6);background:rgba(178,102,255,.12);box-shadow:0 0 14px rgba(178,102,255,.2);}
+    .fn-btn.prev{color:#a0c8e8;border-color:rgba(0,229,255,.2);background:rgba(0,229,255,.05);}
+    .fn-btn.prev:hover{color:var(--accent);border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.12);box-shadow:0 0 14px rgba(0,229,255,.18);}
+    .fn-btn.next{color:var(--ch-color,var(--accent));border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.07);}
+    .fn-btn.next:hover{background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.6);box-shadow:0 0 18px rgba(0,229,255,.22);}
+    @media(max-width:600px){.footer-inner{flex-direction:column;align-items:stretch;}.footer-right{justify-content:center;}.fn-btn{justify-content:center;}}
+
+    /* ══ UNIFIED HEADER ══ */
+    header{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 20px 0 14px;height:58px;
+      border-bottom:1px solid rgba(0,229,255,.09);
+      background:rgba(3,6,14,.97);
+      backdrop-filter:blur(24px);
+      box-shadow:0 2px 24px rgba(0,0,0,.5);
+    }
+    header::after{
+      content:'';position:absolute;bottom:-1px;left:0;right:0;height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--accent,#00e5ff) 20%,rgba(0,170,255,.9) 50%,var(--accent,#00e5ff) 80%,transparent);
+      background-size:200% 100%;animation:headerSweep 4s linear infinite;
+    }
+    @keyframes headerSweep{from{background-position:-100% 0}to{background-position:200% 0}}
+    .header-left{display:flex;align-items:center;gap:0;}
+    .logo{display:flex;align-items:center;gap:12px;margin-left:2px;}
+    .logo-icon{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;position:relative;flex-shrink:0;overflow:visible;}
+    .logo-icon img{width:52px;height:52px;object-fit:contain;border-radius:9px;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));position:relative;top:-5px;left:-5px;}
+    .logo-text{font-family:'Orbitron',monospace;font-size:.92rem;font-weight:700;letter-spacing:.1em;color:#fff;text-shadow:0 0 20px rgba(0,229,255,.4);}
+    .logo-sub{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--accent);letter-spacing:.22em;opacity:.65;margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .btn-back{
+      display:flex;align-items:center;gap:7px;
+      padding:6px 16px;border-radius:20px;
+      border:1px solid rgba(0,229,255,.22);
+      background:rgba(0,229,255,.06);
+      color:#a0c8e8;font-family:'Share Tech Mono',monospace;
+      font-size:.7rem;letter-spacing:.07em;cursor:pointer;
+      text-decoration:none;transition:all .2s;
+    }
+    .btn-back:hover{color:var(--accent);background:rgba(0,229,255,.14);border-color:rgba(0,229,255,.5);box-shadow:0 0 16px rgba(0,229,255,.2);}
+    .btn-back svg{width:12px;height:12px;flex-shrink:0;}
+    #subClock{
+      font-family:'Share Tech Mono',monospace;font-size:.75rem;
+      color:var(--accent);letter-spacing:.1em;
+      text-shadow:0 0 10px rgba(0,229,255,.35);
+      background:rgba(0,229,255,.05);
+      border:1px solid rgba(0,229,255,.14);
+      border-radius:20px;padding:5px 14px;
+      white-space:nowrap;
+    }
+
+    /* ══ SIDENAV ══ */
+    .chapter-sidenav {
+      position:fixed;left:0;top:50%;transform:translateY(-50%);
+      z-index:150;display:flex;flex-direction:column;
+      background:rgba(2,5,14,.98);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+      border:1.5px solid rgba(0,229,255,.28);border-left:none;
+      border-radius:0 18px 18px 0;overflow:hidden;
+      box-shadow:6px 0 40px rgba(0,0,0,.65),0 0 28px rgba(0,229,255,.08);
+      transition:box-shadow .3s,border-color .3s;min-width:48px;
+    }
+    .chapter-sidenav:hover{box-shadow:8px 0 50px rgba(0,0,0,.7),0 0 40px rgba(0,229,255,.12);border-color:rgba(0,229,255,.35);}
+    .chapter-sidenav::before{content:'';display:block;height:2px;flex-shrink:0;background:linear-gradient(90deg,transparent,rgba(0,229,255,.9),rgba(0,229,255,.5),transparent);}
+    .chapter-sidenav::after{content:'';display:block;height:2px;flex-shrink:0;margin-top:auto;background:linear-gradient(90deg,transparent,rgba(0,229,255,.5),rgba(0,229,255,.2),transparent);}
+    .ch-nav-item{
+      display:flex;align-items:center;padding:10px 14px 10px 12px;
+      font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.06em;
+      color:rgba(200,220,240,.85);text-decoration:none;cursor:pointer;
+      border-left:2.5px solid transparent;transition:all .22s ease;white-space:nowrap;
+      border-bottom:1px solid rgba(0,229,255,.06);position:relative;overflow:hidden;min-width:148px;
+    }
+    .ch-nav-item:last-child{border-bottom:none;}
+    .ch-nav-item .ch-num{font-size:.66rem;font-weight:700;flex-shrink:0;min-width:20px;color:rgba(180,210,235,.9);}
+    .ch-nav-item .ch-label{max-width:160px;overflow:hidden;font-size:.7rem;letter-spacing:.04em;color:rgba(220,235,250,.9);padding-left:8px;}
+    .ch-nav-item:hover{color:var(--accent);border-left-color:rgba(0,229,255,.6);background:rgba(0,229,255,.05);}
+    .ch-nav-item.current-ch{color:var(--ch-color,var(--accent));border-left-color:var(--ch-color,var(--accent));background:rgba(var(--ch-rgb,0,229,255),.08);}
+    .ch-nav-item.current-ch .ch-num{color:var(--ch-color,var(--accent));}
+    .ch-nav-item.current-ch::after{content:'';position:absolute;right:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--ch-color,var(--accent));box-shadow:0 0 8px var(--ch-color,var(--accent));}
+    .ch-nav-item.locked{opacity:.28;cursor:default;pointer-events:none;}
+    @media(max-width:768px){.chapter-sidenav{display:none;}}
+
+    /* ── DAY THEME ── */
+    body.theme-day{--bg:#cce0f2;--surface:rgba(255,255,255,.88);--surface2:rgba(232,246,255,.92);--border:rgba(26,101,168,.18);--border2:rgba(26,101,168,.30);--accent:#1265a8;--accent2:#0d5090;--accent3:#1a88cc;--green:#157a32;--red:#b03020;--yellow:#b8880e;--purple:#6640c0;--pink:#c03080;--muted:#6a90b0;--text:#0c1c2e;--text-dim:#1a3550;--text-faint:#3a6080;}
+    body.theme-day .bg-nebula,body.theme-day .bg-scanlines,body.theme-day .bg-stars{opacity:0;pointer-events:none;}
+    body.theme-day header{background:rgba(255,255,255,.82);backdrop-filter:blur(20px) saturate(1.8);border-bottom:1px solid rgba(26,123,191,.15);}
+    body.theme-day .section-card{background:rgba(255,255,255,.9);border-color:rgba(26,101,168,.18);}
+    body.theme-day .section-title{color:#0a1828;}
+    body.theme-day .section-num{color:#1265a8;background:rgba(26,123,191,.1);}
+    body.theme-day .prose{color:#1a3550;}
+    body.theme-day .prose strong{color:#0a1828;}
+    body.theme-day .hero{background:rgba(255,255,255,.88);border-color:rgba(26,123,191,.2);}
+    body.theme-day .insight-box{background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.04));border-color:rgba(26,101,168,.22);}
+    body.theme-day .warn-box{background:linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));border-color:rgba(176,48,32,.22);}
+    body.theme-day .gold-box{background:linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03));border-color:rgba(184,136,14,.22);}
+    body.theme-day .success-box{background:linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03));border-color:rgba(21,122,50,.22);}
+    body.theme-day .purple-box{background:linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.03));border-color:rgba(102,64,192,.22);}
+    body.theme-day #site-footer{background:rgba(255,255,255,.88) !important;border-top-color:rgba(26,101,168,.15) !important;}
+
+    /* ── MOBILE ── */
+    @media(max-width:640px){
+      body{font-size:15px;}
+      main{padding:20px 14px 80px !important;}
+      .hero{flex-direction:column !important;text-align:center !important;padding:22px 18px !important;gap:18px !important;}
+      .hero-title{font-size:1.1rem !important;}
+      .hero-icon{width:70px !important;height:70px !important;margin:0 auto !important;}
+      .section-body{padding:18px 16px 20px !important;}
+      .role-grid,.signal-grid{grid-template-columns:1fr !important;}
+      .prose{font-size:.9rem !important;}
+      .flow-step{padding:14px 14px !important;}
+      .cmp-table{font-size:.78rem !important;}
+      .cmp-table th,.cmp-table td{padding:8px 10px !important;}
+      .chapter-sidenav{display:none !important;}
+    }
+  
+    /* ── Google AdSense 廣告容器 ── */
+    .ad-unit {
+      display: block;
+      width: 100%;
+      margin: 28px 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    .ad-unit-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 4px;
+      opacity: .55;
+      text-transform: uppercase;
+    }
+    .ad-unit ins { display: block; margin: 0 auto; }
+    .ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 0 0 4px;
+    }
+    body.theme-day .ad-unit-label { color: #5a8ab8; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       SPACE MODE VISUAL ENHANCEMENTS — 統一增強版
+       ═══════════════════════════════════════════════════════════ */
+
+    .bg-nebula {
+      animation: nebulaFloat 28s ease-in-out infinite alternate !important;
+    }
+    @keyframes nebulaFloat {
+      0%   { opacity:.75; transform:scale(1) translateX(0); }
+      50%  { opacity:.9; transform:scale(1.015) translateX(3px); }
+      100% { opacity:1;  transform:scale(1.025) translateX(-3px); }
+    }
+
+    .bg-stars {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(1px 1px at 12% 8%,  rgba(255,255,255,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 28% 22%, rgba(200,240,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 5%,  rgba(255,255,255,.4)  0%, transparent 100%),
+        radial-gradient(1px 1px at 62% 18%, rgba(200,220,255,.5)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 9%,  rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.45) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 62%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 48% 72%, rgba(180,210,255,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 78%, rgba(200,230,255,.3)  0%, transparent 100%);
+      animation: starTwinkle 8s ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle { 0%{opacity:.6}50%{opacity:.85}100%{opacity:.7} }
+    body.theme-day .bg-stars { opacity: 0; pointer-events: none; }
+
+    .section-card {
+      transition: transform .25s, box-shadow .3s, border-color .3s !important;
+    }
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 30px rgba(0,229,255,.06) !important;
+      border-color: rgba(0,229,255,.18) !important;
+    }
+    body.theme-day .section-card:hover {
+      box-shadow: 0 12px 40px rgba(26,80,160,.15) !important;
+      border-color: rgba(26,123,191,.3) !important;
+      transform: translateY(-2px);
+    }
+
+    /* ── Day theme sky & sun ── */
+    body.theme-day {
+      background:
+        radial-gradient(ellipse 60% 25% at 20% 15%, rgba(255,255,255,.5) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 75% 10%, rgba(255,255,255,.45) 0%, transparent 55%),
+        linear-gradient(180deg,
+          #4fa8de 0%, #6bbcec 12%, #8bd0f5 28%, #a8dff8 45%,
+          #c2edfb 62%, #d5f3f8 78%, #e4f8f2 100%
+        ) !important;
+    }
+    body.theme-day::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 180px 35px at 15% 18%, rgba(255,255,255,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 220px 40px at 45% 12%, rgba(255,255,255,.5) 0%, transparent 70%),
+        radial-gradient(ellipse 160px 30px at 72% 22%, rgba(255,255,255,.45) 0%, transparent 65%);
+      animation: cloudDrift 40s ease-in-out infinite alternate;
+    }
+    @keyframes cloudDrift {
+      0%   { transform: translateX(0); opacity: .8; }
+      100% { transform: translateX(18px); opacity: 1; }
+    }
+    body.theme-day::after {
+      content: '';
+      position: fixed; top: -60px; right: -60px; width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,100,.38) 0%, rgba(255,200,50,.15) 40%, transparent 70%);
+      z-index: 0; pointer-events: none;
+      animation: sunPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0%   { opacity: .7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+    body.theme-day .bg-nebula { opacity: 0 !important; animation: none !important; }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE RESPONSIVE FIX — 手機版完整修復
+       ═══════════════════════════════════════════════════════════ */
+
+    .cmp-table, .compare-table {
+      display: block; width: 100%;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    svg { max-width: 100%; height: auto; }
+
+    @media (max-width: 640px) {
+      body { font-size: 15px; }
+      main { padding: 20px 14px 80px !important; }
+      .section-card { padding: 0; border-radius: 16px; }
+      .section-body { padding: 18px 16px 20px !important; }
+      .hero { flex-direction: column !important; text-align: center !important; padding: 22px 18px !important; gap: 18px !important; }
+      .hero-title { font-size: 1.1rem !important; line-height: 1.5 !important; }
+      .hero-icon  { width: 70px !important; height: 70px !important; margin: 0 auto !important; }
+      .section-header { padding: 16px 16px 12px !important; gap: 8px !important; }
+      .section-title  { font-size: .95rem !important; }
+      .prose, .section-body p { font-size: .9rem !important; line-height: 1.75 !important; }
+      .insight-box, .key-concept, .warn-box, .gold-box, .green-box { padding: 14px 14px !important; }
+      .cmp-table, .compare-table { font-size: .78rem !important; }
+      .quiz-opt { padding: 10px 14px !important; font-size: .86rem !important; }
+      .quiz-q   { font-size: .9rem !important; }
+      .footer-inner { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+      .fn-btn { justify-content: center !important; text-align: center !important; }
+      .chapter-sidenav { display: none !important; }
+      .toc { display: none !important; }
+      .sop-step { padding: 14px !important; }
+    }
+    @media (max-width: 400px) {
+      main { padding: 16px 10px 80px !important; }
+      .hero-title { font-size: 1rem !important; }
+    }
+
+  
+    body.theme-day {
+      --bg:#cce0f2;--surface:rgba(255,255,255,.88);--accent:#1265a8;--green:#157a32;--red:#b03020;
+      --yellow:#b8880e;--purple:#6640c0;--text:#0c1c2e;--text-dim:#1a3550;--text-faint:#3a6080;
+    }
+    body.theme-day { background:linear-gradient(180deg,#4fa8de 0%,#8bd0f5 28%,#c2edfb 62%,#e4f8f2 100%); scrollbar-color:rgba(26,123,191,.3) transparent; }
+    body.theme-day .bg-nebula, body.theme-day .bg-scanlines { opacity:0; pointer-events:none; }
+    body.theme-day .bg-stars { opacity:0; pointer-events:none; }
+    body.theme-day header { background:rgba(255,255,255,.88) !important; box-shadow:0 2px 28px rgba(26,80,160,.12) !important; }
+    body.theme-day .hero { background:rgba(255,255,255,.9) !important; }
+    body.theme-day .section-card { background:rgba(255,255,255,.92) !important; border-color:rgba(26,101,168,.15) !important; box-shadow:0 8px 36px rgba(26,60,140,.1) !important; }
+    body.theme-day .prose { color:#1a3550; }
+    body.theme-day .prose strong { color:#0a1828; }
+    body.theme-day em.hl { color:#0d6ea8; } body.theme-day em.hlg { color:#157a32; }
+    body.theme-day em.hlr { color:#a02818; } body.theme-day em.hly { color:#8a6000; }
+    body.theme-day .insight-box { background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.05)); border-color:rgba(26,123,191,.25); }
+    body.theme-day .warn-box { background:linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03)); border-color:rgba(176,48,32,.22); }
+    body.theme-day .gold-box { background:linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03)); border-color:rgba(184,136,14,.22); }
+    body.theme-day .insight-text { color:#1a2d40; }
+    body.theme-day .key-concept { background:linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,123,191,.03)); border-color:rgba(26,123,191,.22); }
+    body.theme-day .key-concept-label { color:#1265a8; } body.theme-day .key-concept-text { color:#1265a8; }
+    body.theme-day .chapter-footer { background:rgba(255,255,255,.92); border-color:rgba(26,101,168,.22); }
+    body.theme-day .footer-complete-title { color:#0a1828; } body.theme-day .footer-complete-desc { color:#2a5070; }
+    body.theme-day .footer-next-hint { color:#1265a8; opacity:.85; }
+    body.theme-day .fn-btn.prev { color:#2a5080; border-color:rgba(26,101,168,.25); background:rgba(26,123,191,.07); }
+    body.theme-day .fn-btn.next { color:#1265a8; border-color:rgba(26,101,168,.35); background:rgba(26,123,191,.1); }
+    body.theme-day .fn-btn.home { color:#2a5080; border-color:rgba(26,101,168,.2); background:rgba(26,123,191,.05); }
+    body.theme-day strong { color:#0a1828; }
+    body.theme-day .section-body { color:#0c1c2e; }
+    body.theme-day #site-footer { background:linear-gradient(180deg,rgba(240,247,255,.97),rgba(228,240,255,.99)) !important; border-top-color:rgba(26,101,168,.15) !important; }
+    body.theme-day #site-footer p, body.theme-day #site-footer span { color:rgba(30,70,120,.65) !important; }
+    body.theme-day #site-footer a { color:rgba(18,101,168,.7) !important; }
+    body.theme-day #subClock { color:#0a3a7a; text-shadow:none; background:rgba(10,60,160,.05); border-color:rgba(10,60,160,.16); }
+    body.theme-day .quiz-block { background:linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04)); border-color:rgba(102,64,192,.2); }
+    body.theme-day .quiz-q { color:#0a1828; }
+    body.theme-day .quiz-opt { background:rgba(102,64,192,.04); border-color:rgba(102,64,192,.15); color:#1a2d40; }
+    body.theme-day .quiz-opt.correct { border-color:rgba(21,122,50,.5)!important; background:rgba(21,122,50,.1)!important; color:#157a32!important; }
+    body.theme-day .quiz-opt.wrong { border-color:rgba(176,48,32,.5)!important; background:rgba(176,48,32,.1)!important; color:#b03020!important; }
+    body.theme-day .sop-step { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
+    body.theme-day .sop-title { color:#0a1828; } body.theme-day .sop-desc { color:#1a3550; }
+    body.theme-day .vocab-item { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
+    body.theme-day .vocab-term { color:#1265a8 !important; } body.theme-day .vocab-def { color:#1a3550 !important; }
+
+  </style>
+
+  <!-- ☀️ Comprehensive Day Theme Patch — from chapter5 unified style -->
+  <style>
+       ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── CSS 變數覆蓋 ── */
+    body.theme-day {
+      --bg:         #cce0f2;
+      --surface:    rgba(255,255,255,.88);
+      --surface2:   rgba(232,246,255,.92);
+      --border:     rgba(26,101,168,.18);
+      --border2:    rgba(26,101,168,.30);
+      --accent:     #1265a8;
+      --accent2:    #0d5090;
+      --accent3:    #1a88cc;
+      --green:      #157a32;
+      --red:        #b03020;
+      --yellow:     #b8880e;
+      --purple:     #6640c0;
+      --pink:       #c03080;
+      --muted:      #6a90b0;
+      --text:       #0c1c2e;
+      --text-dim:   #1a3550;
+      --text-faint: #3a6080;
+      --jelly-cyan: #1265a8;
+      --jelly-pink: #c03080;
+      --glow:       0 2px 14px rgba(26,101,168,.18);
+    }
+
+    /* ── 背景：藍天漸層 ── */
+    body.theme-day {
+      background: linear-gradient(180deg,#6ab8e8 0%,#8ecff5 18%,#b2e0fb 40%,#cceeff 62%,#d8f0f8 80%,#e8f8f0 100%);
+      scrollbar-color: rgba(26,123,191,.3) transparent;
+    }
+    body.theme-day .bg-nebula,
+    body.theme-day .bg-scanlines { opacity:0; pointer-events:none; }
+
+    /* ── Header ── */
+    body.theme-day header {
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(26,123,191,.15);
+      box-shadow: 0 2px 20px rgba(26,100,180,.1);
+    }
+    body.theme-day header::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.55) 30%,rgba(33,150,211,.75) 50%,rgba(26,123,191,.55) 70%,transparent);
+    }
+    body.theme-day .logo-text { color:#0a1828; text-shadow:0 1px 4px rgba(26,80,160,.18); }
+    body.theme-day .logo-sub  { color:#1265a8; opacity:.85; }
+    body.theme-day .logo-icon img { filter:drop-shadow(0 2px 6px rgba(26,100,180,.2)); }
+
+    /* ── 返回按鈕 / 章節 badge ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.08);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.15);
+      border-color: rgba(26,123,191,.4);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.28);
+      color: #1265a8;
+    }
+
+    /* ── 進度條 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,123,191,.12);
+    }
+    body.theme-day .progress-track-sticky { background: rgba(26,123,191,.1); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #c03080);
+      box-shadow: 0 0 8px rgba(26,123,191,.35);
+    }
+    body.theme-day .progress-label-sm { color: #5a8ab8; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; }
+
+    /* ── Hero 區塊 ── */
+    body.theme-day .hero {
+      background: rgba(255,255,255,.88);
+      border-color: rgba(26,123,191,.22);
+      box-shadow: 0 8px 40px rgba(26,80,160,.12), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    body.theme-day .hero::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.45),rgba(33,150,211,.6),rgba(26,123,191,.45),transparent);
+    }
+    body.theme-day .hero-label  { color: #1265a8; }
+    body.theme-day .hero-title  {
+      background: linear-gradient(90deg,#0a2d50 0%,#1265a8 55%,#1a88cc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.4));
+    }
+    body.theme-day .hero-desc { color: #1a3550; }
+
+    /* ── Tags ── */
+    body.theme-day .tag-cyan   { color:#0d6ea8; border-color:rgba(13,110,168,.3); background:rgba(13,110,168,.08); }
+    body.theme-day .tag-pink   { color:#b0206a; border-color:rgba(176,32,106,.3); background:rgba(176,32,106,.07); }
+    body.theme-day .tag-green  { color:#157a32; border-color:rgba(21,122,50,.3); background:rgba(21,122,50,.07); }
+    body.theme-day .tag-yellow { color:#8a6000; border-color:rgba(138,96,0,.3); background:rgba(138,96,0,.07); }
+
+    /* ── Section Card ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.75);
+      animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    body.theme-day .section-card::before {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.35),transparent);
+      animation: none;
+      opacity: .6;
+    }
+    body.theme-day .card-header {
+      background: rgba(26,123,191,.04);
+      border-bottom-color: rgba(26,123,191,.1);
+    }
+    body.theme-day .card-icon {
+      background: linear-gradient(135deg,rgba(26,123,191,.12),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .card-num   { color: #1265a8; opacity: .8; }
+    body.theme-day .card-title { color: #0a1828; }
+    body.theme-day .card-body  { }
+
+    /* ── 內文 ── */
+    body.theme-day .content-para { color: #0c1c2e; }
+    body.theme-day em.hl        { color: #0d6ea8; }
+    body.theme-day em.hl-pink   { color: #b0206a; }
+    body.theme-day em.hl-yellow { color: #8a6000; }
+    body.theme-day em.hl-green  { color: #157a32; }
+
+    /* ── Insight Box ── */
+    body.theme-day .insight-box {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,80,160,.05));
+      border-color: rgba(26,123,191,.25);
+    }
+    body.theme-day .insight-text  { color: #1a2d40; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Mistake Box ── */
+    body.theme-day .mistake-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-box .insight-text { color: #2a1818; }
+
+    /* ── Example Box ── */
+    body.theme-day .example-box {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .example-label { color: #8a6000; }
+    body.theme-day .example-box p { color: #2a3040; }
+
+    /* ── Compare Table ── */
+    body.theme-day .compare-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .compare-table td {
+      color: #1a2d40;
+      border-bottom-color: rgba(26,123,191,.07);
+    }
+    body.theme-day .compare-table tr:hover td { background: rgba(26,123,191,.04); }
+    body.theme-day .compare-table .val-up { color: #a02818; }
+    body.theme-day .compare-table .val-dn { color: #126e28; }
+
+    /* ── Flow Chart ── */
+    body.theme-day .flow-chart {
+      background: rgba(255,255,255,.65);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.07));
+      border-color: rgba(26,123,191,.3);
+      color: #0a1828;
+    }
+    body.theme-day .flow-arrow { color: #1265a8; }
+    body.theme-day .flow-decision {
+      background: linear-gradient(135deg,rgba(138,96,0,.1),rgba(120,80,0,.05));
+      border-color: rgba(138,96,0,.3);
+      color: #8a6000;
+    }
+
+    /* ── Quiz ── */
+    body.theme-day .quiz-block {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04));
+      border-color: rgba(102,64,192,.2);
+    }
+    body.theme-day .quiz-label { color: #6640c0; }
+    body.theme-day .quiz-q     { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(102,64,192,.04);
+      border-color: rgba(102,64,192,.15);
+      color: #1a2d40;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(102,64,192,.1);
+      border-color: rgba(102,64,192,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-opt.correct { border-color:rgba(21,122,50,.5)!important; background:rgba(21,122,50,.1)!important; color:#157a32!important; }
+    body.theme-day .quiz-opt.wrong   { border-color:rgba(176,48,32,.5)!important; background:rgba(176,48,32,.1)!important; color:#b03020!important; }
+    body.theme-day .quiz-letter {
+      border-color: rgba(102,64,192,.3);
+      color: #6640c0;
+      background: rgba(102,64,192,.08);
+    }
+    body.theme-day .quiz-feedback.ok   { background:rgba(21,122,50,.08); border-color:rgba(21,122,50,.25); color:#157a32; }
+    body.theme-day .quiz-feedback.fail { background:rgba(176,48,32,.08); border-color:rgba(176,48,32,.25); color:#b03020; }
+
+    /* ── Jelly Tip Bubble ── */
+    body.theme-day .jelly-tip {
+      background: linear-gradient(135deg,rgba(26,123,191,.06),rgba(192,48,128,.03));
+      border-color: rgba(26,123,191,.18);
+    }
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+    body.theme-day .jelly-tip-bubble::before { border-right-color: rgba(26,123,191,.22); }
+    body.theme-day .jelly-tip-name { color: #1265a8; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(26,123,191,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept::after {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.4),transparent);
+      animation: none; opacity: .65;
+    }
+    body.theme-day .key-concept-label { color: #1265a8; opacity: .85; }
+    body.theme-day .key-concept-text  { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+
+    /* ── Vocab List ── */
+    body.theme-day .vocab-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .vocab-item:hover { border-color: rgba(26,101,168,.28); }
+    body.theme-day .vocab-term { color: #1265a8; }
+    body.theme-day .vocab-def  { color: #1a3550; }
+
+    /* ── Chapter Footer ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .footer-info        { color: #5a8ab8; }
+    body.theme-day .footer-info strong { color: #2a4a68; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.07);
+      border-color: rgba(26,123,191,.22);
+      color: #2a4a78;
+    }
+
+    /* ── Timeline ── */
+    body.theme-day .timeline::before {
+      background: linear-gradient(180deg,#157a32,#1265a8,#b03020,#b8880e);
+    }
+    body.theme-day .timeline-dot { background: #daeeff; }
+    body.theme-day .timeline-dot.bull { border-color:#157a32; box-shadow:0 0 6px rgba(21,122,50,.4); }
+    body.theme-day .timeline-dot.bear { border-color:#b03020; box-shadow:0 0 6px rgba(176,48,32,.4); }
+    body.theme-day .timeline-dot.side { border-color:#b8880e; box-shadow:0 0 6px rgba(184,136,14,.4); }
+    body.theme-day .timeline-phase.bull { color: #157a32; }
+    body.theme-day .timeline-phase.bear { color: #b03020; }
+    body.theme-day .timeline-phase.side { color: #b8880e; }
+    body.theme-day .timeline-title      { color: #0a1828; }
+    body.theme-day .timeline-desc       { color: #1a3550; }
+
+    /* ── Stat Cards ── */
+    body.theme-day .stat-card {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+    body.theme-day .stat-card:hover { border-color: rgba(26,101,168,.3); }
+    body.theme-day .stat-label { color: #2a4a68; }
+
+    /* ── Case Study ── */
+    body.theme-day .case-study {
+      background: linear-gradient(135deg,rgba(138,96,0,.06),rgba(120,80,0,.02));
+      border-color: rgba(138,96,0,.2);
+    }
+    body.theme-day .case-header {
+      background: rgba(138,96,0,.07);
+      border-bottom-color: rgba(138,96,0,.14);
+    }
+    body.theme-day .case-badge {
+      background: rgba(138,96,0,.1);
+      border-color: rgba(138,96,0,.25);
+      color: #8a6000;
+    }
+    body.theme-day .case-title { color: #0a1828; }
+    body.theme-day .case-body p { color: #2a3040; }
+    body.theme-day .case-lesson {
+      background: rgba(138,96,0,.07);
+      border-color: rgba(138,96,0,.2);
+      color: #8a6000;
+    }
+
+    /* ── Psychology Cards ── */
+    body.theme-day .psych-card.danger { background:rgba(255,255,255,.75); border-color:rgba(176,48,32,.22); }
+    body.theme-day .psych-card.warn   { background:rgba(255,255,255,.75); border-color:rgba(184,136,14,.22); }
+    body.theme-day .psych-name        { color: #0a1828; }
+    body.theme-day .psych-desc        { color: #1a3550; }
+    body.theme-day .psych-example     { color: #3a5070; background:rgba(0,0,0,.04); }
+
+    /* ── Kbar Demo ── */
+    body.theme-day .kbar-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,123,191,.15);
+    }
+    body.theme-day .kbar-demo-title { color: #1265a8; }
+
+    /* ── Chart Demo ── */
+    body.theme-day .chart-demo {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.14);
+    }
+
+    /* ── Emotion Strip ── */
+    body.theme-day .emotion-strip { border-color: rgba(26,101,168,.14); }
+
+    /* ── 強制移除白天模式閃爍 ── */
+    body.theme-day .section-card::before { animation: none !important; }
+    body.theme-day header::after          { animation: headerSweep 6s linear infinite; opacity: .6; }
+
+    /* ── 通用 scrollbar ── */
+    body.theme-day { scrollbar-color: rgba(26,123,191,.3) transparent; }
+    body.theme-day::-webkit-scrollbar-thumb { background: rgba(26,123,191,.25); }
+
+  
+    /* ═══════════════════════════════════════════════════════════════
+       ☀️  白天晴空主題 — 全面修復補丁 v2
+       修復項目：
+         1. 側邊欄 (chapter-sidenav) — 白底深藍文字，清晰邊框
+         2. 進度導覽條 (toc-strip / toc-dot) — 深色圓圈文字，高對比
+         3. 章節底部 footer — 白底清晰文字，按鈕明顯
+         4. Header logo — 使用 jelly.png
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 1. 左側章節目錄 sidenav ── */
+    body.theme-day .chapter-sidenav {
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(20px) saturate(1.8);
+      border-color: rgba(26,101,168,.35);
+      box-shadow: 4px 0 28px rgba(26,80,160,.18), 0 0 12px rgba(26,123,191,.08);
+    }
+    body.theme-day .chapter-sidenav:hover {
+      border-color: rgba(26,101,168,.5);
+      box-shadow: 6px 0 36px rgba(26,80,160,.22), 0 0 18px rgba(26,123,191,.1);
+    }
+    body.theme-day .chapter-sidenav::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.7), rgba(33,150,211,.5), transparent);
+    }
+    body.theme-day .chapter-sidenav::after {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.35), rgba(26,123,191,.2), transparent);
+    }
+    /* ch-nav-item 基礎：深藍文字 */
+    body.theme-day .ch-nav-item {
+      color: #1a3a60;
+      border-bottom-color: rgba(26,101,168,.1);
+      border-left-color: transparent;
+    }
+    body.theme-day .ch-nav-item::before {
+      background: linear-gradient(90deg, rgba(26,123,191,.0), rgba(26,123,191,.08));
+    }
+    body.theme-day .ch-nav-item .ch-num {
+      color: #2a5080;
+      font-weight: 700;
+    }
+    body.theme-day .ch-nav-item .ch-label {
+      color: #1a3a60;
+    }
+    /* hover 狀態 */
+    body.theme-day .ch-nav-item:hover {
+      color: #0d3d7a;
+      border-left-color: rgba(26,101,168,.55);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .ch-nav-item:hover .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item:hover .ch-label { color: #0d3d7a; }
+    /* 當前章節 */
+    body.theme-day .ch-nav-item.current-ch {
+      color: #1265a8;
+      border-left-color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    body.theme-day .ch-nav-item.current-ch .ch-num  { color: #1265a8; }
+    body.theme-day .ch-nav-item.current-ch .ch-label { color: #1265a8; font-weight: 600; }
+    body.theme-day .ch-nav-item.current-ch::after {
+      background: #1265a8;
+      box-shadow: 0 0 6px rgba(26,101,168,.5);
+    }
+
+    /* ── 2. 進度導覽條 (toc-strip) ── */
+    body.theme-day .toc-strip {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,101,168,.2);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .toc-item:hover {
+      background: rgba(26,123,191,.08);
+    }
+    /* toc-dot：深色圓圈，數字清晰可見 */
+    body.theme-day .toc-dot {
+      border-color: rgba(26,101,168,.35);
+      color: #1a3a60;
+      background: rgba(255,255,255,.9);
+      font-weight: 700;
+    }
+    body.theme-day .toc-dot.active {
+      border-color: #1265a8;
+      background: rgba(26,123,191,.15);
+      color: #1265a8;
+      box-shadow: 0 0 10px rgba(26,101,168,.3);
+    }
+    body.theme-day .toc-item:hover .toc-dot {
+      border-color: rgba(26,101,168,.6);
+      color: #1265a8;
+      background: rgba(26,123,191,.1);
+    }
+    /* toc-lbl：深色標籤文字 */
+    body.theme-day .toc-lbl {
+      color: #2a4a68;
+      font-weight: 500;
+    }
+    body.theme-day .toc-item:hover .toc-lbl { color: #0d3560; }
+    /* toc-connector：藍色連線 */
+    body.theme-day .toc-connector {
+      background: rgba(26,101,168,.2);
+    }
+
+    /* ── 3. 章節底部 footer (unified footer) ── */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(26,101,168,.22);
+      box-shadow: 0 6px 32px rgba(26,80,160,.1);
+    }
+    body.theme-day .chapter-footer::before {
+      background: linear-gradient(90deg, transparent, rgba(26,123,191,.5), rgba(33,150,211,.65), rgba(26,123,191,.5), transparent);
+      animation: none;
+      opacity: .7;
+    }
+    /* footer 左側完成標章 */
+    body.theme-day .footer-complete-badge {
+      background: linear-gradient(135deg, rgba(26,123,191,.14), rgba(26,80,160,.08));
+      border-color: rgba(26,101,168,.3);
+    }
+    /* footer 標題 */
+    body.theme-day .footer-complete-title { color: #0a1828; }
+    body.theme-day .footer-complete-desc  { color: #2a5070; }
+    body.theme-day .footer-next-hint      { color: #1265a8; opacity: .85; }
+    /* fn-btn 上一章 */
+    body.theme-day .fn-btn.prev {
+      color: #2a5080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.07);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #0d3560;
+      border-color: rgba(26,101,168,.5);
+      background: rgba(26,123,191,.13);
+      box-shadow: 0 2px 12px rgba(26,101,168,.15);
+    }
+    /* fn-btn 下一章 (accent) */
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,101,168,.35);
+      background: rgba(26,123,191,.1);
+      font-weight: 600;
+    }
+    body.theme-day .fn-btn.next:hover {
+      color: #fff;
+      background: #1265a8;
+      border-color: #1265a8;
+      box-shadow: 0 4px 18px rgba(26,101,168,.3);
+    }
+    body.theme-day .fn-btn.locked {
+      color: #8ab0d0;
+      border-color: rgba(26,101,168,.15);
+      background: rgba(26,123,191,.04);
+    }
+
+    /* ── 舊版 footer (chapter1 樣式相容) ── */
+    body.theme-day .footer-info        { color: #2a4a68; }
+    body.theme-day .footer-info strong { color: #0a1828; }
+    body.theme-day .next-btn {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.28);
+      color: #1265a8;
+      font-weight: 600;
+    }
+    body.theme-day .next-btn:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.5);
+    }
+    body.theme-day .prev-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #2a5080;
+    }
+
+    /* ── 4. Header logo 圖片亮度 ── */
+    body.theme-day .logo-icon img {
+      filter: drop-shadow(0 2px 8px rgba(26,80,160,.25));
+      opacity: 1;
+    }
+    body.theme-day .logo-text {
+      color: #0a1828;
+      text-shadow: 0 1px 3px rgba(26,80,160,.15);
+      font-weight: 700;
+    }
+    body.theme-day .logo-sub { color: #1265a8; opacity: .9; font-weight: 600; }
+
+    /* ── 5. sticky progress bar 文字明顯化 ── */
+    body.theme-day .sticky-progress {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid rgba(26,123,191,.18);
+      box-shadow: 0 2px 12px rgba(26,80,160,.08);
+    }
+    body.theme-day .progress-label-sm { color: #2a4a68; font-weight: 500; }
+    body.theme-day .progress-pct-sm   { color: #1265a8; font-weight: 700; }
+    body.theme-day .progress-track-sticky { background: rgba(26,101,168,.12); }
+    body.theme-day .progress-fill-sticky {
+      background: linear-gradient(90deg, #1265a8, #1a88cc);
+      box-shadow: 0 0 8px rgba(26,101,168,.4);
+    }
+
+    /* ── 6. back-btn / chapter-badge 明顯化 ── */
+    body.theme-day .btn-back {
+      background: rgba(26,123,191,.09);
+      border-color: rgba(26,101,168,.3);
+      color: #1a3a60;
+      font-weight: 500;
+    }
+    body.theme-day .btn-back:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,101,168,.52);
+      color: #0d3560;
+    }
+    body.theme-day .chapter-badge {
+      background: rgba(26,123,191,.12);
+      border-color: rgba(26,101,168,.35);
+      color: #1265a8;
+      font-weight: 700;
+    }
+
+  
+    /* ═══════════════════════════════════════════════════════════
+       COMPREHENSIVE DAY THEME PATCH — ALL MISSING COMPONENTS
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ── 通用：黑色背景容器 ── */
+    body.theme-day .rhythm-row,
+    body.theme-day .tri-canvas,
+    body.theme-day .pat-nav-wrap,
+    body.theme-day .sim-wrap,
+    body.theme-day .detector-wrap,
+    body.theme-day .rr-bar,
+    body.theme-day .strat-picker,
+    body.theme-day .sl-body,
+    body.theme-day .pat-output,
+    body.theme-day .tri-result,
+    body.theme-day .picker-result {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .jelly-bubble,
+    body.theme-day .jelly-tip-bubble {
+      background: rgba(255,255,255,.85);
+      border-color: rgba(26,123,191,.22);
+      color: #0a1828;
+    }
+
+    /* ── 段落與 Prose ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+    body.theme-day .prose em { color: #1265a8; }
+    body.theme-day .section-title { color: #0a1828; }
+    body.theme-day .section-num { color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .section-header { border-bottom-color: rgba(26,123,191,.12); }
+    body.theme-day .section-header::after { background: linear-gradient(90deg,transparent,rgba(26,123,191,.3),transparent); }
+
+    /* ── 蠟燭卡片 ── */
+    body.theme-day .candle-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .candle-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .candle-name { color: #1265a8; }
+    body.theme-day .candle-desc { color: #1a3550; }
+
+    /* ── Insight Boxes (warn, gold, purple) ── */
+    body.theme-day .warn-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .warn-box .insight-text { color: #2a1818; }
+    body.theme-day .gold-box {
+      background: linear-gradient(135deg,rgba(184,136,14,.07),rgba(160,110,0,.03));
+      border-color: rgba(184,136,14,.22);
+    }
+    body.theme-day .gold-box .insight-text { color: #2a2010; }
+    body.theme-day .purple-box {
+      background: linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.03));
+      border-color: rgba(102,64,192,.22);
+    }
+    body.theme-day .purple-box .insight-text { color: #1a1028; }
+    body.theme-day .danger-box {
+      background: linear-gradient(135deg,rgba(176,48,32,.07),rgba(160,20,10,.03));
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .danger-box .insight-text { color: #2a1818; }
+    body.theme-day .success-box {
+      background: linear-gradient(135deg,rgba(21,122,50,.07),rgba(0,90,40,.03));
+      border-color: rgba(21,122,50,.22);
+    }
+    body.theme-day .success-box .insight-text { color: #102018; }
+    body.theme-day .insight-box-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.07),rgba(160,80,0,.03));
+      border-color: rgba(184,100,0,.22);
+    }
+    body.theme-day .insight-box-orange .insight-label { color: #a05000; }
+    body.theme-day .insight-body .insight-text { color: #0c1c2e; }
+    body.theme-day .insight-quote { color: #1265a8; }
+
+    /* ── Force Meter ── */
+    body.theme-day .force-label { color: #1a3550; }
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .force-val { color: #3a5070; }
+
+    /* ── Pattern Cards ── */
+    body.theme-day .pattern-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .pattern-card:hover { background: rgba(255,255,255,.95); border-color: rgba(26,123,191,.35); }
+    body.theme-day .pattern-name { color: #0a1828; }
+    body.theme-day .pattern-desc { color: #1a3550; }
+    body.theme-day .pattern-key { color: #1265a8; }
+    body.theme-day .pb-bull { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .pb-bear { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .pb-warn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .pb-neutral { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+
+    /* ── Detector ── */
+    body.theme-day .detector-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .detector-title { color: #1265a8; }
+    body.theme-day .detector-item {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .detector-item:hover { background: rgba(26,123,191,.08); }
+    body.theme-day .detector-item.selected { background: rgba(26,123,191,.12); border-color: rgba(26,123,191,.35); }
+    body.theme-day .di-label { color: #1a3550; }
+    body.theme-day .detector-output {
+      background: rgba(255,255,255,.7);
+      border-color: rgba(26,101,168,.15);
+      color: #0a1828;
+    }
+    body.theme-day .detector-output strong { color: #1265a8; }
+
+    /* ── Sim Wrap ── */
+    body.theme-day .sim-wrap {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .sim-title { color: #1265a8; }
+    body.theme-day .sim-canvas { background: rgba(200,230,245,.5); border-color: rgba(26,101,168,.2); }
+    body.theme-day .sim-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.22);
+      color: #1a4a78;
+    }
+    body.theme-day .sim-btn:hover { background: rgba(26,123,191,.14); border-color: rgba(26,123,191,.4); }
+    body.theme-day .sim-result { color: #1a3550; }
+
+    /* ── Breakout Compare (bc-card) ── */
+    body.theme-day .bc-card.true {
+      background: rgba(176,48,32,.06);
+      border-color: rgba(176,48,32,.25);
+    }
+    body.theme-day .bc-card.false {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+    }
+    body.theme-day .bc-points { color: #1a3550; }
+
+    /* ── Flow Steps ── */
+    body.theme-day .flow-step {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .flow-step:hover { background: rgba(255,255,255,.92); border-color: rgba(26,123,191,.35); }
+    body.theme-day .flow-heading { color: #0a1828; }
+    body.theme-day .flow-sub { color: #1a3550; }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+    body.theme-day .flow-num.cn { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .flow-num.rn { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .flow-num.gn { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .flow-num.yn { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .flow-num.pn { background:rgba(176,32,106,.1); border-color:rgba(176,32,106,.3); color:#b0206a; }
+    body.theme-day .flow-content .flow-sub strong { color: #0a1828; }
+
+    /* ── Shadow Lines ── */
+    body.theme-day .shadow-line,
+    body.theme-day .sl-wrap {
+      border-color: rgba(26,101,168,.15);
+      background: transparent;
+    }
+    body.theme-day .sl-body {
+      background: rgba(255,255,255,.72);
+    }
+    body.theme-day .sl-text { color: #1a3550; }
+    body.theme-day .sl-text strong { color: #0a1828; }
+
+    /* ── Chip ── */
+    body.theme-day .chip-red    { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-green  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-cyan   { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+    body.theme-day .chip-yellow { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.3); color:#8a6000; }
+    body.theme-day .chip-purple { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.3); color:#6640c0; }
+    body.theme-day .chip-orange { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.3); color:#a05000; }
+    body.theme-day .chip-support  { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.3); color:#157a32; }
+    body.theme-day .chip-resist   { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.3); color:#a02818; }
+    body.theme-day .chip-neutral  { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.3); color:#0d6ea8; }
+
+    /* ── Sec Divider ── */
+    body.theme-day .sec-divider { color: #5a8ab8; }
+    body.theme-day .sec-divider::before,
+    body.theme-day .sec-divider::after { background: rgba(26,123,191,.18); }
+
+    /* ── Val Colors ── */
+    body.theme-day .val-red,  body.theme-day .val-r { color: #a02818; }
+    body.theme-day .val-green, body.theme-day .val-g { color: #157a32; }
+    body.theme-day .val-yellow, body.theme-day .val-y { color: #8a6000; }
+    body.theme-day .val-cyan, body.theme-day .val-c { color: #0d6ea8; }
+    body.theme-day .val-purple, body.theme-day .val-p { color: #6640c0; }
+    body.theme-day .val-orange, body.theme-day .val-o { color: #a05000; }
+    body.theme-day .td-bull { color: #157a32 !important; }
+    body.theme-day .td-bear { color: #a02818 !important; }
+    body.theme-day .td-warn { color: #8a6000 !important; }
+
+    /* ── CMP/Compare Tables ── */
+    body.theme-day .cmp-table th {
+      background: rgba(26,123,191,.06);
+      color: #1265a8;
+      border-bottom-color: rgba(26,123,191,.2);
+    }
+    body.theme-day .cmp-table td {
+      color: #1a3550;
+      border-bottom-color: rgba(26,101,168,.08);
+    }
+    body.theme-day .cmp-table tr:hover td { background: rgba(26,123,191,.04); }
+
+    /* ── Quiz (all variants) ── */
+    body.theme-day .quiz-section {
+      background: linear-gradient(135deg,rgba(102,64,192,.06),rgba(26,80,160,.03));
+      border-color: rgba(102,64,192,.18);
+    }
+    body.theme-day .quiz-section-title { color: #0a1828; }
+    body.theme-day .quiz-q { color: #0a1828; }
+    body.theme-day .quiz-opt {
+      background: rgba(255,255,255,.75);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.35);
+      color: #0a1828;
+    }
+    body.theme-day .quiz-letter {
+      background: rgba(26,123,191,.1);
+      border-color: rgba(26,123,191,.3);
+      color: #1265a8;
+    }
+
+    /* ── Checklist ── */
+    body.theme-day .check-item,
+    body.theme-day .check-list .check-item {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .check-text { color: #0a1828; }
+    body.theme-day .check-text strong { color: #1265a8; }
+
+    /* ── Before/After (ba-card) ── */
+    body.theme-day .ba-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .ba-label { color: #3a6080; }
+    body.theme-day .ba-text { color: #0a1828; }
+
+    /* ── Key Concept ── */
+    body.theme-day .key-concept {
+      background: linear-gradient(135deg,rgba(26,123,191,.07),rgba(26,80,160,.03));
+      border-color: rgba(26,123,191,.22);
+    }
+    body.theme-day .key-concept-label { color: #1265a8; }
+    body.theme-day .key-concept-text { color: #1265a8; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+
+    /* ── Section Cards (general) ── */
+    body.theme-day .section-card {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 6px 28px rgba(26,80,160,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    /* ── Pat Nav Tabs ── */
+    body.theme-day .pat-nav-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-nav-title { color: #1265a8; }
+    body.theme-day .pat-tab {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .pat-tab:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .pat-tab.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .pat-output {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .pat-out-name { color: #0a1828; }
+    body.theme-day .pat-out-essence { color: #b0206a; }
+    body.theme-day .pat-out-body { color: #1a3550; }
+    body.theme-day .pat-out-body strong { color: #0a1828; }
+
+    /* ── Triangle Sim ── */
+    body.theme-day .tri-wrap {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .tri-title { color: #1265a8; }
+    body.theme-day .tri-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.2);
+      color: #1a3550;
+    }
+    body.theme-day .tri-btn:hover { background: rgba(26,123,191,.12); color: #0a1828; }
+    body.theme-day .tri-btn.active { background: rgba(26,123,191,.18); border-color: #1265a8; color: #1265a8; }
+    body.theme-day .tri-canvas { background: rgba(200,230,248,.6); border-color: rgba(26,101,168,.2); }
+    body.theme-day .tri-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.15);
+      color: #1a3550;
+    }
+    body.theme-day .tri-result strong { color: #1265a8; }
+
+    /* ── Reliability Meter ── */
+    body.theme-day .rel-card {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rel-name { color: #0a1828; }
+    body.theme-day .rel-bar-bg { background: rgba(26,80,160,.1); }
+    body.theme-day .rel-pct { color: #3a6080; }
+
+    /* ── Mistake Cards ── */
+    body.theme-day .mistake-card {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.22);
+    }
+    body.theme-day .mistake-title { color: #a02818; }
+    body.theme-day .mistake-body { color: #2a1818; }
+    body.theme-day .mistake-fix {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.25);
+      color: #157a32;
+    }
+
+    /* ── Anatomy / SVG Col ── */
+    body.theme-day .anatomy-row { border-color: rgba(26,101,168,.15); }
+
+    /* ── BK Cards (支撐壓力) ── */
+    body.theme-day .bk-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .bk-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .bk-body { color: #1a3550; }
+    body.theme-day .bk-check { color: #157a32; }
+    body.theme-day .bk-icon { color: #1265a8; }
+    body.theme-day .bk-compare {
+      background: rgba(240,248,255,.7);
+      border-color: rgba(26,101,168,.15);
+    }
+
+    /* ── Danger Cards ── */
+    body.theme-day .danger-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.18);
+    }
+    body.theme-day .danger-title { color: #a02818; }
+    body.theme-day .danger-body { color: #2a2020; }
+
+    /* ── CS/Strength chips ── */
+    body.theme-day .cs-high { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.28); color:#a02818; }
+    body.theme-day .cs-med  { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.28); color:#8a6000; }
+    body.theme-day .cs-low  { background:rgba(13,110,168,.08); border-color:rgba(13,110,168,.22); color:#0d6ea8; }
+
+    /* ── Combo Row ── */
+    body.theme-day .combo-row {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .combo-ind { color: #1265a8; }
+    body.theme-day .combo-desc { color: #1a3550; }
+
+    /* ── Risk Reward Visual ── */
+    body.theme-day .rr-bar {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .rr-label { color: #3a6080; }
+    body.theme-day .rr-track { background: rgba(26,80,160,.1); }
+    body.theme-day .rr-ratio-badge {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+    }
+    body.theme-day .rr-ratio-label { color: #5a8ab8; }
+
+    /* ── Error Analysis ── */
+    body.theme-day .error-analysis {
+      background: rgba(176,48,32,.04);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .error-header {
+      background: rgba(176,48,32,.07);
+      border-bottom-color: rgba(176,48,32,.15);
+    }
+    body.theme-day .error-title { color: #0a1828; }
+    body.theme-day .error-body p { color: #2a1818; }
+    body.theme-day .error-lesson {
+      background: rgba(21,122,50,.06);
+      border-color: rgba(21,122,50,.22);
+      color: #157a32;
+    }
+
+    /* ── Strategy Picker ── */
+    body.theme-day .strat-picker {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .strat-picker-title { color: #1265a8; }
+    body.theme-day .picker-btn {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,101,168,.22);
+      color: #1a3550;
+    }
+    body.theme-day .picker-btn:hover { border-color: rgba(26,123,191,.45); color: #1265a8; background: rgba(26,123,191,.1); }
+    body.theme-day .picker-btn.active-btn { border-color: #1265a8; color: #1265a8; background: rgba(26,123,191,.14); }
+    body.theme-day .picker-result {
+      background: rgba(240,248,255,.8);
+      border-color: rgba(26,101,168,.18);
+      color: #1a3550;
+    }
+    body.theme-day .picker-result strong { color: #0a1828; }
+
+    /* ── SOP Steps (ch10) ── */
+    body.theme-day .sop-title { color: #0a1828; }
+    body.theme-day .sop-desc { color: #1a3550; }
+    body.theme-day .sop-line { background: rgba(26,101,168,.15); }
+    body.theme-day .sc-c { background:rgba(13,110,168,.1); border-color:rgba(13,110,168,.4); color:#0d6ea8; }
+    body.theme-day .sc-g { background:rgba(21,122,50,.1); border-color:rgba(21,122,50,.35); color:#157a32; }
+    body.theme-day .sc-y { background:rgba(184,136,14,.1); border-color:rgba(184,136,14,.35); color:#8a6000; }
+    body.theme-day .sc-r { background:rgba(176,48,32,.1); border-color:rgba(176,48,32,.35); color:#a02818; }
+    body.theme-day .sc-p { background:rgba(102,64,192,.1); border-color:rgba(102,64,192,.35); color:#6640c0; }
+    body.theme-day .sc-o { background:rgba(184,100,0,.1); border-color:rgba(184,100,0,.35); color:#a05000; }
+
+    /* ── Autopsy Cards (ch10) ── */
+    body.theme-day .autopsy-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+      box-shadow: 0 4px 16px rgba(26,80,160,.08);
+    }
+    body.theme-day .autopsy-head {
+      background: rgba(26,123,191,.05);
+      border-bottom-color: rgba(26,101,168,.12);
+    }
+    body.theme-day .autopsy-num { color: #3a6080; }
+    body.theme-day .autopsy-title { color: #0a1828; }
+    body.theme-day .autopsy-scene { color: #1a3550; }
+    body.theme-day .autopsy-why { color: #1265a8; }
+    body.theme-day .autopsy-fix { color: #157a32; }
+    body.theme-day .autopsy-body { color: #1a3550; }
+
+    /* ── Case Selectors (ch10) ── */
+    body.theme-day .case-selector {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-card {
+      background: rgba(255,255,255,.82);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .case-panel {
+      background: rgba(240,248,255,.75);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .case-step { color: #1a3550; }
+
+    /* ── Graduation Badge ── */
+    body.theme-day .graduation {
+      background: linear-gradient(135deg,rgba(26,123,191,.08),rgba(102,64,192,.05));
+      border-color: rgba(26,123,191,.22);
+    }
+
+    /* ── Flow Nodes (various) ── */
+    body.theme-day .flow-node {
+      background: linear-gradient(135deg,rgba(26,123,191,.1),rgba(26,80,160,.06));
+      border-color: rgba(26,123,191,.28);
+      color: #0a1828;
+    }
+    body.theme-day .flow-node-orange {
+      background: linear-gradient(135deg,rgba(184,100,0,.1),rgba(160,80,0,.05));
+      border-color: rgba(184,100,0,.28);
+      color: #a05000;
+    }
+    body.theme-day .flow-node-red {
+      background: linear-gradient(135deg,rgba(176,48,32,.1),rgba(150,20,10,.05));
+      border-color: rgba(176,48,32,.28);
+      color: #a02818;
+    }
+    body.theme-day .flow-node-green {
+      background: linear-gradient(135deg,rgba(21,122,50,.08),rgba(0,90,40,.04));
+      border-color: rgba(21,122,50,.28);
+      color: #157a32;
+    }
+    body.theme-day .flow-chart {
+      background: rgba(240,248,255,.65);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .flow-arrow { color: #5a8ab8; }
+
+    /* ── CC Box (趨勢) ── */
+    body.theme-day .cc-box {
+      background: rgba(255,255,255,.78);
+      border-color: rgba(26,101,168,.18);
+    }
+    body.theme-day .cc-item { color: #1a3550; }
+    body.theme-day .cc-text { color: #0a1828; }
+
+    /* ── Before/After Cards ── */
+    body.theme-day .before-after { border-color: rgba(26,101,168,.15); }
+    body.theme-day .bull-card {
+      background: rgba(176,48,32,.05);
+      border-color: rgba(176,48,32,.2);
+    }
+    body.theme-day .bear-card {
+      background: rgba(21,122,50,.05);
+      border-color: rgba(21,122,50,.2);
+    }
+
+    /* ── Footer Buttons (fn-btn) ── */
+    body.theme-day .fn-btn.prev {
+      color: #3a6080;
+      border-color: rgba(26,101,168,.25);
+      background: rgba(26,123,191,.06);
+    }
+    body.theme-day .fn-btn.prev:hover {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.45);
+      background: rgba(26,123,191,.12);
+    }
+    body.theme-day .fn-btn.next {
+      color: #1265a8;
+      border-color: rgba(26,123,191,.35);
+      background: rgba(26,123,191,.08);
+    }
+    body.theme-day .fn-btn.next:hover {
+      background: rgba(26,123,191,.16);
+      border-color: rgba(26,123,191,.55);
+    }
+    body.theme-day .footer-complete-text { color: #1a3550; }
+
+    /* ── RSI Gauge ── */
+    body.theme-day .rsi-gauge-wrap svg text { fill: #1a3550 !important; }
+
+    /* ── Teal theme (ch9) day mode ── */
+    body.theme-day .tag-teal { color:#157a6a; border-color:rgba(21,122,106,.3); background:rgba(21,122,106,.07); }
+    body.theme-day .rr-ratio-num { color: #1265a8; }
+
+    /* ── Hero Icon border colors ── */
+    body.theme-day .hero-icon {
+      background: rgba(26,123,191,.06);
+      border-color: rgba(26,123,191,.25);
+      box-shadow: 0 4px 20px rgba(26,80,160,.1);
+    }
+
+    /* ── General text fixes ── */
+    body.theme-day strong { color: #0a1828; }
+    body.theme-day .section-body { color: #0c1c2e; }
+
+
+  </style>
+
+  <!-- ☀️ Chips-Specific Day Theme Supplement -->
+  <style>
+
+    /* ════════════════════════════════════════════════════════
+       ☀️ CHIPS-SPECIFIC DAY THEME SUPPLEMENT
+       Covers all chips-unique component classes
+       ════════════════════════════════════════════════════════ */
+
+    /* ── SVG Chart Wrap (外資機構組成示意 etc.) ── */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(230,245,255,.75) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* ── Concentration Visual (籌碼集中度) ── */
+    body.theme-day .conc-visual {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .conc-title { color: #1265a8; }
+    body.theme-day .conc-bar-track { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .conc-bar-label { color: #1a3550; }
+    body.theme-day .conc-bar-pct { color: #3a6080; }
+
+    /* ── Stage Cards (投信季底行為等) ── */
+    body.theme-day .stage-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      box-shadow: 0 4px 16px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day .stage-num { color: #1265a8; }
+    body.theme-day .stage-title { color: #0a1828; }
+    body.theme-day .stage-desc { color: #1a3550; }
+    body.theme-day .stage-grid { gap: inherit; }
+
+    /* ── Signal Cards ── */
+    body.theme-day .signal-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .signal-head { color: #1265a8; border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .signal-body { color: #1a3550; }
+    body.theme-day .signal-label { color: #3a6080; }
+    body.theme-day .signal-dot { }
+
+    /* ── Role Cards (三大法人角色) ── */
+    body.theme-day .role-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .role-name { color: #0a1828; }
+    body.theme-day .role-desc { color: #1a3550; }
+    body.theme-day .role-en { color: #5a8ab8; }
+    body.theme-day .role-scale { color: #3a6080; }
+
+    /* ── Season Cards (季節性行為) ── */
+    body.theme-day .season-card {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .season-badge { }
+    body.theme-day .season-month { color: #1265a8; }
+    body.theme-day .season-desc { color: #1a3550; }
+    body.theme-day .season-intensity { color: #3a6080; }
+
+    /* ── Naked Cards (裸K等) ── */
+    body.theme-day .naked-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .naked-title { color: #1265a8; }
+    body.theme-day .naked-desc { color: #1a3550; }
+    body.theme-day .naked-val { color: #0a1828; }
+
+    /* ── ADR Meter ── */
+    body.theme-day .adr-meter {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .adr-title { color: #1265a8; }
+    body.theme-day .adr-label { color: #1a3550; }
+    body.theme-day .adr-bar { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .adr-zones { color: #3a6080; }
+    body.theme-day .adr-scale { color: #5a8ab8; }
+
+    /* ── Stock Cards ── */
+    body.theme-day .stock-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .stock-name { color: #0a1828; }
+    body.theme-day .stock-desc { color: #1a3550; }
+    body.theme-day .stock-label { color: #5a8ab8; }
+    body.theme-day .stock-icon { }
+
+    /* ── Cal Grid (calendar) ── */
+    body.theme-day .cal-grid { border-color: rgba(26,101,168,.15); }
+    body.theme-day .cal-cell {
+      background: rgba(255,255,255,.75) !important;
+      border-color: rgba(26,101,168,.1) !important;
+      color: #1a3550;
+    }
+    body.theme-day .cal-cell.buy { background: rgba(176,48,32,.08) !important; border-color: rgba(176,48,32,.2) !important; }
+    body.theme-day .cal-cell.sell { background: rgba(21,122,50,.08) !important; border-color: rgba(21,122,50,.2) !important; }
+
+    /* ── Timeline (tl-*) ── */
+    body.theme-day .tl-item { border-color: rgba(26,101,168,.15); }
+    body.theme-day .tl-dot {
+      background: rgba(255,255,255,.9);
+      border-color: rgba(26,101,168,.4);
+    }
+    body.theme-day .tl-head { color: #1265a8; }
+    body.theme-day .tl-body { color: #1a3550; }
+
+    /* ── Account Cards (acct-*) ── */
+    body.theme-day .acct-card {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .acct-name { color: #0a1828; }
+    body.theme-day .acct-desc { color: #1a3550; }
+    body.theme-day .acct-tag { }
+    body.theme-day .acct-split { border-color: rgba(26,101,168,.1); }
+    body.theme-day .acct-en { color: #5a8ab8; }
+
+    /* ── Health Meter ── */
+    body.theme-day .health-meter {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .hm-title { color: #1265a8; }
+    body.theme-day .hm-label { color: #1a3550; }
+    body.theme-day .hm-bar-bg { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .hm-val { color: #3a6080; }
+
+    /* ── SOP Steps ── */
+    body.theme-day .sop-wrap {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .sop-step {
+      background: rgba(255,255,255,.72) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .sop-num { color: #1265a8; }
+    body.theme-day .sop-heading { color: #0a1828; }
+    body.theme-day .sop-body { color: #1a3550; }
+
+    /* ── Filter Row ── */
+    body.theme-day .filter-row {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .filter-title { color: #1265a8; }
+    body.theme-day .filter-desc { color: #1a3550; }
+
+    /* ── FB Cards (避免/必做) ── */
+    body.theme-day .fb-must {
+      background: rgba(21,122,50,.06) !important;
+      border-color: rgba(21,122,50,.22) !important;
+      color: #157a32;
+    }
+    body.theme-day .fb-avoid {
+      background: rgba(176,48,32,.06) !important;
+      border-color: rgba(176,48,32,.22) !important;
+      color: #a02818;
+    }
+    body.theme-day .fb-plus {
+      background: rgba(26,123,191,.06) !important;
+      border-color: rgba(26,123,191,.22) !important;
+      color: #1265a8;
+    }
+
+    /* ── Intensity Dots ── */
+    body.theme-day .intensity-label { color: #3a6080; }
+
+    /* ── Jelly Mini SVG ── */
+    body.theme-day .jelly-mini-svg { opacity: .85; }
+
+    /* ── Psych Grid container ── */
+    body.theme-day .psych-grid { }
+    body.theme-day .psych-icon { }
+
+    /* ── Stat Row / Stat Num ── */
+    body.theme-day .stat-row { border-color: rgba(26,101,168,.08); }
+    body.theme-day .stat-num { color: #1265a8; }
+
+    /* ── Emotion Segment ── */
+    body.theme-day .emotion-seg { border-color: rgba(26,101,168,.15); }
+
+    /* ── Insight icon/label ── */
+    body.theme-day .insight-icon { }
+    body.theme-day .insight-label { color: #1265a8; }
+
+    /* ── Cyan Box ── */
+    body.theme-day .cyan-box {
+      background: linear-gradient(135deg,rgba(13,110,168,.07),rgba(0,90,140,.03)) !important;
+      border-color: rgba(13,110,168,.22) !important;
+    }
+    body.theme-day .cyan-box .insight-text { color: #0a2840; }
+
+    /* ── Section icon opacity ── */
+    body.theme-day .section-icon { opacity: 1 !important; }
+
+    /* ── Any dark inline background overrides (via style attribute) ── */
+    /* Force all remaining dark containers to light in day mode */
+    body.theme-day .section-body > div[style*="rgba(0,0,0"] {
+      background: rgba(255,255,255,.78) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .section-body > div[style*="background:#0"] {
+      background: rgba(255,255,255,.78) !important;
+    }
+    body.theme-day .section-body > div[style*="background: #0"] {
+      background: rgba(255,255,255,.78) !important;
+    }
+
+    /* ── Tag red (used in chips files) ── */
+    body.theme-day .tag-red { color:#a02818; border-color:rgba(160,40,24,.3); background:rgba(160,40,24,.07); }
+
+    /* ── Shadow Line (sl-*) ── */
+    body.theme-day .sl-top { border-bottom-color: rgba(26,101,168,.12); }
+    body.theme-day .sl-side { border-color: rgba(26,101,168,.15); }
+
+    /* ── Badge variants ── */
+    body.theme-day .badge-buy { background: rgba(176,48,32,.1); color: #a02818; border-color: rgba(176,48,32,.25); }
+    body.theme-day .badge-sell { background: rgba(21,122,50,.1); color: #157a32; border-color: rgba(21,122,50,.25); }
+    body.theme-day .badge-hot { background: rgba(184,136,14,.1); color: #8a6000; border-color: rgba(184,136,14,.25); }
+    body.theme-day .badge-end { background: rgba(102,64,192,.1); color: #6640c0; border-color: rgba(102,64,192,.25); }
+
+    /* ── General: any div with inline dark bg inside section-card ── */
+    body.theme-day .section-card p { color: #0c1c2e; }
+    body.theme-day .section-card span { }
+    body.theme-day .section-card li { color: #0c1c2e; }
+
+    /* ── CMP Table wrap ── */
+    body.theme-day .cmp-table-wrap { overflow: auto; }
+
+    /* ── Prose text ── */
+    body.theme-day .prose { color: #1a3550; }
+    body.theme-day .prose strong { color: #0a1828; }
+
+    /* ── Site footer ── */
+    body.theme-day #site-footer {
+      background: rgba(230,245,255,.95);
+      border-top: 1px solid rgba(26,101,168,.18);
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span { color: #3a6080; }
+    body.theme-day #site-footer a { color: #1265a8; }
+    body.theme-day #site-footer a:hover { color: #0d3560; }
+
+
+  </style>
+
+  <!-- ☀️ Day Mode Final Fixes: Quiz, SVG wrappers, dark divs -->
+  <style>
+    /* quiz-wrap light background */
+    body.theme-day .quiz-wrap {
+      background: rgba(245,250,255,.92) !important;
+      border-color: rgba(26,101,168,.2) !important;
+    }
+    body.theme-day .quiz-wrap .quiz-q { color: #0a1828 !important; }
+    body.theme-day .quiz-wrap .quiz-opt {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      color: #1a3550 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-opt:hover:not(.disabled) {
+      background: rgba(26,123,191,.1) !important;
+      border-color: rgba(26,123,191,.35) !important;
+      color: #0a1828 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-letter {
+      background: rgba(26,123,191,.1) !important;
+      border-color: rgba(26,123,191,.25) !important;
+      color: #1265a8 !important;
+    }
+    body.theme-day .quiz-wrap .quiz-feedback { color: #1a3550 !important; }
+
+    /* svg-chart-wrap light */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(220,238,252,.35) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* line-chart containers */
+    body.theme-day .line-chart-wrap,
+    body.theme-day .bar-chart-wrap,
+    body.theme-day .chart-canvas-wrap {
+      background: rgba(220,238,252,.35) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* dark section-body sub-containers */
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.18)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0, .18)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.2)"],
+    body.theme-day .section-body > div[style*="rgba(0,0,0,.3)"] {
+      background: rgba(255,255,255,.85) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+
+    /* maintenance overlay - keep dark (it's a modal) */
+    #maintenanceOverlay { /* intentionally no override */ }
+
+    /* chapter-footer dark background */
+    body.theme-day .chapter-footer {
+      background: rgba(255,255,255,.92) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+
+    /* force-bar-fill stays colorful but track is light */
+    body.theme-day .force-bar-bg { background: rgba(26,80,160,.1) !important; }
+  </style>
+
+  <!-- ☀️ Footer Day Mode Fix -->
+  <style>
+    body.theme-day #site-footer {
+      background: linear-gradient(180deg, rgba(220,240,255,.95), rgba(200,230,250,.98)) !important;
+      border-top: 1px solid rgba(26,101,168,.18) !important;
+      box-shadow: 0 -2px 20px rgba(26,80,160,.08) !important;
+    }
+    body.theme-day #site-footer p,
+    body.theme-day #site-footer span,
+    body.theme-day #site-footer div { color: #3a6080 !important; }
+    body.theme-day #site-footer a { color: #1265a8 !important; }
+    body.theme-day #site-footer a:hover { color: #0d3560 !important; }
+  </style>
+</head>
+<body>
+<script>
+(function() {
+  function applyTheme(theme) {
+    if (theme === 'day') {
+      document.body.classList.add('theme-day');
+    } else {
+      document.body.classList.remove('theme-day');
+    }
+  }
+  var t = localStorage.getItem('jelly_global_theme') || 'space';
+  applyTheme(t);
+  try {
+    var _bc = new BroadcastChannel('jellystock_theme');
+    _bc.onmessage = function(e) {
+      if (e.data && e.data.theme) applyTheme(e.data.theme);
+    };
+  } catch(e) {}
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'jelly_global_theme') {
+      applyTheme(e.newValue || 'space');
+    }
+  });
+})();
+</script>
+
+<div class="bg-nebula"></div>
+<div class="bg-scanlines"></div>
+<div class="bg-stars"></div>
+
+<!-- SIDENAV -->
+<nav class="chapter-sidenav" aria-label="章節導覽">
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter1.html"><span class="ch-num">01</span><span class="ch-label">籌碼本質</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter2.html"><span class="ch-num">02</span><span class="ch-label">三大法人</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter3.html"><span class="ch-num">03</span><span class="ch-label">外資布局</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter4.html"><span class="ch-num">04</span><span class="ch-label">投信季底</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter5.html"><span class="ch-num">05</span><span class="ch-label">自營避險</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter6.html"><span class="ch-num">06</span><span class="ch-label">融資融券</span></a>
+  <a class="ch-nav-item current-ch" href="/stock_site/chips/chips_chapter7.html"><span class="ch-num">07</span><span class="ch-label">借券賣出</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter8.html"><span class="ch-num">08</span><span class="ch-label">主力散戶</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter9.html"><span class="ch-num">09</span><span class="ch-label">法人背離</span></a>
+  <a class="ch-nav-item" href="/stock_site/chips/chips_chapter10.html"><span class="ch-num">10</span><span class="ch-label">實戰選股</span></a>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+        <div class="logo-sub">籌碼分析教學</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="subClock">--:--:--</span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="sticky-progress">
+  <div class="progress-track-sticky"><div class="progress-fill-sticky" id="progressFill"></div></div>
+  <div class="progress-info-row">
+    <span class="progress-label-sm">第七章閱讀進度</span>
+    <span class="progress-pct-sm" id="progressPct">0%</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ══ HERO ══ -->
+  <div class="hero">
+    <div class="hero-icon">
+      <svg width="78" height="88" viewBox="0 0 78 88" xmlns="http://www.w3.org/2000/svg">
+        <!-- 借出方 stock pile -->
+        <rect x="8" y="20" width="20" height="28" rx="4" fill="rgba(0,229,255,.12)" stroke="rgba(0,229,255,.4)" stroke-width="1.2"/>
+        <text x="18" y="38" fill="rgba(0,229,255,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">LEND</text>
+        <!-- 借入方 -->
+        <rect x="50" y="20" width="20" height="28" rx="4" fill="rgba(255,61,90,.1)" stroke="rgba(255,61,90,.4)" stroke-width="1.2"/>
+        <text x="60" y="38" fill="rgba(255,61,90,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">SELL</text>
+        <!-- Arrow lend→sell -->
+        <line x1="29" y1="34" x2="49" y2="34" stroke="rgba(0,229,255,.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <polygon points="49,30 55,34 49,38" fill="rgba(0,229,255,.6)"/>
+        <!-- Down arrow = short pressure -->
+        <line x1="39" y1="52" x2="39" y2="72" stroke="rgba(255,61,90,.7)" stroke-width="2"/>
+        <polygon points="33,68 39,76 45,68" fill="rgba(255,61,90,.85)"/>
+        <!-- Warning glow -->
+        <circle cx="39" cy="76" r="6" fill="none" stroke="rgba(255,61,90,.3)" stroke-width="1">
+          <animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".5;0;.5" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Label -->
+        <text x="39" y="14" fill="rgba(0,229,255,.7)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1">BORROWED</text>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-label">CHAPTER 07 · 籌碼進階篇</div>
+      <div class="hero-title">借券賣出<br/>的深層意義</div>
+      <div class="hero-desc">借券賣出是台灣市場中最常被誤解的籌碼指標之一。它不只是「有人看空」的訊號，背後涉及借券來源、大股東出貨手法、空頭成本結構，以及整體借券餘額增減所揭露的市場壓力。讀懂借券，才能看穿最難察覺的主力出貨動作。</div>
+      <div class="hero-tags">
+        <span class="tag tag-red">借券賣出</span>
+        <span class="tag tag-cyan">借券來源</span>
+        <span class="tag tag-yellow">大股東出貨</span>
+        <span class="tag tag-purple">空頭成本</span>
+        <span class="tag tag-green">借券餘額</span>
+        <span class="tag tag-orange">警示訊號</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1：什麼是借券賣出 ══ -->
+    <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="2321848525"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+<div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—01</div>
+      <div class="section-title">借券賣出是什麼？與融券的根本差異</div>
+      <div class="section-icon">🔍</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">許多人把借券賣出和融券混為一談，但兩者在<em>借方身份、成本結構、使用目的</em>上都截然不同。搞清楚這個差異，是正確解讀借券數據的第一步。</p>
+
+      <div class="role-grid">
+        <div class="role-card type-a">
+          <div class="role-icon">📉</div>
+          <div class="role-name">融券賣出</div>
+          <div class="role-en">MARGIN SHORT</div>
+          <div class="role-desc">散戶或一般投資人透過券商融資系統向市場借股來賣，需繳保證金、每日計息，成本高。做空目的明確，多為短線看空操作。</div>
+          <span class="role-scale">使用者：散戶為主</span>
+        </div>
+        <div class="role-card type-b">
+          <div class="role-icon">🏦</div>
+          <div class="role-name">借券賣出</div>
+          <div class="role-en">SECURITIES LENDING</div>
+          <div class="role-desc">機構投資人或大戶透過證券借貸平台，向持股者（如壽險、基金）借入股票後賣出。成本彈性低、通常是中長線佈局，也可能是大股東隱性出貨工具。</div>
+          <span class="role-scale">使用者：法人、大戶</span>
+        </div>
+        <div class="role-card type-c">
+          <div class="role-icon">⚙️</div>
+          <div class="role-name">避險借券</div>
+          <div class="role-en">HEDGING SHORT</div>
+          <div class="role-desc">自營商或外資為對沖衍生品部位（如認售權證）而進行的借券賣出，與市場方向判斷無關，是機械性操作。</div>
+          <span class="role-scale">使用者：自營/外資</span>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">💡</div>
+        <div class="insight-body">
+          <div class="insight-label">核心差異</div>
+          <div class="insight-text">融券是<strong>散戶做空工具</strong>，門檻低但成本高、期間短；借券是<strong>法人與大戶工具</strong>，門檻高但成本低、可維持較長時間。兩者在籌碼分析上的意義完全不同——借券賣出通常代表更有分量的空頭力量。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">融券 vs 借券：完整對照</div>
+      <div style="overflow-x:auto;">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>比較項目</th><th style="color:var(--red)">融券賣出</th><th style="color:var(--accent)">借券賣出</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>借用對象</td><td>向券商系統融通</td><td class="val-cyan">向持股者（壽險、基金）借入</td></tr>
+            <tr><td>使用者</td><td>散戶、一般投資人</td><td class="val-cyan">機構法人、大戶、大股東</td></tr>
+            <tr><td>保證金要求</td><td class="val-yellow">90% 保證金（較高）</td><td class="val-green">較低，依協議</td></tr>
+            <tr><td>持有期間</td><td class="val-red">通常數日～數週</td><td class="val-cyan">可達數月甚至更長</td></tr>
+            <tr><td>回補壓力</td><td class="val-orange">強迫回補機制（市況不利即斷頭）</td><td class="val-green">彈性較高，可自行決定時機</td></tr>
+            <tr><td>揭露位置</td><td>融資融券日報表</td><td class="val-cyan">借券賣出日報表（分開揭露）</td></tr>
+            <tr><td>籌碼意義</td><td>短線看空、散戶恐慌</td><td class="val-red">中長線空頭、可能為出貨工具</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2：借券來源深解 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—02</div>
+      <div class="section-title">借券來源深解：誰在把股票借出去？</div>
+      <div class="section-icon">🏗️</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">借券賣出的「空頭」固然值得關注，但更關鍵的問題是：<em>股票是從誰手上借出來的？</em>借券來源決定了空頭的力道、持續性，以及背後可能隱藏的信息不對稱。</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot cy"></div>
+          <div class="tl-head cy">來源一：國內外壽險公司 / 退休基金</div>
+          <div class="tl-body">壽險公司通常是最大的借券出借方。<strong>他們長期持有大量藍籌股，閒置股票出借可賺取借券費用（年化約 0.5%～3%）</strong>，屬於被動增益行為。他們本身不看空，只是賺手續費。此類借出通常沒有特殊信號意義。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot rd"></div>
+          <div class="tl-head rd">來源二：大股東（董監事）透過「隱性出貨」</div>
+          <div class="tl-body">這是最需要警惕的借券來源。<strong>大股東直接賣股會觸發申報義務，但若先借出股票讓他人賣，再於未來回補，可繞過部分申報規定。</strong>這種手法讓大股東得以在高位悄悄減碼而不驚動市場，是借券分析最核心的風險訊號。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot yn"></div>
+          <div class="tl-head yn">來源三：外資機構持股出借</div>
+          <div class="tl-body">部分外資機構在持股期間，也會將股票出借給其他機構賺取費用。<strong>若外資同時持股又有大量借券餘額，表示有空頭在利用外資持股做放空，形成「同一標的多空共存」的複雜結構。</strong></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot gn"></div>
+          <div class="tl-head gn">來源四：台灣集中保管結算所（TDCC）系統媒合</div>
+          <div class="tl-body">透過 TDCC 的有價證券借貸系統，出借方與借入方由平台媒合，資訊相對透明。每日公告的「借券餘額」即來自此系統，是散戶可追蹤的主要數據來源。</div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <div class="insight-icon">⚠️</div>
+        <div class="insight-body">
+          <div class="insight-label">大股東借券的識別挑戰</div>
+          <div class="insight-text">大股東透過借券出貨幾乎無法從表面數據直接辨認，因為<strong>借出方的身份不會公開揭露</strong>。但可以間接觀察：若某股的借券餘額快速增加，同時大股東持股比例出現下降（需等季報公告），就可能是大股東正在隱性出貨的訊號。這種組合通常是最危險的警示。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3：借券餘額的意義 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—03</div>
+      <div class="section-title">借券餘額怎麼看？增減訊號完整解析</div>
+      <div class="section-icon">📊</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">借券餘額（Shares on Loan）是市場目前仍未回補的借券賣出總量，代表空頭的<em>未平倉存量</em>。正確解讀它的增減，是判斷空頭壓力強弱的關鍵。</p>
+
+      <!-- SVG Chart: 借券餘額示意圖 -->
+      <div class="svg-chart-wrap">
+        <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <defs>
+            <linearGradient id="loanGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255,61,90,.6)"/>
+              <stop offset="100%" stop-color="rgba(255,61,90,.05)"/>
+            </linearGradient>
+            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(0,229,255,.7)"/>
+              <stop offset="100%" stop-color="rgba(0,229,255,.05)"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <line x1="60" y1="30" x2="60" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="60" y1="210" x2="670" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="60" y1="80"  x2="670" y2="80"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="60" y1="130" x2="670" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="60" y1="170" x2="670" y2="170" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Stock price line (blue) -->
+          <polyline points="60,160 130,140 200,120 270,100 340,90 380,75 420,80 460,100 500,130 560,155 620,170 670,185"
+            fill="none" stroke="rgba(0,229,255,.75)" stroke-width="2" stroke-linejoin="round"/>
+          <!-- Loan balance area (red, inversely related) -->
+          <polygon points="60,200 130,195 200,188 270,178 340,160 380,145 420,150 460,165 500,175 560,185 620,192 670,198 670,210 60,210"
+            fill="url(#loanGrad)" opacity=".7"/>
+          <polyline points="60,200 130,195 200,188 270,178 340,160 380,145 420,150 460,165 500,175 560,185 620,192 670,198"
+            fill="none" stroke="rgba(255,61,90,.8)" stroke-width="1.8" stroke-linejoin="round"/>
+          <!-- Phase labels -->
+          <text x="200" y="24" fill="rgba(0,229,255,.6)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">→ 股價上漲 借券增加</text>
+          <text x="430" y="24" fill="rgba(255,61,90,.7)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">→ 股價回落 借券回補</text>
+          <!-- Vertical divider -->
+          <line x1="400" y1="30" x2="400" y2="210" stroke="rgba(255,255,255,.1)" stroke-width="1" stroke-dasharray="6,3"/>
+          <text x="400" y="225" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">高點</text>
+          <!-- Legend -->
+          <line x1="80" y1="240" x2="110" y2="240" stroke="rgba(0,229,255,.75)" stroke-width="2"/>
+          <text x="115" y="244" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace">股價走勢</text>
+          <rect x="200" y="234" width="30" height="10" rx="2" fill="rgba(255,61,90,.4)"/>
+          <text x="235" y="244" fill="rgba(255,61,90,.8)" font-size="9" font-family="Share Tech Mono,monospace">借券餘額</text>
+          <text x="390" y="255" fill="rgba(255,255,255,.3)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">借券餘額與股價的典型相對關係示意</text>
+        </svg>
+      </div>
+
+      <div class="sec-divider">借券餘額四種狀態解讀</div>
+
+      <div class="shadow-line">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">✅ 狀態一：借券餘額持續下降（回補）</div>
+          <div class="sl-text">空頭陸續買回股票還給出借方，代表<strong>看空動能消退</strong>，空頭認為下跌空間有限開始退場。若同時股價止跌，通常是中短線偏多訊號。<strong>大量回補往往伴隨急漲行情（軋空）。</strong></div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">⚠️ 狀態二：借券餘額快速增加</div>
+          <div class="sl-text">短期內借券餘額大幅攀升，表示<strong>空頭快速建立新部位</strong>，通常是有信息優勢的機構或大股東預期股價下跌。若此時股價仍在高位，這是一個需要高度警覺的警示訊號。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side neu"></div>
+        <div class="sl-body">
+          <div class="sl-top neu">〰 狀態三：借券餘額高位盤整</div>
+          <div class="sl-text">大量借券未被回補，表示<strong>空頭持續看空但尚未停損</strong>。若股價在高借券餘額下仍能上漲，代表多方力道壓過空頭，一旦多方疲軟，這批空頭就是下跌的推手。<strong>高位盤整後突然大增是最危險的前兆。</strong></div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side cy"></div>
+        <div class="sl-body">
+          <div class="sl-top cy">💡 狀態四：低借券餘額 + 股價上漲</div>
+          <div class="sl-text">借券餘額極低代表<strong>市場幾乎沒有做空力量</strong>，股價上漲缺乏空頭干擾。若此時外資與投信也同步買進，是籌碼面最乾淨的上漲格局之一。但也要注意：低借券不代表股票沒問題，只代表市場空頭少。</div>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <div class="insight-icon">📐</div>
+        <div class="insight-body">
+          <div class="insight-label">實用計算：借券佔流通股比例</div>
+          <div class="insight-text">觀察「借券餘額 ÷ 在外流通股數」比例。比例超過 <strong>3%</strong> 算中等空頭壓力；超過 <strong>5%</strong> 是重要警戒；超過 <strong>8%</strong> 代表機構有高度共識看空，需特別留意。此比例可在 JellyStock 或公開資訊觀測站查詢。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 4：大股東出貨手法 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—04</div>
+      <div class="section-title">大股東出貨手法：借券如何成為隱形出口</div>
+      <div class="section-icon">🕵️</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">台灣上市公司的大股東若要在公開市場大量出售持股，必須進行<em>內部人申報</em>，且每筆賣出都會在申報後曝光。這讓大股東的直接出貨行為難以隱藏。然而，<strong>借券機制提供了一條「看不見的出口」。</strong></p>
+
+      <div class="sec-divider">大股東隱性出貨的運作邏輯</div>
+
+      <div class="flow-step">
+        <div class="flow-num cn">①</div>
+        <div class="flow-content">
+          <div class="flow-heading">大股東將持股出借給機構</div>
+          <div class="flow-sub">大股東或其關聯方將持有的股票透過 TDCC 借券系統出借給有空頭需求的機構投資人，取得一定比例的借券費用收入。此時帳面上股票「仍屬大股東持有」，但實際流通股驟然增加。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num rn">②</div>
+        <div class="flow-content">
+          <div class="flow-heading">借入方在市場上賣出股票</div>
+          <div class="flow-sub">借入機構在市場上賣出借入的股票，供給面增加，形成下跌壓力。這批賣壓表面上看來是「一般機構」的賣出，<strong>無法直接歸因於大股東</strong>，市場察覺困難。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num yn">③</div>
+        <div class="flow-content">
+          <div class="flow-heading">股價下跌後大股東同步減持</div>
+          <div class="flow-sub">在借券賣出壓低股價之後，大股東可以「配合市場行情」在較低位正式申報減持，此時減持幅度看起來合理，不容易被投資人解讀為出貨訊號。<strong>借券創造了「低價申報」的掩護效果。</strong></div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gn">④</div>
+        <div class="flow-content">
+          <div class="flow-heading">借入方回補（或大股東補回）</div>
+          <div class="flow-sub">若大股東已成功出貨，借入方可在更低的股價買回股票還給出借方，空頭賺取價差。若大股東是最終受益者，<strong>等同以借券方式完成了一輪「先賣後補」的實質出貨。</strong></div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <div class="insight-icon">🚨</div>
+        <div class="insight-body">
+          <div class="insight-label">高危警示組合</div>
+          <div class="insight-text">以下三個訊號同時出現時，需高度警覺大股東正在隱性出貨：<br/>
+          <strong>① 借券餘額單週增加超過 1%（佔股本）</strong><br/>
+          <strong>② 大股東持股申報比例在最新季報中下降</strong><br/>
+          <strong>③ 股價高位震盪、成交量異常放大但無法突破前高</strong><br/>
+          三者同時出現，代表「有人在高位悄悄出貨」，應避免追高或盡快評估減倉。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">直接賣股 vs 借券出貨：對比</div>
+      <div style="overflow-x:auto;">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>比較項目</th><th style="color:var(--yellow)">直接申報賣出</th><th style="color:var(--red)">借券隱性出貨</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>申報揭露時間</td><td class="val-yellow">賣出前3日申報，市場能提早知情</td><td class="val-red">借出行為無需即時揭露，難以預判</td></tr>
+            <tr><td>市場衝擊</td><td class="val-yellow">申報後可能引發跟進賣壓</td><td class="val-red">間接施壓，賣壓來源模糊，衝擊更隱蔽</td></tr>
+            <tr><td>可追蹤性</td><td class="val-green">相對透明，可從內部人申報查詢</td><td class="val-red">極難追蹤，需跨比對多項數據</td></tr>
+            <tr><td>對散戶的威脅</td><td class="val-yellow">中等（可提前觀察）</td><td class="val-red">高（難以及時察覺）</td></tr>
+            <tr><td>通常使用時機</td><td>持股比例仍高、急於出清時</td><td class="val-red">高位持股、想緩慢出清而不被發現</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 5：空頭成本結構 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—05</div>
+      <div class="section-title">空頭成本結構：借券成本如何影響空頭行為</div>
+      <div class="section-icon">💰</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">借券空頭不是無成本的。<em>借券費率的高低，直接決定了空頭能維持多久、在哪個價位回補。</em>理解空頭的成本結構，能讓你預判他們的行為邊界。</p>
+
+      <div class="signal-grid">
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:var(--green)"></div>
+            <div class="signal-label" style="color:var(--green)">低費率期（0.1%～0.5%）</div>
+          </div>
+          <div class="signal-body">空頭持有成本極低，可長期維持部位。通常出現在股票流動性高、出借方多的個股。低費率代表空頭不急於回補，可能長期壓制股價。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:var(--yellow)"></div>
+            <div class="signal-label" style="color:var(--yellow)">中等費率（0.5%～3%）</div>
+          </div>
+          <div class="signal-body">為多數台股借券的常見費率區間。空頭有一定成本壓力，若股價遲遲不跌，時間一久成本侵蝕獲利，促使空頭提早回補。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:var(--orange)"></div>
+            <div class="signal-label" style="color:var(--orange)">高費率（3%～8%）</div>
+          </div>
+          <div class="signal-body">出現在籌碼稀缺、出借方少的股票。空頭成本高，通常代表有強烈做空動機（如確知利空），但也增加了軋空爆發的風險。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:var(--red)"></div>
+            <div class="signal-label" style="color:var(--red)">極高費率（8%以上）</div>
+          </div>
+          <div class="signal-body">市場幾乎借不到此股，願意支付高費率的空頭通常持有重要內部利空信息。費率過高也代表若股價不跌，空頭損益兩平點迅速上移，容易產生急速軋空行情。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">借券費率與軋空風險</div>
+
+      <p class="prose">當借券費率急速上升，意味著出借方稀少、空頭爭相借股，一旦利空消息未能兌現，空頭面臨<strong>高成本 + 股價上漲</strong>的雙重壓力，被迫快速回補，就會引爆「軋空行情」。</p>
+
+      <div class="force-meter-wrap">
+        <div class="force-row">
+          <div class="force-label">費率 0.1%：軋空風險</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="8%" style="background:linear-gradient(90deg,var(--green),rgba(0,230,118,.5))"></div></div>
+          <div class="force-val">極低</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">費率 1%：軋空風險</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="25%" style="background:linear-gradient(90deg,var(--accent),rgba(0,200,255,.5))"></div></div>
+          <div class="force-val">低</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">費率 3%：軋空風險</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="50%" style="background:linear-gradient(90deg,var(--yellow),rgba(255,200,0,.5))"></div></div>
+          <div class="force-val">中等</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">費率 6%：軋空風險</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="75%" style="background:linear-gradient(90deg,var(--orange),rgba(255,120,0,.5))"></div></div>
+          <div class="force-val">高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">費率 10%+：軋空風險</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="95%" style="background:linear-gradient(90deg,var(--red),rgba(255,61,90,.5))"></div></div>
+          <div class="force-val">極高</div>
+        </div>
+      </div>
+
+      <div class="success-box">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-body">
+          <div class="insight-label">軋空操作策略</div>
+          <div class="insight-text">若某個股借券費率在短期內從 1% 跳升至 5% 以上，同時借券餘額高位盤整、基本面未見利空，可能是<strong>軋空行情的前兆</strong>。此時做多需要謹慎設好停損（因空頭仍多），但若消息明確轉正，軋空漲幅有時可達 15%～30%，是積極操作者的機會窗口。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 6：實戰警示訊號 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—06</div>
+      <div class="section-title">借券增加的六大警示訊號與對應操作</div>
+      <div class="section-icon">🚨</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">並非所有「借券增加」都是警示，要看增加的<em>速度、背景、以及其他籌碼指標的配合</em>。以下六種模式是實戰中最常見、需要立刻反應的危險組合。</p>
+
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">🔴 訊號一：股價創高 + 借券急速增加</div>
+          <div class="sl-text">最經典的警示組合。<strong>股價在高位時，有分量的空頭開始大量建立空單</strong>，代表他們認為股價已到頂或即將反轉。若借券單週增加幅度超過上週的 50%，需立刻重新評估持倉。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">🔴 訊號二：外資連買 + 借券同步大增</div>
+          <div class="sl-text">外資在市場上買進，同時借券賣出也在增加，代表<strong>外資可能以「左手買、右手空」方式進行套利或對沖</strong>，而非單純看多。這種情況下外資買超的正面信號要大打折扣，不能直接解讀為看多訊號。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side neu"></div>
+        <div class="sl-body">
+          <div class="sl-top neu">🟡 訊號三：投信連買 + 借券也在增加</div>
+          <div class="sl-text">投信作帳拉抬的同時，有空頭在利用高位做空。這不一定是壞事——投信的強力買盤可能壓制空頭，但<strong>作帳結束後，若借券仍高位，股價回落速度可能更快</strong>，出場時機更需精準。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">🔴 訊號四：法說會 / 財報前借券激增</div>
+          <div class="sl-text">重要公告（法說會、季報、年報）前一～二週，借券突然大幅增加，<strong>強烈暗示有人提前得知業績不如預期或有利空消息</strong>。這類借券行為有時被監管機構調查，但市場上仍常出現。散戶應將此視為最高級別的警示。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">🟢 訊號五：借券大量回補 + 股價止跌</div>
+          <div class="sl-text">借券從高位快速下降，代表空頭認輸回補，<strong>做空的賣壓解除，股價可能迎來反彈</strong>。若同時外資轉為買超，是籌碼面的強烈反轉訊號，可考慮逢低進場。</div>
+        </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side cy"></div>
+        <div class="sl-body">
+          <div class="sl-top cy">🔵 訊號六：新股 / 解禁後借券快速建立</div>
+          <div class="sl-text">股票上市後鎖定期解禁時（通常是上市後6個月），持股大股東或機構開始可以出借股票。若解禁日後借券餘額快速建立，<strong>需警惕持股者正在利用借券機制逐步出清</strong>，這在成長股或生技股中特別常見。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 7：如何查詢 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—07</div>
+      <div class="section-title">實戰查詢：哪裡找借券數據？怎麼看？</div>
+      <div class="section-icon">🖥️</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">借券數據比融資融券更分散，需要知道去哪裡查、看哪些欄位。以下是台灣投資人最常用的查詢路徑。</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot cy"></div>
+          <div class="tl-head cy">路徑一：TDCC 集保中心（最完整）</div>
+          <div class="tl-body">前往 <strong>台灣集中保管結算所（TDCC）→ 有價證券借貸</strong> 查詢頁面。可查詢個股的每日借券餘額、當日借出張數、費率區間。是最原始的官方數據，但介面較不直觀。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot gn"></div>
+          <div class="tl-head gn">路徑二：JellyStock 借券排行</div>
+          <div class="tl-body">JellyStock 的<strong>借券餘額排行 / 借券變化排行</strong>功能，可直接看單日借券增減排名，並搭配股價走勢圖比對。適合快速篩選需要注意的個股，不需逐一查詢。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot yn"></div>
+          <div class="tl-head yn">路徑三：公開資訊觀測站 → 融資融券及借券</div>
+          <div class="tl-body">公開資訊觀測站（MOPS）的<strong>市場觀測 → 融資融券餘額及借券</strong>欄位，可查詢個股的借券餘額歷史變化，適合做較長期的趨勢分析（例如近三個月的借券走勢）。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot pu"></div>
+          <div class="tl-head pu">路徑四：券商看盤軟體（元大、國泰等）</div>
+          <div class="tl-body">多數大型券商的看盤軟體都整合了借券數據，可在個股頁面直接查看當日借券異動。<strong>最適合即時追蹤</strong>，但歷史資料通常只保留數週，不適合長期比對。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">快速判讀三步驟</div>
+      <div class="flow-step">
+        <div class="flow-num cn">1</div>
+        <div class="flow-content">
+          <div class="flow-heading">查借券餘額佔比</div>
+          <div class="flow-sub">計算借券餘額 ÷ 在外流通股，判斷目前空頭壓力等級（3% 以下低、3%～5% 中、5% 以上高）。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num yn">2</div>
+        <div class="flow-content">
+          <div class="flow-heading">比對近2週的借券變化速度</div>
+          <div class="flow-sub">重點不在絕對值，而在<strong>增減速度</strong>。若單週增幅超過 0.5%（佔股本），需提高警覺；若快速下降超過 1%，可能是回補行情前兆。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gn">3</div>
+        <div class="flow-content">
+          <div class="flow-heading">交叉比對外資、投信動向</div>
+          <div class="flow-sub">借券數據需與法人買超方向對比：借券增加但外資也大買 → 需確認是否為對沖操作；借券增加而外資也賣超 → 多空共同看壞，最危險的格局。</div>
+        </div>
+      </div>
+
+      <div class="purple-box">
+        <div class="insight-icon">⚡</div>
+        <div class="insight-body">
+          <div class="insight-label">進階技巧</div>
+          <div class="insight-text">將借券餘額的歷史曲線與股價K線重疊觀察，找出「借券頂部 → 股價頂部」的時間差。在許多案例中，<strong>借券餘額在股價見頂前 1～3 週就已大幅攀升</strong>，這個時間差是機構信息優勢的體現，也是散戶可以參考的領先指標。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 8：測驗 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—08</div>
+      <div class="section-title">章節知識測驗</div>
+      <div class="section-icon">🎓</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">完成本章測驗，確認你已掌握借券賣出的核心概念與實戰應用。</p>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q1 · 借券賣出與融券賣出最根本的差異是？</div>
+        <div class="quiz-opts" id="q1opts">
+          <div class="quiz-opt" onclick="answerQ('q1',this,'A')"><div class="quiz-letter">A</div>借券賣出需要繳納更高的保證金</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'B')"><div class="quiz-letter">B</div>借券賣出主要由機構法人使用，成本低且可持續更長時間</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'C')"><div class="quiz-letter">C</div>借券賣出只能由外資操作，散戶無法參與</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'D')"><div class="quiz-letter">D</div>借券賣出必須在法說會後才能進行</div>
+        </div>
+        <div class="quiz-feedback" id="q1fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q2 · 大股東利用借券「隱性出貨」的核心邏輯是？</div>
+        <div class="quiz-opts" id="q2opts">
+          <div class="quiz-opt" onclick="answerQ('q2',this,'A')"><div class="quiz-letter">A</div>直接在市場上賣出大量股票，但不向主管機關申報</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'B')"><div class="quiz-letter">B</div>將持股出借給他人賣出，間接施壓股價，自己再配合低位正式減持</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'C')"><div class="quiz-letter">C</div>透過融資買進再融券賣出，製造成交量</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'D')"><div class="quiz-letter">D</div>在外資買進時同步借券做空，賺取價差</div>
+        </div>
+        <div class="quiz-feedback" id="q2fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q3 · 以下哪個情況最可能引發「軋空行情」？</div>
+        <div class="quiz-opts" id="q3opts">
+          <div class="quiz-opt" onclick="answerQ('q3',this,'A')"><div class="quiz-letter">A</div>借券費率長期維持在 0.1%，借券餘額緩慢上升</div>
+          <div class="quiz-opt" onclick="answerQ('q3',this,'B')"><div class="quiz-letter">B</div>融資餘額大幅增加，散戶積極追多</div>
+          <div class="quiz-opt" onclick="answerQ('q3',this,'C')"><div class="quiz-letter">C</div>借券費率從 1% 急升至 8%，借券餘額高位盤整，股價卻開始反彈</div>
+          <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><div class="quiz-letter">D</div>外資連續三日賣超，投信同步減碼</div>
+        </div>
+        <div class="quiz-feedback" id="q3fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q4 · 重要法說會前一週，某股借券餘額突然增加 2%（佔股本），這代表什麼？</div>
+        <div class="quiz-opts" id="q4opts">
+          <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><div class="quiz-letter">A</div>市場對公司前景樂觀，機構積極建多</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><div class="quiz-letter">B</div>屬於正常的避險操作，不必理會</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><div class="quiz-letter">C</div>強烈暗示有人提前得知業績不如預期，需高度警覺</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><div class="quiz-letter">D</div>代表股票流動性提升，是正面訊號</div>
+        </div>
+        <div class="quiz-feedback" id="q4fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 9：重點整理 ══ -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—09</div>
+      <div class="section-title">本章重點整理</div>
+      <div class="section-icon">✅</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">掌握以下核心觀念，你就具備了正確解讀借券數據的完整框架。</p>
+
+      <div class="flow-step">
+        <div class="flow-num cn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">借券 ≠ 融券，兩者性質完全不同</div>
+          <div class="flow-sub">借券是法人與大戶的工具，成本低、期間長；融券是散戶工具，成本高、期間短。分析法人籌碼時，借券的重量遠大於融券。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num rn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">借券來源決定信號強度</div>
+          <div class="flow-sub">壽險出借是中性的收費行為；大股東出借是最危險的隱性出貨訊號；法說會或重大公告前激增，是信息不對稱的強烈警示。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num yn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">借券餘額要看「速度」不只是絕對值</div>
+          <div class="flow-sub">單週增幅超過 0.5%（佔股本）才需警覺；快速大量回補是多頭轉機信號。搭配費率分析，可判斷軋空風險。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">借券領先股價 1～3 週是常見規律</div>
+          <div class="flow-sub">機構信息優勢使得借券餘額有時在股價頂部出現前就已大幅攀升。將借券曲線與股價K線重疊觀察，找出這個時間差，是進階的預判工具。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num pn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">三維交叉驗證：借券 + 法人 + 技術面</div>
+          <div class="flow-sub">任何單一指標都可能誤導。借券增加需同時看外資是否賣超、股價是否在高位震盪、技術面是否出現頂部訊號，三者共振才是最可靠的判斷基礎。</div>
+        </div>
+      </div>
+
+      <div class="insight-box" style="margin-top:28px;">
+        <div class="insight-icon">🚀</div>
+        <div class="insight-body">
+          <div class="insight-label">下一章預告</div>
+          <div class="insight-text">第八章將深入解析<strong>主力散戶比：股票的「健康度」</strong>——集保戶數變化、大戶持股比例增減判讀，學會從籌碼集中度判斷主力是否仍在護盤，還是已悄悄離場。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
+  <div class="ad-unit">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8975741363002226"
+         data-ad-slot="1893335041"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  <hr class="ad-divider">
+
+  <!-- CHAPTER FOOTER -->
+  <div class="chapter-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="footer-complete-badge">✅</div>
+        <div class="footer-complete-text">
+          <div class="footer-complete-title">第7章完成</div>
+          <div class="footer-complete-desc">你已掌握借券來源、大股東出貨手法與借券警示訊號</div>
+          <div class="footer-next-hint">下一章：主力散戶比：股票的「健康度」</div>
+        </div>
+      </div>
+      <div class="footer-right">
+        <a class="fn-btn home" href="/">🏠 回首頁</a>
+        <a class="fn-btn prev" href="/stock_site/chips/chips_chapter6.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          第6章
+        </a>
+        <a class="fn-btn next" href="#">
+          第8章
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;" data-dark-footer="1">
+  <div style="padding:20px 40px 24px;display:flex;flex-direction:column;gap:8px;">
+    <p style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:rgba(122,154,184,.6);line-height:1.7;text-align:center;">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px;">
+      <a href="/stock_site/legal/about.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">關於本站</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/privacy.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">隱私政策</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="/stock_site/legal/disclaimer.html" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">免責聲明</a>
+      <span style="color:rgba(0,229,255,.2);">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer" style="color:rgba(0,229,255,.6);font-size:.7rem;font-family:'Share Tech Mono',monospace;text-decoration:none;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.6)'">聯絡我們</a>
+    </div>
+    <p style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:rgba(122,154,184,.3);margin-top:6px;">© 2025 JellyStock. All rights reserved.</p>
+  </div>
+</footer>
+
+<div id="maintenanceOverlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,6,14,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(7,13,26,.97),rgba(11,18,32,.98));border:1px solid rgba(0,229,255,.25);border-radius:22px;box-shadow:0 0 60px rgba(0,229,255,.12),0 24px 60px rgba(0,0,0,.6);padding:48px 52px 44px;text-align:center;max-width:420px;width:90%;">
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:#ffd600;letter-spacing:.06em;margin-bottom:12px;">系統維護中</div>
+    <div id="maintMsgText" style="font-family:'Noto Sans TC',sans-serif;font-size:.85rem;color:#7a9ab8;line-height:1.7;">本網站暫時維護中，請稍後再試。</div>
+  </div>
+</div>
+
+<script>
+/* ── Clock ── */
+(function(){
+  function tick(){
+    var now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
+    var p=function(n){return String(n).padStart(2,'0');};
+    var s=now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+    var el=document.getElementById('subClock');
+    if(el)el.textContent=s;
+  }
+  tick();setInterval(tick,1000);
+})();
+
+/* ── Scroll Progress ── */
+(function(){
+  function upd(){
+    var doc=document.documentElement;
+    var st=window.pageYOffset||doc.scrollTop;
+    var sh=doc.scrollHeight-doc.clientHeight;
+    var pct=sh>0?Math.round((st/sh)*100):0;
+    var f=document.getElementById('progressFill');
+    var l=document.getElementById('progressPct');
+    if(f)f.style.width=pct+'%';
+    if(l)l.textContent=pct+'%';
+  }
+  window.addEventListener('scroll',upd,{passive:true});
+  upd();
+})();
+
+/* ── Reveal on Scroll ── */
+(function(){
+  var cards=document.querySelectorAll('.section-card.reveal');
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');}});
+  },{threshold:0.08});
+  cards.forEach(function(c){obs.observe(c);});
+})();
+
+/* ── Animate Force Bars ── */
+(function(){
+  var bars=document.querySelectorAll('.force-bar-fill');
+  bars.forEach(function(b){
+    var tw=b.getAttribute('data-width')||b.style.width;
+    b.style.width='0%';
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){b.style.width=tw;obs.disconnect();}
+      });
+    },{threshold:0.2});
+    obs.observe(b);
+  });
+})();
+
+/* ── Quiz ── */
+var answers={q1:'B',q2:'B',q3:'C',q4:'C'};
+var feedbacks={
+  q1:{
+    B:'✅ 正確！借券賣出主要由機構法人與大戶使用，向有價證券持有人（如壽險、基金）借入股票後賣出，成本較低、可持續較長時間，與散戶使用的高成本融券完全不同。',
+    default:'❌ 不對。借券賣出的核心特徵是：使用者為法人大戶、借股來源為大型持股機構、成本低且期間可較長，這與散戶的融券賣出在性質上截然不同。'
+  },
+  q2:{
+    B:'✅ 正確！大股東將持股出借給他人賣出，間接對股價施壓，自己再在較低位正式申報減持，達到隱藏出貨意圖的效果。這繞過了直接申報賣出的市場衝擊，是最難被散戶察覺的出貨手法。',
+    default:'❌ 不對。大股東借券隱性出貨的邏輯是：出借持股→他人在市場賣出壓低股價→自己在低位正式申報減持，形成隱蔽的間接出貨，而非直接申報或製造成交量。'
+  },
+  q3:{
+    C:'✅ 完全正確！借券費率急速飆升代表可借股極少、空頭爭相借入，同時高位借券餘額積累了大量回補需求。若此時股價反彈（例如有利多消息），空頭面臨高成本+帳面虧損的雙重壓力，被迫快速回補，就會引爆軋空行情。',
+    default:'❌ 不對。軋空最典型的前提是：借券費率高（空頭成本大）、借券餘額高（空頭部位大）、而股價卻開始上漲（空頭帳面虧損），三者同時出現才是最容易引爆軋空的條件。'
+  },
+  q4:{
+    C:'✅ 正確！重要公告前借券突然激增，強烈暗示有人提前掌握業績不如預期或其他利空消息，提早建立空頭部位。這是借券分析中信息不對稱最明顯的警示訊號，散戶應視為最高級別的危險指標。',
+    default:'❌ 不對。法說會前的借券激增，幾乎可以確定是有人提前得知業績或其他利空，這是信息不對稱的直接體現，是需要高度警覺的負面訊號，絕非正面信號。'
+  }
+};
+window.answerQ=function(qid,el,choice){
+  var opts=document.querySelectorAll('#'+qid+'opts .quiz-opt');
+  opts.forEach(function(o){o.classList.add('disabled');});
+  var fb=document.getElementById(qid+'fb');
+  var ok=choice===answers[qid];
+  el.classList.add(ok?'correct':'wrong');
+  if(fb){
+    fb.className='quiz-feedback show '+(ok?'ok':'fail');
+    fb.innerHTML=feedbacks[qid][choice]||feedbacks[qid]['default'];
+  }
+};
+
+/* ── Maintenance ── */
+(function(){
+  var overlay=document.getElementById('maintenanceOverlay');
+  function check(){
+    fetch(window.location.origin+'/api/maintenance?t='+Date.now())
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var msg=document.getElementById('maintMsgText');
+        if(msg&&d.message)msg.textContent=d.message;
+        overlay.style.display=d.enabled?'flex':'none';
+      })
+      .catch(function(){})
+      .finally(function(){setTimeout(check,30000);});
+  }
+  check();
+})();
+</script>
+
+<script>
+/* 白天模式 Logo 修復 */
+(function() {
+  var logoImg = document.querySelector('.logo-icon img');
+  if (logoImg) {
+    logoImg.src = '/images/jelly.png';
+    logoImg.alt = 'JellyStock';
+    logoImg.onerror = function() { this.style.display = 'none'; };
+    logoImg.style.cssText = 'width:46px;height:46px;object-fit:contain;border-radius:9px;position:relative;top:-4px;left:-4px;';
+  }
+})();
+</script>
+
+
+<script>
+/* ── Comprehensive Day Mode Fix v2 ── */
+(function() {
+  const DARK_FILLS = new Set([
+    '#040b15','#050c1a','#030a12','#040d18','#020810','#03080f','#060d1a',
+    '#08060a','#04080f','#050a18','#04080e','#03060d','#070d1a','#0b1220'
+  ]);
+
+  function isDarkHex(c) {
+    if (!c) return false;
+    const low = c.toLowerCase().trim();
+    if (DARK_FILLS.has(low)) return true;
+    // any hex like #0XX or #1XX that's very dark
+    const hex = low.match(/^#([0-9a-f]{6})$/);
+    if (hex) {
+      const r=parseInt(hex[1].slice(0,2),16),g=parseInt(hex[1].slice(2,4),16),b=parseInt(hex[1].slice(4,6),16);
+      return (r+g+b) < 80;
+    }
+    return false;
+  }
+  function isDarkRgba(c) {
+    if (!c) return false;
+    const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (m) return (+m[1]+ +m[2]+ +m[3]) < 60;
+    return false;
+  }
+  function isFaintRgba(c) {
+    if (!c) return false;
+    const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
+    return m && parseFloat(m[1]) <= 0.25;
+  }
+  function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
+
+  // Map neon colors → readable day colors
+  function mapNeon(c) {
+    if (!c) return null;
+    const low = c.toLowerCase();
+    if (/rgba?\(0,\s*229,\s*255/.test(low) || low === '#00e5ff') return '#1265a8';
+    if (/rgba?\(0,\s*230,\s*118/.test(low) || /rgba?\(0,\s*232,\s*118/.test(low) || low === '#00e676') return '#157a32';
+    if (/rgba?\(255,\s*61,\s*90/.test(low) || low === '#ff3d5a') return '#a02818';
+    if (/rgba?\(255,\s*214,\s*0/.test(low) || low === '#ffd600') return '#8a6000';
+    if (/rgba?\(178,\s*102,\s*255/.test(low) || low === '#b266ff') return '#6640c0';
+    if (/rgba?\(255,\s*110,\s*180/.test(low) || low === '#ff6eb4') return '#b0206a';
+    if (/rgba?\(255,\s*152,\s*0/.test(low) || low === '#ff9800') return '#a05000';
+    if (/rgba?\(0,\s*184,\s*212/.test(low) || low === '#00b8d4') return '#0d6ea8';
+    if (/rgba?\(255,\s*255,\s*255/.test(low) || low === '#fff' || low === 'white') return '#1a3550';
+    return null;
+  }
+  function mapNeonStroke(c) {
+    if (!c) return null;
+    // faint white grid lines -> light grey visible on white bg
+    if (isFaintRgba(c) && /rgba\(255,\s*255,\s*255/.test(c)) return 'rgba(26,101,168,.12)';
+    if (/rgba?\(0,\s*229,\s*255/.test(c)) return 'rgba(18,101,168,.4)';
+    return null;
+  }
+
+  function fixSvgsForMode(isDay) {
+    // 1. Fix SVG elements with inline style="background:..."
+    document.querySelectorAll('svg[style]').forEach(svg => {
+      if (!svg.dataset.origStyle) svg.dataset.origStyle = svg.getAttribute('style') || '';
+      if (isDay) {
+        const s = svg.dataset.origStyle;
+        if (s.includes('background:#') || s.includes('background: #') ||
+            s.includes('background:rgba(0,0,0') || s.includes('background: rgba(0,0,0')) {
+          svg.style.background = 'rgba(220,238,252,0.5)';
+          svg.style.borderRadius = '10px';
+        }
+      } else {
+        svg.setAttribute('style', svg.dataset.origStyle);
+      }
+    });
+
+    // 2. Fix SVG rect fills
+    document.querySelectorAll('svg rect').forEach(r => {
+      const f = r.getAttribute('fill') || '';
+      if (!r.dataset.origFill) r.dataset.origFill = f;
+      const orig = r.dataset.origFill;
+      if (isDay) {
+        if (isDark(orig)) r.setAttribute('fill', 'rgba(210,235,252,0.45)');
+      } else r.setAttribute('fill', orig);
+    });
+
+    // 3. Fix SVG text fills (neon -> readable day)
+    document.querySelectorAll('svg text, svg tspan').forEach(t => {
+      const f = t.getAttribute('fill') || '';
+      if (!t.dataset.origFill) t.dataset.origFill = f;
+      const orig = t.dataset.origFill;
+      if (isDay) {
+        const mapped = mapNeon(orig);
+        if (mapped) { t.setAttribute('fill', mapped); t.style.opacity = '1'; }
+        else if (isFaintRgba(orig) || isDark(orig)) {
+          t.setAttribute('fill', '#1a3550'); t.style.opacity = '1';
+        }
+        // CSS var
+        const v = orig.match(/var\(--(\w[\w-]*)\)/);
+        if (v) {
+          const cm={accent:'#1265a8',green:'#157a32',red:'#a02818',yellow:'#8a6000',purple:'#6640c0',pink:'#b0206a',orange:'#a05000'};
+          if (cm[v[1]]) { t.setAttribute('fill', cm[v[1]]); t.style.opacity='1'; }
+        }
+      } else { t.setAttribute('fill', orig); t.style.opacity = ''; }
+    });
+
+    // 4. Fix SVG line/path strokes
+    document.querySelectorAll('svg line, svg path, svg polyline').forEach(el => {
+      const s = el.getAttribute('stroke') || '';
+      if (!el.dataset.origStroke) el.dataset.origStroke = s;
+      const orig = el.dataset.origStroke;
+      if (isDay && orig) {
+        const mapped = mapNeonStroke(orig);
+        if (mapped) el.setAttribute('stroke', mapped);
+        else {
+          const nm = mapNeon(orig);
+          if (nm) el.setAttribute('stroke', nm);
+        }
+      } else if (!isDay && orig) el.setAttribute('stroke', orig);
+    });
+
+    // 5. Fix SVG circle fills
+    document.querySelectorAll('svg circle, svg ellipse').forEach(el => {
+      const f = el.getAttribute('fill') || '';
+      if (!el.dataset.origFill) el.dataset.origFill = f;
+      const orig = el.dataset.origFill;
+      if (isDay) {
+        const mapped = mapNeon(orig);
+        if (mapped) el.setAttribute('fill', mapped);
+        else if (isDark(orig)) el.setAttribute('fill', 'rgba(210,235,252,0.45)');
+      } else el.setAttribute('fill', orig);
+    });
+
+    // 6. Fix svg-chart-wrap inline border color
+    document.querySelectorAll('.svg-chart-wrap').forEach(w => {
+      if (isDay) {
+        w.style.borderColor = 'rgba(26,101,168,.2)';
+        w.style.background = 'rgba(220,238,252,0.3)';
+      } else {
+        w.style.borderColor = '';
+        w.style.background = '';
+      }
+    });
+  }
+
+  function run() { fixSvgsForMode(document.body.classList.contains('theme-day')); }
+  const origToggle = window.toggleTheme;
+  window.toggleTheme = function() { if (origToggle) origToggle(); setTimeout(run, 30); };
+  document.addEventListener('DOMContentLoaded', function() {
+    run();
+    const obs = new MutationObserver(function(m) {
+      m.forEach(function(x){ if(x.attributeName==='class') run(); });
+    });
+    obs.observe(document.body, { attributes: true });
+  });
+  // Also run immediately if DOM already ready
+  if (document.readyState !== 'loading') setTimeout(run, 50);
+})();
+</script>
+
+</body>
+</html>

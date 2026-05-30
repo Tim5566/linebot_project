@@ -163,25 +163,45 @@ def register_api(app):
         return send_from_directory('stock_site/features', 'chapter10.html')
 
     # ── 籌碼分析教學章節 ────────────────────────────────────────────────────────
-    @app.route("/stock_site/features/chips_chapter1.html")
+    @app.route("/stock_site/chips/chips_chapter1.html")
     def page_chips_chapter1():
-        return send_from_directory('stock_site/features', 'chips_chapter1.html')
-    
-    @app.route("/stock_site/features/chips_chapter2.html")
+        return send_from_directory('stock_site/chips', 'chips_chapter1.html')
+
+    @app.route("/stock_site/chips/chips_chapter2.html")
     def page_chips_chapter2():
-        return send_from_directory('stock_site/features', 'chips_chapter2.html')
-    
-    @app.route("/stock_site/features/chips_chapter3.html")
+        return send_from_directory('stock_site/chips', 'chips_chapter2.html')
+
+    @app.route("/stock_site/chips/chips_chapter3.html")
     def page_chips_chapter3():
-        return send_from_directory('stock_site/features', 'chips_chapter3.html')
-    
-    @app.route("/stock_site/features/chips_chapter4.html")
+        return send_from_directory('stock_site/chips', 'chips_chapter3.html')
+
+    @app.route("/stock_site/chips/chips_chapter4.html")
     def page_chips_chapter4():
-        return send_from_directory('stock_site/features', 'chips_chapter4.html')
-    
-    @app.route("/stock_site/features/chips_chapter5.html")
+        return send_from_directory('stock_site/chips', 'chips_chapter4.html')
+
+    @app.route("/stock_site/chips/chips_chapter5.html")
     def page_chips_chapter5():
-        return send_from_directory('stock_site/features', 'chips_chapter5.html')
+        return send_from_directory('stock_site/chips', 'chips_chapter5.html')
+
+    @app.route("/stock_site/chips/chips_chapter6.html")
+    def page_chips_chapter6():
+        return send_from_directory('stock_site/chips', 'chips_chapter6.html')
+
+    @app.route("/stock_site/chips/chips_chapter7.html")
+    def page_chips_chapter7():
+        return send_from_directory('stock_site/chips', 'chips_chapter7.html')
+
+    @app.route("/stock_site/chips/chips_chapter8.html")
+    def page_chips_chapter8():
+        return send_from_directory('stock_site/chips', 'chips_chapter8.html')
+
+    @app.route("/stock_site/chips/chips_chapter9.html")
+    def page_chips_chapter9():
+        return send_from_directory('stock_site/chips', 'chips_chapter9.html')
+
+    @app.route("/stock_site/chips/chips_chapter10.html")
+    def page_chips_chapter10():
+        return send_from_directory('stock_site/chips', 'chips_chapter10.html')
 
     # ── 公司重大訊息 API ───────────────────────────────────────────────────────
     @app.route("/api/news")
