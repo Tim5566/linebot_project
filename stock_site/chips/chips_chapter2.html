@@ -760,7 +760,7 @@
 
   <!-- ☀️ Comprehensive Day Theme Patch — from chapter5 unified style -->
   <style>
-       ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
+       /* ☀️  白天晴空主題 (theme-day) — 章節頁面統一配色
        ═══════════════════════════════════════════════════════════════ */
 
     /* ── CSS 變數覆蓋 ── */
@@ -2191,6 +2191,139 @@
     body.theme-day .force-bar-bg { background: rgba(26,80,160,.1) !important; }
   </style>
 
+  <!-- ☀️ SEC 10-17 新節段白天模式完整補丁 -->
+  <style>
+    /* ══════════════════════════════════════════════
+       SVG 內文字 — 白天模式全面加深
+       問題：rgba(212,228,247,.65) 在白底幾乎不可見
+             rgba(122,154,184,.4/.5) 太淡
+             neon rgba(0,229,255,.6) 在白底偏淡
+       解決：透過 JS fixSvgsForMode 已處理 SVG text
+             但 opacity 過低的仍需 CSS 加強
+    ══════════════════════════════════════════════ */
+
+    /* simWrapper 互動模擬器 — 白天模式 */
+    body.theme-day #simWrapper {
+      background: rgba(240,248,255,.9) !important;
+      border-color: rgba(26,101,168,.2) !important;
+    }
+    body.theme-day #simWrapper .insight-label,
+    body.theme-day #simWrapper > div:first-child {
+      color: #1265a8 !important;
+    }
+    body.theme-day #simWrapper span[id$="Val"] { }
+    body.theme-day #simWrapper input[type="range"] { opacity: 1; }
+    body.theme-day #simWrapper > div > div > span:first-child {
+      color: #1a3550 !important;
+    }
+    body.theme-day #simResult {
+      background: rgba(230,244,255,.95) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+    body.theme-day #simDesc { color: #1a3550 !important; }
+    body.theme-day #simScore { color: #3a6080 !important; }
+
+    /* 誤判 mistake 卡片 — 白天 */
+    body.theme-day div[style*="rgba(255,61,90,.06)"] {
+      background: rgba(255,245,245,.92) !important;
+      border-color: rgba(176,48,32,.22) !important;
+    }
+    body.theme-day div[style*="rgba(255,61,90,.06)"] > div:first-child + div {
+      color: #0a1828 !important;
+      font-weight: 600;
+    }
+    body.theme-day div[style*="rgba(255,61,90,.06)"] > div:nth-child(2) {
+      color: #2a1818 !important;
+    }
+    /* 綠色修正框 inside mistake cards */
+    body.theme-day div[style*="rgba(0,230,118,.08)"] {
+      background: rgba(235,255,242,.9) !important;
+      border-color: rgba(21,122,50,.25) !important;
+    }
+    body.theme-day div[style*="rgba(0,230,118,.08)"] {
+      color: #157a32 !important;
+    }
+
+    /* 各 inline style 暗色背景容器 — 白天強制轉換 */
+    body.theme-day div[style*="background:rgba(0,0,0,.25)"] {
+      background: rgba(240,248,255,.9) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+
+    /* shadow-line sl-text 顏色 */
+    body.theme-day .sl-text { color: #1a3550 !important; }
+    body.theme-day .sl-text strong { color: #0a1828 !important; }
+    body.theme-day .sl-body { background: rgba(240,248,255,.7) !important; }
+
+    /* flow-step 白天 */
+    body.theme-day .flow-step { border-color: rgba(26,101,168,.12) !important; }
+    body.theme-day .flow-heading { color: #0a1828 !important; }
+    body.theme-day .flow-sub { color: #1a3550 !important; }
+
+    /* insight/warn/gold/purple/success boxes text */
+    body.theme-day .insight-text { color: #0a1828 !important; }
+    body.theme-day .insight-box  { background: linear-gradient(135deg,rgba(220,240,255,.9),rgba(200,230,252,.7)) !important; border-color: rgba(26,101,168,.25) !important; }
+    body.theme-day .warn-box     { background: linear-gradient(135deg,rgba(255,240,240,.9),rgba(255,230,230,.7)) !important; border-color: rgba(176,48,32,.25) !important; }
+    body.theme-day .gold-box     { background: linear-gradient(135deg,rgba(255,248,220,.9),rgba(255,240,200,.7)) !important; border-color: rgba(184,136,14,.28) !important; }
+    body.theme-day .purple-box   { background: linear-gradient(135deg,rgba(240,230,255,.9),rgba(230,218,252,.7)) !important; border-color: rgba(102,64,192,.25) !important; }
+    body.theme-day .success-box  { background: linear-gradient(135deg,rgba(230,255,240,.9),rgba(215,252,230,.7)) !important; border-color: rgba(21,122,50,.25) !important; }
+    body.theme-day .warn-box  .insight-label { color: #a02818 !important; }
+    body.theme-day .gold-box  .insight-label { color: #8a6000 !important; }
+    body.theme-day .purple-box .insight-label { color: #6640c0 !important; }
+    body.theme-day .success-box .insight-label { color: #157a32 !important; }
+
+    /* cmp-table 白天 */
+    body.theme-day .cmp-table th { background: rgba(26,101,168,.08); color: #1265a8; border-bottom-color: rgba(26,101,168,.18); }
+    body.theme-day .cmp-table td { color: #1a3550; border-bottom-color: rgba(26,101,168,.08); }
+    body.theme-day .cmp-table tr:hover td { background: rgba(26,123,191,.05); }
+    body.theme-day .cmp-table { background: rgba(240,248,255,.6); }
+
+    /* signal-card 白天 */
+    body.theme-day .signal-card { background: rgba(240,248,255,.88) !important; border-color: rgba(26,101,168,.18) !important; }
+    body.theme-day .signal-body { color: #1a3550 !important; }
+    body.theme-day .signal-body strong { color: #0a1828 !important; }
+
+    /* chip 白天 */
+    body.theme-day .chip-red    { background: rgba(176,48,32,.1);  border-color: rgba(176,48,32,.28);  color: #a02818; }
+    body.theme-day .chip-cyan   { background: rgba(13,110,168,.1); border-color: rgba(13,110,168,.28); color: #0d6ea8; }
+    body.theme-day .chip-yellow { background: rgba(184,136,14,.1); border-color: rgba(184,136,14,.28); color: #8a6000; }
+    body.theme-day .chip-green  { background: rgba(21,122,50,.1);  border-color: rgba(21,122,50,.28);  color: #157a32; }
+    body.theme-day .chip-purple { background: rgba(102,64,192,.1); border-color: rgba(102,64,192,.28); color: #6640c0; }
+    body.theme-day .chip-orange { background: rgba(184,100,0,.1);  border-color: rgba(184,100,0,.28);  color: #a05000; }
+
+    /* sec-divider 白天 */
+    body.theme-day .sec-divider { color: #5a8ab8 !important; }
+    body.theme-day .sec-divider::before, body.theme-day .sec-divider::after { background: rgba(26,101,168,.15) !important; }
+
+    /* 進階測驗 quiz-feedback 白天 */
+    body.theme-day .quiz-feedback { color: #1a3550 !important; background: rgba(235,245,255,.9) !important; border-color: rgba(26,101,168,.18) !important; }
+
+    /* role-card 白天 inline 覆蓋 */
+    body.theme-day .role-card.foreign { background: linear-gradient(135deg,rgba(255,240,240,.9),rgba(255,235,235,.7)) !important; border-color: rgba(176,48,32,.22) !important; }
+    body.theme-day .role-card.trust   { background: linear-gradient(135deg,rgba(220,240,255,.9),rgba(210,235,252,.7)) !important; border-color: rgba(26,101,168,.22) !important; }
+    body.theme-day .role-card.dealer  { background: linear-gradient(135deg,rgba(255,248,218,.9),rgba(255,244,200,.7)) !important; border-color: rgba(184,136,14,.22) !important; }
+    body.theme-day .role-desc { color: #1a3550 !important; }
+    body.theme-day .role-card .chip-red    { background: rgba(176,48,32,.1)  !important; border-color: rgba(176,48,32,.28)  !important; color: #a02818 !important; }
+    body.theme-day .role-card .chip-cyan   { background: rgba(13,110,168,.1) !important; border-color: rgba(13,110,168,.28) !important; color: #0d6ea8 !important; }
+    body.theme-day .role-card .chip-yellow { background: rgba(184,136,14,.1) !important; border-color: rgba(184,136,14,.28) !important; color: #8a6000 !important; }
+
+    /* ── SVG 文字白天加深補丁（JS 無法處理 opacity 太低的 rgba） ──
+       用 CSS filter 整體提升 SVG 對比度                          */
+    body.theme-day .svg-chart-wrap svg {
+      filter: contrast(1.08) saturate(0.88);
+    }
+    /* SVG rect 背景在白天模式 */
+    body.theme-day .svg-chart-wrap {
+      background: rgba(215,235,250,.5) !important;
+      border: 1px solid rgba(26,101,168,.18) !important;
+      border-radius: 12px;
+    }
+
+    /* ── 滑桿標籤文字 ── */
+    body.theme-day #simWrapper label,
+    body.theme-day #simWrapper > div > div { color: #1a3550 !important; }
+  </style>
+
   <!-- ☀️ Footer Day Mode Fix -->
   <style>
     body.theme-day #site-footer {
@@ -2205,7 +2338,7 @@
     body.theme-day #site-footer a:hover { color: #0d3560 !important; }
   </style>
 </head>
-<body>
+<body spellcheck="false">
 <script>
 (function() {
   function applyTheme(theme) {
@@ -2923,6 +3056,776 @@
     </div>
   </div>
 
+  <!-- ═══ SEC 10 ─ 外資解析深度篇 ═══ -->
+  <div class="section-card reveal" id="sec10">
+    <div class="section-header">
+      <span class="section-num">SEC 10</span>
+      <span class="section-title">外資解析深度篇：誰在買台股？</span>
+      <span class="section-icon">🌐</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">許多人以為「外資」是一個整體，其實外資是來自全球各地、數以千計的機構法人的集合。理解外資的組成結構，才能正確解讀他們的行為。</p>
+
+      <!-- 外資組成圓餅 SVG -->
+      <div class="svg-chart-wrap">
+        <svg width="100%" viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="280" fill="#040b15" rx="14"/>
+          <text x="330" y="26" fill="rgba(0,229,255,.75)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="3">外資機構類型組成估計（台股）</text>
+          <!-- Pie chart representation as arc bars -->
+          <!-- Index/ETF Funds -->
+          <rect x="50" y="55" width="200" height="30" rx="6" fill="rgba(255,61,90,.15)" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <rect x="50" y="55" width="176" height="30" rx="6" fill="rgba(255,61,90,.4)"/>
+          <text x="46" y="50" fill="#ff3d5a" font-size="9.5" font-family="Share Tech Mono, monospace">指數型/ETF基金</text>
+          <text x="237" y="75" fill="#ff3d5a" font-size="11" font-family="Share Tech Mono, monospace">~44%</text>
+
+          <!-- Active Funds -->
+          <rect x="50" y="105" width="200" height="30" rx="6" fill="rgba(255,110,180,.12)" stroke="rgba(255,110,180,.28)" stroke-width="1"/>
+          <rect x="50" y="105" width="124" height="30" rx="6" fill="rgba(255,110,180,.4)"/>
+          <text x="46" y="100" fill="#ff6eb4" font-size="9.5" font-family="Share Tech Mono, monospace">主動型共同基金</text>
+          <text x="185" y="125" fill="#ff6eb4" font-size="11" font-family="Share Tech Mono, monospace">~31%</text>
+
+          <!-- Hedge Funds -->
+          <rect x="50" y="155" width="200" height="30" rx="6" fill="rgba(178,102,255,.1)" stroke="rgba(178,102,255,.25)" stroke-width="1"/>
+          <rect x="50" y="155" width="76" height="30" rx="6" fill="rgba(178,102,255,.38)"/>
+          <text x="46" y="150" fill="#b266ff" font-size="9.5" font-family="Share Tech Mono, monospace">對沖基金</text>
+          <text x="137" y="175" fill="#b266ff" font-size="11" font-family="Share Tech Mono, monospace">~19%</text>
+
+          <!-- Sovereign -->
+          <rect x="50" y="205" width="200" height="30" rx="6" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.2)" stroke-width="1"/>
+          <rect x="50" y="205" width="24" height="30" rx="6" fill="rgba(0,229,255,.3)"/>
+          <text x="46" y="200" fill="#00e5ff" font-size="9.5" font-family="Share Tech Mono, monospace">主權/退休基金</text>
+          <text x="85" y="225" fill="#00e5ff" font-size="11" font-family="Share Tech Mono, monospace">~6%</text>
+
+          <!-- Right side: key insight box -->
+          <rect x="310" y="48" width="310" height="196" rx="10" fill="rgba(0,229,255,.03)" stroke="rgba(0,229,255,.12)" stroke-width="1"/>
+          <text x="465" y="72" fill="rgba(0,229,255,.7)" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="2">各類型行為特徵</text>
+          <line x1="325" y1="82" x2="605" y2="82" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+          <text x="326" y="102" fill="#ff3d5a" font-size="9.5" font-family="Share Tech Mono, monospace">ETF型：</text>
+          <text x="380" y="102" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">被動追蹤指數，外資整體買賣</text>
+          <text x="380" y="117" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">超最大貢獻者，短期波動小</text>
+          <text x="326" y="140" fill="#ff6eb4" font-size="9.5" font-family="Share Tech Mono, monospace">主動型：</text>
+          <text x="386" y="140" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">研究驅動，看好特定產業/</text>
+          <text x="386" y="155" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">個股會集中大量買超</text>
+          <text x="326" y="178" fill="#b266ff" font-size="9.5" font-family="Share Tech Mono, monospace">對沖型：</text>
+          <text x="380" y="178" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">短線進出，波動性高，有</text>
+          <text x="380" y="193" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">時會製造假突破</text>
+          <text x="326" y="216" fill="#00e5ff" font-size="9.5" font-family="Share Tech Mono, monospace">主權型：</text>
+          <text x="380" y="216" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">超長線，幾乎不賣，買進</text>
+          <text x="380" y="231" fill="rgba(212,228,247,.65)" font-size="9" font-family="Noto Sans TC, sans-serif">代表極度看好台灣</text>
+
+          <!-- Bottom note -->
+          <text x="330" y="262" fill="rgba(122,154,184,.4)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">數據為估計值，實際組成依市場環境持續變化</text>
+        </svg>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🔭</div>
+        <div class="insight-body">
+          <div class="insight-label">為何外資有時「集體」大賣？</div>
+          <div class="insight-text">當全球風險情緒惡化（如聯準會升息、地緣衝突、金融危機），ETF型外資和對沖基金會同步撤離所有新興市場，包括台股。這時候「外資大賣」不是針對台灣，而是<strong>全球資金避險的機械性動作</strong>。散戶不必過度恐慌，也不該在這時逆勢接刀。</div>
+        </div>
+      </div>
+
+      <div class="sec-divider">外資決策的三大核心變數</div>
+
+      <div class="signal-grid">
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:#ff3d5a;box-shadow:0 0 8px rgba(255,61,90,.5)"></div>
+            <div class="signal-label" style="color:#ff3d5a;">美元強弱 / 新台幣匯率</div>
+          </div>
+          <div class="signal-body">美元走強時，外資持有台股的<strong>美元換算報酬下降</strong>，會觸發贖回壓力。美元指數 DXY 上升 → 外資賣台股；DXY 下降 → 外資回補。這是外資行為最關鍵的宏觀指標。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,.4)"></div>
+            <div class="signal-label" style="color:#00e5ff;">台積電 / 半導體景氣循環</div>
+          </div>
+          <div class="signal-body">外資對台股的最大配置集中在台積電（佔外資持股市值約45%）。<strong>AI需求、晶圓代工景氣、先進製程訂單</strong>，直接決定外資的台積電持股量，進而帶動整體台股走向。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:#ffd600;box-shadow:0 0 8px rgba(255,214,0,.4)"></div>
+            <div class="signal-label" style="color:#ffd600;">MSCI 指數調整</div>
+          </div>
+          <div class="signal-body">每年MSCI定期調整成分股時，被動ETF外資<strong>被迫在固定日期大量買進/賣出</strong>台灣相關股票。提前掌握MSCI調整名單，可預測特定日期的外資行為。</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-head">
+            <div class="signal-dot" style="background:#b266ff;box-shadow:0 0 8px rgba(178,102,255,.4)"></div>
+            <div class="signal-label" style="color:#b266ff;">全球風險胃口（Risk-On/Off）</div>
+          </div>
+          <div class="signal-body">VIX恐慌指數飆升時，外資會<strong>統一撤離新興市場</strong>（Risk-Off）。VIX回落後，資金重新流入（Risk-On）。觀察 VIX 的走勢，可提前預判外資的大方向。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 11 ─ 投信深度篇：季末作帳完整解析 ═══ -->
+  <div class="section-card reveal" id="sec11">
+    <div class="section-header">
+      <span class="section-num">SEC 11</span>
+      <span class="section-title">投信深度篇：季末作帳完整操作手冊</span>
+      <span class="section-icon">📋</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">「投信作帳」是台灣股市中最有規律性、最可預測的籌碼行為之一。只要掌握節奏，散戶可以有條不紊地搭上這班列車。</p>
+
+      <!-- 全年季末作帳日曆 SVG -->
+      <div class="svg-chart-wrap">
+        <svg width="100%" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="200" fill="#040b15" rx="14"/>
+          <text x="330" y="26" fill="rgba(0,229,255,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="3">投信作帳年曆 — 四大高潮時點</text>
+          
+          <!-- Timeline backbone -->
+          <rect x="40" y="90" width="580" height="4" rx="2" fill="rgba(255,255,255,.06)"/>
+
+          <!-- Q1: 3月 -->
+          <line x1="85" y1="80" x2="85" y2="100" stroke="rgba(0,229,255,.6)" stroke-width="2"/>
+          <rect x="55" y="48" width="62" height="28" rx="6" fill="rgba(0,229,255,.12)" stroke="rgba(0,229,255,.3)" stroke-width="1"/>
+          <text x="86" y="58" fill="#00e5ff" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle">Q1末</text>
+          <text x="86" y="70" fill="#00e5ff" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">3月底</text>
+          <text x="86" y="115" fill="rgba(0,229,255,.5)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">年初布局</text>
+          <text x="86" y="127" fill="rgba(0,229,255,.5)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">拉尾段</text>
+
+          <!-- Q2: 6月 -->
+          <line x1="230" y1="80" x2="230" y2="100" stroke="rgba(0,230,118,.6)" stroke-width="2"/>
+          <rect x="200" y="48" width="62" height="28" rx="6" fill="rgba(0,230,118,.1)" stroke="rgba(0,230,118,.3)" stroke-width="1"/>
+          <text x="231" y="58" fill="#00e676" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle">Q2末</text>
+          <text x="231" y="70" fill="#00e676" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">6月底</text>
+          <text x="231" y="115" fill="rgba(0,230,118,.5)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">半年報</text>
+          <text x="231" y="127" fill="rgba(0,230,118,.5)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">績效衝刺</text>
+
+          <!-- Mid note -->
+          <text x="330" y="155" fill="rgba(255,152,0,.6)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">★ 9月末與12月末為全年最強作帳時點</text>
+          
+          <!-- Q3: 9月 -->
+          <line x1="440" y1="80" x2="440" y2="100" stroke="rgba(255,152,0,.8)" stroke-width="2.5"/>
+          <rect x="408" y="44" width="66" height="32" rx="6" fill="rgba(255,152,0,.14)" stroke="rgba(255,152,0,.4)" stroke-width="1.5"/>
+          <text x="441" y="55" fill="#ff9800" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">Q3末</text>
+          <text x="441" y="68" fill="#ff9800" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">9月底</text>
+          <text x="441" y="115" fill="rgba(255,152,0,.6)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">前三季</text>
+          <text x="441" y="127" fill="rgba(255,152,0,.6)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">衝全年績效</text>
+
+          <!-- Q4: 12月 -->
+          <line x1="580" y1="78" x2="580" y2="102" stroke="rgba(255,61,90,.9)" stroke-width="3"/>
+          <rect x="545" y="42" width="70" height="34" rx="6" fill="rgba(255,61,90,.16)" stroke="rgba(255,61,90,.5)" stroke-width="2"/>
+          <text x="580" y="54" fill="#ff3d5a" font-size="10.5" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">Q4末</text>
+          <text x="580" y="67" fill="#ff3d5a" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">12月底</text>
+          <text x="580" y="115" fill="rgba(255,61,90,.65)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">年末衝刺</text>
+          <text x="580" y="127" fill="rgba(255,61,90,.65)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">最強作帳</text>
+
+          <text x="330" y="178" fill="rgba(122,154,184,.4)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">每季末前 2~3 週為投信買超密集期，散戶最佳搭車窗口</text>
+        </svg>
+      </div>
+
+      <div class="sec-divider">作帳行情完整 SOP</div>
+
+      <div class="flow-step">
+        <div class="flow-num cn">S1</div>
+        <div class="flow-content">
+          <div class="flow-heading">季末前 4～6 週：篩選投信連續買超個股</div>
+          <div class="flow-sub">用JellyStock或籌碼K線，篩選「投信連續買超 ≥ 7 天」且「投信持股比例 5%～12%」的個股。太低代表布局未完成，太高代表已接近天花板。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num yn">S2</div>
+        <div class="flow-content">
+          <div class="flow-heading">確認股票體質：避開基本面地雷</div>
+          <div class="flow-sub">投信也會買到爛股，所以要確認：近兩季EPS正成長、沒有重大財務危機、產業趨勢明確。即使法人在買，地雷股也不能碰。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gn">S3</div>
+        <div class="flow-content">
+          <div class="flow-heading">等待技術面確認：量增突破</div>
+          <div class="flow-sub">籌碼面好但技術面未動，是「布局期」，不急著進。等到K線出現量增突破近期高點，代表主力開始拉抬——這才是進場點。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num rn">S4</div>
+        <div class="flow-content">
+          <div class="flow-heading">季末前 2 週：準備出場計畫</div>
+          <div class="flow-sub">進入季末前 2 週，開始設定停利點（通常在漲幅 15%～25% 區間考慮減碼）。若投信開始出現賣超訊號，不論獲利多少，必須優先出場。</div>
+        </div>
+      </div>
+
+      <!-- 投信持股甜蜜區 SVG -->
+      <div class="svg-chart-wrap" style="margin-top:20px;">
+        <svg width="100%" viewBox="0 0 660 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="140" fill="#040b15" rx="12"/>
+          <text x="330" y="24" fill="rgba(0,229,255,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="2">投信持股比例「甜蜜區」判讀</text>
+
+          <!-- Gauge bar -->
+          <rect x="50" y="55" width="560" height="24" rx="8" fill="rgba(255,255,255,.04)"/>
+          <!-- 0-5%: 布局中 -->
+          <rect x="50" y="55" width="100" height="24" rx="8" fill="rgba(122,154,184,.25)"/>
+          <!-- 5-15%: 甜蜜區 -->
+          <rect x="150" y="55" width="220" height="24" fill="rgba(0,230,118,.35)"/>
+          <!-- 15-25%: 警戒 -->
+          <rect x="370" y="55" width="130" height="24" fill="rgba(255,214,0,.3)"/>
+          <!-- 25%+: 危險 -->
+          <rect x="500" y="55" width="110" height="24" rx="0" fill="rgba(255,61,90,.3)" style="border-radius:0 8px 8px 0"/>
+          <!-- scale ticks -->
+          <line x1="50"  y1="52" x2="50"  y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
+          <line x1="150" y1="52" x2="150" y2="80" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+          <line x1="370" y1="52" x2="370" y2="80" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+          <line x1="500" y1="52" x2="500" y2="80" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+          <line x1="610" y1="52" x2="610" y2="80" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
+          <!-- Labels -->
+          <text x="50"  y="92" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">0%</text>
+          <text x="150" y="92" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">5%</text>
+          <text x="370" y="92" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">15%</text>
+          <text x="500" y="92" fill="rgba(122,154,184,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">25%</text>
+          <text x="100" y="70" fill="rgba(122,154,184,.8)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">布局中</text>
+          <text x="260" y="70" fill="rgba(0,230,118,.9)" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">★ 甜蜜區</text>
+          <text x="435" y="70" fill="rgba(255,214,0,.85)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">注意警戒</text>
+          <text x="555" y="70" fill="rgba(255,61,90,.85)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">過重警示</text>
+          <text x="330" y="120" fill="rgba(122,154,184,.4)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">5%~15% 甜蜜區：投信有動機繼續買進且有足夠拉抬空間，是最佳進場窗口</text>
+        </svg>
+      </div>
+
+      <div class="warn-box">
+        <div class="insight-icon">⚠️</div>
+        <div class="insight-body">
+          <div class="insight-label">投信換股陷阱</div>
+          <div class="insight-text">季末作帳結束後（通常季初的前1~2週），投信常會出現「換股賣出」——賣掉漲幅已大的舊持股，去買下一季要布局的新標的。這時散戶若未注意投信的賣超訊號，很容易在高點接到最後一棒。<strong>季初的投信賣超，不代表股票爛，而是投信在換倉</strong>。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 12 ─ 自營商深度篇 ═══ -->
+  <div class="section-card reveal" id="sec12">
+    <div class="section-header">
+      <span class="section-num">SEC 12</span>
+      <span class="section-title">自營商深度篇：看懂權證與避險的關係</span>
+      <span class="section-icon">⚙️</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">自營商的操作邏輯是三大法人中最複雜的，因為他們同時扮演<strong>方向交易者</strong>和<strong>衍生品造市商</strong>兩個角色。搞清楚這兩個帳戶，才不會被假訊號誤導。</p>
+
+      <!-- 自營商架構圖 SVG -->
+      <div class="svg-chart-wrap">
+        <svg width="100%" viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="240" fill="#040b15" rx="14"/>
+          <text x="330" y="26" fill="rgba(255,214,0,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="3">自營商操作架構圖</text>
+          
+          <!-- Central node: 自營商 -->
+          <rect x="270" y="50" width="120" height="42" rx="10" fill="rgba(255,214,0,.12)" stroke="rgba(255,214,0,.4)" stroke-width="1.5"/>
+          <text x="330" y="68" fill="#ffd600" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">自營商</text>
+          <text x="330" y="82" fill="rgba(255,214,0,.6)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">Proprietary Desk</text>
+
+          <!-- Left branch: 自行買賣 -->
+          <line x1="270" y1="71" x2="155" y2="110" stroke="rgba(0,229,255,.35)" stroke-width="1.5" stroke-dasharray="none"/>
+          <rect x="60" y="100" width="130" height="54" rx="9" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.28)" stroke-width="1"/>
+          <text x="125" y="120" fill="#00e5ff" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">自行買賣帳戶</text>
+          <text x="125" y="135" fill="rgba(0,229,255,.6)" font-size="8.5" font-family="Noto Sans TC, sans-serif" text-anchor="middle">方向性操作</text>
+          <text x="125" y="148" fill="rgba(0,229,255,.5)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">代表真實看法 ✓</text>
+
+          <!-- Left branch outcomes -->
+          <line x1="125" y1="154" x2="90" y2="190" stroke="rgba(0,230,118,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+          <rect x="45" y="185" width="90" height="28" rx="7" fill="rgba(0,230,118,.08)" stroke="rgba(0,230,118,.2)" stroke-width="1"/>
+          <text x="90" y="200" fill="#00e676" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">買超→看多訊號</text>
+          
+          <line x1="125" y1="154" x2="160" y2="190" stroke="rgba(255,61,90,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+          <rect x="115" y="185" width="90" height="28" rx="7" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.2)" stroke-width="1"/>
+          <text x="160" y="200" fill="#ff3d5a" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">賣超→看空訊號</text>
+
+          <!-- Right branch: 避險買賣 -->
+          <line x1="390" y1="71" x2="505" y2="110" stroke="rgba(255,152,0,.35)" stroke-width="1.5"/>
+          <rect x="470" y="100" width="130" height="54" rx="9" fill="rgba(255,152,0,.08)" stroke="rgba(255,152,0,.28)" stroke-width="1"/>
+          <text x="535" y="120" fill="#ff9800" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">避險買賣帳戶</text>
+          <text x="535" y="135" fill="rgba(255,152,0,.6)" font-size="8.5" font-family="Noto Sans TC, sans-serif" text-anchor="middle">衍生品對沖操作</text>
+          <text x="535" y="148" fill="rgba(255,61,90,.6)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">與方向無關 ✗</text>
+
+          <!-- Right branch outcomes -->
+          <line x1="535" y1="154" x2="500" y2="190" stroke="rgba(255,152,0,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+          <rect x="455" y="185" width="90" height="28" rx="7" fill="rgba(255,152,0,.08)" stroke="rgba(255,152,0,.2)" stroke-width="1"/>
+          <text x="500" y="197" fill="rgba(255,152,0,.8)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">認購權證發行</text>
+          <text x="500" y="207" fill="rgba(255,152,0,.8)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">→機械性買股對沖</text>
+          
+          <line x1="535" y1="154" x2="570" y2="190" stroke="rgba(178,102,255,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+          <rect x="525" y="185" width="90" height="28" rx="7" fill="rgba(178,102,255,.08)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+          <text x="570" y="197" fill="rgba(178,102,255,.8)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">期貨/選擇權部位</text>
+          <text x="570" y="207" fill="rgba(178,102,255,.8)" font-size="8" font-family="Noto Sans TC, sans-serif" text-anchor="middle">→動態調整Delta</text>
+
+          <!-- Bottom label -->
+          <text x="330" y="228" fill="rgba(122,154,184,.4)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">只有左側「自行買賣帳戶」才代表自營商的方向判斷</text>
+        </svg>
+      </div>
+
+      <div class="sec-divider">認購權證與避險的實際運作</div>
+
+      <div class="shadow-line">
+        <div class="sl-side pu"></div>
+        <div class="sl-body">
+          <div class="sl-top pu">📘 範例：自營商發行 A 股認購權證</div>
+          <div class="sl-text">
+            <strong>情境：</strong>券商甲發行 A 股的認購權證，散戶 B 花 5 萬元買進，賭 A 股上漲。<br><br>
+            <strong>券商甲的避險行為：</strong>A 股若上漲，券商甲要賠錢給散戶，所以券商甲同步到現貨市場買入 A 股，當作對沖。<br><br>
+            <strong>結果：</strong>在籌碼數據上，自營商的「避險帳戶」顯示大量買超 A 股——但這只是機械性的避險，不代表自營商看好 A 股。如果 A 股上漲，自營商反而要賣出股票來結清部位。
+          </div>
+        </div>
+      </div>
+
+      <div class="success-box">
+        <div class="insight-icon">✅</div>
+        <div class="insight-body">
+          <div class="insight-label">如何判斷自營商買超是「自行帳戶」還是「避險帳戶」？</div>
+          <div class="insight-text">在 JellyStock 的法人頁面，可以切換查看自營商「自行」與「避險」的分拆數據。<strong>若自行帳戶持續買超，且當天沒有大量新認購權證發行</strong>，才是值得追蹤的正向訊號。普通的法人數據平台只顯示合計買賣超，容易造成誤判。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 13 ─ 法人籌碼互動模擬器 ═══ -->
+  <div class="section-card reveal" id="sec13">
+    <div class="section-header">
+      <span class="section-num">SEC 13</span>
+      <span class="section-title">互動模擬：法人動向即時解讀訓練</span>
+      <span class="section-icon">🎮</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">透過以下的互動模擬，練習在不同的法人買賣超情境下，快速做出正確的市場解讀。這是培養籌碼直覺的最快方式。</p>
+
+      <!-- Interactive Simulator -->
+      <div id="simWrapper" style="background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.12);border-radius:16px;padding:22px;margin:20px 0;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--accent);margin-bottom:14px;">⚡ 法人情境訓練模擬器</div>
+
+        <!-- Sliders -->
+        <div style="display:grid;gap:16px;margin-bottom:20px;">
+          <!-- Foreign -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:.82rem;color:var(--red);">🌏 外資買賣超（億元）</span>
+              <span id="foreignVal" style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--red);">+50</span>
+            </div>
+            <input type="range" id="foreignSlider" min="-200" max="200" value="50" step="10"
+              style="width:100%;accent-color:#ff3d5a;cursor:pointer;"
+              oninput="updateSim()">
+          </div>
+          <!-- Trust -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:.82rem;color:var(--accent);">📈 投信買賣超（億元）</span>
+              <span id="trustVal" style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--accent);">+20</span>
+            </div>
+            <input type="range" id="trustSlider" min="-80" max="80" value="20" step="5"
+              style="width:100%;accent-color:#00e5ff;cursor:pointer;"
+              oninput="updateSim()">
+          </div>
+          <!-- Dealer -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:.82rem;color:var(--yellow);">⚡ 自營自行買賣超（億元）</span>
+              <span id="dealerVal" style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--yellow);">+5</span>
+            </div>
+            <input type="range" id="dealerSlider" min="-60" max="60" value="5" step="5"
+              style="width:100%;accent-color:#ffd600;cursor:pointer;"
+              oninput="updateSim()">
+          </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div id="simResult" style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:18px;">
+          <div id="simSignal" style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;margin-bottom:10px;color:#00e676;">🟢 偏多格局</div>
+          <div id="simDesc" style="font-size:.85rem;color:var(--text-dim);line-height:1.75;"></div>
+          <div id="simScore" style="margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-faint);"></div>
+        </div>
+      </div>
+
+      <script>
+      function updateSim() {
+        const f = parseInt(document.getElementById('foreignSlider').value);
+        const t = parseInt(document.getElementById('trustSlider').value);
+        const d = parseInt(document.getElementById('dealerSlider').value);
+        document.getElementById('foreignVal').textContent = (f >= 0 ? '+' : '') + f;
+        document.getElementById('trustVal').textContent   = (t >= 0 ? '+' : '') + t;
+        document.getElementById('dealerVal').textContent  = (d >= 0 ? '+' : '') + d;
+
+        let score = 0;
+        score += f > 100 ? 3 : f > 20 ? 2 : f > 0 ? 1 : f > -30 ? -1 : f > -100 ? -2 : -3;
+        score += t > 30 ? 2 : t > 5 ? 1.5 : t > 0 ? 0.5 : t > -10 ? -0.5 : t > -40 ? -1.5 : -2;
+        score += d > 20 ? 0.5 : d > 0 ? 0.3 : d < 0 ? -0.3 : 0;
+
+        const signalEl = document.getElementById('simSignal');
+        const descEl   = document.getElementById('simDesc');
+        const scoreEl  = document.getElementById('simResult');
+        const scoreTextEl = document.getElementById('simScore');
+
+        let signal, desc, color, borderColor;
+
+        if (score >= 4) {
+          signal = '🚀 強烈多頭訊號 — 主升段前兆';
+          desc = '外資大幅買超配合投信積極布局，是籌碼面最強的多頭排列。如果同時出現K線突破與量能放大，是非常可靠的進場訊號。停損設在最近低點，目標至少15%漲幅。';
+          color = '#00e676'; borderColor = 'rgba(0,230,118,.25)';
+        } else if (score >= 2) {
+          signal = '🟢 偏多格局 — 可考慮布局';
+          desc = '主要法人呈現買超，市場整體氛圍正向。可開始關注籌碼面良好的個股，但需配合技術面確認後再進場，不宜追高。';
+          color = '#00e676'; borderColor = 'rgba(0,230,118,.18)';
+        } else if (score >= 0.5) {
+          signal = '🟡 中性偏多 — 觀察為主';
+          desc = '法人多空力道接近，市場可能出現盤整震盪。建議持股不追高，等待更明確的方向訊號，手上留有部分現金。';
+          color = '#ffd600'; borderColor = 'rgba(255,214,0,.2)';
+        } else if (score >= -0.5) {
+          signal = '⚪ 中性 — 保持觀望';
+          desc = '法人無明顯方向，可能正在觀望市場發展。這種格局下個股行情為主，不宜大量加碼，以保守心態應對。';
+          color = '#7a9ab8'; borderColor = 'rgba(122,154,184,.2)';
+        } else if (score >= -2) {
+          signal = '🔴 偏空格局 — 降低持倉';
+          desc = '主要法人轉向賣超，籌碼面呈現偏空排列。建議減少持股比例，手上持股注意停損紀律，現金比例可提高至 50% 以上。';
+          color = '#ff3d5a'; borderColor = 'rgba(255,61,90,.2)';
+        } else {
+          signal = '⛔ 強烈空頭訊號 — 空手或做空';
+          desc = '外資大幅賣超搭配投信同步撤退，是籌碼面最危險的雙殺格局。此時不宜逆勢抄底，應全面退出多頭部位，靜待籌碼回穩再重新評估。';
+          color = '#ff3d5a'; borderColor = 'rgba(255,61,90,.3)';
+        }
+
+        document.getElementById('simSignal').textContent = signal;
+        document.getElementById('simSignal').style.color = color;
+        descEl.textContent = desc;
+        scoreEl.style.borderColor = borderColor;
+        scoreTextEl.textContent = '綜合籌碼強度評分：' + score.toFixed(1) + ' / 5.5';
+      }
+      updateSim();
+      </script>
+
+      <div class="gold-box" style="margin-top:16px;">
+        <div class="insight-icon">💡</div>
+        <div class="insight-body">
+          <div class="insight-label">實戰提示</div>
+          <div class="insight-text">上方模擬器的評分邏輯反映的是籌碼面的強弱，但<strong>不能單獨作為買賣依據</strong>。籌碼面是「背景音樂」，技術面是「觸發點」，基本面是「地板」——三者結合才是完整的選股框架。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 14 ─ 法人買賣超數據來源與工具 ═══ -->
+  <div class="section-card reveal" id="sec14">
+    <div class="section-header">
+      <span class="section-num">SEC 14</span>
+      <span class="section-title">法人數據從哪裡看？免費到進階工具一覽</span>
+      <span class="section-icon">🛠️</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">三大法人的買賣超數據是公開資訊，但<strong>不同平台提供的深度差異極大</strong>。以下整理從免費到付費的工具梯度，根據你的需求選擇適合的工具。</p>
+
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>工具 / 平台</th>
+            <th>費用</th>
+            <th>數據深度</th>
+            <th>適合族群</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span style="color:var(--accent);font-weight:600;">台灣證交所官網</span></td>
+            <td class="val-green">免費</td>
+            <td>每日三大法人合計買賣超</td>
+            <td>入門者、查單日數據</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--accent);font-weight:600;">JellyStock</span></td>
+            <td class="val-green">免費+</td>
+            <td>個股連續買賣超、自行/避險分拆、累計統計</td>
+            <td>散戶、個股分析者</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--yellow);font-weight:600;">籌碼K線</span></td>
+            <td class="val-yellow">付費</td>
+            <td>多元籌碼面板、投信持股比例歷史、法人同時買超篩選器</td>
+            <td>積極操作者</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--yellow);font-weight:600;">CMoney / 股市爸爸</span></td>
+            <td class="val-yellow">付費</td>
+            <td>法人追蹤、量化選股、回測功能</td>
+            <td>量化投資者</td>
+          </tr>
+          <tr>
+            <td><span style="color:var(--orange);font-weight:600;">Bloomberg / Refinitiv</span></td>
+            <td class="val-red">高費用</td>
+            <td>機構級數據、外資持股明細（至機構名稱）</td>
+            <td>法人、研究員</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sec-divider">每日籌碼分析的標準流程</div>
+
+      <div class="shadow-line">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">📅 每日必看清單（5分鐘完成）</div>
+          <div class="sl-text">
+            <strong>① 大盤方向：</strong>外資今日是否買超台積電？買超金額與過去5天均值比較。<br><br>
+            <strong>② 投信黑馬：</strong>刷新「投信連續買超 ≥ 5 天」個股清單，標記新進入名單的股票。<br><br>
+            <strong>③ 自營確認：</strong>若有個股顯示自營商大量買超，查詢是否有近期認購權證大量發行。<br><br>
+            <strong>④ 雙買名單：</strong>篩選「外資 + 投信同日買超」個股，加入自選清單重點觀察。
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">⏱️</div>
+        <div class="insight-body">
+          <div class="insight-label">最佳查看時間</div>
+          <div class="insight-text">三大法人的詳細買賣超數據，通常在<strong>每個交易日收盤後約 1 小時（約下午 2:30～3:30）</strong>正式公告。設定提醒，養成每天收盤後花 5 分鐘更新籌碼筆記的習慣，1 個月後你的選股邏輯會脫胎換骨。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 15 ─ 常見錯誤與迷思破解 ═══ -->
+  <div class="section-card reveal" id="sec15">
+    <div class="section-header">
+      <span class="section-num">SEC 15</span>
+      <span class="section-title">常見迷思破解：散戶最常犯的 6 大籌碼誤判</span>
+      <span class="section-icon">🚨</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">籌碼分析是強大的工具，但若使用方式錯誤，反而會增加虧損的機率。以下是散戶最常犯的六大誤判，逐一拆解並給出正確的應對方式。</p>
+
+      <!-- Mistake cards grid -->
+      <div style="display:grid;gap:16px;margin:20px 0;">
+        
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #1</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「外資今天買超，明天一定漲」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">單日外資買超不具預測性。外資可能只是在調整部位比例，且買超金額相對整體外資資金可能微不足道。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：看<strong>連續 3 天以上</strong>的方向性買超，單日數據僅供參考。</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #2</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「自營商買超 = 看多訊號」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">這是本章最重要的觀念。自營商的「避險買超」佔整體自營買超的絕大多數，跟股票漲跌方向完全無關。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：只看自營「自行買賣帳戶」的方向，避險帳戶直接忽略。</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #3</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「投信持股比例越高越好」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">投信持股比例超過 20% 時，反而是危險訊號。此時投信已經把「牌面」亮出來，後續能買的量有限，稍有異動就可能大量換股砸盤。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：找 5%～15% 的甜蜜區，既代表投信有心布局，又有足夠的加碼空間。</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #4</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「外資賣超就是利空，趕快出場」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">外資賣超有時是技術性調節（如 MSCI 調整、年末結算），而非真正看空。若只有外資賣超但投信繼續買，個股未必會大跌。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：確認外資賣超的背景因素，若伴隨台幣大幅貶值才是真正的撤退訊號。</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #5</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「三大法人都賣，散戶就能撿便宜」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">「法人賣超→散戶接」的逆操作邏輯，在台股歷史上鮮少成功。大資金的賣壓通常遠超散戶承接能力，接了之後還有更多賣壓等著。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：跟著大資金的方向走，而不是對抗它。法人大賣時保持現金為王。</div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(255,61,90,.06),rgba(255,61,90,.02));border:1px solid rgba(255,61,90,.2);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-family:'Orbitron',monospace;font-size:.65rem;background:rgba(255,61,90,.15);color:#ff3d5a;border:1px solid rgba(255,61,90,.3);padding:3px 8px;border-radius:6px;">誤判 #6</span>
+            <span style="font-size:.88rem;color:#fff;font-weight:600;">「籌碼面買訊，立刻大量買進」</span>
+          </div>
+          <div style="font-size:.83rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px;">籌碼分析是輔助工具，不是聖杯。法人也有看錯的時候，且法人的建倉往往需要數週，過早重倉可能要等很久甚至等到虧損。</div>
+          <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#00e676;">✅ 正確做法：籌碼面確認後，等待技術面的進場觸發點，分批建倉，控制每筆倉位。</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 16 ─ 進階：法人持股比例變化追蹤 ═══ -->
+  <div class="section-card reveal" id="sec16">
+    <div class="section-header">
+      <span class="section-num">SEC 16</span>
+      <span class="section-title">進階技巧：累計持股比例變化的追蹤術</span>
+      <span class="section-icon">📐</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">單日買賣超只是「一天的動作」，真正重要的是<strong>法人累計持股比例的長期變化趨勢</strong>。一支股票的法人持股從 5% 增加到 20%，代表一個完整的機構建倉過程——這才是最值錢的訊息。</p>
+
+      <!-- 持股比例走勢示意 SVG -->
+      <div class="svg-chart-wrap">
+        <svg width="100%" viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="240" fill="#040b15" rx="14"/>
+          <text x="330" y="26" fill="rgba(0,229,255,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="2">投信持股比例 vs 股價走勢（示意）</text>
+
+          <!-- Y-axis left: 持股% -->
+          <line x1="60" y1="40" x2="60" y2="190" stroke="rgba(0,229,255,.2)" stroke-width="1"/>
+          <text x="55" y="44" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="end">20%</text>
+          <text x="55" y="90" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="end">15%</text>
+          <text x="55" y="130" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="end">10%</text>
+          <text x="55" y="167" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="end">5%</text>
+          <text x="55" y="191" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="end">0%</text>
+
+          <!-- X-axis -->
+          <line x1="60" y1="190" x2="620" y2="190" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+
+          <!-- Grid lines -->
+          <line x1="60" y1="130" x2="620" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="60" y1="90"  x2="620" y2="90"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Sweet zone highlight -->
+          <rect x="60" y="90" width="560" height="77" fill="rgba(0,230,118,.04)"/>
+          <text x="625" y="130" fill="rgba(0,230,118,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">甜蜜</text>
+          <text x="625" y="140" fill="rgba(0,230,118,.5)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">區間</text>
+
+          <!-- 投信持股% line -->
+          <polyline points="60,191 130,180 185,165 230,148 275,133 320,118 360,104 400,95 435,91 470,88 510,85 550,92 590,110 620,130"
+            fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Stock price line (normalized) -->
+          <polyline points="60,185 130,178 185,168 230,152 275,138 320,120 360,105 400,88 435,72 470,60 510,52 550,68 590,88 620,110"
+            fill="none" stroke="rgba(255,61,90,.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="none"/>
+
+          <!-- Labels -->
+          <text x="65" y="207" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace">1月</text>
+          <text x="235" y="207" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace">4月</text>
+          <text x="400" y="207" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace">7月</text>
+          <text x="565" y="207" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono, monospace">10月</text>
+
+          <!-- Phase annotations -->
+          <text x="145" y="60" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">默默建倉期</text>
+          <text x="365" y="60" fill="rgba(0,229,255,.8)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">主升段</text>
+          <text x="560" y="60" fill="rgba(255,214,0,.7)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">換股減碼</text>
+
+          <!-- Phase lines -->
+          <line x1="270" y1="45" x2="270" y2="190" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="490" y1="45" x2="490" y2="190" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,3"/>
+
+          <!-- Legend -->
+          <line x1="70" y1="222" x2="100" y2="222" stroke="rgba(0,229,255,.8)" stroke-width="2"/>
+          <text x="105" y="226" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono, monospace">投信持股%</text>
+          <line x1="215" y1="222" x2="245" y2="222" stroke="rgba(255,61,90,.7)" stroke-width="2"/>
+          <text x="250" y="226" fill="rgba(255,61,90,.7)" font-size="9" font-family="Share Tech Mono, monospace">股價走勢（示意）</text>
+        </svg>
+      </div>
+
+      <div class="shadow-line">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">📊 三個關鍵階段的意義</div>
+          <div class="sl-text">
+            <strong>默默建倉期（持股 0%→10%）：</strong>投信慢慢累積，股價可能還沒反應，是散戶最佳的低位布局窗口。<br><br>
+            <strong>主升段（持股 10%→20%）：</strong>進入甜蜜區，投信加速買進，股價同步拉升。此時進場仍有空間，但風險也逐漸增加。<br><br>
+            <strong>換股減碼期（持股 20%+後轉跌）：</strong>投信開始出貨，股價先抵抗後跟跌。看到法人持股比例從高點回落，就是離場警訊。
+          </div>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <div class="insight-icon">🏆</div>
+        <div class="insight-body">
+          <div class="insight-label">進階技巧：找「持股加速增加」的股票</div>
+          <div class="insight-text">若過去3個月，投信持股比例從 3% 增加到 10%（增速加快），且近期每日買超量逐漸放大，這代表投信從「試探性布局」轉為「積極建倉」——是最早期、最有爆發力的進場訊號之一。這種機會通常出現在財報爆發前、或產業政策利多確認前。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 17 ─ 整合測驗升級版 ═══ -->
+  <div class="section-card reveal" id="sec17">
+    <div class="section-header">
+      <span class="section-num">SEC 17</span>
+      <span class="section-title">進階測驗：情境題實戰演練</span>
+      <span class="section-icon">🎯</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">以下情境題比前面的選擇題更貼近實戰，需要綜合運用本章所有概念。</p>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">情境 A：外資連續 8 天買超台積電，但同期台幣也在升值，你應如何解讀？</div>
+        <div class="quiz-opts" id="qa1opts">
+          <div class="quiz-opt" onclick="answerQ('qa1',this,'A')"><div class="quiz-letter">A</div>台幣升值會降低外資的匯率成本，加上外資持續買超，是極度正面的雙重訊號</div>
+          <div class="quiz-opt" onclick="answerQ('qa1',this,'B')"><div class="quiz-letter">B</div>台幣升值會導致外資換匯成本增加，所以應該看空</div>
+          <div class="quiz-opt" onclick="answerQ('qa1',this,'C')"><div class="quiz-letter">C</div>台幣升值對外資不利，連續買超只是技術調整，不具參考價值</div>
+          <div class="quiz-opt" onclick="answerQ('qa1',this,'D')"><div class="quiz-letter">D</div>需要同時確認是否有 MSCI 調整因素</div>
+        </div>
+        <div class="quiz-feedback" id="qa1fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">情境 B：某中型股投信持股比例從上月的 18% 降至本月的 22%，且同期股價上漲 15%，你的操作策略是？</div>
+        <div class="quiz-opts" id="qa2opts">
+          <div class="quiz-opt" onclick="answerQ('qa2',this,'A')"><div class="quiz-letter">A</div>持股比例持續上升代表投信更看好，繼續持有甚至加碼</div>
+          <div class="quiz-opt" onclick="answerQ('qa2',this,'B')"><div class="quiz-letter">B</div>已超出甜蜜區，應開始規劃減碼時機，設好停利點</div>
+          <div class="quiz-opt" onclick="answerQ('qa2',this,'C')"><div class="quiz-letter">C</div>22% 還不算高，等超過 30% 再考慮出場</div>
+          <div class="quiz-opt" onclick="answerQ('qa2',this,'D')"><div class="quiz-letter">D</div>股價漲了就賣，不需要管法人持股比例</div>
+        </div>
+        <div class="quiz-feedback" id="qa2fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">情境 C：自營商今日大幅買超某股 3 億元，但同日該股有大量新認購權證發行，你如何解讀？</div>
+        <div class="quiz-opts" id="qa3opts">
+          <div class="quiz-opt" onclick="answerQ('qa3',this,'A')"><div class="quiz-letter">A</div>自營商大量買超是看多訊號，加上認購權證發行代表市場看好，積極追漲</div>
+          <div class="quiz-opt" onclick="answerQ('qa3',this,'B')"><div class="quiz-letter">B</div>這可能是避險買超，與股票方向無關，不應視為多頭訊號</div>
+          <div class="quiz-opt" onclick="answerQ('qa3',this,'C')"><div class="quiz-letter">C</div>認購權證多代表散戶看好，是散戶共識訊號，可以追</div>
+          <div class="quiz-opt" onclick="answerQ('qa3',this,'D')"><div class="quiz-letter">D</div>自營商只做短線，不管他</div>
+        </div>
+        <div class="quiz-feedback" id="qa3fb"></div>
+      </div>
+
+      <script>
+      const advAnswers = {
+        qa1: { correct: 'A', 
+          right: '✅ 正確！台幣升值代表外資持有台股的美元計報酬自動提升，外資在這種匯率環境下更願意持有台股。加上連續8天買超，是非常正面的訊號，台股大盤可能進入強勢多頭格局。',
+          A: '✅ 正確！台幣升值代表外資持有台股的美元計報酬自動提升，外資在這種匯率環境下更願意持有台股。加上連續8天買超，是非常正面的訊號，台股大盤可能進入強勢多頭格局。',
+          B: '❌ 錯誤。台幣升值對外資是有利的，因為他們持有台股的美元換算價值上升，等於匯率為他們「加錢」。',
+          C: '❌ 錯誤。台幣升值對外資是正面的，並不會削弱他們的買超意義。',
+          D: '部分正確，確認 MSCI 是否有調整是好習慣，但在台幣升值且持續買超的背景下，基本上可以判斷為正面訊號。'
+        },
+        qa2: { correct: 'B',
+          right: '✅ 正確！22% 已超出 5%~15% 的甜蜜區進入「警戒帶」。投信繼續加碼的空間縮小，且在較高持股比例下，任何負面消息都可能引發集中出貨，風險急劇上升。應設好停利點準備有序退場。',
+          A: '❌ 錯誤！持股超過 15% 時，風險在快速上升，不是繼續加碼的時機。',
+          B: '✅ 正確！22% 已超出 5%~15% 的甜蜜區進入「警戒帶」。投信繼續加碼的空間縮小，且在較高持股比例下，任何負面消息都可能引發集中出貨，風險急劇上升。應設好停利點準備有序退場。',
+          C: '❌ 錯誤！等到 30% 才出場，幾乎注定會成為最後一棒。',
+          D: '部分正確但不完整，價格訊號固然重要，但忽視籌碼結構會錯失更重要的風險訊號。'
+        },
+        qa3: { correct: 'B',
+          right: '✅ 完全正確！自營商發行認購權證後，為了對沖風險會機械性地買入現股——這就是「避險買超」，跟他們對股票的方向判斷毫無關係。甚至股票大漲時，自營商反而要在現貨市場賣股（因為要履約支付散戶獲利）。',
+          A: '❌ 大錯特錯！這就是本章最核心的觀念。自營商認購權證大量發行後的買超，是避險操作，不是看多訊號。',
+          B: '✅ 完全正確！自營商發行認購權證後，為了對沖風險會機械性地買入現股——這就是「避險買超」，跟他們對股票的方向判斷毫無關係。甚至股票大漲時，自營商反而要在現貨市場賣股（因為要履約支付散戶獲利）。',
+          C: '❌ 錯誤！認購權證熱門代表散戶看多在買認購，但自營商卻可能是相反方向在對沖。',
+          D: '❌ 自行買賣帳戶的自營商動向是值得參考的，只是本例中是避險帳戶的操作。'
+        }
+      };
+
+      function answerQ(qid, el, choice) {
+        const data = advAnswers[qid];
+        if (!data) return;
+        const opts = document.getElementById(qid + 'opts');
+        if (opts.dataset.answered) return;
+        opts.dataset.answered = '1';
+        Array.from(opts.children).forEach(o => o.style.pointerEvents = 'none');
+        const fb = document.getElementById(qid + 'fb');
+        const isCorrect = (choice === data.correct);
+        el.style.background = isCorrect ? 'rgba(0,230,118,.15)' : 'rgba(255,61,90,.12)';
+        el.style.borderColor = isCorrect ? 'rgba(0,230,118,.4)' : 'rgba(255,61,90,.35)';
+        fb.style.display = 'block';
+        fb.style.color = isCorrect ? 'var(--green)' : 'var(--text-dim)';
+        fb.textContent = data[choice] || data.right;
+      }
+      </script>
+    </div>
+  </div>
+
     <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
   <div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
@@ -2942,8 +3845,8 @@
       <div class="footer-left">
         <div class="footer-complete-badge">✅</div>
         <div class="footer-complete-text">
-          <div class="footer-complete-title">第2章完成</div>
-          <div class="footer-complete-desc">你已掌握外資、投信、自營商的本質差異與操作邏輯</div>
+          <div class="footer-complete-title">第2章完成（完整版）</div>
+          <div class="footer-complete-desc">你已掌握三大法人深度解析、季末作帳SOP、避險迷思破解、法人持股比例追蹤術與互動模擬訓練</div>
           <div class="footer-next-hint">下一章：外資長線布局的追蹤方法</div>
         </div>
       </div>
@@ -2951,11 +3854,11 @@
         <a class="fn-btn home" href="/">
           🏠 回首頁
         </a>
-        <a class="fn-btn prev" href="/stock_site/features/chips_chapter1.html">
+        <a class="fn-btn prev" href="/stock_site/chips/chips_chapter1.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           第1章
         </a>
-        <a class="fn-btn next" href="/stock_site/features/chips_chapter3.html">
+        <a class="fn-btn next" href="/stock_site/chips/chips_chapter3.html">
           第3章
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
@@ -3127,6 +4030,12 @@ window.answerQ = function(qid, el, choice) {
     if (/rgba?\(255,\s*152,\s*0/.test(low) || low === '#ff9800') return '#a05000';
     if (/rgba?\(0,\s*184,\s*212/.test(low) || low === '#00b8d4') return '#0d6ea8';
     if (/rgba?\(255,\s*255,\s*255/.test(low) || low === '#fff' || low === 'white') return '#1a3550';
+    // 淡藍灰說明文字 rgba(212,228,247,...) → 深藍可讀
+    if (/rgba?\(212,\s*228,\s*247/.test(low)) return '#1a3550';
+    // 中灰藍 rgba(122,154,184,...) → 深灰藍
+    if (/rgba?\(122,\s*154,\s*184/.test(low)) return '#2a4a68';
+    // 底部說明極淡色 rgba(74,104,136,...) → 可讀深灰藍
+    if (/rgba?\(74,\s*104,\s*136/.test(low)) return '#3a5a78';
     return null;
   }
   function mapNeonStroke(c) {
