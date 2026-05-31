@@ -2031,6 +2031,38 @@
       border-color: rgba(26,101,168,.18) !important;
     }
 
+    /* ── 重壓股篩選漏斗 Day Theme 深色覆蓋 ── */
+    /* SVG 背景 */
+    body.theme-day #funnel-wrap { background: rgba(220,238,252,.5) !important; }
+    body.theme-day #funnel-svg { background: rgba(220,238,252,.5) !important; }
+
+    /* 標題文字 */
+    body.theme-day #funnel-svg .fn-title { fill: #0a2d5a !important; }
+
+    /* Level 1: 灰藍 polygon → 深藍色調 */
+    body.theme-day #funnel-svg .fn-p1 { fill: rgba(26,101,168,.15) !important; stroke: rgba(26,101,168,.45) !important; }
+    body.theme-day #funnel-svg .fn-l1 { fill: #1a3550 !important; }
+    body.theme-day #funnel-svg .fn-h1 { fill: #1265a8 !important; }
+
+    /* Level 2: 青色 polygon → 深青藍 */
+    body.theme-day #funnel-svg .fn-p2 { fill: rgba(0,130,180,.18) !important; stroke: rgba(0,120,170,.6) !important; }
+    body.theme-day #funnel-svg .fn-l2 { fill: #0066aa !important; }
+    body.theme-day #funnel-svg .fn-h2 { fill: #1a7a40 !important; }
+
+    /* Level 3: 綠色 polygon → 深綠 */
+    body.theme-day #funnel-svg .fn-p3 { fill: rgba(0,140,80,.16) !important; stroke: rgba(0,130,70,.55) !important; }
+    body.theme-day #funnel-svg .fn-l3 { fill: #0a6030 !important; }
+    body.theme-day #funnel-svg .fn-h3 { fill: #8a6000 !important; }
+
+    /* Level 4: 黃色 polygon → 深橙黃 */
+    body.theme-day #funnel-svg .fn-p4 { fill: rgba(180,130,0,.16) !important; stroke: rgba(180,130,0,.5) !important; }
+    body.theme-day #funnel-svg .fn-l4 { fill: #7a5500 !important; }
+    body.theme-day #funnel-svg .fn-h4 { fill: #a06000 !important; }
+
+    /* Level 5: 橙色 polygon → 深橙 */
+    body.theme-day #funnel-svg .fn-p5 { fill: rgba(200,90,0,.22) !important; stroke: rgba(200,90,0,.65) !important; }
+    body.theme-day #funnel-svg .fn-l5 { fill: #b05000 !important; }
+
     /* ── Concentration Visual (籌碼集中度) ── */
     body.theme-day .conc-visual {
       background: rgba(255,255,255,.82) !important;
@@ -2448,30 +2480,22 @@
   <div class="hero">
     <div class="hero-icon">
       <svg width="80" height="86" viewBox="0 0 80 86" xmlns="http://www.w3.org/2000/svg">
-        <!-- Calendar base -->
         <rect x="6" y="14" width="68" height="64" rx="8" fill="none" stroke="rgba(0,229,255,.35)" stroke-width="1.5"/>
         <rect x="6" y="14" width="68" height="20" rx="8" fill="rgba(0,229,255,.12)"/>
-        <!-- Calendar header fills -->
         <rect x="6" y="26" width="68" height="8" fill="rgba(0,229,255,.08)"/>
-        <!-- Ring posts -->
         <rect x="22" y="8" width="5" height="16" rx="2.5" fill="rgba(0,229,255,.6)"/>
         <rect x="53" y="8" width="5" height="16" rx="2.5" fill="rgba(0,229,255,.6)"/>
-        <!-- Month label -->
         <text x="40" y="30" fill="#ff9800" font-size="7" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700" opacity=".9">QUARTER END</text>
-        <!-- Grid dates -->
         <rect x="12" y="42" width="10" height="9" rx="2" fill="rgba(0,230,118,.15)" stroke="rgba(0,230,118,.3)" stroke-width=".8"/>
         <rect x="26" y="42" width="10" height="9" rx="2" fill="rgba(0,230,118,.15)" stroke="rgba(0,230,118,.3)" stroke-width=".8"/>
         <rect x="40" y="42" width="10" height="9" rx="2" fill="rgba(0,229,255,.18)" stroke="rgba(0,229,255,.4)" stroke-width=".8"/>
         <rect x="54" y="42" width="10" height="9" rx="2" fill="rgba(0,229,255,.2)" stroke="rgba(0,229,255,.5)" stroke-width="1"/>
         <rect x="12" y="55" width="10" height="9" rx="2" fill="rgba(0,229,255,.28)" stroke="rgba(0,229,255,.55)" stroke-width="1"/>
         <rect x="26" y="55" width="10" height="9" rx="2" fill="rgba(255,214,0,.2)" stroke="rgba(255,214,0,.5)" stroke-width="1"/>
-        <!-- Last 2 days glow -->
         <rect x="40" y="55" width="10" height="9" rx="2" fill="rgba(255,61,90,.15)" stroke="rgba(255,61,90,.4)" stroke-width=".8"/>
         <rect x="54" y="55" width="10" height="9" rx="2" fill="rgba(255,61,90,.15)" stroke="rgba(255,61,90,.4)" stroke-width=".8"/>
-        <!-- Bottom row -->
         <rect x="12" y="68" width="10" height="9" rx="2" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.25)" stroke-width=".8"/>
         <rect x="26" y="68" width="10" height="9" rx="2" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.2)" stroke-width=".8"/>
-        <!-- Glowing pulse on peak day -->
         <circle cx="59" cy="59" r="3" fill="#ff9800" opacity=".9">
           <animate attributeName="opacity" values=".3;1;.3" dur="1.6s" repeatCount="indefinite"/>
           <animate attributeName="r" values="2;4;2" dur="1.6s" repeatCount="indefinite"/>
@@ -2481,7 +2505,7 @@
     <div class="hero-content">
       <div class="hero-label">CHAPTER 04 · 籌碼進階篇</div>
       <div class="hero-title">投信季底<br/>作帳實戰規律</div>
-      <div class="hero-desc">每到季末，台灣投信基金經理人面臨績效報告壓力，他們會集中火力拉抬重押持股——這就是「作帳行情」。本章帶你掌握時間規律、篩選標的，學會在法人作帳前佈局、在作帳後安全出場的完整策略。</div>
+      <div class="hero-desc">每到季末，台灣投信基金經理人面臨績效報告壓力，他們會集中火力拉抬重押持股——這就是「作帳行情」。本章帶你掌握時間規律、篩選標的、多空分層布局，學會在法人作帳前卡位、在作帳後安全出場的完整策略。</div>
       <div class="hero-tags">
         <span class="tag tag-orange">季底作帳</span>
         <span class="tag tag-yellow">投信重壓股</span>
@@ -2493,8 +2517,7 @@
     </div>
   </div>
 
-  <!-- SECTION 1: 什麼是作帳行情 -->
-    <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
+  <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
   <div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
@@ -2506,6 +2529,10 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
   <hr class="ad-divider">
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1: 什麼是作帳行情？深度剖析
+       ═══════════════════════════════════════════ -->
 <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—01</div>
@@ -2566,7 +2593,7 @@
     </div>
   </div>
 
-  <!-- SECTION 2: 四季時間規律 -->
+  <!-- SECTION 2: 四季作帳時間表 -->
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—02</div>
@@ -2574,15 +2601,15 @@
       <div class="section-icon">🗓️</div>
     </div>
     <div class="section-body">
-      <p class="prose">每年有四個季底，但<em>作帳行情的強度並不相同</em>。理解各季底的差異，能幫助你判斷何時應積極參與，何時只需觀望。</p>
+      <p class="prose">每年有四個季底，但<em>作帳行情的強度並不相同</em>。理解各季底的差異，能幫助你判斷何時應積極參與，何時只需觀望。Q3通常是全年最值得操作的時間點，Q4雖壓力最大卻因外資縮手而效果打折。</p>
 
       <div class="season-grid">
         <div class="season-card q1">
           <div class="season-badge">Q1 · 第一季底</div>
-          <div class="season-month">📅 3月最後2週</div>
-          <div class="season-desc">全年第一次作帳，基金年初剛建倉，不少持股還在虧損，但仍須讓年報看起來不太差。作帳動力中等，受農曆年後行情影響大。</div>
+          <div class="season-month">📅 3月最後2週（約3/15～3/31）</div>
+          <div class="season-desc">全年第一次作帳，基金年初剛完成新一輪建倉，許多持股可能仍在成本附近。農曆春節後效應仍在，市場流動性逐漸回升。作帳動力中等，對個股推升效果因基金持股分散而較弱。</div>
           <div class="season-intensity">
-            <span class="intensity-label">強度</span>
+            <span class="intensity-label">作帳強度</span>
             <div class="intensity-dots">
               <div class="idot on-1"></div><div class="idot on-1"></div><div class="idot on-1"></div><div class="idot"></div><div class="idot"></div>
             </div>
@@ -2590,21 +2617,21 @@
         </div>
         <div class="season-card q2">
           <div class="season-badge">Q2 · 第二季底</div>
-          <div class="season-month">📅 6月最後2週</div>
-          <div class="season-desc">上半年結算，投信通常已持有標的2個月以上，有相當成本。半年報告前，基金間競爭加劇，這是全年作帳力道較強的季底之一。</div>
+          <div class="season-month">📅 6月最後2週（約6/15～6/30）</div>
+          <div class="season-desc">上半年「期中考」，投信已持有標的約2～5個月，持股成本相對明確。半年報告前競爭加劇，績效落後的基金會積極拉抬重押股。特別適合追蹤投信前5大持股，是四季中力道第二強的時間點。</div>
           <div class="season-intensity">
-            <span class="intensity-label">強度</span>
+            <span class="intensity-label">作帳強度</span>
             <div class="intensity-dots">
               <div class="idot on-2"></div><div class="idot on-2"></div><div class="idot on-2"></div><div class="idot on-2"></div><div class="idot"></div>
             </div>
           </div>
         </div>
         <div class="season-card q3">
-          <div class="season-badge">Q3 · 第三季底</div>
-          <div class="season-month">📅 9月最後2週</div>
-          <div class="season-desc">台灣電子股旺季，科技基金通常表現最積極。此時外資也可能同向買進半導體，容易形成共振。是四季中<strong>最常出現明顯作帳行情</strong>的時間點。</div>
+          <div class="season-badge">Q3 · 第三季底 ⭐ 最強</div>
+          <div class="season-month">📅 9月最後2週（約9/12～9/30）</div>
+          <div class="season-desc">台灣電子股旺季 + 法人作帳的完美共振期。科技基金在此時重壓半導體、AI概念股，外資也可能在旺季同向買進。<strong>統計上這是全年最常出現明顯作帳行情的時間點，也是散戶最值得參與的季節。</strong></div>
           <div class="season-intensity">
-            <span class="intensity-label">強度</span>
+            <span class="intensity-label">作帳強度</span>
             <div class="intensity-dots">
               <div class="idot on-3"></div><div class="idot on-3"></div><div class="idot on-3"></div><div class="idot on-3"></div><div class="idot on-3"></div>
             </div>
@@ -2612,10 +2639,10 @@
         </div>
         <div class="season-card q4">
           <div class="season-badge">Q4 · 第四季底</div>
-          <div class="season-month">📅 12月最後2週</div>
-          <div class="season-desc">全年最終交帳，績效壓力最大。但同時間外資開始「假期前縮手」，市場成交量萎縮，投信有時孤軍奮戰，推升效果因量縮而打折。</div>
+          <div class="season-month">📅 12月最後2週（約12/15～12/31）</div>
+          <div class="season-desc">全年最終交帳，績效壓力最大，但同時外資進入「假期前縮手」模式，市場成交量萎縮。投信有時須孤軍拉抬，效果因量縮打折。對持股比例最高的個股仍有明顯拉抬，值得選擇性參與。</div>
           <div class="season-intensity">
-            <span class="intensity-label">強度</span>
+            <span class="intensity-label">作帳強度</span>
             <div class="intensity-dots">
               <div class="idot on-4"></div><div class="idot on-4"></div><div class="idot on-4"></div><div class="idot on-4"></div><div class="idot"></div>
             </div>
@@ -2623,11 +2650,85 @@
         </div>
       </div>
 
-      <div class="sec-divider">以 Q3 為例 — 月底作帳節奏拆解</div>
+      <div class="sec-divider">作帳週期強度圖（以Q3為例）</div>
+      <div class="svg-chart-wrap">
+        <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.2);">
+          <defs>
+            <linearGradient id="phaseA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7a9ab8" stop-opacity=".5"/><stop offset="100%" stop-color="#7a9ab8" stop-opacity=".1"/></linearGradient>
+            <linearGradient id="phaseB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00e676" stop-opacity=".7"/><stop offset="100%" stop-color="#00e676" stop-opacity=".2"/></linearGradient>
+            <linearGradient id="phaseC" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00e5ff" stop-opacity=".8"/><stop offset="100%" stop-color="#00e5ff" stop-opacity=".2"/></linearGradient>
+            <linearGradient id="phaseD" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd600" stop-opacity="1"/><stop offset="100%" stop-color="#ff9800" stop-opacity=".4"/></linearGradient>
+            <linearGradient id="phaseE" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff3d5a" stop-opacity=".7"/><stop offset="100%" stop-color="#ff3d5a" stop-opacity=".15"/></linearGradient>
+          </defs>
+          <line x1="55" y1="25" x2="55" y2="200" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <line x1="55" y1="200" x2="695" y2="200" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <line x1="55" y1="165" x2="695" y2="165" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="55" y1="130" x2="695" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="55" y1="95" x2="695" y2="95" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="48" y="204" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">低</text>
+          <text x="48" y="134" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">中</text>
+          <text x="48" y="84" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">高</text>
+          <!-- Phase zones -->
+          <rect x="55" y="25" width="120" height="175" fill="rgba(122,154,184,.03)"/>
+          <rect x="175" y="25" width="130" height="175" fill="rgba(0,230,118,.04)"/>
+          <rect x="305" y="25" width="140" height="175" fill="rgba(0,229,255,.04)"/>
+          <rect x="445" y="25" width="130" height="175" fill="rgba(255,152,0,.05)"/>
+          <rect x="575" y="25" width="120" height="175" fill="rgba(255,61,90,.03)"/>
+          <!-- Labels -->
+          <text x="115" y="18" fill="rgba(122,154,184,.6)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">季底前30天</text>
+          <text x="240" y="18" fill="rgba(0,230,118,.7)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">觀察期 D-15</text>
+          <text x="375" y="18" fill="rgba(0,229,255,.8)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">佈局期 D-7</text>
+          <text x="510" y="18" fill="rgba(255,214,0,.9)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">高峰 D0</text>
+          <text x="635" y="18" fill="rgba(255,61,90,.8)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">季後退場</text>
+          <!-- Dividers -->
+          <line x1="175" y1="25" x2="175" y2="200" stroke="rgba(0,230,118,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="305" y1="25" x2="305" y2="200" stroke="rgba(0,229,255,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="445" y1="25" x2="445" y2="200" stroke="rgba(255,214,0,.25)" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="575" y1="25" x2="575" y2="200" stroke="rgba(255,61,90,.25)" stroke-width="1" stroke-dasharray="3,3"/>
+          <!-- Bars D-30 to D-16 -->
+          <rect x="60" y="190" width="15" height="10" rx="3" fill="url(#phaseA)"/>
+          <rect x="78" y="186" width="15" height="14" rx="3" fill="url(#phaseA)"/>
+          <rect x="96" y="188" width="15" height="12" rx="3" fill="url(#phaseA)"/>
+          <rect x="114" y="184" width="15" height="16" rx="3" fill="url(#phaseA)"/>
+          <rect x="132" y="190" width="15" height="10" rx="3" fill="url(#phaseA)"/>
+          <rect x="150" y="186" width="15" height="14" rx="3" fill="url(#phaseA)"/>
+          <!-- D-15 to D-8 -->
+          <rect x="178" y="178" width="16" height="22" rx="3" fill="url(#phaseB)"/>
+          <rect x="198" y="170" width="16" height="30" rx="3" fill="url(#phaseB)"/>
+          <rect x="218" y="162" width="16" height="38" rx="3" fill="url(#phaseB)"/>
+          <rect x="238" y="155" width="16" height="45" rx="3" fill="url(#phaseB)"/>
+          <rect x="258" y="147" width="16" height="53" rx="3" fill="url(#phaseB)"/>
+          <rect x="278" y="140" width="16" height="60" rx="3" fill="url(#phaseB)"/>
+          <!-- D-7 to D-2 -->
+          <rect x="308" y="128" width="17" height="72" rx="3" fill="url(#phaseC)"/>
+          <rect x="329" y="115" width="17" height="85" rx="3" fill="url(#phaseC)"/>
+          <rect x="350" y="103" width="17" height="97" rx="3" fill="url(#phaseC)"/>
+          <rect x="371" y="92" width="17" height="108" rx="3" fill="url(#phaseC)"/>
+          <rect x="392" y="82" width="17" height="118" rx="3" fill="url(#phaseC)"/>
+          <rect x="413" y="74" width="17" height="126" rx="3" fill="url(#phaseC)"/>
+          <!-- D-1 D0 PEAK -->
+          <rect x="448" y="42" width="20" height="158" rx="3" fill="url(#phaseD)"/>
+          <rect x="472" y="35" width="20" height="165" rx="3" fill="url(#phaseD)"/>
+          <rect x="472" y="35" width="20" height="165" rx="3" fill="none" stroke="rgba(255,214,0,.6)" stroke-width="1.5"/>
+          <text x="482" y="28" fill="#ffd600" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">最高峰</text>
+          <!-- D+1 to D+5 sharp drop -->
+          <rect x="578" y="150" width="17" height="50" rx="3" fill="url(#phaseE)"/>
+          <rect x="599" y="170" width="17" height="30" rx="3" fill="url(#phaseE)"/>
+          <rect x="620" y="182" width="17" height="18" rx="3" fill="url(#phaseE)"/>
+          <rect x="641" y="188" width="17" height="12" rx="3" fill="url(#phaseE)"/>
+          <rect x="662" y="192" width="17" height="8" rx="3" fill="url(#phaseE)"/>
+          <!-- X labels -->
+          <text x="115" y="218" fill="rgba(255,255,255,.3)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-30 ~ D-16</text>
+          <text x="240" y="218" fill="rgba(0,230,118,.6)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-15 ~ D-8</text>
+          <text x="375" y="218" fill="rgba(0,229,255,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-7 ~ D-2</text>
+          <text x="482" y="218" fill="rgba(255,214,0,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-1 / D0</text>
+          <text x="630" y="218" fill="rgba(255,61,90,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D+1 ~ D+5</text>
+          <text x="375" y="258" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">投信作帳週期強度示意圖（橫軸為距季底天數）</text>
+        </svg>
+      </div>
 
-      <p class="prose" style="margin-bottom:14px;">以下以 9 月份為例，展示投信在月底前如何逐步加速作帳。掌握節奏，你就能在高點前佈局，在頂點附近出場。</p>
-
-      <!-- Calendar simulation -->
+      <div class="sec-divider">以 Q3（9月）為例 — 日曆節奏拆解</div>
+      <p class="prose" style="margin-bottom:14px;">以下以 9 月份為例，展示投信在月底前如何逐步加速作帳。掌握節奏，在高點前佈局，在頂點附近出場。</p>
       <div class="cal-grid">
         <div class="cal-cell neutral"><div class="day">一</div><div class="date">1</div></div>
         <div class="cal-cell neutral"><div class="day">二</div><div class="date">2</div></div>
@@ -2636,7 +2737,6 @@
         <div class="cal-cell neutral"><div class="day">五</div><div class="date">5</div></div>
         <div class="cal-cell neutral"><div class="day">六</div><div class="date">6</div></div>
         <div class="cal-cell neutral"><div class="day">日</div><div class="date">7</div></div>
-
         <div class="cal-cell neutral"><div class="day">一</div><div class="date">8</div></div>
         <div class="cal-cell neutral"><div class="day">二</div><div class="date">9</div></div>
         <div class="cal-cell neutral"><div class="day">三</div><div class="date">10</div></div>
@@ -2644,42 +2744,33 @@
         <div class="cal-cell neutral"><div class="day">五</div><div class="date">12</div></div>
         <div class="cal-cell neutral"><div class="day">六</div><div class="date">13</div></div>
         <div class="cal-cell neutral"><div class="day">日</div><div class="date">14</div></div>
-
-        <div class="cal-cell active-buy"><div class="day">一</div><div class="date">15</div><span class="badge badge-buy">開始佈局</span></div>
+        <div class="cal-cell active-buy"><div class="day">一</div><div class="date">15</div><span class="badge badge-buy">開始觀察</span></div>
         <div class="cal-cell active-buy"><div class="day">二</div><div class="date">16</div></div>
         <div class="cal-cell active-buy"><div class="day">三</div><div class="date">17</div></div>
         <div class="cal-cell active-buy"><div class="day">四</div><div class="date">18</div></div>
-        <div class="cal-cell active-buy"><div class="day">五</div><div class="date">19</div></div>
+        <div class="cal-cell active-buy"><div class="day">五</div><div class="date">19</div><span class="badge badge-buy">試單時機</span></div>
         <div class="cal-cell neutral"><div class="day">六</div><div class="date">20</div></div>
         <div class="cal-cell neutral"><div class="day">日</div><div class="date">21</div></div>
-
-        <div class="cal-cell peak-buy"><div class="day">一</div><div class="date">22</div><span class="badge badge-hot">加速買</span></div>
+        <div class="cal-cell peak-buy"><div class="day">一</div><div class="date">22</div><span class="badge badge-hot">加碼佈局</span></div>
         <div class="cal-cell peak-buy"><div class="day">二</div><div class="date">23</div></div>
         <div class="cal-cell peak-buy"><div class="day">三</div><div class="date">24</div></div>
-        <div class="cal-cell peak-buy"><div class="day">四</div><div class="date">25</div><span class="badge badge-hot">高峰期</span></div>
-        <div class="cal-cell peak-buy"><div class="day">五</div><div class="date">26</div></div>
+        <div class="cal-cell peak-buy"><div class="day">四</div><div class="date">25</div></div>
+        <div class="cal-cell peak-buy"><div class="day">五</div><div class="date">26</div><span class="badge badge-hot">高峰啟動</span></div>
         <div class="cal-cell neutral"><div class="day">六</div><div class="date">27</div></div>
         <div class="cal-cell neutral"><div class="day">日</div><div class="date">28</div></div>
-
-        <div class="cal-cell danger"><div class="day">一</div><div class="date">29</div><span class="badge badge-end">季底前2</span></div>
-        <div class="cal-cell danger"><div class="day">二</div><div class="date">30</div><span class="badge badge-sell">⚠ 出場</span></div>
-        <div class="cal-cell neutral" style="opacity:.3"><div class="day">三</div><div class="date">—</div></div>
-        <div class="cal-cell neutral" style="opacity:.3"><div class="day">四</div><div class="date">—</div></div>
-        <div class="cal-cell neutral" style="opacity:.3"><div class="day">五</div><div class="date">—</div></div>
-        <div class="cal-cell neutral" style="opacity:.3"><div class="day">六</div><div class="date">—</div></div>
-        <div class="cal-cell neutral" style="opacity:.3"><div class="day">日</div><div class="date">—</div></div>
+        <div class="cal-cell danger"><div class="day">一</div><div class="date">29</div><span class="badge badge-sell">開始減倉</span></div>
+        <div class="cal-cell danger"><div class="day">二</div><div class="date">30</div><span class="badge badge-end">季底！清倉</span></div>
+        <div class="cal-cell neutral" style="opacity:.4"><div class="day">三</div><div class="date">—</div></div>
+        <div class="cal-cell neutral" style="opacity:.4"><div class="day">四</div><div class="date">—</div></div>
+        <div class="cal-cell neutral" style="opacity:.4"><div class="day">五</div><div class="date">—</div></div>
+        <div class="cal-cell neutral" style="opacity:.4"><div class="day">六</div><div class="date">—</div></div>
+        <div class="cal-cell neutral" style="opacity:.4"><div class="day">日</div><div class="date">—</div></div>
       </div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
-        <span style="display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--green);">■ 布局期（月中）</span>
-        <span style="display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--orange);">■ 加速買進期</span>
-        <span style="display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--red);">■ 出場警示（最後2日）</span>
-      </div>
-
       <div class="gold-box">
-        <div class="insight-icon">⏰</div>
+        <div class="insight-icon">🏆</div>
         <div class="insight-body">
-          <div class="insight-label">黃金窗口</div>
-          <div class="insight-text">統計上，<strong>季底前第10～5個交易日</strong>是作帳行情啟動最集中的時段。此時投信已確定季底標的，會開始連續買進。過了季底最後1天，買盤通常消失，股價容易在之後2～5個交易日出現回落。</div>
+          <div class="insight-label">黃金操作窗口</div>
+          <div class="insight-text">最佳進場時機是<strong>季底前 10～15 個交易日</strong>（約9月15日前後），此時投信剛啟動佈局、個股剛開始連買，股價尚未大幅拉升，性價比最高。季底前2～3天是減倉視窗，切勿拖延。</div>
         </div>
       </div>
     </div>
@@ -2689,373 +2780,433 @@
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—03</div>
-      <div class="section-title">如何找投信重壓股？篩選三步驟</div>
+      <div class="section-title">如何找到投信重壓股？完整篩選條件</div>
       <div class="section-icon">🔍</div>
     </div>
     <div class="section-body">
-      <p class="prose">找出投信可能在季底拉抬的標的，是整個策略的核心。投信的選股偏好和散戶差異很大——他們傾向持有<em>流動性高、基本面穩定</em>的個股，而非投機小型股。</p>
+      <p class="prose">不是所有投信持股都適合做作帳操作。以下條件能讓你在百檔標的中快速過濾出真正值得關注的重壓股，減少雜訊干擾。</p>
 
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="tl-dot or"></div>
-          <div class="tl-head or">STEP 1 · 查詢投信持股明細</div>
-          <div class="tl-body">
-            前往台灣集中保管結算所（TDCC）的公開資訊觀測站，或使用 JellyStock 的投信買超排行，直接看<strong>近期投信持續買超的個股名單</strong>。重點不在單日買超大，而在「連續買超天數」超過 5 天以上。
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot gn"></div>
-          <div class="tl-head gn">STEP 2 · 確認「重壓度」</div>
-          <div class="tl-body">
-            查看集保中心「持股分級」資料，確認投信法人在該股的持股比例。持股比例越高，季底拉抬動機越強——因為哪怕只漲 2%，對基金淨值的正面貢獻都相當顯著。理想目標：<strong>投信持股佔股本 3% 以上</strong>，且近1個月持續增加。
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot rd"></div>
-          <div class="tl-head rd">STEP 3 · 確認「股性」適合作帳</div>
-          <div class="tl-body">
-            並非所有重押股都適合。投信偏好：成交量每日在 3,000 張以上（易推不易卡）、股價在 50～500 元區間（過低被視為問題股）、近期基本面沒有明顯利空。<strong>排除近期有大量散戶融資的標的</strong>，融資高代表散戶已過早埋伏，軋空空間小。
-          </div>
-        </div>
+      <div class="svg-chart-wrap" id="funnel-wrap">
+        <svg id="funnel-svg" viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <defs>
+            <linearGradient id="fn1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7a9ab8" stop-opacity=".35"/><stop offset="100%" stop-color="#7a9ab8" stop-opacity=".12"/></linearGradient>
+            <linearGradient id="fn2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00e5ff" stop-opacity=".22"/><stop offset="100%" stop-color="#00a8cc" stop-opacity=".08"/></linearGradient>
+            <linearGradient id="fn3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00e676" stop-opacity=".22"/><stop offset="100%" stop-color="#00b050" stop-opacity=".08"/></linearGradient>
+            <linearGradient id="fn4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd600" stop-opacity=".22"/><stop offset="100%" stop-color="#ff9800" stop-opacity=".08"/></linearGradient>
+            <linearGradient id="fn5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff9800" stop-opacity=".35"/><stop offset="100%" stop-color="#ff6000" stop-opacity=".15"/></linearGradient>
+          </defs>
+          <!-- Title -->
+          <text class="fn-title" x="350" y="22" fill="rgba(255,255,255,.7)" font-size="12" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="2" font-weight="700">重壓股篩選漏斗</text>
+          <!-- Level 1 -->
+          <polygon class="fn-poly fn-p1" points="70,32 630,32 565,82 135,82" fill="url(#fn1)" stroke="rgba(150,180,210,.55)" stroke-width="1.5"/>
+          <text class="fn-label fn-l1" x="350" y="62" fill="rgba(210,228,245,.9)" font-size="10.5" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="600">全市場個股（約 1,700+ 支）</text>
+          <text class="fn-hint fn-h1" x="572" y="90" fill="rgba(0,229,255,.75)" font-size="8.5" font-family="Share Tech Mono, monospace">篩：投信買超 ≥ 3天</text>
+          <!-- Level 2 -->
+          <polygon class="fn-poly fn-p2" points="135,95 565,95 505,143 195,143" fill="url(#fn2)" stroke="rgba(0,229,255,.5)" stroke-width="1.5"/>
+          <text class="fn-label fn-l2" x="350" y="124" fill="#00e5ff" font-size="10.5" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">投信持續買超名單（約 80～120 支）</text>
+          <text class="fn-hint fn-h2" x="518" y="152" fill="rgba(0,230,118,.8)" font-size="8.5" font-family="Share Tech Mono, monospace" font-weight="600">篩：持股≥3% + 量≥3000張</text>
+          <!-- Level 3 -->
+          <polygon class="fn-poly fn-p3" points="195,158 505,158 465,206 235,206" fill="url(#fn3)" stroke="rgba(0,230,118,.5)" stroke-width="1.5"/>
+          <text class="fn-label fn-l3" x="350" y="187" fill="#00e676" font-size="10.5" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">有效重壓標的（約 20～40 支）</text>
+          <text class="fn-hint fn-h3" x="477" y="214" fill="rgba(255,214,0,.85)" font-size="8.5" font-family="Share Tech Mono, monospace" font-weight="600">篩：融資低 + 外資中立</text>
+          <!-- Level 4 -->
+          <polygon class="fn-poly fn-p4" points="235,220 465,220 435,268 265,268" fill="url(#fn4)" stroke="rgba(255,214,0,.55)" stroke-width="1.5"/>
+          <text class="fn-label fn-l4" x="350" y="249" fill="#ffd600" font-size="10.5" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">優選作帳操作標的（約 5～15 支）</text>
+          <text class="fn-hint fn-h4" x="448" y="277" fill="rgba(255,152,0,.85)" font-size="8.5" font-family="Share Tech Mono, monospace" font-weight="600">最終確認：技術面突破</text>
+          <!-- Final -->
+          <polygon class="fn-poly fn-p5" points="265,282 435,282 420,322 280,322" fill="url(#fn5)" stroke="rgba(255,152,0,.7)" stroke-width="2"/>
+          <text class="fn-label fn-l5" x="350" y="308" fill="#ff9800" font-size="12" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">★  佈局候選（3～8 支）</text>
+        </svg>
       </div>
 
-      <div class="sec-divider">重壓股的類型分析</div>
+      <div class="sec-divider">六大篩選條件詳解</div>
 
-      <div class="stock-grid">
-        <div class="stock-card">
-          <div class="stock-icon">💻</div>
-          <div class="stock-name">科技型</div>
-          <div class="stock-desc">半導體、AI 概念、電子零組件。這類股佔台灣科技基金前10大持股最多，Q3 旺季效應疊加，作帳動力最強。</div>
-          <span class="stock-label chip-orange">高頻首選</span>
-        </div>
-        <div class="stock-card">
-          <div class="stock-icon">🏭</div>
-          <div class="stock-name">傳產龍頭</div>
-          <div class="stock-desc">鋼鐵、石化、塑化等傳產績優股。平衡型基金必備，季底偶有拉抬，但幅度通常較小，波動也較低。</div>
-          <span class="stock-label chip-yellow">穩健參考</span>
-        </div>
-        <div class="stock-card">
-          <div class="stock-icon">💊</div>
-          <div class="stock-name">生技醫療</div>
-          <div class="stock-desc">生技基金重壓、季底有拉抬紀錄。但股價波動大、漲停後容易一字板，散戶追高風險較高，需謹慎操作。</div>
-          <span class="stock-label chip-red">謹慎評估</span>
-        </div>
-      </div>
-
-      <div class="cmp-table-wrap" style="overflow-x:auto;">
+      <div style="overflow-x:auto;">
         <table class="cmp-table">
           <thead>
             <tr>
               <th>篩選條件</th>
-              <th>理想值</th>
-              <th>警示值</th>
-              <th>說明</th>
+              <th style="color:var(--green)">✔ 符合標準</th>
+              <th style="color:var(--red)">✘ 排除標準</th>
+              <th>為什麼重要</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>投信連續買超天數</td>
-              <td class="val-green">≥ 5 天</td>
-              <td class="val-red">< 3 天</td>
-              <td>連續性代表刻意佈局，非單日偶發</td>
+              <td>① 投信連續買超天數</td>
+              <td class="val-green">≥ 5 個交易日</td>
+              <td class="val-red">&lt; 3 天或中斷過</td>
+              <td>連續性代表「刻意佈局」而非偶發買進，是季底前鋪貨的真實訊號</td>
             </tr>
             <tr>
-              <td>投信持股佔股本</td>
+              <td>② 投信持股佔股本比例</td>
               <td class="val-green">≥ 3%</td>
-              <td class="val-red">< 1%</td>
-              <td>比例越高，拉抬對淨值貢獻越大</td>
+              <td class="val-red">&lt; 1%</td>
+              <td>持股比例越高，拉抬這支股票對基金淨值的貢獻越顯著，動機越強</td>
             </tr>
             <tr>
-              <td>每日成交量</td>
+              <td>③ 日均成交量</td>
               <td class="val-green">≥ 3,000 張</td>
-              <td class="val-red">< 1,000 張</td>
-              <td>量小的股票投信推升費力且易暴露</td>
+              <td class="val-red">&lt; 1,000 張</td>
+              <td>量小的股票投信拉抬費力，且買超行為容易被看穿、產生反效果</td>
             </tr>
             <tr>
-              <td>股價區間</td>
-              <td class="val-cyan">50 ~ 500 元</td>
-              <td class="val-red">< 20 元</td>
-              <td>過低股價通常為問題股，投信迴避</td>
+              <td>④ 股價區間</td>
+              <td class="val-cyan">30 ～ 800 元</td>
+              <td class="val-red">&lt; 20 元（問題股）</td>
+              <td>過低股價通常為基本面不佳或流動性差的股票，投信不會重押</td>
             </tr>
             <tr>
-              <td>融資使用率</td>
-              <td class="val-green">< 20%</td>
-              <td class="val-red">≥ 40%</td>
-              <td>融資高代表散戶早已埋伏，壓縮漲幅</td>
+              <td>⑤ 融資使用率</td>
+              <td class="val-green">&lt; 20%（乾淨籌碼）</td>
+              <td class="val-red">≥ 40%（散戶滿倉）</td>
+              <td>融資高代表散戶已提前埋伏，作帳行情的漲幅空間被壓縮，散戶賣壓也大</td>
             </tr>
             <tr>
-              <td>近期主力籌碼</td>
-              <td class="val-green">投信主導</td>
-              <td class="val-red">外資大量賣出</td>
-              <td>投信單打獨鬥 vs 多方共識訊號完全不同</td>
+              <td>⑥ 外資方向</td>
+              <td class="val-green">外資中立或同向買進</td>
+              <td class="val-red">外資大量賣超中</td>
+              <td>外資同向是多方共識力量疊加；外資大賣代表籌碼轉移，風險極高</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <div class="sec-divider">各條件重要性權重</div>
+      <div class="force-meter-wrap">
+        <div class="force-row">
+          <div class="force-label">② 投信持股比例</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--green),var(--accent));"></div></div>
+          <div class="force-val">最高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">① 連續買超天數</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--green),var(--accent));"></div></div>
+          <div class="force-val">很高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">⑥ 外資方向</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:78%;background:linear-gradient(90deg,var(--yellow),var(--orange));"></div></div>
+          <div class="force-val">高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">⑤ 融資使用率</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:65%;background:linear-gradient(90deg,var(--yellow),var(--orange));"></div></div>
+          <div class="force-val">中高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">③ 日均成交量</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:52%;background:linear-gradient(90deg,var(--accent),var(--purple));"></div></div>
+          <div class="force-val">中</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">④ 股價區間</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:35%;background:linear-gradient(90deg,var(--muted),var(--text-dim));"></div></div>
+          <div class="force-val">基本</div>
+        </div>
+      </div>
+      <div class="success-box">
+        <div class="insight-icon">💡</div>
+        <div class="insight-body">
+          <div class="insight-label">篩選黃金組合</div>
+          <div class="insight-text">同時滿足條件①②⑤⑥（連買≥5天 + 持股≥3% + 融資低 + 外資不賣）的個股，歷史上在季底前10天到季底當日，重壓股平均漲幅約 <strong>4.5～8%</strong>。條件越完整，勝率越高。</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- SECTION 4: 月底 vs 季底差異 -->
+  <!-- SECTION 4: 月底 vs 季底 -->
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—04</div>
-      <div class="section-title">月底行情 vs 季底行情：差在哪裡？</div>
+      <div class="section-title">月底行情 vs 季底行情：核心差異全解</div>
       <div class="section-icon">📊</div>
     </div>
     <div class="section-body">
-      <p class="prose">很多人聽說「月底前投信會拉抬」，就誤以為每個月底都一樣。事實上，<em>非季底月份的月底效應遠弱於季底</em>，混淆兩者是常見失誤。</p>
+      <p class="prose">很多人聽說「月底前投信會拉抬」，就誤以為每個月底都一樣。事實上，<em>非季底月份的月底效應遠弱於季底</em>，混淆兩者是常見且昂貴的錯誤。</p>
 
-      <!-- SVG comparison chart -->
       <div class="svg-chart-wrap">
-        <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+        <svg viewBox="0 0 720 285" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
           <defs>
             <linearGradient id="barQ" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#ff9800" stop-opacity=".9"/>
               <stop offset="100%" stop-color="#ff9800" stop-opacity=".3"/>
             </linearGradient>
             <linearGradient id="barM" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#00e5ff" stop-opacity=".7"/>
-              <stop offset="100%" stop-color="#00e5ff" stop-opacity=".2"/>
+              <stop offset="0%" stop-color="#00e5ff" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#00e5ff" stop-opacity=".12"/>
+            </linearGradient>
+            <linearGradient id="barQ3s" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffd600" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#ff9800" stop-opacity=".5"/>
             </linearGradient>
           </defs>
-          <!-- Grid -->
-          <line x1="60" y1="30" x2="60" y2="220" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="60" y1="220" x2="670" y2="220" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="60" y1="170" x2="670" y2="170" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="60" y1="120" x2="670" y2="120" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="60" y1="70" x2="670" y2="70" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <!-- Y labels -->
-          <text x="50" y="224" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="end" font-family="Share Tech Mono, monospace">0%</text>
-          <text x="50" y="174" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="end" font-family="Share Tech Mono, monospace">2%</text>
-          <text x="50" y="124" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="end" font-family="Share Tech Mono, monospace">4%</text>
-          <text x="50" y="74" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="end" font-family="Share Tech Mono, monospace">6%</text>
-          <!-- Months: Jan～Dec -->
-          <!-- Month bars (non-quarter end - cyan, quarter end - orange) -->
-          <!-- Jan -->
-          <rect x="72" y="205" width="22" height="15" rx="3" fill="url(#barM)"/>
-          <text x="83" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">1月</text>
-          <!-- Feb -->
-          <rect x="122" y="208" width="22" height="12" rx="3" fill="url(#barM)"/>
-          <text x="133" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">2月</text>
-          <!-- Mar (Q1 quarter end) -->
-          <rect x="172" y="175" width="22" height="45" rx="3" fill="url(#barQ)"/>
-          <text x="183" y="235" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">3月</text>
-          <text x="183" y="168" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">Q1</text>
-          <!-- Apr -->
-          <rect x="222" y="207" width="22" height="13" rx="3" fill="url(#barM)"/>
-          <text x="233" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">4月</text>
-          <!-- May -->
-          <rect x="272" y="210" width="22" height="10" rx="3" fill="url(#barM)"/>
-          <text x="283" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">5月</text>
-          <!-- Jun (Q2 quarter end) -->
-          <rect x="322" y="162" width="22" height="58" rx="3" fill="url(#barQ)"/>
-          <text x="333" y="235" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">6月</text>
-          <text x="333" y="155" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">Q2</text>
-          <!-- Jul -->
-          <rect x="372" y="204" width="22" height="16" rx="3" fill="url(#barM)"/>
-          <text x="383" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">7月</text>
-          <!-- Aug -->
-          <rect x="422" y="206" width="22" height="14" rx="3" fill="url(#barM)"/>
-          <text x="433" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">8月</text>
-          <!-- Sep (Q3 - strongest) -->
-          <rect x="472" y="83" width="22" height="137" rx="3" fill="url(#barQ)"/>
-          <text x="483" y="235" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">9月</text>
-          <text x="483" y="76" fill="var(--yellow)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">Q3★</text>
-          <!-- Oct -->
-          <rect x="522" y="207" width="22" height="13" rx="3" fill="url(#barM)"/>
-          <text x="533" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">10月</text>
-          <!-- Nov -->
-          <rect x="572" y="209" width="22" height="11" rx="3" fill="url(#barM)"/>
-          <text x="583" y="235" fill="rgba(255,255,255,.4)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">11月</text>
-          <!-- Dec (Q4) -->
-          <rect x="622" y="146" width="22" height="74" rx="3" fill="url(#barQ)"/>
-          <text x="633" y="235" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">12月</text>
-          <text x="633" y="139" fill="var(--accent)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">Q4</text>
-          <!-- Title -->
-          <text x="365" y="18" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="2">投信月底拉抬強度示意（季底 vs 非季底）</text>
-          <!-- Legend -->
-          <rect x="430" y="248" width="10" height="10" rx="2" fill="url(#barQ)"/>
-          <text x="445" y="258" fill="var(--accent)" font-size="9" font-family="Share Tech Mono, monospace">季底月份</text>
-          <rect x="520" y="248" width="10" height="10" rx="2" fill="url(#barM)"/>
-          <text x="535" y="258" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono, monospace">一般月底</text>
+          <line x1="55" y1="28" x2="55" y2="218" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="55" y1="218" x2="700" y2="218" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="55" y1="173" x2="700" y2="173" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="55" y1="128" x2="700" y2="128" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="55" y1="83" x2="700" y2="83" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="48" y="222" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">0%</text>
+          <text x="48" y="177" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">2%</text>
+          <text x="48" y="132" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">4%</text>
+          <text x="48" y="87" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">6%</text>
+          <!-- Bars -->
+          <rect x="60" y="207" width="24" height="11" rx="3" fill="url(#barM)"/>
+          <text x="72" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">1月</text>
+          <rect x="115" y="209" width="24" height="9" rx="3" fill="url(#barM)"/>
+          <text x="127" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">2月</text>
+          <rect x="170" y="175" width="24" height="43" rx="3" fill="url(#barQ)"/>
+          <text x="182" y="233" fill="rgba(255,152,0,.75)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">3月</text>
+          <text x="182" y="168" fill="rgba(255,152,0,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">Q1</text>
+          <rect x="225" y="208" width="24" height="10" rx="3" fill="url(#barM)"/>
+          <text x="237" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">4月</text>
+          <rect x="280" y="210" width="24" height="8" rx="3" fill="url(#barM)"/>
+          <text x="292" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">5月</text>
+          <rect x="335" y="161" width="24" height="57" rx="3" fill="url(#barQ)"/>
+          <text x="347" y="233" fill="rgba(255,152,0,.75)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">6月</text>
+          <text x="347" y="154" fill="rgba(255,152,0,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">Q2</text>
+          <rect x="390" y="207" width="24" height="11" rx="3" fill="url(#barM)"/>
+          <text x="402" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">7月</text>
+          <rect x="445" y="210" width="24" height="8" rx="3" fill="url(#barM)"/>
+          <text x="457" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">8月</text>
+          <!-- Sep Q3 STAR -->
+          <rect x="500" y="75" width="24" height="143" rx="3" fill="url(#barQ3s)"/>
+          <rect x="500" y="75" width="24" height="143" rx="3" fill="none" stroke="rgba(255,214,0,.6)" stroke-width="1.5"/>
+          <text x="512" y="233" fill="rgba(255,214,0,.9)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">9月</text>
+          <text x="512" y="67" fill="#ffd600" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" font-weight="700">Q3★</text>
+          <rect x="555" y="208" width="24" height="10" rx="3" fill="url(#barM)"/>
+          <text x="567" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">10月</text>
+          <rect x="610" y="210" width="24" height="8" rx="3" fill="url(#barM)"/>
+          <text x="622" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">11月</text>
+          <rect x="660" y="147" width="24" height="71" rx="3" fill="url(#barQ)"/>
+          <text x="672" y="233" fill="rgba(255,152,0,.75)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">12月</text>
+          <text x="672" y="140" fill="rgba(255,152,0,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">Q4</text>
+          <text x="370" y="17" fill="rgba(255,255,255,.4)" font-size="10" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="2">投信各月月底拉抬強度比較（季底 vs 非季底）</text>
+          <rect x="375" y="250" width="10" height="10" rx="2" fill="url(#barQ)"/>
+          <text x="390" y="260" fill="rgba(255,152,0,.8)" font-size="9" font-family="Share Tech Mono, monospace">季底月份（3/6/9/12月）</text>
+          <rect x="540" y="250" width="10" height="10" rx="2" fill="url(#barM)"/>
+          <text x="555" y="260" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono, monospace">一般月底</text>
         </svg>
       </div>
 
-      <div class="sec-divider">月底 vs 季底 對照</div>
-
+      <div class="sec-divider">月底 vs 季底 核心對照表</div>
       <div style="overflow-x:auto;">
         <table class="cmp-table">
           <thead>
             <tr>
               <th>比較項目</th>
-              <th style="color:var(--accent)">季底（3/6/9/12月）</th>
+              <th style="color:var(--orange)">季底（3/6/9/12月）</th>
               <th style="color:var(--accent)">一般月底（非季底）</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>觸發壓力</td>
-              <td class="val-orange">公告持股明細 + 淨值績效報告</td>
-              <td class="val-cyan">月度績效更新（非強制揭露）</td>
+              <td>觸發壓力來源</td>
+              <td class="val-orange">強制公告持股明細 + 基金淨值績效報告</td>
+              <td class="val-cyan">月度績效更新（非強制揭露，壓力輕）</td>
             </tr>
             <tr>
               <td>買超力道</td>
-              <td class="val-orange">集中、可觀（常見 3~8% 漲幅）</td>
-              <td class="val-cyan">零散、輕微（通常 0.5~1.5%）</td>
+              <td class="val-orange">集中且可觀（重壓股常見 4～8% 漲幅）</td>
+              <td class="val-cyan">零散輕微（0.5～1.5% 以下）</td>
             </tr>
             <tr>
-              <td>作帳天數</td>
-              <td class="val-orange">通常持續 10~15 個交易日</td>
-              <td class="val-cyan">通常 3~5 個交易日以內</td>
+              <td>持續天數</td>
+              <td class="val-orange">10～15 個交易日（從月中開始）</td>
+              <td class="val-cyan">3～5 個交易日以內</td>
             </tr>
             <tr>
-              <td>適合散戶操作</td>
-              <td class="val-green">✔ 明確、值得佈局</td>
-              <td class="val-red">✘ 規律性弱，難以預判</td>
+              <td>個股明確性</td>
+              <td class="val-orange">明確聚焦前5大持股，標的清晰可預判</td>
+              <td class="val-cyan">分散不集中，難以預判哪支受益</td>
             </tr>
             <tr>
-              <td>季底後反彈</td>
-              <td class="val-red">季底後通常有5~10個交易日整理</td>
-              <td class="val-cyan">影響較小，回落不明顯</td>
+              <td>適合操作？</td>
+              <td class="val-green">✔ 明確值得佈局，有清晰的進出場機制</td>
+              <td class="val-red">✘ 規律性弱，追進易高買低賣</td>
+            </tr>
+            <tr>
+              <td>季後/月後效應</td>
+              <td class="val-red">季底後通常有5～10天整理甚至明顯回落</td>
+              <td class="val-cyan">影響小，回落不明顯</td>
             </tr>
           </tbody>
         </table>
       </div>
-
       <div class="success-box">
         <div class="insight-icon">💡</div>
         <div class="insight-body">
           <div class="insight-label">核心結論</div>
-          <div class="insight-text">只有在<strong>季底月份（3、6、9、12月）的後半段</strong>才值得積極追蹤投信作帳行情。其他月份的「月底效應」力道弱、可預測性低，不建議以此作為進場依據。</div>
+          <div class="insight-text">只有在<strong>季底月份（3、6、9、12月）的後半段</strong>才值得積極追蹤投信作帳行情。其他月份的「月底效應」力道弱、可預測性低，不建議以此作為進場依據，容易追高被套。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SECTION 5: 投信重壓名單追蹤實戰 -->
+  <!-- SECTION 5: 實戰 SOP -->
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—05</div>
-      <div class="section-title">投信重壓名單追蹤實戰</div>
+      <div class="section-title">投信重壓名單追蹤實戰 SOP</div>
       <div class="section-icon">📡</div>
     </div>
     <div class="section-body">
-      <p class="prose">找到方法論還不夠，必須落實成每日追蹤的習慣。以下是一套可操作的日常流程，讓你在季底前 2 週就完成佈局準備。</p>
-
-      <div class="sec-divider">每日追蹤 SOP（季底前 15 個交易日啟動）</div>
+      <p class="prose">找到方法論還不夠，必須落實成每日追蹤的習慣。以下是一套可操作的日常流程，讓你在季底前 2 週就完成佈局準備，並在季底後安全落袋為安。</p>
 
       <div class="flow-step">
         <div class="flow-num on">D-15</div>
         <div class="flow-content">
-          <div class="flow-heading">建立觀察名單</div>
-          <div class="flow-sub">在 JellyStock 或公開資訊觀測站查詢「近5日投信買超前20名」，過濾掉月均量低於 2,000 張的個股，剩餘標的加入觀察名單。此時只看不買，等待更多訊號確認。</div>
+          <div class="flow-heading">建立第一版觀察名單</div>
+          <div class="flow-sub">在 JellyStock、公開資訊觀測站或台股籌碼平台，查詢「近5日投信買超前20名」。過濾掉：①月均量低於2,000張、②股價低於20元、③融資率超過40% 的個股。剩下的加入觀察名單，此時只看不買，等待更多訊號確認。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num on">D-10</div>
+        <div class="flow-num gn">D-10</div>
         <div class="flow-content">
-          <div class="flow-heading">確認連續性 + 篩掉外資賣超</div>
-          <div class="flow-sub">再次更新名單，刪去投信買超中斷的個股。同時檢查外資動向——<strong>外資若持續賣超，投信單打獨鬥推不太動</strong>，應從名單剔除。理想情況是外資中立或同向買進。</div>
+          <div class="flow-heading">確認連續性 + 交叉比對外資動向</div>
+          <div class="flow-sub">再次更新名單，刪去投信買超中斷超過1天的個股。同時逐一查詢外資動向：<strong>若外資持續賣超，投信單打獨鬥推不太動，應從名單剔除</strong>。理想狀態是外資中立或同向買進。此步是最重要的二次過濾，可篩掉 60% 的風險標的。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num gn">D-7</div>
+        <div class="flow-num cn">D-7</div>
         <div class="flow-content">
-          <div class="flow-heading">技術面確認 + 試單</div>
-          <div class="flow-sub">確認個股是否在季底作帳啟動前已突破近期盤整區。作帳行情最有效的模式是<strong>「投信連買 + 技術突破同步」</strong>，此時可以用總部位的 30% 輕倉試單。</div>
+          <div class="flow-heading">技術面確認 + 試單進場</div>
+          <div class="flow-sub">確認個股在季底作帳啟動前是否突破近期盤整區或站穩均線。作帳行情最有效的模式是<strong>「投信連買 + 技術突破同步出現」</strong>。確認後，可用總部位的 30% 輕倉試單。試單停損設在當日最低點下方 3%。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num yn">D-4</div>
         <div class="flow-content">
-          <div class="flow-heading">加碼主力標的</div>
-          <div class="flow-sub">進入作帳最後衝刺期，選取名單中漲幅最明顯（代表投信最積極拉抬）的 2～3 檔，將部位加至 6～7 成。注意設停損，通常以<strong>買進日最低點下方 3%</strong> 為停損基準。</div>
+          <div class="flow-heading">加碼主力標的（衝刺前的機會）</div>
+          <div class="flow-sub">進入作帳最後衝刺期，從名單中選取<strong>漲幅最強且投信最積極</strong>的 2～3 檔，將總部位加至 6～7 成。設定移動停損，隨股價上漲逐步上調停損線。避免在此時段一次重倉某一標的，分散 2～3 支降低集中風險。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num rn">D-1</div>
+        <div class="flow-num rn">D-2</div>
         <div class="flow-content">
-          <div class="flow-heading">季底前一日減倉準備</div>
-          <div class="flow-sub">季底最後一個交易日前一天，評估是否已達到<strong>預期報酬目標（如持有成本 + 5%）</strong>。若達標，可在季底最後一日分批出場，不要貪戀最後一天的漲幅——那可能是最後的流動性出口。</div>
+          <div class="flow-heading">開始分批出場（第一次減倉 30%）</div>
+          <div class="flow-sub">季底前2個交易日，評估是否達到預期報酬目標（如買進成本 +4% 以上）。若達標，在這天減倉 30%。<strong>不要等到最後一天才全部出</strong>，分2～3天出場能降低衝擊成本，也避免最後一天流動性不足的滑點風險。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num cn">D+1</div>
+        <div class="flow-num rn">D0</div>
         <div class="flow-content">
-          <div class="flow-heading">季底後的觀察與複盤</div>
-          <div class="flow-sub">季底後第 1～3 個交易日，投信買盤通常消失，確認是否有出現「作帳後倒貨」現象（大量量縮伴隨微跌）。若有，確保已出場。若仍有外資持續買進，可繼續持有觀察是否轉為外資行情。</div>
+          <div class="flow-heading">季底當日尾盤：清倉 90%</div>
+          <div class="flow-sub">季底最後一個交易日尾盤（13:30 之後），分批出清剩餘持股的 90%。此時流動性仍充足，是最後的安全出場視窗。<strong>不要期待明天還會漲</strong>——投信作帳動機在今天結束，隔天買盤消失後股價失去支撐。</div>
         </div>
       </div>
-
+      <div class="flow-step">
+        <div class="flow-num cn">D+1~3</div>
+        <div class="flow-content">
+          <div class="flow-heading">季底後：觀察 + 複盤（留倉 10%）</div>
+          <div class="flow-sub">留下的 10% 是觀察倉。季底後 1～3 天：若外資開始接力買進，可能轉為外資行情，考慮重新加碼；若出現<strong>量縮伴隨盤中弱勢</strong>（作帳後倒貨訊號），立即出清所有留倉。最晚 D+3 全部出清。</div>
+        </div>
+      </div>
       <div class="purple-box">
-        <div class="insight-icon">🎯</div>
+        <div class="insight-icon">⚡</div>
         <div class="insight-body">
-          <div class="insight-label">風險提醒</div>
-          <div class="insight-text">以上流程是統計規律，不是每次都會成功。當市場出現<strong>系統性利空（如美國升息意外、地緣衝突升級）</strong>時，投信本身績效也在下跌，作帳動機大幅削弱。遇到大環境翻空，應暫停此策略。</div>
+          <div class="insight-label">特殊情況：大盤系統性風險</div>
+          <div class="insight-text">若季底前遭遇<strong>重大利空（美聯儲緊縮、地緣衝突、台股大盤單日跌超2%）</strong>，投信自身績效也在惡化，作帳動機大幅削弱。此時應暫停或縮減作帳策略倉位，不要硬撐。大環境比策略更重要。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SECTION 6: 出場策略與常見失誤 -->
+  <!-- SECTION 6: 出場策略 + 失誤解析 -->
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—06</div>
-      <div class="section-title">出場策略與常見失誤解析</div>
+      <div class="section-title">出場策略與常見失誤深度解析</div>
       <div class="section-icon">🚪</div>
     </div>
     <div class="section-body">
-      <p class="prose">作帳行情最大的陷阱不在「進場」，而在<em>出場太晚</em>。許多人看到投信連續買超就興奮持有，卻在季底後第一個交易日遭遇急跌。以下三種常見失誤必須了解。</p>
+      <p class="prose">作帳行情最大的陷阱不在「進場」，而在<em>出場太晚</em>。以下用三種常見失誤搭配正確應對，讓你徹底避開作帳尾聲的風險地雷。</p>
 
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">❌ 失誤一：以為投信「以後還會繼續買」</div>
-          <div class="sl-text">投信作帳是<strong>短期績效管理行為，不是長線看好</strong>。季底一過，下一季的建倉策略可能完全不同，甚至反手獲利了結。不要把季底的連買訊號誤解為長線多頭。</div>
+          <div class="sl-top up">❌ 失誤一：誤以為投信「以後還會繼續買」</div>
+          <div class="sl-text">投信作帳是<strong>短期績效管理行為，不是長線看好</strong>。季底一過，下一季的建倉策略可能完全不同，甚至反手獲利了結。歷史上多次季後大跌，都與投信作帳結束後開始倒貨有關。不要把短期連買訊號誤解為長線多頭。</div>
         </div>
       </div>
-
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">❌ 失誤二：追高在季底最後一天</div>
-          <div class="sl-text">最後一天往往量縮價穩甚至上漲，但這是最後流動性視窗。隔天投信停止買進，如果其他買盤沒跟上，股價就沒有支撐。<strong>最後一天進場等於替投信接盤</strong>，應避免。</div>
+          <div class="sl-top up">❌ 失誤二：在季底最後一天追高進場</div>
+          <div class="sl-text">最後一天往往量縮、股價仍在高點，吸引散戶「看到強勢不敢錯過」追入。但這是最後的流動性視窗——隔天投信停止買進，若外資沒跟上，股價就沒有支撐。<strong>最後一天進場幾乎等於替投信接盤</strong>，成為讓他們獲利了結的對手方。</div>
         </div>
       </div>
-
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">❌ 失誤三：忽略外資動向</div>
-          <div class="sl-text">部分標的即使投信猛買，若外資同步大量賣出，代表籌碼在從外資手上轉移到投信——<strong>散戶夾在中間很危險</strong>。這種情況常見於外資對某個股長線看空，只是投信短期接刀。</div>
+          <div class="sl-top up">❌ 失誤三：忽略外資動向，看到投信連買就衝</div>
+          <div class="sl-text">若外資同步大量賣出，代表籌碼從外資手上轉移到投信——<strong>散戶夾在中間極度危險</strong>。這常見於外資對某股長線看空（可能掌握財報負面資訊）、而投信短期為績效硬撐。這類情況，季底後倒貨速度非常快。</div>
         </div>
       </div>
 
       <div class="sec-divider">正確的三段式出場邏輯</div>
 
+      <div class="svg-chart-wrap">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <defs>
+            <linearGradient id="curveLine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4a6888"/>
+              <stop offset="35%" stop-color="#00e676"/>
+              <stop offset="60%" stop-color="#ffd600"/>
+              <stop offset="80%" stop-color="#ff9800"/>
+              <stop offset="100%" stop-color="#ff3d5a"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="15" x2="40" y2="155" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <line x1="40" y1="155" x2="680" y2="155" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <!-- Phase zones -->
+          <rect x="40" y="15" width="175" height="140" fill="rgba(0,229,255,.02)"/>
+          <rect x="215" y="15" width="180" height="140" fill="rgba(0,230,118,.02)"/>
+          <rect x="395" y="15" width="140" height="140" fill="rgba(255,152,0,.04)"/>
+          <rect x="535" y="15" width="145" height="140" fill="rgba(255,61,90,.03)"/>
+          <!-- Labels -->
+          <text x="127" y="10" fill="rgba(0,229,255,.5)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-15 ~ D-8 試單+觀察</text>
+          <text x="305" y="10" fill="rgba(0,230,118,.6)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-7 ~ D-2 加碼</text>
+          <text x="465" y="10" fill="rgba(255,152,0,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-1~D0 出場</text>
+          <text x="607" y="10" fill="rgba(255,61,90,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D+1~D+5 觀察倉</text>
+          <!-- Price curve -->
+          <polyline points="50,140 80,133 110,126 140,119 170,112 200,102 230,89 260,77 290,67 320,59 350,53 380,49 410,46 440,45 470,47 500,53 520,65 545,90 575,115 610,132 650,142 675,147" fill="none" stroke="url(#curveLine)" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Exit markers -->
+          <circle cx="415" cy="46" r="5" fill="#ffd600" stroke="#ff9800" stroke-width="1.5"/>
+          <line x1="415" y1="51" x2="415" y2="90" stroke="rgba(255,214,0,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="415" y="100" fill="rgba(255,214,0,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">-30% (D-2)</text>
+          <circle cx="470" cy="47" r="6" fill="#ff9800" stroke="#ffd600" stroke-width="2"/>
+          <line x1="470" y1="53" x2="470" y2="95" stroke="rgba(255,152,0,.5)" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="470" y="106" fill="#ff9800" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">-60% 尾盤 (D0)</text>
+          <circle cx="565" cy="82" r="5" fill="#ff3d5a" stroke="#ff3d5a" stroke-width="1.5"/>
+          <line x1="565" y1="87" x2="565" y2="118" stroke="rgba(255,61,90,.4)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="565" y="128" fill="rgba(255,61,90,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">-10% 留倉出清</text>
+          <!-- Entry markers -->
+          <circle cx="115" cy="126" r="4" fill="rgba(0,229,255,.5)" stroke="rgba(0,229,255,.8)" stroke-width="1.5"/>
+          <text x="115" y="143" fill="rgba(0,229,255,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">試單</text>
+          <circle cx="240" cy="89" r="4" fill="rgba(0,230,118,.5)" stroke="rgba(0,230,118,.8)" stroke-width="1.5"/>
+          <text x="240" y="106" fill="rgba(0,230,118,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">加碼</text>
+          <text x="365" y="182" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">作帳行情進出場全週期示意（數字為各階段出清比例）</text>
+        </svg>
+      </div>
+
       <div class="force-meter-wrap">
         <div class="force-row">
-          <div class="force-label">季底前3日開始減倉</div>
+          <div class="force-label">D-2 開始第一次減倉</div>
           <div class="force-bar-bg"><div class="force-bar-fill" style="width:30%;background:linear-gradient(90deg,var(--green),var(--accent));"></div></div>
-          <div class="force-val">30%</div>
+          <div class="force-val">出30%</div>
         </div>
         <div class="force-row">
-          <div class="force-label">季底前1日再減30%</div>
+          <div class="force-label">D0 季底尾盤主要出場</div>
           <div class="force-bar-bg"><div class="force-bar-fill" style="width:60%;background:linear-gradient(90deg,var(--yellow),var(--orange));"></div></div>
-          <div class="force-val">60%</div>
+          <div class="force-val">再出60%</div>
         </div>
         <div class="force-row">
-          <div class="force-label">季底當日尾盤清倉</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:90%;background:linear-gradient(90deg,var(--orange),var(--red));"></div></div>
-          <div class="force-val">90%</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label">季底後觀察（留10%）</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:10%;background:linear-gradient(90deg,var(--purple),rgba(178,102,255,.5));"></div></div>
-          <div class="force-val">10%</div>
+          <div class="force-label">D+1~3 觀察倉最終清除</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" style="width:10%;background:linear-gradient(90deg,var(--orange),var(--red));"></div></div>
+          <div class="force-val">出清10%</div>
         </div>
       </div>
-      <p class="prose" style="font-size:.8rem;">最後留下的 10% 是用來觀察「有沒有外資接力」。若季底後外資也開始買超，則可能轉為外資行情，考慮重新加碼。若無，這 10% 最遲在季底後第 3 個交易日全部出場。</p>
 
       <div class="cyan-box">
         <div class="insight-icon">🔑</div>
@@ -3067,74 +3218,80 @@
     </div>
   </div>
 
-  <!-- SECTION 7: 進階 - 投信重押名單查詢 -->
+  <!-- SECTION 7: 進階解讀 -->
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—07</div>
-      <div class="section-title">進階：投信重押名單的完整解讀</div>
+      <div class="section-title">進階：公告持股名單解讀 + 作帳三種結局</div>
       <div class="section-icon">📈</div>
     </div>
     <div class="section-body">
-      <p class="prose">除了追蹤買超數字，理解投信公告的<em>前10大持股名單</em>更能在季底前提早鎖定目標。每季末後 45 天內，所有基金必須公告完整持股明細，這是規律操作的重要資料來源。</p>
+      <p class="prose">深度解讀投信公告的<em>前10大持股名單</em>，能讓你在下一季底前提早鎖定目標。每季末後 45 天內，所有基金必須公告完整持股明細，這是可以「向前看」的戰略性資訊，相當於對手的底牌提前翻開。</p>
 
-      <div class="sec-divider">如何解讀前10大持股公告</div>
+      <div class="sec-divider">如何解讀季度持股公告</div>
 
       <div class="shadow-line">
         <div class="sl-side dn"></div>
         <div class="sl-body">
-          <div class="sl-top dn">✅ 重點一：「持股比例增加」比「絕對排名」更重要</div>
-          <div class="sl-text">若某個股在本季末公告的持股比例比上季大幅提升，代表本季大量加碼，<strong>下一季底拉抬意願通常更高</strong>（已投入更多成本，出不掉只能撐）。比排名更有參考價值。</div>
+          <div class="sl-top dn">✅ 重點一：「持股比例增加速度」比「絕對排名」更重要</div>
+          <div class="sl-text">若某個股在本季末公告的持股比例比上季<strong>大幅提升超過1個百分點</strong>，代表本季大量加碼建倉，下一季底拉抬意願通常更高（已投入更多成本，必須拉高才能獲利了結）。例如：從持股2%增至4.5%，即使排名從第3掉至第5，仍比排名第1但沒加碼的更具作帳動力。</div>
         </div>
       </div>
-
       <div class="shadow-line">
         <div class="sl-side or"></div>
         <div class="sl-body">
-          <div class="sl-top or">⚡ 重點二：多家基金同時持有的標的</div>
-          <div class="sl-text">若同一個股同時出現在多支台股基金的前10大，意味著「多家基金都需要在季底拉抬它」，<strong>多頭共識力量疊加</strong>，作帳效果通常更顯著。這類標的是優先觀察的首選。</div>
+          <div class="sl-top or">⚡ 重點二：多家基金同時持有的「共識標的」</div>
+          <div class="sl-text">若同一個股同時出現在<strong>5家以上台股基金的前10大持股</strong>，意味著「多家基金都需要在季底拉抬它」。這類共識標的一旦啟動，作帳效果明顯放大——因為每家基金都不想讓別家先賣而自己被套，反而形成比賽拉抬的格局，力道遠比單一基金強。</div>
         </div>
       </div>
-
       <div class="shadow-line">
         <div class="sl-side neu"></div>
         <div class="sl-body">
-          <div class="sl-top neu">⚠️ 重點三：季底後公告的「轉移訊號」</div>
-          <div class="sl-text">若某股在最新公告中<strong>消失或大幅縮減持股比例</strong>，代表投信已在上季季底後持續減碼，下個季底很可能不再拉抬，甚至繼續倒出。這類標的應從作帳名單剔除。</div>
+          <div class="sl-top neu">⚠️ 重點三：公告中消失的持股 = 下季危險標的</div>
+          <div class="sl-text">若某股在上季公告中佔比很高，但最新公告<strong>持股大幅縮減或完全消失</strong>，代表投信已在上季季底後持續減碼，下個季底很可能繼續賣出，根本不會拉抬。這類標的即使買超數字偶爾出現，也可能只是其他小型基金動作，別錯誤判斷。</div>
         </div>
       </div>
 
-      <div class="sec-divider">作帳行情的三種結果</div>
+      <div class="sec-divider">作帳行情三種結局與應對策略</div>
 
       <table class="cmp-table">
         <thead>
           <tr>
-            <th>結果類型</th>
-            <th>描述</th>
+            <th>結局類型</th>
+            <th>特徵描述</th>
             <th>發生機率</th>
-            <th>散戶應對</th>
+            <th>散戶最佳應對</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><span class="chip chip-green">外資接力</span></td>
-            <td>投信作帳結束後，外資看好基本面持續買進，行情延伸</td>
-            <td class="val-green">約 20~30%</td>
-            <td>可留倉觀察，視外資動向決定是否加碼</td>
+            <td><span class="chip chip-green">📈 外資接力</span></td>
+            <td>投信作帳結束後，外資看好基本面持續買進，行情延伸至季底後1～2週</td>
+            <td class="val-green">約 20～30%</td>
+            <td>留觀察倉10%，視外資買超持續性決定是否重新加碼</td>
           </tr>
           <tr>
-            <td><span class="chip chip-yellow">橫盤整理</span></td>
-            <td>投信買盤消失，行情停滯，股價在高點附近震盪</td>
-            <td class="val-yellow">約 40~50%</td>
-            <td>按計劃出場，不追高也不恐慌，等下一季</td>
+            <td><span class="chip chip-yellow">➡️ 橫盤整理</span></td>
+            <td>投信買盤消失，行情停滯，股價在高點附近震盪1～2週後才決定方向</td>
+            <td class="val-yellow">約 40～50%</td>
+            <td>按計劃在季底前完成出場，不追高也不恐慌，等下季再觀察</td>
           </tr>
           <tr>
-            <td><span class="chip chip-red">作帳後倒貨</span></td>
-            <td>投信季底前拉高後，季後立刻開始減碼獲利了結</td>
-            <td class="val-red">約 20~30%</td>
-            <td>季底前必須出場，季後持有虧損風險高</td>
+            <td><span class="chip chip-red">📉 作帳後倒貨</span></td>
+            <td>投信季底前拉高後，季後立刻反手大量賣出，股價快速回落5～15%</td>
+            <td class="val-red">約 20～30%</td>
+            <td>季底前必須出清主倉，D+1若出現大量急跌，觀察倉立即停損</td>
           </tr>
         </tbody>
       </table>
+
+      <div class="warn-box">
+        <div class="insight-icon">📌</div>
+        <div class="insight-body">
+          <div class="insight-label">情境判斷：如何提前預判是哪種結局？</div>
+          <div class="insight-text">若季底前最後一週<strong>外資已開始買進同一標的</strong>，發生「外資接力」的機率明顯提升。若整個作帳期間外資都在賣，幾乎可以確認是「橫盤或倒貨」，出場不能猶豫。不確定時，寧可早出場少賺一點，也不要賭留倉。</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3146,54 +3303,61 @@
       <div class="section-icon">🎓</div>
     </div>
     <div class="section-body">
-      <p class="prose">完成本章測驗，確認你已掌握投信季底作帳的核心概念。每題只有一個正確答案。</p>
+      <p class="prose">完成本章測驗，確認你已掌握投信季底作帳的核心概念。每題只有一個最佳答案。</p>
 
-      <!-- Quiz 1 -->
       <div class="quiz-wrap">
         <div class="quiz-q">Q1 · 以下哪個月份的投信作帳行情，通常是全年四季中力道最強的？</div>
         <div class="quiz-opts" id="q1opts">
-          <div class="quiz-opt" onclick="answerQ('q1',this,'A')"><div class="quiz-letter">A</div>3月（Q1 季底）</div>
-          <div class="quiz-opt" onclick="answerQ('q1',this,'B')"><div class="quiz-letter">B</div>6月（Q2 季底）</div>
-          <div class="quiz-opt" onclick="answerQ('q1',this,'C')"><div class="quiz-letter">C</div>9月（Q3 季底）</div>
-          <div class="quiz-opt" onclick="answerQ('q1',this,'D')"><div class="quiz-letter">D</div>12月（Q4 季底）</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'A')"><div class="quiz-letter">A</div>3月（Q1 季底）——全年第一次，動力最強</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'B')"><div class="quiz-letter">B</div>6月（Q2 季底）——上半年決算，同樣很重要</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'C')"><div class="quiz-letter">C</div>9月（Q3 季底）——電子旺季+外資共振</div>
+          <div class="quiz-opt" onclick="answerQ('q1',this,'D')"><div class="quiz-letter">D</div>12月（Q4 季底）——全年終結，壓力最大</div>
         </div>
         <div class="quiz-feedback" id="q1fb"></div>
       </div>
 
-      <!-- Quiz 2 -->
       <div class="quiz-wrap">
-        <div class="quiz-q">Q2 · 在篩選投信重壓股時，下列哪項條件「應該排除」的標的？</div>
+        <div class="quiz-q">Q2 · 在篩選投信重壓股時，下列哪項條件應該「排除」的標的？</div>
         <div class="quiz-opts" id="q2opts">
-          <div class="quiz-opt" onclick="answerQ('q2',this,'A')"><div class="quiz-letter">A</div>投信持股佔股本超過 3%</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'A')"><div class="quiz-letter">A</div>投信持股佔股本超過 3%，且近10日連續買超</div>
           <div class="quiz-opt" onclick="answerQ('q2',this,'B')"><div class="quiz-letter">B</div>融資使用率達 45%，散戶已大量埋伏</div>
-          <div class="quiz-opt" onclick="answerQ('q2',this,'C')"><div class="quiz-letter">C</div>每日成交量約 5,000 張</div>
-          <div class="quiz-opt" onclick="answerQ('q2',this,'D')"><div class="quiz-letter">D</div>近 7 日投信連續買超</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'C')"><div class="quiz-letter">C</div>每日成交量約 5,000 張，流動性良好</div>
+          <div class="quiz-opt" onclick="answerQ('q2',this,'D')"><div class="quiz-letter">D</div>外資近5日輕微買超，方向中立偏多</div>
         </div>
         <div class="quiz-feedback" id="q2fb"></div>
       </div>
 
-      <!-- Quiz 3 -->
       <div class="quiz-wrap">
         <div class="quiz-q">Q3 · 季底當天（最後一個交易日），從作帳行情策略的角度，最建議的操作是？</div>
         <div class="quiz-opts" id="q3opts">
           <div class="quiz-opt" onclick="answerQ('q3',this,'A')"><div class="quiz-letter">A</div>看到漲勢強勁，追加買進等隔日繼續漲</div>
           <div class="quiz-opt" onclick="answerQ('q3',this,'B')"><div class="quiz-letter">B</div>什麼都不動，繼續持有觀察下週動向</div>
-          <div class="quiz-opt" onclick="answerQ('q3',this,'C')"><div class="quiz-letter">C</div>在尾盤分批出場，清倉大部分持股</div>
-          <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><div class="quiz-letter">D</div>在季底前3日就全部清倉</div>
+          <div class="quiz-opt" onclick="answerQ('q3',this,'C')"><div class="quiz-letter">C</div>在尾盤分批出場，清倉約90%持股</div>
+          <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><div class="quiz-letter">D</div>在季底前3日就全部清倉，以免踏空</div>
         </div>
         <div class="quiz-feedback" id="q3fb"></div>
       </div>
 
-      <!-- Quiz 4 -->
       <div class="quiz-wrap">
-        <div class="quiz-q">Q4 · 若某標的投信持續買超，但外資同時大量賣出，這代表什麼訊號？</div>
+        <div class="quiz-q">Q4 · 若某標的投信持續買超，但外資同時大量賣出，這最可能代表什麼訊號？</div>
         <div class="quiz-opts" id="q4opts">
-          <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><div class="quiz-letter">A</div>外資看錯，應跟著投信操作</div>
-          <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><div class="quiz-letter">B</div>籌碼在轉移，投信接刀，散戶夾中間風險高</div>
-          <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><div class="quiz-letter">C</div>這是最強的多頭共識訊號</div>
-          <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><div class="quiz-letter">D</div>外資只是短線，不影響長期判斷</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><div class="quiz-letter">A</div>外資看錯了，應堅定跟著投信操作</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><div class="quiz-letter">B</div>籌碼在從外資轉移到投信，散戶夾中間風險高</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><div class="quiz-letter">C</div>這是最強的多頭共識訊號，立刻加碼</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><div class="quiz-letter">D</div>外資只是避險操作，不影響長期判斷</div>
         </div>
         <div class="quiz-feedback" id="q4fb"></div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q5 · 在季度持股公告中，哪種情況最值得下一季作帳前重點追蹤？</div>
+        <div class="quiz-opts" id="q5opts">
+          <div class="quiz-opt" onclick="answerQ('q5',this,'A')"><div class="quiz-letter">A</div>持股比例比上季大幅增加，且同時出現在多家基金前10大</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'B')"><div class="quiz-letter">B</div>排名第一，持股比例和上季相同沒有變化</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'C')"><div class="quiz-letter">C</div>本季公告中持股大幅縮減，但仍在前10大</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'D')"><div class="quiz-letter">D</div>只有一家基金持有，但持股比例很高</div>
+        </div>
+        <div class="quiz-feedback" id="q5fb"></div>
       </div>
     </div>
   </div>
@@ -3202,59 +3366,68 @@
   <div class="section-card reveal">
     <div class="section-header">
       <div class="section-num">04—09</div>
-      <div class="section-title">本章重點整理</div>
+      <div class="section-title">本章重點整理 · 建立完整框架</div>
       <div class="section-icon">✅</div>
     </div>
     <div class="section-body">
-      <p class="prose">掌握以下核心概念，你就具備了利用投信作帳行情的完整框架。</p>
+      <p class="prose">掌握以下核心概念，你就具備了利用投信作帳行情的完整操作框架。</p>
 
       <div class="flow-step">
-        <div class="flow-num on">✓</div>
+        <div class="flow-num gn">✓</div>
         <div class="flow-content">
-          <div class="flow-heading">季底行情的驅動力是制度，不是人性</div>
-          <div class="flow-sub">投信在季底積極買進是制度性的可預測行為，根源是基金公告義務和績效排名壓力。這種規律性讓散戶能提前佈局。</div>
+          <div class="flow-heading">作帳行情的驅動力是制度，不是偶然</div>
+          <div class="flow-sub">投信在季底積極買進是制度性的可預測行為，根源是基金公告義務和績效排名壓力。這種規律性讓有準備的散戶能提前卡位，而非追著行情跑。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num gn">✓</div>
         <div class="flow-content">
-          <div class="flow-heading">Q3（9月）作帳最強，Q4（12月）次之</div>
-          <div class="flow-sub">每季強度不同，9月因電子旺季+外資共振，通常是全年最值得操作的作帳時間點。一般月底的效應太弱，不值得特別操作。</div>
+          <div class="flow-heading">Q3（9月）最強，Q4（12月）次之，Q1最弱</div>
+          <div class="flow-sub">每季強度不同，9月因電子旺季+外資共振是全年最值得操作的時間點。一般非季底月份的月底效應太弱，不值得特別操作，容易賠時間成本。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num cn">✓</div>
         <div class="flow-content">
-          <div class="flow-heading">篩選重壓股的三個核心指標</div>
-          <div class="flow-sub">①投信連買≥5天、②持股佔股本≥3%、③融資使用率低。三個條件同時符合，勝率最高。外資同向買超是額外加分。</div>
+          <div class="flow-heading">篩選重壓股的核心三角：買超連續 + 持股比例 + 外資不賣</div>
+          <div class="flow-sub">投信連買≥5天、持股佔股本≥3%、外資方向中立或偏多。三個條件同時符合，勝率最高。再加上融資率低（低於20%），幾乎是黃金標準組合。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num rn">✓</div>
         <div class="flow-content">
-          <div class="flow-heading">出場比進場更重要</div>
-          <div class="flow-sub">作帳行情有明確終點（季底當日），必須有計劃地在季底前2～3日開始減倉，最晚在季底當日尾盤清倉90%持股。不要期待季後還有投信買盤支撐。</div>
+          <div class="flow-heading">出場比進場更重要，有明確終點必須遵守</div>
+          <div class="flow-sub">作帳行情有明確終點（季底當日），必須有計劃地在季底前2天開始減倉，最晚在季底當日尾盤清倉90%持股。不要期待季後還有投信買盤支撐——動機消失了，買盤就消失了。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num yn">✓</div>
         <div class="flow-content">
-          <div class="flow-heading">外資背離時放棄作帳操作</div>
-          <div class="flow-sub">若外資對同標的持續大量賣超，代表投信在接刀。此時即使投信買超數字好看，也應放棄，散戶不應夾在兩大法人之間操作。</div>
+          <div class="flow-heading">外資賣超 + 投信買超 = 紅燈，直接排除</div>
+          <div class="flow-sub">若外資對同標的持續大量賣超，代表投信在接刀、籌碼在轉移。此時即使投信買超數字好看，也應直接放棄，散戶不應夾在兩大法人之間操作，這是最容易出現大虧損的情境。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num pn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">季度持股公告是下一輪的偵察地圖</div>
+          <div class="flow-sub">每季末公告是「透明度最高的情報」：持股比例大增的個股是下季優先候選；多家基金同時持有的是共識標的；持股大減的要從名單剔除。養成在公告後第一時間解讀的習慣，等於提早2個月鎖定目標。</div>
         </div>
       </div>
 
       <div class="insight-box" style="margin-top:28px;">
         <div class="insight-icon">🚀</div>
         <div class="insight-body">
-          <div class="insight-label">下一章預告</div>
-          <div class="insight-text">第五章將深入剖析<strong>自營商的避險與裸部位判讀</strong>——如何區分自行帳戶買賣與避險帳戶的機械操作，看懂自營商對市場方向的真實判斷，以及什麼情況下自營商的動作才是真正的看多訊號。</div>
+          <div class="insight-label">下一章預告：第五章</div>
+          <div class="insight-text">第五章將深入剖析<strong>自營商的避險與裸部位判讀</strong>——如何區分自行帳戶買賣與避險帳戶的機械操作，看懂自營商對市場方向的真實判斷，以及什麼情況下自營商的動作才是真正的看多訊號，又什麼時候只是程式化對沖，與行情方向無關。</div>
         </div>
       </div>
     </div>
   </div>
 
-    <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
+
+
+        <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
   <div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
@@ -3374,7 +3547,7 @@
 })();
 
 /* ── Quiz ── */
-var answers = { q1: 'C', q2: 'B', q3: 'C', q4: 'B' };
+var answers = { q1: 'C', q2: 'B', q3: 'C', q4: 'B', q5: 'A' };
 var feedbacks = {
   q1: {
     C: '✅ 正確！9月是台灣電子股旺季，科技基金重壓的半導體、AI 概念股同時享有基本面題材，加上外資可能共振，Q3 作帳行情通常是全年四季中最明顯的一次。',
@@ -3391,6 +3564,10 @@ var feedbacks = {
   q4: {
     B: '✅ 正確！外資賣 + 投信買，代表籌碼從外資手中轉移到投信，投信可能在「接刀」。散戶夾在中間操作，一旦投信季後也開始獲利了結，下跌風險很高。這種情況應迴避。',
     default: '❌ 不對。外資大量賣出 + 投信買進，是籌碼轉移的警示訊號，代表投信可能在接刀，對散戶來說風險極高，應迴避此類標的。'
+  },
+  q5: {
+    A: '✅ 正確！持股比例大幅增加代表本季大量建倉，下季底拉抬動機最強。多家基金同時持有則代表多方共識，作帳效果疊加放大。這是優先觀察的黃金標準。',
+    default: '❌ 不對。最值得追蹤的是「持股比例大幅增加」且「多家基金同時持有」的個股，這代表下季底有多方力量共同拉抬的動機。'
   }
 };
 window.answerQ = function(qid, el, choice) {
@@ -3497,7 +3674,9 @@ window.answerQ = function(qid, el, choice) {
 
   function fixSvgsForMode(isDay) {
     // 1. Fix SVG elements with inline style="background:..."
+    // (funnel-svg 由下方第 0 步單獨處理，此處跳過，避免覆蓋)
     document.querySelectorAll('svg[style]').forEach(svg => {
+      if (svg.id === 'funnel-svg') return; // 由第 0 步專門處理
       if (!svg.dataset.origStyle) svg.dataset.origStyle = svg.getAttribute('style') || '';
       if (isDay) {
         const s = svg.dataset.origStyle;
@@ -3578,6 +3757,12 @@ window.answerQ = function(qid, el, choice) {
         w.style.background = '';
       }
     });
+
+    // 0. Special: funnel SVG explicit handling (最後執行，避免被步驟 1 的 setAttribute 覆蓋)
+    var funnelSvg = document.getElementById('funnel-svg');
+    if (funnelSvg) {
+      funnelSvg.style.background = isDay ? 'rgba(215,235,252,0.55)' : 'rgba(0,0,0,.18)';
+    }
   }
 
   function run() { fixSvgsForMode(document.body.classList.contains('theme-day')); }

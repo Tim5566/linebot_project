@@ -4017,6 +4017,80 @@
     body.theme-day .ad-unit-label { color: #5a8ab8; }
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
+    /* ═══════════════════════════════════════════════════════
+       ☀️ DAY THEME — #seo-static-content 完整補丁
+       修正：核心功能介紹、技術分析教學、籌碼分析教學 區塊
+       在白天模式下仍顯示深色背景的問題
+       ═══════════════════════════════════════════════════════ */
+
+    /* 整個 seo-static-content section 背景 */
+    body.theme-day #seo-static-content {
+      background: linear-gradient(180deg,
+        rgba(235,247,255,0) 0%,
+        rgba(235,247,255,.72) 6%,
+        rgba(235,247,255,.72) 94%,
+        rgba(235,247,255,0) 100%
+      ) !important;
+      border-top-color: rgba(26,101,168,.12) !important;
+      color: #1a3550 !important;
+    }
+
+    /* 標題 h2（核心功能介紹、技術分析教學、籌碼分析教學）*/
+    body.theme-day #seo-static-content h2 {
+      color: #1265a8 !important;
+    }
+
+    /* 說明文字 p */
+    body.theme-day #seo-static-content p {
+      color: #3a6080 !important;
+    }
+
+    /* 功能卡片（核心功能介紹 6 張）*/
+    body.theme-day #seo-static-content div[style*="rgba(0,229,255,.04)"] {
+      background: rgba(255,255,255,.68) !important;
+      border-color: rgba(26,101,168,.18) !important;
+      box-shadow: 0 2px 12px rgba(26,80,160,.06);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    body.theme-day #seo-static-content div[style*="rgba(0,229,255,.04)"]:hover {
+      border-color: rgba(26,101,168,.35) !important;
+      background: rgba(255,255,255,.82) !important;
+    }
+    /* 功能卡片標題 h3 */
+    body.theme-day #seo-static-content h3 {
+      color: #0a1828 !important;
+    }
+    /* 功能卡片內文 */
+    body.theme-day #seo-static-content p[style*="#8ab0c8"],
+    body.theme-day #seo-static-content p[style*="color:#8ab0c8"] {
+      color: #3a6080 !important;
+    }
+
+    /* 技術分析教學章節按鈕（青色系）*/
+    body.theme-day #seo-static-content nav[aria-label="技術分析教學章節"] a {
+      background: rgba(26,101,168,.07) !important;
+      border-color: rgba(26,101,168,.22) !important;
+      color: #1a4a78 !important;
+    }
+    body.theme-day #seo-static-content nav[aria-label="技術分析教學章節"] a:hover {
+      background: rgba(26,101,168,.16) !important;
+      border-color: rgba(26,101,168,.45) !important;
+      color: #0d2d5a !important;
+    }
+
+    /* 籌碼分析教學章節按鈕（紫色系）*/
+    body.theme-day #seo-static-content nav[aria-label="籌碼分析教學章節"] a {
+      background: rgba(102,64,192,.07) !important;
+      border-color: rgba(102,64,192,.22) !important;
+      color: #4a2ea8 !important;
+    }
+    body.theme-day #seo-static-content nav[aria-label="籌碼分析教學章節"] a:hover {
+      background: rgba(102,64,192,.16) !important;
+      border-color: rgba(102,64,192,.45) !important;
+      color: #2d1880 !important;
+    }
+
   </style>
   <!-- Google Identity Services（點登入時才載入，避免開站閃爍） -->
   <script>
@@ -5236,10 +5310,10 @@
 <section id="seo-static-content" aria-label="功能介紹與教學導覽" style="
   position:relative;
   z-index:2;
-  background:linear-gradient(180deg,rgba(3,6,13,0) 0%,rgba(5,10,20,.97) 6%,rgba(5,10,20,.97) 94%,rgba(3,6,13,0) 100%);
+  background:linear-gradient(180deg,rgba(3,6,13,0) 0%,rgba(5,10,20,.72) 6%,rgba(5,10,20,.72) 94%,rgba(3,6,13,0) 100%);
   border-top:1px solid rgba(0,229,255,.08);
-  padding:64px 40px 72px;
-  max-width:1100px;
+  padding:64px 32px 72px;
+  max-width:100%;
   margin:0 auto;
   font-family:'Noto Sans TC',sans-serif;
   color:#d4e4f7;
@@ -7221,6 +7295,83 @@ function applyTheme(theme) {
   if (titleText) {
     titleText.setAttribute('fill', theme === 'day' ? 'url(#tg1day)' : 'url(#tg1)');
   }
+
+  // ── SEO Static Content inline-style patch ──
+  // 這些元素用 inline style 寫死顏色，CSS 選擇器覆蓋不到，需要 JS 處理
+  _applySeoSectionTheme(theme);
+}
+
+function _applySeoSectionTheme(theme) {
+  const isDay = theme === 'day';
+  const sec = document.getElementById('seo-static-content');
+  if (!sec) return;
+
+  // section 本身背景
+  sec.style.background = isDay
+    ? 'linear-gradient(180deg,rgba(235,247,255,0) 0%,rgba(235,247,255,.72) 6%,rgba(235,247,255,.72) 94%,rgba(235,247,255,0) 100%)'
+    : 'linear-gradient(180deg,rgba(3,6,13,0) 0%,rgba(5,10,20,.72) 6%,rgba(5,10,20,.72) 94%,rgba(3,6,13,0) 100%)';
+  sec.style.borderTopColor = isDay ? 'rgba(26,101,168,.12)' : 'rgba(0,229,255,.08)';
+  sec.style.color = isDay ? '#1a3550' : '#d4e4f7';
+
+  // 所有 h2（核心功能介紹、技術分析教學、籌碼分析教學）
+  sec.querySelectorAll('h2').forEach(el => {
+    el.style.color = isDay ? '#1265a8' : '#00e5ff';
+  });
+
+  // 所有 p（說明文字）
+  sec.querySelectorAll('p').forEach(el => {
+    // 只改沒有特別顏色的 p（排除 feature card 內文）
+    el.style.color = isDay ? '#3a6080' : '#7a9ab8';
+  });
+
+  // 功能介紹卡片（背景是 rgba(0,229,255,.04)）
+  sec.querySelectorAll('div[style*="border-radius:12px"]').forEach(el => {
+    el.style.background = isDay
+      ? 'rgba(255,255,255,.68)'
+      : 'rgba(0,229,255,.04)';
+    el.style.borderColor = isDay
+      ? 'rgba(26,101,168,.18)'
+      : 'rgba(0,229,255,.1)';
+    // 卡片內 h3
+    const h3 = el.querySelector('h3');
+    if (h3) h3.style.color = isDay ? '#0a1828' : '#fff';
+    // 卡片內 p
+    const p = el.querySelector('p');
+    if (p) p.style.color = isDay ? '#3a5a78' : '#8ab0c8';
+  });
+
+  // 技術分析教學章節按鈕（青色系）
+  const techNav = sec.querySelector('nav[aria-label="技術分析教學章節"]');
+  if (techNav) {
+    techNav.querySelectorAll('a').forEach(a => {
+      a.style.background = isDay ? 'rgba(26,101,168,.08)' : 'rgba(0,229,255,.06)';
+      a.style.borderColor = isDay ? 'rgba(26,101,168,.25)' : 'rgba(0,229,255,.18)';
+      a.style.color      = isDay ? '#1a4a78' : '#a0c8e0';
+      // 覆寫 onmouseover / onmouseout 為白天模式正確色
+      a.onmouseover = isDay
+        ? () => { a.style.background='rgba(26,101,168,.16)'; a.style.color='#0d2d5a'; }
+        : () => { a.style.background='rgba(0,229,255,.14)';  a.style.color='#fff'; };
+      a.onmouseout  = isDay
+        ? () => { a.style.background='rgba(26,101,168,.08)'; a.style.color='#1a4a78'; }
+        : () => { a.style.background='rgba(0,229,255,.06)';  a.style.color='#a0c8e0'; };
+    });
+  }
+
+  // 籌碼分析教學章節按鈕（紫色系）
+  const chipsNav = sec.querySelector('nav[aria-label="籌碼分析教學章節"]');
+  if (chipsNav) {
+    chipsNav.querySelectorAll('a').forEach(a => {
+      a.style.background = isDay ? 'rgba(102,64,192,.07)'  : 'rgba(140,100,255,.06)';
+      a.style.borderColor= isDay ? 'rgba(102,64,192,.22)'  : 'rgba(140,100,255,.2)';
+      a.style.color      = isDay ? '#4a2ea8'               : '#a08de0';
+      a.onmouseover = isDay
+        ? () => { a.style.background='rgba(102,64,192,.16)'; a.style.color='#2d1880'; }
+        : () => { a.style.background='rgba(140,100,255,.15)';a.style.color='#fff'; };
+      a.onmouseout  = isDay
+        ? () => { a.style.background='rgba(102,64,192,.07)'; a.style.color='#4a2ea8'; }
+        : () => { a.style.background='rgba(140,100,255,.06)';a.style.color='#a08de0'; };
+    });
+  }
 }
 
 function setTheme(theme) {
@@ -7460,6 +7611,9 @@ function _startMaintPoll() {
 // 頁面載入後開始輪詢
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(_startMaintPoll, 1000);
+  // 確保 seo-static-content 在 DOM ready 後也套用正確主題（初次載入補丁）
+  const t = localStorage.getItem('jelly_global_theme') || 'space';
+  _applySeoSectionTheme(t);
 });
 // 登入/登出時重新評估 UI
 document.addEventListener('_authChanged', () => {

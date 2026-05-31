@@ -2306,21 +2306,26 @@
   <!-- HERO -->
   <div class="hero">
     <div class="hero-icon">
-      <svg width="68" height="80" viewBox="0 0 68 80" xmlns="http://www.w3.org/2000/svg">
-        <!-- Leverage bar chart with danger threshold -->
-        <rect x="8"  y="48" width="12" height="22" rx="2" fill="#00e5ff" opacity=".8"/>
-        <rect x="24" y="34" width="12" height="36" rx="2" fill="#00e5ff" opacity=".85"/>
-        <rect x="40" y="18" width="12" height="52" rx="2" fill="#ffd600" opacity=".85"/>
-        <rect x="56" y="8"  width="12" height="62" rx="2" fill="#ff3d5a" opacity=".85"/>
-        <!-- Danger line at 120% -->
-        <line x1="4" y1="28" x2="72" y2="28" stroke="#ff3d5a" stroke-width="1.5" stroke-dasharray="4,3"/>
-        <text x="5" y="25" fill="#ff3d5a" font-size="6" font-family="Share Tech Mono, monospace">維持率 130%</text>
-        <!-- Warning glow on last bar -->
-        <rect x="56" y="8" width="12" height="62" rx="2" fill="none" stroke="#ff3d5a" stroke-width="1.5" opacity=".6">
-          <animate attributeName="opacity" values=".3;.9;.3" dur="1.6s" repeatCount="indefinite"/>
+      <svg width="80" height="90" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background glow -->
+        <ellipse cx="40" cy="78" rx="28" ry="6" fill="rgba(255,61,90,.12)"/>
+        <!-- Leverage bars - growing left to right -->
+        <rect x="6"  y="58" width="13" height="22" rx="3" fill="#00e5ff" opacity=".75"/>
+        <rect x="22" y="44" width="13" height="36" rx="3" fill="#00e5ff" opacity=".82"/>
+        <rect x="38" y="26" width="13" height="54" rx="3" fill="#ffd600" opacity=".85"/>
+        <rect x="54" y="10" width="13" height="70" rx="3" fill="#ff3d5a" opacity=".88"/>
+        <!-- Animated danger glow on tallest bar -->
+        <rect x="54" y="10" width="13" height="70" rx="3" fill="none" stroke="#ff3d5a" stroke-width="1.8" opacity=".5">
+          <animate attributeName="opacity" values=".2;.85;.2" dur="1.4s" repeatCount="indefinite"/>
         </rect>
-        <!-- Arrow pointing up on last bar = squeeze -->
-        <polyline points="62,6 58,12 62,10 66,12 62,6" fill="#ff3d5a"/>
+        <!-- Danger threshold line -->
+        <line x1="3" y1="30" x2="72" y2="30" stroke="#ff3d5a" stroke-width="1.4" stroke-dasharray="4,3" opacity=".9"/>
+        <text x="4" y="27" fill="#ff3d5a" font-size="5.5" font-family="Share Tech Mono,monospace" opacity=".9">130%</text>
+        <!-- Up arrow = squeeze direction -->
+        <polygon points="60.5,6 57,13 60.5,11 64,13" fill="#ff3d5a"/>
+        <polygon points="60.5,6 57,13 60.5,11 64,13" fill="#ff3d5a" opacity=".4">
+          <animate attributeName="transform" attributeType="XML" type="translate" values="0,-2;0,0;0,-2" dur="1.2s" repeatCount="indefinite"/>
+        </polygon>
       </svg>
     </div>
     <div class="hero-content">
@@ -2367,48 +2372,112 @@
           <div class="role-icon">📈</div>
           <div class="role-name">融資買進</div>
           <div class="role-en">MARGIN LONG</div>
-          <div class="role-desc">向券商借錢買股，加槓桿做多。台股融資成數一般為六成，即自備四成保證金，券商借六成。股票漲，獲利放大；股票跌，虧損同樣放大，且可能觸發<strong>追繳</strong>甚至<strong>斷頭</strong>。</div>
-          <span class="role-scale" style="background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.25);color:var(--red);">自備 40%，借款 60%</span>
+          <div class="role-desc">向券商借錢買股，加槓桿做多。台股融資成數一般為<strong>六成</strong>，即自備四成保證金，券商借六成。股票漲，獲利放大；股票跌，虧損同樣放大，且可能觸發<strong>追繳</strong>甚至<strong>斷頭</strong>。用融資買 100 萬的股票，只需 40 萬本金，若股價漲 20%，獲利達 50%；但若跌 20%，虧損達 50%——槓桿是中性工具，但在恐慌市場中往往放大傷害。</div>
+          <span class="role-scale" style="background:rgba(255,61,90,.12);border:1px solid rgba(255,61,90,.25);color:var(--red);">自備 40%，借款 60%，槓桿倍數 2.5×</span>
         </div>
         <div class="role-card margin-sell">
           <div class="role-icon">📉</div>
           <div class="role-name">融券放空</div>
           <div class="role-en">MARGIN SHORT</div>
-          <div class="role-desc">向券商借股票賣出，賭股價會跌。台股融券保證金為九成，成本高。放空者的最大風險是股價不跌反漲，形成<strong>軋空</strong>——不斷上漲迫使放空者高價回補，虧損無上限。</div>
+          <div class="role-desc">向券商借股票賣出，賭股價會跌。台股融券保證金為九成，成本極高，且必須支付<strong>借券費</strong>。放空者的最大風險是股價不跌反漲，形成<strong>軋空</strong>——不斷上漲迫使放空者高價回補，理論上虧損無上限。此外，遇到股票<strong>除權息</strong>或公司宣布<strong>現金增資</strong>，融券可能被強制回補。</div>
           <span class="role-scale" style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.22);color:var(--green);">保證金 90%，理論虧損無上限</span>
         </div>
+      </div>
+
+      <!-- 增強版 SVG：資金流向圖 -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 230" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="230" fill="#040b15" rx="12"/>
+          <!-- Title -->
+          <text x="330" y="24" fill="rgba(0,229,255,.8)" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">融資融券 完整資金流向示意</text>
+
+          <!-- INVESTOR box -->
+          <rect x="260" y="38" width="140" height="46" rx="9" fill="rgba(0,229,255,.07)" stroke="rgba(0,229,255,.3)" stroke-width="1.2"/>
+          <text x="330" y="57" fill="#00e5ff" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">投資人</text>
+          <text x="330" y="72" fill="rgba(0,229,255,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">自備資金（保證金）</text>
+
+          <!-- BROKER box -->
+          <rect x="260" y="120" width="140" height="46" rx="9" fill="rgba(178,102,255,.07)" stroke="rgba(178,102,255,.3)" stroke-width="1.2"/>
+          <text x="330" y="139" fill="#b266ff" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">券商</text>
+          <text x="330" y="154" fill="rgba(178,102,255,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">提供借款 / 借券</text>
+
+          <!-- MARGIN LONG LEFT -->
+          <rect x="30" y="78" width="185" height="75" rx="9" fill="rgba(255,61,90,.05)" stroke="rgba(255,61,90,.22)" stroke-width="1"/>
+          <text x="122" y="95" fill="#ff3d5a" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">融資路徑（做多）</text>
+          <text x="122" y="112" fill="rgba(255,200,200,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">①保證金 40萬 + 借款 60萬</text>
+          <text x="122" y="127" fill="rgba(0,230,118,.75)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">②買入 100萬股票</text>
+          <text x="122" y="142" fill="rgba(255,214,0,.75)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">③還款 + 利息（年利率約6~9%）</text>
+
+          <!-- MARGIN SHORT RIGHT -->
+          <rect x="445" y="78" width="185" height="75" rx="9" fill="rgba(0,230,118,.04)" stroke="rgba(0,230,118,.22)" stroke-width="1"/>
+          <text x="537" y="95" fill="#00e676" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">融券路徑（做空）</text>
+          <text x="537" y="112" fill="rgba(180,255,200,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">①保證金 90萬 + 借券費</text>
+          <text x="537" y="127" fill="rgba(0,230,118,.75)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">②借股票賣出，等跌再買回</text>
+          <text x="537" y="142" fill="rgba(255,61,90,.75)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">③回補還券（若漲→軋空虧損）</text>
+
+          <!-- Connecting arrows -->
+          <line x1="260" y1="61" x2="215" y2="100" stroke="rgba(255,61,90,.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <polygon points="215,100 220,90 225,98" fill="rgba(255,61,90,.5)"/>
+          <line x1="400" y1="61" x2="445" y2="100" stroke="rgba(0,230,118,.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <polygon points="445,100 440,90 450,93" fill="rgba(0,230,118,.5)"/>
+
+          <!-- Bottom labels -->
+          <text x="122" y="175" fill="rgba(255,214,0,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">槓桿倍數：×2.5  ·  利息成本：6–9%/年</text>
+          <text x="537" y="175" fill="rgba(255,214,0,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">回補壓力：漲越多虧越多  ·  無上限風險</text>
+
+          <!-- KEY FORMULA -->
+          <rect x="180" y="196" width="300" height="24" rx="6" fill="rgba(0,229,255,.05)" stroke="rgba(0,229,255,.15)" stroke-width="1"/>
+          <text x="330" y="213" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="1">維持率 = 股票市值 ÷ 融資金額 × 100%　｜　券資比 = 融券 ÷ 融資</text>
+        </svg>
       </div>
 
       <div class="insight-box">
         <div class="insight-icon">💡</div>
         <div class="insight-body">
-          <div class="insight-label">核心認知</div>
-          <div class="insight-text">台灣市場的融資餘額，是<strong>散戶情緒的溫度計</strong>。融資大增代表散戶樂觀加碼、市場過熱；融資大減可能是斷頭潮或恐慌性平倉，通常對應市場的短期底部。專業投資人不用融資，所以融資餘額的變化幾乎完全反映散戶的集體行為。</div>
+          <div class="insight-label">核心認知：散戶情緒的溫度計</div>
+          <div class="insight-text">台灣市場的融資餘額幾乎完全代表<strong>散戶的集體行為</strong>——法人與外資極少使用融資，他們有自己的資金池。因此融資大增 = 散戶大量借錢進場、市場過熱；融資急跌 = 斷頭潮爆發或恐慌性出場，通常對應市場的<strong>短期底部</strong>。學會看融資融券數據，等於能「透視」散戶群體在做什麼決策。</div>
         </div>
       </div>
 
-      <!-- SVG：融資融券機制圖 -->
-      <div class="svg-chart-wrap">
-        <svg width="100%" viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg">
-          <rect width="620" height="190" fill="#040b15" rx="12"/>
-          <text x="310" y="26" fill="rgba(0,229,255,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="3">融資 vs 融券 機制對比</text>
-          <!-- Margin Long -->
-          <rect x="30" y="44" width="260" height="120" rx="10" fill="rgba(255,61,90,.05)" stroke="rgba(255,61,90,.2)" stroke-width="1"/>
-          <text x="160" y="64" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">融資（做多）</text>
-          <text x="160" y="84" fill="rgba(255,200,200,.7)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">自備 40% + 借款 60% → 買股</text>
-          <text x="160" y="102" fill="rgba(0,230,118,.8)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">漲：獲利 × 2.5 倍槓桿</text>
-          <text x="160" y="120" fill="rgba(255,61,90,.8)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">跌：維持率不足 → 追繳/斷頭</text>
-          <text x="160" y="150" fill="rgba(255,214,0,.7)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">維持率 = 股票市值 ÷ 融資金額</text>
+      <div class="sec-divider">融資融券的使用限制與門檻</div>
 
-          <!-- Margin Short -->
-          <rect x="330" y="44" width="260" height="120" rx="10" fill="rgba(0,230,118,.04)" stroke="rgba(0,230,118,.2)" stroke-width="1"/>
-          <text x="460" y="64" fill="#00e676" font-size="10" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">融券（做空）</text>
-          <text x="460" y="84" fill="rgba(180,255,200,.7)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">借股賣出 + 保證金 90%</text>
-          <text x="460" y="102" fill="rgba(0,230,118,.8)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">跌：買回還券 → 賺差價</text>
-          <text x="460" y="120" fill="rgba(255,61,90,.8)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">漲：被軋空 → 高價強制回補</text>
-          <text x="460" y="150" fill="rgba(255,214,0,.7)" font-size="8" font-family="Share Tech Mono, monospace" text-anchor="middle">券資比 = 融券餘額 ÷ 融資餘額</text>
-        </svg>
-      </div>
+      <p class="prose">不是所有股票都能融資融券。台灣證交所對可融資股票設有嚴格條件：上市滿 6 個月、財務健全、無重大違規等。<strong>全額交割股</strong>不得融資，因流動性不足；剛上市的 IPO 股在上市後一段時間內也通常無法融資。在查看個股的融資融券數據前，先確認該股是否為<em>可融資標的</em>，若不是，融資數據自然為零，不代表籌碼乾淨。</p>
+
+      <table class="cmp-table">
+        <thead>
+          <tr><th>類型</th><th>融資成數</th><th>融券保證金</th><th>主要風險</th><th>籌碼意義</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>上市普通股</strong></td>
+            <td class="val-red">60%（自備40%）</td>
+            <td class="val-green">90%</td>
+            <td>維持率不足→追繳→斷頭</td>
+            <td>融資餘額高 = 散戶重倉</td>
+          </tr>
+          <tr>
+            <td><strong>上櫃普通股</strong></td>
+            <td class="val-red">50%（自備50%）</td>
+            <td class="val-green">90%</td>
+            <td>同上，融資成數較低</td>
+            <td>波動較大，斷頭更快</td>
+          </tr>
+          <tr>
+            <td><strong>ETF（部分）</strong></td>
+            <td class="val-yellow">60%（部分可融）</td>
+            <td class="val-yellow">90%（部分可融）</td>
+            <td>追蹤誤差+槓桿雙重損耗</td>
+            <td>融資 ETF 代表散戶加碼方向</td>
+          </tr>
+          <tr>
+            <td><strong>全額交割股</strong></td>
+            <td class="val-red">不可融資</td>
+            <td class="val-red">不可融券</td>
+            <td>需全額現金交割</td>
+            <td>無融資數據，不代表籌碼健康</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -2425,36 +2494,55 @@
       <div class="warn-box">
         <div class="insight-icon">🚨</div>
         <div class="insight-body">
-          <div class="insight-label">斷頭機制</div>
-          <div class="insight-text">股價下跌 → 維持率低於 130% → 券商追繳通知 → 期限內未補繳 → 券商於次日開盤<strong>市價強制賣出</strong> → 增加賣壓 → 股價繼續下跌 → 觸發更多斷頭。這個<strong>死亡螺旋</strong>在市場急跌時會被放大，造成非理性的超跌。</div>
+          <div class="insight-label">斷頭機制：死亡螺旋</div>
+          <div class="insight-text">股價下跌 → 維持率低於 130% → 券商追繳通知（24小時內補繳）→ 期限內未補繳 → 券商於次日開盤<strong>市價強制賣出</strong> → 增加賣壓 → 股價繼續下跌 → 觸發更多人的斷頭。這個循環在<strong>市場恐慌的高峰</strong>會被無限放大。2020 年 3 月 COVID 崩跌、2022 年升息衝擊，都出現過此類連鎖斷頭現象。</div>
         </div>
       </div>
 
-      <!-- 維持率說明 SVG -->
-      <div class="svg-chart-wrap">
-        <svg width="100%" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
-          <rect width="620" height="200" fill="#040b15" rx="12"/>
-          <text x="310" y="26" fill="rgba(0,229,255,.7)" font-size="11" font-family="Share Tech Mono, monospace" text-anchor="middle" letter-spacing="3">融資維持率 安全區間示意</text>
-          <!-- Scale bar -->
-          <rect x="40" y="55" width="540" height="36" rx="8" fill="rgba(0,0,0,.4)" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-          <!-- Zones -->
-          <rect x="40" y="55" width="108" height="36" rx="8" fill="rgba(255,61,90,.5)"/>
-          <rect x="148" y="55" width="108" height="36" fill="rgba(255,152,0,.35)"/>
-          <rect x="256" y="55" width="162" height="36" fill="rgba(255,214,0,.25)"/>
-          <rect x="418" y="55" width="162" height="36" rx="8" fill="rgba(0,230,118,.3)"/>
-          <!-- Labels on bar -->
-          <text x="94" y="78" fill="#ff3d5a" font-size="9.5" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">斷頭區</text>
-          <text x="94" y="90" fill="rgba(255,100,100,.8)" font-size="7.5" font-family="Share Tech Mono, monospace" text-anchor="middle">&lt; 130%</text>
-          <text x="202" y="78" fill="#ff9800" font-size="9.5" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">追繳警戒</text>
-          <text x="202" y="90" fill="rgba(255,180,80,.8)" font-size="7.5" font-family="Share Tech Mono, monospace" text-anchor="middle">130~160%</text>
-          <text x="337" y="78" fill="#ffd600" font-size="9.5" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">觀察區</text>
-          <text x="337" y="90" fill="rgba(255,220,80,.8)" font-size="7.5" font-family="Share Tech Mono, monospace" text-anchor="middle">160~200%</text>
-          <text x="499" y="78" fill="#00e676" font-size="9.5" font-family="Share Tech Mono, monospace" text-anchor="middle" font-weight="700">安全區</text>
-          <text x="499" y="90" fill="rgba(100,230,150,.8)" font-size="7.5" font-family="Share Tech Mono, monospace" text-anchor="middle">&gt; 200%</text>
-          <!-- Arrow + notes -->
-          <text x="40" y="120" fill="rgba(255,61,90,.8)" font-size="9" font-family="Share Tech Mono, monospace">← 強制賣出，加劇下跌</text>
-          <text x="310" y="150" fill="rgba(0,229,255,.5)" font-size="9" font-family="Share Tech Mono, monospace" text-anchor="middle">維持率 = 股票市值 ÷ 融資金額 × 100%</text>
-          <text x="310" y="170" fill="rgba(255,255,255,.3)" font-size="8.5" font-family="Share Tech Mono, monospace" text-anchor="middle">例：以 100 元買入，融資 60 元，跌到 78 元 → 維持率 = 78÷60 = 130%（觸線）</text>
+      <!-- 精緻維持率視覺化 SVG -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="240" fill="#040b15" rx="12"/>
+          <text x="330" y="26" fill="rgba(0,229,255,.75)" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">融資維持率 — 四大區間解析</text>
+
+          <!-- Scale background -->
+          <rect x="50" y="46" width="560" height="48" rx="10" fill="rgba(0,0,0,.4)" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+
+          <!-- Zone fills with gradients -->
+          <rect x="50"  y="46" width="112" height="48" rx="10" fill="rgba(255,61,90,.55)"/>
+          <rect x="162" y="46" width="112" height="48" fill="rgba(255,152,0,.38)"/>
+          <rect x="274" y="46" width="168" height="48" fill="rgba(255,214,0,.22)"/>
+          <rect x="442" y="46" width="168" height="48" rx="10" fill="rgba(0,230,118,.32)"/>
+
+          <!-- Zone separators -->
+          <line x1="162" y1="46" x2="162" y2="94" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <line x1="274" y1="46" x2="274" y2="94" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <line x1="442" y1="46" x2="442" y2="94" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+
+          <!-- Zone labels -->
+          <text x="106" y="67" fill="#ff3d5a" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🔴 斷頭區</text>
+          <text x="106" y="83" fill="rgba(255,120,120,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">&lt; 130%</text>
+
+          <text x="218" y="67" fill="#ff9800" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🟠 追繳警戒</text>
+          <text x="218" y="83" fill="rgba(255,180,80,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">130–160%</text>
+
+          <text x="358" y="67" fill="#ffd600" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🟡 觀察區間</text>
+          <text x="358" y="83" fill="rgba(255,220,80,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">160–200%</text>
+
+          <text x="526" y="67" fill="#00e676" font-size="10" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🟢 安全舒適</text>
+          <text x="526" y="83" fill="rgba(100,230,150,.8)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">&gt; 200%</text>
+
+          <!-- Arrow indicator at 130% -->
+          <polygon points="162,102 158,110 162,108 166,110" fill="#ff3d5a"/>
+          <line x1="162" y1="110" x2="162" y2="125" stroke="rgba(255,61,90,.6)" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <text x="162" y="140" fill="#ff3d5a" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">強制賣出線</text>
+
+          <!-- Real example calculation -->
+          <rect x="50" y="158" width="560" height="68" rx="9" fill="rgba(0,229,255,.04)" stroke="rgba(0,229,255,.12)" stroke-width="1"/>
+          <text x="330" y="175" fill="rgba(0,229,255,.7)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">實例計算</text>
+          <text x="80" y="193" fill="rgba(200,220,240,.75)" font-size="8.5" font-family="Share Tech Mono,monospace">以 100 元/股買入 1000 股（市值 10 萬）</text>
+          <text x="80" y="208" fill="rgba(200,220,240,.75)" font-size="8.5" font-family="Share Tech Mono,monospace">融資金額 = 6 萬（60%）　自備保證金 = 4 萬（40%）</text>
+          <text x="80" y="222" fill="rgba(255,214,0,.8)" font-size="8.5" font-family="Share Tech Mono,monospace">跌至 78 元：市值 7.8 萬 ÷ 融資 6 萬 = 130%　→ 觸及斷頭警戒線！</text>
         </svg>
       </div>
 
@@ -2462,42 +2550,88 @@
 
       <p class="prose">許多投資人把斷頭潮視為市場末日，但對有準備的人來說，<strong>斷頭潮往往是短線底部的信號</strong>。當融資餘額在短時間內急劇縮減，代表被迫賣出的賣壓接近尾聲；無法扛住的人已出場，剩下的是意志堅定或沒有融資壓力的持有者，股價自然容易止跌反彈。</p>
 
+      <p class="prose">斷頭的時程並非均勻分布——通常在<strong>首日急跌時規模最大</strong>，第二、三天遞減，第四、五天若股價不再大跌，斷頭潮便逐漸消化完畢。理解這個節奏，能讓你在恐慌中保持清醒。</p>
+
       <div class="signal-grid">
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--red);box-shadow:0 0 6px rgba(255,61,90,.5);"></div>
             <div class="signal-label" style="color:var(--red);">斷頭潮形成中</div>
           </div>
-          <div class="signal-body">融資餘額<strong style="color:var(--text);">單日大量縮減</strong>（超過 5%），同時大盤或個股出現急跌，成交量放大。散戶正在被迫賣出，是恐慌的高峰，<strong style="color:var(--text);">非追空良機</strong>。</div>
+          <div class="signal-body">融資餘額<strong style="color:var(--text);">單日大量縮減</strong>（超過 5%），同時大盤或個股出現急跌，成交量放大。散戶正在被迫賣出，是恐慌的高峰，<strong style="color:var(--text);">非追空良機</strong>。此時追空可能正在追到最低點。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--yellow);box-shadow:0 0 6px rgba(255,214,0,.5);"></div>
             <div class="signal-label" style="color:var(--yellow);">斷頭潮末期</div>
           </div>
-          <div class="signal-body">融資餘額連跌數日後<strong style="color:var(--text);">開始趨穩</strong>，股價卻仍未大跌，代表賣壓在消化。此時缺乏融資壓力的多頭開始接手，是留意做多時機的窗口。</div>
+          <div class="signal-body">融資餘額連跌數日後<strong style="color:var(--text);">開始趨穩</strong>，股價卻仍未大跌，代表賣壓正在消化。此時缺乏融資壓力的多頭開始接手，是留意做多時機的觀察窗口，但尚不急於行動。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--green);box-shadow:0 0 6px rgba(0,230,118,.5);"></div>
-            <div class="signal-label" style="color:var(--green);">健康增資</div>
+            <div class="signal-label" style="color:var(--green);">健康增資訊號</div>
           </div>
-          <div class="signal-body">股價緩步上漲的同時，融資餘額<strong style="color:var(--text);">小幅增加</strong>，增速遠低於漲幅，代表有新的槓桿資金進場，但尚未過熱，是多頭行情初期的健康現象。</div>
+          <div class="signal-body">股價緩步上漲的同時，融資餘額<strong style="color:var(--text);">小幅增加</strong>，增速遠低於漲幅，代表有新的槓桿資金進場，但尚未過熱，是多頭行情初中期的健康現象，可正向看待。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--orange);box-shadow:0 0 6px rgba(255,152,0,.5);"></div>
             <div class="signal-label" style="color:var(--orange);">融資過熱警訊</div>
           </div>
-          <div class="signal-body">融資餘額<strong style="color:var(--text);">急速暴增</strong>，甚至超過前波高點，代表散戶在高位大量加碼。這是行情接近過熱的警訊，一旦漲勢停止，斷頭潮風險大幅升高。</div>
+          <div class="signal-body">融資餘額<strong style="color:var(--text);">急速暴增</strong>，甚至超過前波高點，代表散戶在高位大量加碼。這是行情接近過熱的警訊，一旦漲勢停止，斷頭潮風險大幅升高，主力往往正在出貨。</div>
         </div>
+      </div>
+
+      <!-- 斷頭潮時間線 SVG -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 180" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="180" fill="#040b15" rx="12"/>
+          <text x="330" y="22" fill="rgba(0,229,255,.7)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">斷頭潮發展節奏（典型5日走勢）</text>
+
+          <!-- Day labels -->
+          <text x="80"  y="42" fill="rgba(255,255,255,.4)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">D+1</text>
+          <text x="200" y="42" fill="rgba(255,255,255,.4)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">D+2</text>
+          <text x="320" y="42" fill="rgba(255,255,255,.4)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">D+3</text>
+          <text x="440" y="42" fill="rgba(255,255,255,.4)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">D+4</text>
+          <text x="560" y="42" fill="rgba(255,255,255,.4)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">D+5</text>
+
+          <!-- Fusion bar (融資萎縮量) - inverted bars from top -->
+          <rect x="50"  y="52" width="60" height="72" rx="5" fill="rgba(255,61,90,.55)"/>
+          <rect x="170" y="72" width="60" height="52" rx="5" fill="rgba(255,100,60,.48)"/>
+          <rect x="290" y="88" width="60" height="36" rx="5" fill="rgba(255,152,0,.42)"/>
+          <rect x="410" y="104" width="60" height="20" rx="5" fill="rgba(255,214,0,.38)"/>
+          <rect x="530" y="112" width="60" height="12" rx="5" fill="rgba(0,230,118,.4)"/>
+
+          <!-- Value labels inside bars -->
+          <text x="80"  y="95"  fill="white" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">−8%</text>
+          <text x="200" y="110" fill="white" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">−5%</text>
+          <text x="320" y="116" fill="white" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">−3%</text>
+          <text x="440" y="120" fill="white" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">−1%</text>
+          <text x="560" y="124" fill="white" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">趨穩</text>
+
+          <!-- Bottom annotations -->
+          <text x="80"  y="142" fill="rgba(255,61,90,.8)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">恐慌最烈</text>
+          <text x="200" y="142" fill="rgba(255,120,60,.7)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">連鎖斷頭</text>
+          <text x="320" y="142" fill="rgba(255,152,0,.7)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">賣壓遞減</text>
+          <text x="440" y="142" fill="rgba(255,214,0,.7)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">賣壓尾聲</text>
+          <text x="560" y="142" fill="rgba(0,230,118,.7)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">底部觀察期</text>
+
+          <!-- Phase line -->
+          <line x1="495" y1="50" x2="495" y2="155" stroke="rgba(0,230,118,.3)" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <text x="510" y="62" fill="rgba(0,230,118,.6)" font-size="7.5" font-family="Share Tech Mono,monospace">← 計時開始</text>
+
+          <!-- Legend -->
+          <rect x="50" y="158" width="12" height="8" rx="2" fill="rgba(255,61,90,.55)"/>
+          <text x="67" y="166" fill="rgba(200,220,240,.6)" font-size="8" font-family="Share Tech Mono,monospace">融資餘額單日萎縮比例（越高代表斷頭越嚴重）</text>
+        </svg>
       </div>
 
       <div class="success-box">
         <div class="insight-icon">✅</div>
         <div class="insight-body">
-          <div class="insight-label">實戰操作邏輯</div>
-          <div class="insight-text">大盤融資餘額若在一週內縮減超過 <strong>3～5%</strong>，且股價跌幅已大，可以開始留意反彈機會。這不是買點，而是「<strong>開始計時</strong>」的信號——真正的買點，要等融資餘額止跌穩定，搭配技術面出現底部訊號。</div>
+          <div class="insight-label">實戰操作邏輯：不急於抄底的智慧</div>
+          <div class="insight-text">大盤融資餘額若在一週內縮減超過 <strong>3～5%</strong>，且股價跌幅已大，可以開始留意反彈機會。這不是買點，而是「<strong>開始計時</strong>」的信號——真正的買點，要等融資餘額止跌穩定（連續 2 天萎縮不超過 1%），搭配技術面出現底部訊號（量縮止跌、K線出現長下影線、RSI 進入超賣區），才是合理的進場時機。<strong>斷頭潮當天不要抄底，等它收斂後才是機會。</strong></div>
         </div>
       </div>
     </div>
@@ -2507,7 +2641,7 @@
   <div class="section-card reveal" id="sec3">
     <div class="section-header">
       <span class="section-num">SEC 03</span>
-      <span class="section-title">融券回補與軋空：空頭的噩夢</span>
+      <span class="section-title">融券回補與軋空行情：空頭的噩夢</span>
       <span class="section-icon">🌪️</span>
     </div>
     <div class="section-body">
@@ -2516,45 +2650,128 @@
       <div class="insight-box">
         <div class="insight-icon">🔑</div>
         <div class="insight-body">
-          <div class="insight-label">軋空的觸發條件</div>
-          <div class="insight-text">軋空通常需要三個要素同時存在：①<strong>融券餘額高</strong>（空頭籌碼集中）、②<strong>可借券數量少</strong>（空頭難以加碼）、③<strong>有突發性多頭催化劑</strong>（業績超預期、法人突然大買、利多消息）。三者缺一，軋空的強度都會大打折扣。</div>
+          <div class="insight-label">軋空的三大觸發條件</div>
+          <div class="insight-text">軋空通常需要三個要素同時存在：① <strong>融券餘額高</strong>（空頭籌碼集中、回補量大）、② <strong>可借券數量少或流通籌碼緊</strong>（空頭難以繼續加碼）、③ <strong>有突發性多頭催化劑</strong>（業績超預期、法人突然大買、重大利多消息）。三者缺一，軋空的強度都會大打折扣。<strong>最強的軋空，往往發生在空頭最自信的時候，也是多頭最恐懼的時候。</strong></div>
         </div>
       </div>
 
-      <!-- 軋空行情流程 -->
+      <!-- 軋空行情全流程 SVG -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 260" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="260" fill="#040b15" rx="12"/>
+          <text x="330" y="22" fill="rgba(0,229,255,.75)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">軋空行情 — 完整生命週期</text>
+
+          <!-- Phase boxes -->
+          <!-- Phase 1: Accumulation -->
+          <rect x="30" y="35" width="115" height="80" rx="8" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.3)" stroke-width="1.2"/>
+          <text x="87" y="53" fill="#ff3d5a" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">① 空頭累積期</text>
+          <text x="87" y="68" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">融券持續增加</text>
+          <text x="87" y="82" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">券資比攀升</text>
+          <text x="87" y="96" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">空頭自信滿滿</text>
+          <text x="87" y="108" fill="#ff3d5a" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【彈藥填充期】</text>
+
+          <!-- Arrow 1→2 -->
+          <line x1="145" y1="75" x2="163" y2="75" stroke="rgba(255,214,0,.5)" stroke-width="1.5"/>
+          <polygon points="163,75 156,71 156,79" fill="rgba(255,214,0,.5)"/>
+
+          <!-- Phase 2: Catalyst -->
+          <rect x="163" y="35" width="115" height="80" rx="8" fill="rgba(255,214,0,.06)" stroke="rgba(255,214,0,.3)" stroke-width="1.2"/>
+          <text x="220" y="53" fill="#ffd600" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">② 催化劑出現</text>
+          <text x="220" y="68" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">利多消息/業績</text>
+          <text x="220" y="82" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">法人突然買超</text>
+          <text x="220" y="96" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">股價開始上漲</text>
+          <text x="220" y="108" fill="#ffd600" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【引信點燃】</text>
+
+          <!-- Arrow 2→3 -->
+          <line x1="278" y1="75" x2="296" y2="75" stroke="rgba(0,229,255,.5)" stroke-width="1.5"/>
+          <polygon points="296,75 289,71 289,79" fill="rgba(0,229,255,.5)"/>
+
+          <!-- Phase 3: Small shorts cover -->
+          <rect x="296" y="35" width="115" height="80" rx="8" fill="rgba(0,229,255,.05)" stroke="rgba(0,229,255,.25)" stroke-width="1.2"/>
+          <text x="353" y="53" fill="#00e5ff" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">③ 小空頭回補</text>
+          <text x="353" y="68" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">止損紀律好者</text>
+          <text x="353" y="82" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">率先認賠回補</text>
+          <text x="353" y="96" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">初段漲幅形成</text>
+          <text x="353" y="108" fill="#00e5ff" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【發射初段】</text>
+
+          <!-- Arrow 3→4 -->
+          <line x1="411" y1="75" x2="429" y2="75" stroke="rgba(178,102,255,.5)" stroke-width="1.5"/>
+          <polygon points="429,75 422,71 422,79" fill="rgba(178,102,255,.5)"/>
+
+          <!-- Phase 4: Big shorts forced -->
+          <rect x="429" y="35" width="115" height="80" rx="8" fill="rgba(178,102,255,.06)" stroke="rgba(178,102,255,.3)" stroke-width="1.2"/>
+          <text x="486" y="53" fill="#b266ff" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">④ 大空頭強制</text>
+          <text x="486" y="68" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大部位虧損激增</text>
+          <text x="486" y="82" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">被迫高價回補</text>
+          <text x="486" y="96" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">噴出行情爆發</text>
+          <text x="486" y="108" fill="#b266ff" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【主升段爆發】</text>
+
+          <!-- Arrow 4→5 -->
+          <line x1="544" y1="75" x2="562" y2="75" stroke="rgba(0,230,118,.5)" stroke-width="1.5"/>
+          <polygon points="562,75 555,71 555,79" fill="rgba(0,230,118,.5)"/>
+
+          <!-- Phase 5: End -->
+          <rect x="562" y="35" width="80" height="80" rx="8" fill="rgba(0,230,118,.05)" stroke="rgba(0,230,118,.22)" stroke-width="1.2"/>
+          <text x="602" y="58" fill="#00e676" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">⑤ 軋空</text>
+          <text x="602" y="72" fill="#00e676" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">結束</text>
+          <text x="602" y="88" fill="rgba(150,230,180,.6)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">融券歸零</text>
+          <text x="602" y="101" fill="rgba(150,230,180,.6)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">動力耗盡</text>
+          <text x="602" y="114" fill="rgba(255,61,90,.7)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">⚠️ 風險反轉</text>
+
+          <!-- Stock price curve - rises sharply from phase 2 onwards -->
+          <polyline points="30,220 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40"
+            fill="none" stroke="#00e5ff" stroke-width="2" opacity=".7"/>
+          <!-- Glow duplicate -->
+          <polyline points="30,220 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40"
+            fill="none" stroke="#00e5ff" stroke-width="5" opacity=".08"/>
+
+          <!-- Price axis label -->
+          <text x="18" y="225" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono,monospace">股價</text>
+          <line x1="28" y1="140" x2="28" y2="230" stroke="rgba(0,229,255,.15)" stroke-width="1"/>
+
+          <!-- Area fill under curve -->
+          <polygon points="30,230 87,230 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40 642,230"
+            fill="rgba(0,229,255,.04)"/>
+
+          <!-- Bottom time label -->
+          <text x="330" y="248" fill="rgba(255,255,255,.25)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">時間軸 →（從融券累積到軋空結束，典型週期 2–8 週）</text>
+        </svg>
+      </div>
+
+      <!-- 軋空行情 step cards -->
       <div class="flow-step">
         <div class="flow-num rn">①</div>
         <div class="flow-content">
           <div class="flow-heading">融券大量累積：空頭自信滿滿</div>
-          <div class="flow-sub">某股票基本面欠佳或技術面轉弱，大量投機者融券放空，融券餘額持續攀升，券資比超過 25% 甚至 50% 以上，空頭部位高度集中。</div>
+          <div class="flow-sub">某股票基本面欠佳或技術面轉弱，大量投機者融券放空，融券餘額持續攀升，券資比超過 25% 甚至 50% 以上，空頭部位高度集中。這個階段可能持續數週甚至數個月，空頭對自己的判斷越來越有信心。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num yn">②</div>
         <div class="flow-content">
           <div class="flow-heading">利多催化劑出現：空頭開始不安</div>
-          <div class="flow-sub">突發利多（業績大超預期、主力法人突然大量買超、重大合約宣布、市場熱點轉移至此類股）使得股價開始上漲，空頭出現浮虧，並感受到壓力。</div>
+          <div class="flow-sub">突發利多（業績大超預期、主力法人突然大量買超、重大合約宣布、市場熱點轉移至此類股）使得股價開始上漲。空頭出現浮虧，並感受到壓力，但多數人仍在觀望，認為只是暫時反彈。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num cn">③</div>
         <div class="flow-content">
           <div class="flow-heading">小空頭率先回補：初段漲幅</div>
-          <div class="flow-sub">止損紀律好的小空頭率先買回股票回補，形成初段買盤。股價再漲，剩餘空頭的虧損加深，心理防線接近崩潰。</div>
+          <div class="flow-sub">止損紀律好的小空頭率先買回股票回補，形成初段買盤。股價再漲，剩餘空頭的虧損加深，心理防線接近崩潰。許多散戶空頭此時開始加碼放空——試圖「攤平」，這往往是最危險的操作。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num gn">④</div>
         <div class="flow-content">
           <div class="flow-heading">大空頭被迫回補：加速噴出</div>
-          <div class="flow-sub">持有大量融券的大空頭不得不在<strong>更高的價格</strong>買入回補，形成巨量買單。若此時市場上可買的股票流動性不足，股價會在短時間內急劇噴出，出現跳空漲停或連續漲停。</div>
+          <div class="flow-sub">持有大量融券的大空頭不得不在<strong>更高的價格</strong>買入回補，形成巨量買單。若此時市場上可買的股票流動性不足（籌碼集中、浮動籌碼少），股價會在短時間內急劇噴出，出現跳空漲停或連續漲停，甚至出現<em>天天漲停、空頭無法回補</em>的極端情形。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num pn">⑤</div>
         <div class="flow-content">
           <div class="flow-heading">軋空結束：融券餘額急劇萎縮</div>
-          <div class="flow-sub">融券餘額在軋空過程中大量減少，代表空頭已陸續回補。當融券餘額降至低位，軋空動力消退，行情有可能急轉直下——追高的多頭此時要特別小心。</div>
+          <div class="flow-sub">融券餘額在軋空過程中大量減少，代表空頭已陸續回補。當融券餘額降至低位（通常萎縮超過 70%），軋空動力消退，行情有可能急轉直下——追高的多頭此時要特別小心，沒有人接棒，股價可能像漲多快就跌多快。</div>
         </div>
       </div>
 
@@ -2562,7 +2779,7 @@
         <div class="insight-icon">⚠️</div>
         <div class="insight-body">
           <div class="insight-label">軋空的終點往往是陷阱</div>
-          <div class="insight-text">軋空行情結束時，融券已大量回補，原本推升股價的買盤消失；而在高位追進的多頭卻沒有了支撐。一旦消息退潮，股價可能以比上漲更快的速度回落。<strong>「軋空起漲段做多，軋空末段出場」</strong>，才是正確的操作邏輯。</div>
+          <div class="insight-text">軋空行情結束時，融券已大量回補，原本推升股價的買盤消失；而在高位追進的多頭卻沒有了支撐。一旦消息退潮，股價可能以比上漲更快的速度回落。<strong>「軋空起漲段做多，軋空末段出場」</strong>，才是正確的操作邏輯。參考指標：當融券餘額單週萎縮超過 40%，可以開始考慮減碼。</div>
         </div>
       </div>
     </div>
@@ -2578,39 +2795,65 @@
     <div class="section-body">
       <p class="prose"><strong>券資比 = 融券餘額 ÷ 融資餘額 × 100%</strong>。券資比越高，代表相對於做多的槓桿資金，放空的力量越強。當券資比超過一定門檻，就代表市場上累積了大量的<em>潛在回補買盤</em>——這些空頭一旦認錯，就是一波爆炸性上漲的燃料。</p>
 
-      <!-- 券資比力度計 -->
-      <div class="force-meter-wrap">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-faint);letter-spacing:.2em;margin-bottom:14px;">券資比 → 軋空潛力對照</div>
-        <div class="force-row">
-          <div class="force-label" style="min-width:120px;">5% 以下</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:12%;background:rgba(0,229,255,.4);"></div></div>
-          <div class="force-val" style="color:var(--text-faint);">空頭稀少</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label" style="min-width:120px;">5% ～ 15%</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:30%;background:linear-gradient(90deg,#00e5ff,#ffd600);"></div></div>
-          <div class="force-val" style="color:var(--yellow);">低風險</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label" style="min-width:120px;">15% ～ 30%</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:55%;background:linear-gradient(90deg,#ffd600,#ff9800);"></div></div>
-          <div class="force-val" style="color:var(--orange);">留意</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label" style="min-width:120px;">30% ～ 50%</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:74%;background:linear-gradient(90deg,#ff9800,#ff3d5a);"></div></div>
-          <div class="force-val" style="color:var(--red);">軋空潛力強</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label" style="min-width:120px;">50% 以上</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:94%;background:linear-gradient(90deg,#ff3d5a,#b266ff);box-shadow:0 0 8px rgba(255,61,90,.4);"></div></div>
-          <div class="force-val" style="color:var(--purple);">極高危/機</div>
-        </div>
+      <p class="prose">但券資比也有其局限性：若融資餘額本身很少（例如小型股幾乎沒有人融資），即使融券只有一點點，券資比也可能高得驚人，卻毫無軋空意義。所以<strong>要同時看融券的絕對餘額與券資比</strong>，才有完整的判斷依據。</p>
+
+      <!-- 券資比力度計 - 增強版 -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="200" fill="#040b15" rx="12"/>
+          <text x="330" y="22" fill="rgba(0,229,255,.7)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">券資比 → 軋空潛力能量儀表</text>
+
+          <!-- Gauge background -->
+          <rect x="40" y="40" width="580" height="30" rx="6" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+
+          <!-- Gradient fill bars -->
+          <rect x="40"  y="40" width="58"  height="30" rx="6" fill="rgba(0,229,255,.35)"/>
+          <rect x="98"  y="40" width="116" height="30" fill="rgba(0,229,255,.25)"/>
+          <rect x="214" y="40" width="116" height="30" fill="rgba(255,214,0,.3)"/>
+          <rect x="330" y="40" width="145" height="30" fill="rgba(255,152,0,.35)"/>
+          <rect x="475" y="40" width="145" height="30" rx="6" fill="rgba(255,61,90,.45)"/>
+
+          <!-- Section Labels above -->
+          <text x="69"  y="36" fill="rgba(0,229,255,.7)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">5%↓</text>
+          <text x="156" y="36" fill="rgba(0,229,255,.7)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">5–15%</text>
+          <text x="272" y="36" fill="rgba(255,214,0,.8)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">15–30%</text>
+          <text x="402" y="36" fill="rgba(255,152,0,.85)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">30–50%</text>
+          <text x="547" y="36" fill="rgba(255,61,90,.9)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">50%↑</text>
+
+          <!-- Section labels below -->
+          <text x="69"  y="84" fill="rgba(0,229,255,.65)"  font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">空頭稀少</text>
+          <text x="156" y="84" fill="rgba(0,229,255,.65)"  font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">正常範圍</text>
+          <text x="272" y="84" fill="rgba(255,214,0,.75)"  font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">開始留意</text>
+          <text x="402" y="84" fill="rgba(255,152,0,.8)"   font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">軋空潛力強</text>
+          <text x="547" y="84" fill="rgba(255,61,90,.85)"  font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle">極高風險/機會</text>
+
+          <!-- Section dividers -->
+          <line x1="98"  y1="40" x2="98"  y2="70" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="214" y1="40" x2="214" y2="70" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="330" y1="40" x2="330" y2="70" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="475" y1="40" x2="475" y2="70" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+
+          <!-- Emoji bullets -->
+          <text x="69"  y="60" fill="white" font-size="10" text-anchor="middle">❄️</text>
+          <text x="156" y="60" fill="white" font-size="10" text-anchor="middle">🔵</text>
+          <text x="272" y="60" fill="white" font-size="10" text-anchor="middle">🟡</text>
+          <text x="402" y="60" fill="white" font-size="10" text-anchor="middle">🟠</text>
+          <text x="547" y="60" fill="white" font-size="10" text-anchor="middle">🔴</text>
+
+          <!-- Ideal zone highlight -->
+          <rect x="330" y="100" width="145" height="50" rx="8" fill="rgba(255,152,0,.06)" stroke="rgba(255,152,0,.2)" stroke-width="1"/>
+          <text x="402" y="118" fill="rgba(255,152,0,.8)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">最佳觀察區間</text>
+          <text x="402" y="133" fill="rgba(255,200,120,.65)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">30–50% 且股價築底反轉</text>
+          <text x="402" y="147" fill="rgba(255,200,120,.65)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">配合法人買超，軋空機率最高</text>
+
+          <!-- Notes row -->
+          <text x="330" y="185" fill="rgba(255,255,255,.25)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">※ 券資比需搭配融券絕對餘額判讀；小型股因融資少，券資比易失真</text>
+        </svg>
       </div>
 
       <div class="sec-divider">券資比高不等於立刻軋空</div>
 
-      <p class="prose">券資比只代表「彈藥充足」，但軋空的引爆還需要<strong>催化劑</strong>。許多股票長期維持高券資比卻一直跌——因為空頭基本面判斷正確，也沒有足夠強的多頭力量觸發回補。所以高券資比是<strong>潛力指標</strong>，不是操作指令。</p>
+      <p class="prose">券資比只代表「彈藥充足」，但軋空的引爆還需要<strong>催化劑</strong>。許多股票長期維持高券資比卻一直跌——因為空頭基本面判斷正確，也沒有足夠強的多頭力量觸發回補。所以高券資比是<strong>潛力指標</strong>，不是操作指令。正確的流程是：先篩選高券資比標的 → 觀察基本面是否有轉機 → 等待法人進場訊號 → 技術面確認反轉後才行動。</p>
 
       <table class="cmp-table">
         <thead>
@@ -2624,39 +2867,46 @@
         </thead>
         <tbody>
           <tr>
-            <td>軋空引爆前</td>
+            <td>🚀 軋空引爆前</td>
             <td class="val-red">高（30%+）</td>
             <td class="val-green">開始反轉向上</td>
-            <td class="val-cyan">外資轉買</td>
-            <td>強力進場信號，可積極做多</td>
+            <td class="val-cyan">外資轉為買超</td>
+            <td>強力進場信號，可積極做多，停損設前低</td>
           </tr>
           <tr>
-            <td>空頭陷阱</td>
+            <td>⚠️ 空頭陷阱</td>
             <td class="val-red">高（30%+）</td>
             <td class="val-red">持續下跌</td>
-            <td class="val-red">外資賣超</td>
+            <td class="val-red">外資持續賣超</td>
             <td>空頭判斷正確，多頭勿輕易進場</td>
           </tr>
           <tr>
-            <td>軋空末段</td>
+            <td>📉 軋空末段</td>
             <td class="val-yellow">快速萎縮中</td>
-            <td class="val-yellow">快速上漲</td>
-            <td class="val-yellow">外資觀望</td>
-            <td>動力衰退，高位多頭謹慎減碼</td>
+            <td class="val-yellow">快速上漲中</td>
+            <td class="val-yellow">外資觀望或微減</td>
+            <td>動力衰退，高位多頭開始謹慎減碼</td>
           </tr>
           <tr>
-            <td>安全多頭格局</td>
+            <td>✅ 安全多頭格局</td>
             <td class="val-green">低（5%以下）</td>
             <td class="val-green">緩步上漲</td>
             <td class="val-cyan">外資持續買超</td>
             <td>籌碼最乾淨，適合長線持有</td>
           </tr>
           <tr>
-            <td>多頭過熱</td>
-            <td class="val-green">低（空頭都不敢放空）</td>
+            <td>🔥 多頭過熱</td>
+            <td class="val-green">低（空頭不敢放空）</td>
             <td class="val-red">融資急速增加</td>
-            <td class="val-yellow">外資開始賣</td>
+            <td class="val-yellow">外資開始賣出</td>
             <td>多頭過熱警訊，注意短線修正</td>
+          </tr>
+          <tr>
+            <td>🔍 中性觀察</td>
+            <td class="val-orange">中（15–30%）</td>
+            <td class="val-yellow">橫盤整理</td>
+            <td class="val-yellow">外資觀望</td>
+            <td>等待方向選擇，暫不操作</td>
           </tr>
         </tbody>
       </table>
@@ -2671,63 +2921,201 @@
       <span class="section-icon">🌡️</span>
     </div>
     <div class="section-body">
-      <p class="prose">除了單一個股的融資餘額，觀察<strong>大盤整體的融資使用率</strong>（目前融資餘額 ÷ 融資總限額）可以判斷整個市場的槓桿水位，是評估市場是否過熱的重要參考。</p>
+      <p class="prose">除了單一個股的融資餘額，觀察<strong>大盤整體的融資使用率</strong>（目前融資餘額 ÷ 融資總限額）可以判斷整個市場的槓桿水位，是評估市場是否過熱的重要參考。台灣證交所的融資總限額是固定的，實際使用率的高低直接反映整體市場的散戶槓桿程度。</p>
+
+      <!-- 融資使用率 SVG 溫度計圖 -->
+      <div class="svg-chart-wrap" style="margin:24px 0;">
+        <svg width="100%" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="200" fill="#040b15" rx="12"/>
+          <text x="330" y="22" fill="rgba(0,229,255,.7)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">大盤融資使用率 — 市場槓桿溫度計</text>
+
+          <!-- Thermometer tube -->
+          <rect x="50" y="50" width="560" height="34" rx="17" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.06)" stroke-width="1.2"/>
+
+          <!-- Fill gradient: green→yellow→orange→red -->
+          <defs>
+            <linearGradient id="thermoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="rgba(0,230,118,.6)"/>
+              <stop offset="30%"  stop-color="rgba(0,229,255,.5)"/>
+              <stop offset="55%"  stop-color="rgba(255,214,0,.55)"/>
+              <stop offset="78%"  stop-color="rgba(255,152,0,.6)"/>
+              <stop offset="100%" stop-color="rgba(255,61,90,.7)"/>
+            </linearGradient>
+          </defs>
+          <rect x="50" y="50" width="560" height="34" rx="17" fill="url(#thermoGrad)" opacity=".85"/>
+
+          <!-- Zone markers -->
+          <line x1="162" y1="44" x2="162" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="330" y1="44" x2="330" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="498" y1="44" x2="498" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,2"/>
+
+          <!-- Percentage labels on bar -->
+          <text x="106"  y="72" fill="rgba(255,255,255,.85)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">20%↓</text>
+          <text x="246"  y="72" fill="rgba(255,255,255,.85)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">20–35%</text>
+          <text x="414"  y="72" fill="rgba(255,255,255,.85)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">35–50%</text>
+          <text x="579"  y="72" fill="rgba(255,255,255,.85)" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">50%↑</text>
+
+          <!-- Labels below -->
+          <text x="106"  y="104" fill="rgba(0,230,118,.8)"  font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">❄️ 低槓桿</text>
+          <text x="106"  y="116" fill="rgba(0,230,118,.6)"  font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">積極布局好時機</text>
+
+          <text x="246"  y="104" fill="rgba(0,229,255,.8)"  font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🌤️ 正常活躍</text>
+          <text x="246"  y="116" fill="rgba(0,229,255,.6)"  font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">多頭行情健康狀態</text>
+
+          <text x="414"  y="104" fill="rgba(255,152,0,.85)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🌡️ 偏熱警戒</text>
+          <text x="414"  y="116" fill="rgba(255,152,0,.65)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">開始減少倉位</text>
+
+          <text x="579"  y="104" fill="rgba(255,61,90,.9)"  font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🔥 過熱危險</text>
+          <text x="579"  y="116" fill="rgba(255,61,90,.7)"  font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">斷頭潮隨時爆發</text>
+
+          <!-- Historical reference line -->
+          <line x1="50" y1="155" x2="610" y2="155" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <text x="330" y="142" fill="rgba(255,214,0,.6)" font-size="9" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">歷史事件參照</text>
+          <text x="106" y="170" fill="rgba(0,230,118,.55)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">2020/3 崩跌後</text>
+          <text x="106" y="181" fill="rgba(0,230,118,.5)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">黃金布局期</text>
+          <text x="579" y="170" fill="rgba(255,61,90,.55)"  font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">2021 高峰前</text>
+          <text x="579" y="181" fill="rgba(255,61,90,.5)"   font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">使用率接近60%</text>
+        </svg>
+      </div>
 
       <div class="role-grid-3">
         <div class="role-card c-cyan">
           <div class="role-icon">❄️</div>
           <div class="role-name">低融資使用率</div>
-          <div class="role-en">LOW LEVERAGE</div>
-          <div class="role-desc">市場整體融資使用率偏低（20% 以下），代表散戶謹慎，槓桿未過度使用。此環境中的上漲是相對健康的，因為沒有大量斷頭壓力。</div>
+          <div class="role-en">LOW LEVERAGE · &lt;20%</div>
+          <div class="role-desc">市場整體融資使用率偏低，代表散戶謹慎，槓桿未過度使用。此環境中的上漲是相對健康的，因為沒有大量斷頭壓力。即使遇到急跌，由於槓桿水位低，反彈也往往比較快速有力，是最適合積極布局的市場環境。</div>
         </div>
         <div class="role-card short-squeeze">
           <div class="role-icon">🌤️</div>
           <div class="role-name">中度融資使用率</div>
-          <div class="role-en">MODERATE LEVERAGE</div>
-          <div class="role-desc">使用率 20～40%，市場活躍但不過熱，是多頭行情的常見狀態。需持續監控是否有快速攀升的趨勢，一旦加速增加就要提高警戒。</div>
+          <div class="role-en">MODERATE · 20–40%</div>
+          <div class="role-desc">市場活躍但不過熱，是多頭行情的常見狀態。需持續監控是否有快速攀升的趨勢，一旦加速增加就要提高警戒。這個區間適合正常的做多操作，但要控制部位，不要讓自己的槓桿也跟著市場一起高漲。</div>
         </div>
         <div class="role-card margin-buy">
           <div class="role-icon">🔥</div>
           <div class="role-name">高融資使用率</div>
-          <div class="role-en">HIGH LEVERAGE</div>
-          <div class="role-desc">使用率超過 40% 甚至接近 60%，是市場過熱的警訊。歷史上台股多次大跌前，都出現融資使用率急速攀高的現象，此時應逐步減少倉位。</div>
+          <div class="role-en">OVERHEATED · &gt;40%</div>
+          <div class="role-desc">使用率超過 40% 甚至接近 60%，是市場過熱的警訊。歷史上台股多次大跌前，都出現融資使用率急速攀高的現象。此時應逐步減少倉位，保持高現金比例，等待市場修正後的機會。</div>
         </div>
       </div>
 
       <div class="gold-box">
         <div class="insight-icon">📖</div>
         <div class="insight-body">
-          <div class="insight-label">歷史規律</div>
-          <div class="insight-text">台股歷史上幾次重大系統性下跌（如 2000 年科技泡沫、2008 年金融海嘯、2020 年 COVID 初期崩跌），事前都伴隨融資餘額持續飆升的現象。反之，融資餘額在低點徘徊時期（如 2020 年 3 月崩跌後），往往是長線多頭布局的黃金時機。</div>
+          <div class="insight-label">歷史規律：大崩跌前的共同特徵</div>
+          <div class="insight-text">台股歷史上幾次重大系統性下跌（2000 年科技泡沫、2008 年金融海嘯、2020 年 COVID 初期崩跌、2022 年暴力升息），事前都伴隨<strong>融資餘額持續飆升的現象</strong>。特別是 2000 年的科技泡沫，台股融資餘額在最高峰時超過 5,000 億元，遠超正常水位，崩跌後花了數年才回到合理水位。反之，融資餘額在低點徘徊時期（如 2020 年 3 月崩跌後的 1,800 億元附近），往往是長線多頭布局的<strong>黃金時機</strong>。</div>
         </div>
       </div>
 
       <div class="shadow-line">
         <div class="sl-side dn"></div>
         <div class="sl-body">
-          <div class="sl-top dn">✅ 融資餘額低位 + 外資買超 = 最安全的進場環境</div>
-          <div class="sl-text">當市場融資使用率偏低，代表籌碼乾淨——沒有大量高位套牢的融資多頭需要逃命。此時若外資同步買超，是<strong>最無壓力的多頭格局</strong>，上漲時不容易遭遇散戶賣壓。</div>
+          <div class="sl-top dn">✅ 最安全的進場環境：低融資 + 外資買超</div>
+          <div class="sl-text">當市場融資使用率偏低，代表籌碼乾淨——沒有大量高位套牢的融資多頭需要逃命。此時若外資同步買超，是<strong>最無壓力的多頭格局</strong>，上漲時不容易遭遇散戶賣壓，漲勢更穩健持久。散戶尚未進場，才是真正的啟動訊號。</div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">🚨 融資餘額高位 + 外資賣超 = 最危險的多頭信號</div>
-          <div class="sl-text">高位融資代表散戶高度參與且加槓桿，外資賣超代表機構在出場。<strong>散戶的錢在接外資的貨</strong>——這是多頭行情接近尾聲的經典組合，需要特別謹慎。</div>
+          <div class="sl-top up">🚨 最危險的多頭信號：高融資 + 外資賣超</div>
+          <div class="sl-text">高位融資代表散戶高度參與且加槓桿，外資賣超代表機構在出場。<strong>散戶的錢在接外資的貨</strong>——這是多頭行情接近尾聲的經典組合。若此時你的帳戶也在融資做多，要特別謹慎：你可能正在成為行情尾聲的接盤者。</div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🔧</div>
+        <div class="insight-body">
+          <div class="insight-label">哪裡查大盤融資使用率？</div>
+          <div class="insight-text">台灣證券交易所官網（twse.com.tw）每日公布「信用交易統計」，包含大盤融資餘額、融券餘額、使用率等數據。JellyStock 也整合了這些數據，可在主頁的籌碼面板直接查看趨勢圖表，對照個股數據一起研判。建議每週固定查看一次，建立<strong>習慣性的宏觀籌碼觀察</strong>。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ SEC 6 ─ 小測驗 ═══ -->
+  <!-- ═══ SEC 6 ─ 新增：融資融券與技術面的搭配 ═══ -->
   <div class="section-card reveal" id="sec6">
     <div class="section-header">
       <span class="section-num">SEC 06</span>
+      <span class="section-title">融資融券數據與技術面的搭配使用</span>
+      <span class="section-icon">📊</span>
+    </div>
+    <div class="section-body">
+      <p class="prose">融資融券數據單獨使用價值有限，真正的威力在於和<strong>技術分析</strong>結合時——籌碼面解釋「誰在做什麼」，技術面確認「時機是否成熟」，兩者互補，可以大幅提升進出場的精準度。</p>
+
+      <div class="sec-divider">四種經典搭配訊號</div>
+
+      <!-- 搭配訊號 SVG -->
+      <div class="svg-chart-wrap" style="margin:20px 0;">
+        <svg width="100%" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="200" fill="#040b15" rx="12"/>
+          <text x="330" y="22" fill="rgba(0,229,255,.7)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">籌碼面 × 技術面 — 四象限訊號矩陣</text>
+
+          <!-- 4 quadrant boxes -->
+          <!-- Q1: Good chips, Good tech = STRONG BUY -->
+          <rect x="30" y="36" width="290" height="68" rx="8" fill="rgba(0,230,118,.07)" stroke="rgba(0,230,118,.28)" stroke-width="1.2"/>
+          <text x="175" y="54" fill="#00e676" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">✅ 最強進場訊號</text>
+          <text x="175" y="69" fill="rgba(150,230,180,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">籌碼：融資低 + 外資連買 + 券資比低</text>
+          <text x="175" y="82" fill="rgba(150,230,180,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">技術：突破壓力 + 量增 + 均線多排</text>
+          <text x="175" y="97" fill="rgba(0,230,118,.85)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">→ 積極做多，趨勢行情</text>
+
+          <!-- Q2: Good chips, Bad tech = WAIT -->
+          <rect x="340" y="36" width="290" height="68" rx="8" fill="rgba(255,214,0,.06)" stroke="rgba(255,214,0,.25)" stroke-width="1.2"/>
+          <text x="485" y="54" fill="#ffd600" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">⏳ 等待時機訊號</text>
+          <text x="485" y="69" fill="rgba(255,240,150,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">籌碼：外資在買 + 融券高（軋空潛力）</text>
+          <text x="485" y="82" fill="rgba(255,240,150,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">技術：尚未突破壓力位 / 橫盤整理中</text>
+          <text x="485" y="97" fill="rgba(255,214,0,.85)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">→ 設好觀察點，等技術突破再進</text>
+
+          <!-- Q3: Bad chips, Good tech = SUSPECT -->
+          <rect x="30" y="120" width="290" height="68" rx="8" fill="rgba(255,152,0,.06)" stroke="rgba(255,152,0,.22)" stroke-width="1.2"/>
+          <text x="175" y="138" fill="#ff9800" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">🤔 可疑訊號</text>
+          <text x="175" y="153" fill="rgba(255,200,120,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">籌碼：融資大增 + 外資賣超</text>
+          <text x="175" y="166" fill="rgba(255,200,120,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">技術：短線看漲（RSI 超買、均線黃金叉）</text>
+          <text x="175" y="181" fill="rgba(255,152,0,.85)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">→ 籌碼警示勝技術，謹慎或觀望</text>
+
+          <!-- Q4: Bad chips, Bad tech = AVOID -->
+          <rect x="340" y="120" width="290" height="68" rx="8" fill="rgba(255,61,90,.06)" stroke="rgba(255,61,90,.22)" stroke-width="1.2"/>
+          <text x="485" y="138" fill="#ff3d5a" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">❌ 明確避開訊號</text>
+          <text x="485" y="153" fill="rgba(255,180,180,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">籌碼：融資過熱 + 外資重度賣超</text>
+          <text x="485" y="166" fill="rgba(255,180,180,.7)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">技術：跌破支撐 + 量增殺跌</text>
+          <text x="485" y="181" fill="rgba(255,61,90,.85)" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">→ 空手或放空，不要接刀</text>
+        </svg>
+      </div>
+
+      <div class="shadow-line">
+        <div class="sl-side dn"></div>
+        <div class="sl-body">
+          <div class="sl-top dn">✅ 訊號一致性原則：同向才進場</div>
+          <div class="sl-text">當籌碼面與技術面<strong>指向同一方向</strong>時，進場的勝率最高。若兩者方向不一致（例如技術面看多但融資過熱、外資賣超），應以<strong>籌碼面為優先</strong>，技術面可能只是短暫的反彈訊號，而不是真正的趨勢反轉。</div>
+        </div>
+      </div>
+
+      <div class="shadow-line">
+        <div class="sl-side up"></div>
+        <div class="sl-body">
+          <div class="sl-top up">🚨 警告：技術面「陷阱」更常發生在籌碼惡化時</div>
+          <div class="sl-text">市場上最常見的假突破、假反彈，通常發生在<strong>融資過熱、外資賣超</strong>的環境中。散戶看到均線黃金交叉就追進，卻不知道主力正在利用技術面誘多出貨。<em>籌碼面告訴你「誰在玩球」，技術面只告訴你「球在哪裡」</em>。</div>
+        </div>
+      </div>
+
+      <div class="gold-box">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-body">
+          <div class="insight-label">實用搭配指標</div>
+          <div class="insight-text"><strong>融資餘額趨勢</strong>配合 <strong>RSI</strong>：RSI 超賣（&lt;30）+ 融資急速萎縮完畢 = 反彈機率高。<br/><strong>融券餘額萎縮速度</strong>配合 <strong>MACD</strong>：MACD 底背離 + 融券開始快速回補 = 軋空行情的早期確認。<br/><strong>融資使用率</strong>配合 <strong>大盤成交量</strong>：使用率高且量縮 = 行情即將反轉，融資多頭撐不住。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SEC 7 ─ 小測驗 ═══ -->
+  <div class="section-card reveal" id="sec7">
+    <div class="section-header">
+      <span class="section-num">SEC 07</span>
       <span class="section-title">小測驗：你看懂融資融券了嗎？</span>
       <span class="section-icon">🧩</span>
     </div>
     <div class="section-body">
-      <p class="prose" style="margin-bottom:24px;">完成以下三道題，確認你已掌握本章的核心概念。</p>
+      <p class="prose" style="margin-bottom:24px;">完成以下三道題，確認你已掌握本章的核心概念。每題只能作答一次，答對後顯示詳細解析。</p>
 
       <!-- Q1 -->
       <div class="quiz-wrap">
@@ -2763,6 +3151,18 @@
           <div class="quiz-opt" onclick="answerQ('q3',this,'D')"><div class="quiz-letter">D</div>融券餘額的變化對持多單的人沒有任何意義</div>
         </div>
         <div class="quiz-feedback" id="q3fb"></div>
+      </div>
+
+      <!-- Q4 bonus -->
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q4（進階）｜大盤融資使用率達 55%，同時外資連續 10 天賣超，技術面出現短線黃金交叉。你的操作判斷是？</div>
+        <div class="quiz-opts" id="q4opts">
+          <div class="quiz-opt" onclick="answerQ('q4',this,'A')"><div class="quiz-letter">A</div>技術面黃金交叉是明確買進訊號，立刻做多</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'B')"><div class="quiz-letter">B</div>籌碼面與技術面方向不一致，籌碼面的危險訊號更重要，應保持空手或少量試倉，不重倉追多</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'C')"><div class="quiz-letter">C</div>外資賣超是常態，不用理會，跟著技術面操作</div>
+          <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><div class="quiz-letter">D</div>融資使用率高代表市場很活躍，可以積極進場</div>
+        </div>
+        <div class="quiz-feedback" id="q4fb"></div>
       </div>
     </div>
   </div>

@@ -731,6 +731,26 @@
     body.theme-day .score-label { color:#1a3550; }
     body.theme-day .law-card { background:rgba(255,255,255,.82) !important; border-color:rgba(26,101,168,.15) !important; }
     body.theme-day .law-title { color:#0a1828; }
+
+    /* ── New element responsive ── */
+    @media(max-width:600px) {
+      div[style*="grid-template-columns:1fr 1fr 1fr"],
+      div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      div[style*="grid-template-columns:1fr 1fr"],
+      div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    @media(max-width:400px) {
+      div[style*="grid-template-columns:1fr 1fr 1fr"],
+      div[style*="grid-template-columns: 1fr 1fr 1fr"],
+      div[style*="grid-template-columns:1fr 1fr"],
+      div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
     body.theme-day .quiz-block { background:linear-gradient(135deg,rgba(102,64,192,.07),rgba(80,48,160,.04)); border-color:rgba(102,64,192,.2); }
     body.theme-day .quiz-label { color:#6640c0; }
     body.theme-day .quiz-q { color:#0a1828; }
@@ -2435,7 +2455,7 @@
   <div class="hero-content">
     <div class="hero-label">CHAPTER 05 · 自營商解碼篇</div>
     <div class="hero-title">自營商的避險<br/>與裸部位判讀</div>
-    <div class="hero-desc">自營商每天的買賣超數字，表面看似簡單，實則暗藏兩套截然不同的邏輯——<em>自行買賣帳戶</em>代表主動方向判斷，<em>避險帳戶</em>卻只是衍生品的機械對沖。本章教你拆解數字背後的真相，從「裸部位」的增減讀出機構對後市的隱性態度。</div>
+    <div class="hero-desc">自營商每天的買賣超數字，表面看似簡單，實則暗藏兩套截然不同的邏輯——<em>自行買賣帳戶</em>代表主動方向判斷，<em>避險帳戶</em>卻只是衍生品的機械對沖。大多數散戶把這兩者混為一談，導致判斷完全失準。本章教你徹底拆解數字背後的真相：搞懂 Delta 避險、識別裸部位拐點、掌握三機構共振訊號，讓你對自營商的解讀比99%的人更準確。</div>
     <div class="hero-tags">
       <span class="tag tag-cyan">自行帳戶</span>
       <span class="tag tag-yellow">避險帳戶</span>
@@ -2443,6 +2463,21 @@
       <span class="tag tag-red">方向陷阱</span>
       <span class="tag tag-purple">認購權證</span>
       <span class="tag tag-pink">Delta避險</span>
+      <span class="tag tag-orange">三機構共振</span>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:20px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)"></div>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.06em">9 個章節單元</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--yellow);box-shadow:0 0 8px var(--yellow)"></div>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.06em">2 個實戰案例</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple)"></div>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.06em">5 題互動測驗</span>
+      </div>
     </div>
   </div>
 </div>
@@ -2470,6 +2505,63 @@
     <p class="prose">自營商（Proprietary Dealer）是台灣證券市場中的一類法人，指的是<strong>券商以自有資金直接進行股票買賣</strong>的業務部門。他們不像外資管理客戶資產，也不像投信管理基金，而是用「自家的錢」交易。</p>
     <p class="prose">台灣每家具備自營業務的券商，旗下都設有自營部，人數從數人到數十人不等。自營部的考核目標是<em>自營帳戶的獲利</em>，因此其買賣行為直接反映該機構對市場的看法。</p>
 
+    <!-- NEW: 自營商在台股中的角色圖 -->
+    <div style="margin:20px 0">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.75;margin-bottom:14px;text-transform:uppercase">🏦 自營商的市場定位與特性</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.18);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:1.6rem;margin-bottom:8px">🎯</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--accent);margin-bottom:6px">短線靈活</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.6">持倉週期短（數日至數週），反應市場事件最快，是三大法人中最靈活的</div>
+        </div>
+        <div style="background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.18);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:1.6rem;margin-bottom:8px">⚡</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--yellow);margin-bottom:6px">可多空雙向</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.6">三大法人中唯一可以主動放空個股的機構，透過借券賣出建立空頭部位</div>
+        </div>
+        <div style="background:rgba(178,102,255,.05);border:1px solid rgba(178,102,255,.18);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:1.6rem;margin-bottom:8px">🔀</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;color:var(--purple);margin-bottom:6px">兩帳戶混合</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.6">自行帳戶（有方向）+避險帳戶（無方向）合計申報，是最容易被誤讀的法人</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: 自營商帳戶結構 SVG 圖解 -->
+    <div class="svg-chart-wrap" style="margin:20px 0;padding:20px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);opacity:.75;margin-bottom:14px;text-transform:uppercase">📊 自營商帳戶結構圖解（公告數字 = 自行 + 避險）</div>
+      <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <!-- BG -->
+        <rect width="800" height="220" fill="rgba(0,0,0,.25)" rx="12"/>
+
+        <!-- 公告數字大框 -->
+        <rect x="280" y="20" width="240" height="50" rx="8" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.4)" stroke-width="1.5"/>
+        <text x="400" y="43" text-anchor="middle" fill="rgba(0,229,255,.95)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">自營商合計買賣超</text>
+        <text x="400" y="60" text-anchor="middle" fill="rgba(122,154,184,.7)" font-family="Share Tech Mono,monospace" font-size="9">（每日15:30後公告）</text>
+
+        <!-- 分叉箭頭 -->
+        <line x1="290" y1="70" x2="210" y2="110" stroke="rgba(255,214,0,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <line x1="510" y1="70" x2="590" y2="110" stroke="rgba(0,229,255,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="295" y="95" fill="rgba(255,214,0,.7)" font-family="Share Tech Mono,monospace" font-size="8">包含</text>
+        <text x="490" y="95" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono,monospace" font-size="8">包含</text>
+
+        <!-- 自行帳戶框 -->
+        <rect x="60" y="110" width="300" height="80" rx="8" fill="rgba(0,230,118,.07)" stroke="rgba(0,230,118,.45)" stroke-width="1.5"/>
+        <text x="210" y="135" text-anchor="middle" fill="rgba(0,230,118,.95)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">自行買賣帳戶</text>
+        <text x="210" y="152" text-anchor="middle" fill="rgba(200,230,200,.65)" font-family="Share Tech Mono,monospace" font-size="9">PROPRIETARY TRADING</text>
+        <text x="210" y="170" text-anchor="middle" fill="rgba(0,230,118,.8)" font-family="Share Tech Mono,monospace" font-size="9">✅ 代表機構真實方向判斷</text>
+
+        <!-- 避險帳戶框 -->
+        <rect x="440" y="110" width="300" height="80" rx="8" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.45)" stroke-width="1.5"/>
+        <text x="590" y="135" text-anchor="middle" fill="rgba(255,214,0,.95)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">避險帳戶</text>
+        <text x="590" y="152" text-anchor="middle" fill="rgba(230,220,160,.65)" font-family="Share Tech Mono,monospace" font-size="9">HEDGING ACCOUNT</text>
+        <text x="590" y="170" text-anchor="middle" fill="rgba(255,61,90,.85)" font-family="Share Tech Mono,monospace" font-size="9">❌ 機械式對沖，無方向意義</text>
+
+        <!-- 底部說明 -->
+        <text x="400" y="208" text-anchor="middle" fill="rgba(122,154,184,.5)" font-family="Share Tech Mono,monospace" font-size="8">合計數字 = 自行買超 + 避險買超 ← 只看這個會誤判！必須拆開看！</text>
+      </svg>
+    </div>
+
     <div class="insight-box">
       <div class="insight-icon">🔍</div>
       <div class="insight-body">
@@ -2492,6 +2584,31 @@
         <div class="acct-en">HEDGING ACCOUNT</div>
         <div class="acct-desc">當券商發行認購/認售權證後，為對沖 Delta 風險而進行的<strong>機械式股票買賣</strong>。與市場方向判斷完全無關，純屬風險管理操作。</div>
         <span class="acct-tag">❌ 無方向意義</span>
+      </div>
+    </div>
+
+    <!-- NEW: 快速識別表 -->
+    <div style="margin:20px 0;background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.1);border-radius:14px;padding:20px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);opacity:.75;margin-bottom:14px;text-transform:uppercase">⚡ 避險帳戶干擾度 — 快速判斷法</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:rgba(255,61,90,.05);border:1px solid rgba(255,61,90,.18);border-radius:10px;padding:14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--red);margin-bottom:8px;font-weight:700">🚨 干擾高 — 慎用合計數字</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.7">
+            • 當日有熱門認購/認售權證成交<br/>
+            • 個股是「台積電、聯發科、鴻海」等大型權證標的<br/>
+            • 避險帳戶買賣超 ＞ 自行帳戶買賣超<br/>
+            • 權證到期日前後一週
+          </div>
+        </div>
+        <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:10px;padding:14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--green);margin-bottom:8px;font-weight:700">✅ 干擾低 — 可信度較高</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.7">
+            • 個股無大量權證掛牌<br/>
+            • 自行帳戶佔自營合計 80% 以上<br/>
+            • 中小型股（權證較少）<br/>
+            • 財報前後等事件驅動時期
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2523,6 +2640,58 @@
       </div>
     </div>
 
+    <!-- NEW: Delta Hedging 視覺化圖解 -->
+    <div class="svg-chart-wrap" style="margin:20px 0;padding:16px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--yellow);opacity:.85;margin-bottom:12px;text-transform:uppercase">⚖️ Delta 避險：股價上漲時 vs 下跌時 對比圖解</div>
+      <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <rect width="800" height="260" fill="rgba(0,0,0,.25)" rx="12"/>
+
+        <!-- 左側：股價上漲情境 -->
+        <text x="200" y="26" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">📈 股價上漲時</text>
+        <!-- 股價上漲arrow -->
+        <rect x="30" y="42" width="340" height="36" rx="6" fill="rgba(0,230,118,.07)" stroke="rgba(0,230,118,.3)" stroke-width="1"/>
+        <text x="200" y="58" text-anchor="middle" fill="rgba(200,240,200,.8)" font-family="Share Tech Mono,monospace" font-size="9">正股：₩100 → ₩110（+10%）</text>
+        <text x="200" y="72" text-anchor="middle" fill="rgba(0,230,118,.75)" font-family="Share Tech Mono,monospace" font-size="9">認購證 Delta：0.60 → 0.72</text>
+
+        <text x="200" y="100" text-anchor="middle" fill="rgba(200,220,240,.5)" font-family="Share Tech Mono,monospace" font-size="8">▼ 券商需補足持倉</text>
+
+        <rect x="30" y="108" width="340" height="36" rx="6" fill="rgba(0,229,255,.07)" stroke="rgba(0,229,255,.3)" stroke-width="1"/>
+        <text x="200" y="124" text-anchor="middle" fill="rgba(180,230,255,.85)" font-family="Share Tech Mono,monospace" font-size="9">持股需求：10000張 × 0.72 = 7200張</text>
+        <text x="200" y="138" text-anchor="middle" fill="rgba(0,229,255,.75)" font-family="Share Tech Mono,monospace" font-size="9">原持股：6000張 → 需追買 1200張</text>
+
+        <text x="200" y="163" text-anchor="middle" fill="rgba(200,220,240,.5)" font-family="Share Tech Mono,monospace" font-size="8">▼ 避險帳戶動作</text>
+
+        <rect x="30" y="170" width="340" height="50" rx="6" fill="rgba(0,230,118,.1)" stroke="rgba(0,230,118,.5)" stroke-width="1.5"/>
+        <text x="200" y="191" text-anchor="middle" fill="rgba(0,230,118,.95)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">避險帳戶「買超」+1200張</text>
+        <text x="200" y="208" text-anchor="middle" fill="rgba(255,61,90,.85)" font-family="Share Tech Mono,monospace" font-size="9">⚠️ 但這不代表看多！純屬補倉</text>
+
+        <!-- 中間分隔線 -->
+        <line x1="400" y1="20" x2="400" y2="240" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="6,4"/>
+
+        <!-- 右側：股價下跌情境 -->
+        <text x="600" y="26" text-anchor="middle" fill="rgba(255,61,90,.9)" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">📉 股價下跌時</text>
+        <rect x="430" y="42" width="340" height="36" rx="6" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+        <text x="600" y="58" text-anchor="middle" fill="rgba(255,200,200,.8)" font-family="Share Tech Mono,monospace" font-size="9">正股：₩100 → ₩90（-10%）</text>
+        <text x="600" y="72" text-anchor="middle" fill="rgba(255,61,90,.75)" font-family="Share Tech Mono,monospace" font-size="9">認購證 Delta：0.60 → 0.45</text>
+
+        <text x="600" y="100" text-anchor="middle" fill="rgba(200,220,240,.5)" font-family="Share Tech Mono,monospace" font-size="8">▼ 券商需減少持倉</text>
+
+        <rect x="430" y="108" width="340" height="36" rx="6" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.3)" stroke-width="1"/>
+        <text x="600" y="124" text-anchor="middle" fill="rgba(255,245,180,.85)" font-family="Share Tech Mono,monospace" font-size="9">持股需求：10000張 × 0.45 = 4500張</text>
+        <text x="600" y="138" text-anchor="middle" fill="rgba(255,214,0,.75)" font-family="Share Tech Mono,monospace" font-size="9">原持股：6000張 → 需賣出 1500張</text>
+
+        <text x="600" y="163" text-anchor="middle" fill="rgba(200,220,240,.5)" font-family="Share Tech Mono,monospace" font-size="8">▼ 避險帳戶動作</text>
+
+        <rect x="430" y="170" width="340" height="50" rx="6" fill="rgba(255,61,90,.1)" stroke="rgba(255,61,90,.5)" stroke-width="1.5"/>
+        <text x="600" y="191" text-anchor="middle" fill="rgba(255,61,90,.95)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">避險帳戶「賣超」-1500張</text>
+        <text x="600" y="208" text-anchor="middle" fill="rgba(255,61,90,.85)" font-family="Share Tech Mono,monospace" font-size="9">⚠️ 但這不代表看空！純屬減倉</text>
+
+        <!-- 底部核心結論 -->
+        <rect x="30" y="232" width="740" height="22" rx="5" fill="rgba(178,102,255,.08)" stroke="rgba(178,102,255,.25)" stroke-width="1"/>
+        <text x="400" y="247" text-anchor="middle" fill="rgba(178,102,255,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">核心結論：避險帳戶的買賣方向與股價方向相同，但都不代表主觀看法——它只是追蹤 Delta 的機械動作</text>
+      </svg>
+    </div>
+
     <div class="sec-divider">DELTA HEDGING 流程</div>
 
     <div class="timeline">
@@ -2550,6 +2719,54 @@
         <div class="tl-dot pu"></div>
         <div class="tl-head pu">STEP 5 ── 認售權證（反向操作）</div>
         <div class="tl-body">若券商發行的是<strong>認售權證（Put Warrant）</strong>，Delta 為負值，券商需在避險帳戶<strong>賣出</strong>正股對沖。投資人大量買進認售證時，自營商避險帳戶反而呈現「賣超」。</div>
+      </div>
+    </div>
+
+    <!-- NEW: 認購 vs 認售 避險行為比較 -->
+    <div style="margin:20px 0">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.75;margin-bottom:14px;text-transform:uppercase">📋 認購 vs 認售權證：避險帳戶行為對比</div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table class="cmp-table" style="min-width:480px">
+          <thead>
+            <tr>
+              <th>情境</th>
+              <th>權證類型</th>
+              <th>Delta 方向</th>
+              <th>避險帳戶動作</th>
+              <th>誤判風險</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>投資人大量買進認購證</td>
+              <td style="color:var(--green)">認購（Call）</td>
+              <td class="val-green">正值 (+)</td>
+              <td class="val-green">買進正股</td>
+              <td style="color:var(--red)">誤以為自營看多 ⚠️</td>
+            </tr>
+            <tr>
+              <td>投資人大量買進認售證</td>
+              <td style="color:var(--red)">認售（Put）</td>
+              <td class="val-dn">負值 (-)</td>
+              <td class="val-dn">賣出正股</td>
+              <td style="color:var(--red)">誤以為自營看空 ⚠️</td>
+            </tr>
+            <tr>
+              <td>股價上漲，Delta 值升高</td>
+              <td style="color:var(--accent)">認購（Call）</td>
+              <td class="val-green">Delta 增加</td>
+              <td class="val-green">追加買進</td>
+              <td style="color:var(--yellow)">股漲時自營更「看多」？錯！</td>
+            </tr>
+            <tr>
+              <td>權證到期，全數結算</td>
+              <td style="color:var(--purple)">任何類型</td>
+              <td class="val-yellow">歸零</td>
+              <td class="val-dn">賣出全部對沖股</td>
+              <td style="color:var(--red)">到期日前後賣壓激增 ⚠️</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -2763,6 +2980,113 @@
   </div>
 </div>
 
+<!-- SECTION 4.5 NEW: 裸部位實戰案例 -->
+<div class="section-card reveal">
+  <div class="section-header">
+    <div class="section-num">5-4.5</div>
+    <div class="section-title">裸部位實戰案例解析</div>
+    <div class="section-icon">📋</div>
+  </div>
+  <div class="section-body">
+    <p class="prose">理論讀完了，現在看看裸部位在真實數據中的樣子。以下兩個情境呈現了「正確解讀」和「錯誤解讀」的對比。</p>
+
+    <!-- 案例1：正確解讀 -->
+    <div style="background:linear-gradient(135deg,rgba(0,230,118,.05),rgba(0,80,40,.02));border:1px solid rgba(0,230,118,.2);border-radius:16px;overflow:hidden;margin-bottom:16px">
+      <div style="background:rgba(0,230,118,.08);padding:14px 18px;border-bottom:1px solid rgba(0,230,118,.1)">
+        <div style="font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:var(--green)">📗 案例 A：正確訊號識別</div>
+        <div style="font-size:.72rem;color:var(--text-faint);font-family:'Share Tech Mono',monospace;margin-top:4px">某半導體中型股，10 個交易日連續裸多累積</div>
+      </div>
+      <div style="padding:16px 18px">
+        <!-- 迷你K線+裸部位模擬圖 -->
+        <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:14px">
+          <rect width="680" height="160" fill="rgba(0,0,0,.2)" rx="8"/>
+          <!-- X axis days -->
+          <text x="50" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D1</text>
+          <text x="110" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D2</text>
+          <text x="170" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D3</text>
+          <text x="230" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D4</text>
+          <text x="290" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D5</text>
+          <text x="350" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D6</text>
+          <text x="410" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D7</text>
+          <text x="470" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D8</text>
+          <text x="530" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D9</text>
+          <text x="590" y="150" fill="rgba(122,154,184,.5)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">D10</text>
+          <!-- Baseline -->
+          <line x1="20" y1="130" x2="660" y2="130" stroke="rgba(0,229,255,.08)" stroke-width="1"/>
+          <!-- Naked position bars (growing) - self account daily net -->
+          <rect x="35" y="115" width="30" height="15" rx="3" fill="rgba(0,230,118,.45)"/>
+          <rect x="95" y="108" width="30" height="22" rx="3" fill="rgba(0,230,118,.5)"/>
+          <rect x="155" y="100" width="30" height="30" rx="3" fill="rgba(0,230,118,.55)"/>
+          <rect x="215" y="105" width="30" height="25" rx="3" fill="rgba(0,230,118,.5)"/>
+          <rect x="275" y="92" width="30" height="38" rx="3" fill="rgba(0,230,118,.6)"/>
+          <rect x="335" y="88" width="30" height="42" rx="3" fill="rgba(0,230,118,.65)"/>
+          <rect x="395" y="82" width="30" height="48" rx="3" fill="rgba(0,230,118,.7)"/>
+          <rect x="455" y="75" width="30" height="55" rx="3" fill="rgba(0,230,118,.75)"/>
+          <rect x="515" y="70" width="30" height="60" rx="3" fill="rgba(0,230,118,.8)"/>
+          <rect x="575" y="60" width="30" height="70" rx="3" fill="rgba(0,230,118,.9)"/>
+          <!-- Labels -->
+          <text x="20" y="12" fill="rgba(0,230,118,.8)" font-size="9" font-family="Share Tech Mono,monospace">自行帳戶日淨買超（張）</text>
+          <text x="400" y="12" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace">連續10日，累積裸多 +8,500張 ✅</text>
+          <!-- Trend arrow -->
+          <path d="M40 118 L600 62" stroke="rgba(0,230,118,.35)" stroke-width="1.5" stroke-dasharray="6,3" fill="none"/>
+        </svg>
+        <div style="font-size:.82rem;color:var(--text-dim);line-height:1.75">
+          自行帳戶每日小量持續買進，10日累積裸多部位達 <strong style="color:var(--green)">8,500張</strong>。同期外資亦連續5日買超，投信持平。這是教科書級別的「機構悄悄建倉」訊號——股價在接下來3週內上漲 <strong style="color:var(--green)">23%</strong>。
+        </div>
+        <div style="margin-top:12px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px 14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確解讀</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.6">連續性 + 累積量 + 外資同步 = 高可靠度多頭訊號。即使單日量不大，趨勢一致才是關鍵。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 案例2：錯誤解讀警示 -->
+    <div style="background:linear-gradient(135deg,rgba(255,61,90,.05),rgba(150,20,0,.02));border:1px solid rgba(255,61,90,.2);border-radius:16px;overflow:hidden">
+      <div style="background:rgba(255,61,90,.08);padding:14px 18px;border-bottom:1px solid rgba(255,61,90,.1)">
+        <div style="font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;color:var(--red)">📕 案例 B：常見錯誤解讀</div>
+        <div style="font-size:.72rem;color:var(--text-faint);font-family:'Share Tech Mono',monospace;margin-top:4px">熱門權證標的，避險帳戶主導合計數字</div>
+      </div>
+      <div style="padding:16px 18px">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px">
+          <table class="cmp-table" style="min-width:420px">
+            <thead>
+              <tr><th>帳戶別</th><th>買超張數</th><th>佔合計比例</th><th>方向意義</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:var(--yellow)">避險帳戶</strong></td>
+                <td class="val-green">+4,200 張</td>
+                <td style="color:var(--red)">91%</td>
+                <td style="color:var(--red)">❌ 無方向意義</td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--accent)">自行帳戶</strong></td>
+                <td class="val-cyan">+420 張</td>
+                <td style="color:var(--green)">9%</td>
+                <td style="color:var(--green)">✅ 方向訊號（但量太小）</td>
+              </tr>
+              <tr>
+                <td><strong>自營商合計</strong></td>
+                <td class="val-green">+4,620 張</td>
+                <td>—</td>
+                <td style="color:var(--red)">⚠️ 誤以為強烈看多</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:.82rem;color:var(--text-dim);line-height:1.75">
+          表面上自營商合計大買超 4,620 張，看起來「強烈看多」，但實際上 91% 來自避險帳戶（因為當天這支股票有大量認購權證成交）。真正反映方向的自行帳戶只有 420 張，訊號相當微弱。
+        </div>
+        <div style="margin-top:12px;background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.18);border-radius:8px;padding:10px 14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--red);margin-bottom:4px">⚠️ 錯誤解讀後果</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.6">若誤信「合計買超」而追進，後來股價因技術面壓力回落，損失慘重。正確做法：先確認自行帳戶佔比，若低於50%，合計數字的參考意義極低。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- SECTION 5 -->
 <div class="section-card reveal">
   <div class="section-header">
@@ -2859,6 +3183,60 @@
   <div class="section-body">
     <p class="prose">自營商訊號單獨使用時效果有限，真正的威力在於<em>與外資、投信協同判讀</em>。不同機構的同步行為，代表更廣泛的市場共識，勝率遠高於單一機構的信號。</p>
 
+    <!-- NEW: 三機構協同象限圖 -->
+    <div class="svg-chart-wrap" style="margin:20px 0;padding:16px">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);opacity:.75;margin-bottom:12px;text-transform:uppercase">🔗 三大機構協同程度 × 訊號強度示意圖</div>
+      <svg viewBox="0 0 740 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <rect width="740" height="320" fill="rgba(0,0,0,.25)" rx="12"/>
+
+        <!-- 三個圓圈（法人） -->
+        <!-- 外資 -->
+        <circle cx="280" cy="130" r="90" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.35)" stroke-width="1.5"/>
+        <text x="195" y="80" fill="rgba(255,61,90,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">外資</text>
+        <text x="195" y="94" fill="rgba(255,61,90,.6)" font-family="Share Tech Mono,monospace" font-size="8">FOREIGN</text>
+
+        <!-- 投信 -->
+        <circle cx="460" cy="130" r="90" fill="rgba(0,229,255,.07)" stroke="rgba(0,229,255,.35)" stroke-width="1.5"/>
+        <text x="525" y="80" fill="rgba(0,229,255,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">投信</text>
+        <text x="525" y="94" fill="rgba(0,229,255,.6)" font-family="Share Tech Mono,monospace" font-size="8">TRUST</text>
+
+        <!-- 自營 -->
+        <circle cx="370" cy="220" r="90" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.35)" stroke-width="1.5"/>
+        <text x="370" y="312" text-anchor="middle" fill="rgba(255,214,0,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">自營（自行）</text>
+        <text x="370" y="304" text-anchor="middle" fill="rgba(255,214,0,.6)" font-family="Share Tech Mono,monospace" font-size="8">PROPRIETARY</text>
+
+        <!-- 交集區域標註 -->
+        <!-- 外資+投信交集 -->
+        <text x="370" y="118" text-anchor="middle" fill="rgba(200,240,255,.7)" font-family="Share Tech Mono,monospace" font-size="8">外資+投信</text>
+        <text x="370" y="130" text-anchor="middle" fill="rgba(0,230,118,.75)" font-family="Share Tech Mono,monospace" font-size="8">強多頭</text>
+
+        <!-- 外資+自營交集 -->
+        <text x="288" y="198" text-anchor="middle" fill="rgba(200,240,200,.7)" font-family="Share Tech Mono,monospace" font-size="8">外資+自營</text>
+        <text x="288" y="210" text-anchor="middle" fill="rgba(0,229,255,.75)" font-family="Share Tech Mono,monospace" font-size="8">短加速</text>
+
+        <!-- 投信+自營交集 -->
+        <text x="455" y="198" text-anchor="middle" fill="rgba(200,240,200,.7)" font-family="Share Tech Mono,monospace" font-size="8">投信+自營</text>
+        <text x="455" y="210" text-anchor="middle" fill="rgba(178,102,255,.75)" font-family="Share Tech Mono,monospace" font-size="8">中線+短線</text>
+
+        <!-- 三者共振核心 -->
+        <circle cx="370" cy="175" r="32" fill="rgba(0,230,118,.15)" stroke="rgba(0,230,118,.6)" stroke-width="2">
+          <animate attributeName="r" values="28;34;28" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".8;1;.8" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+        <text x="370" y="170" text-anchor="middle" fill="#fff" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">三強</text>
+        <text x="370" y="184" text-anchor="middle" fill="rgba(0,230,118,.95)" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">共振 🔥</text>
+
+        <!-- 右側說明 -->
+        <text x="640" y="50" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">訊號強度</text>
+        <rect x="590" y="60" width="100" height="16" rx="4" fill="rgba(0,230,118,.25)" stroke="rgba(0,230,118,.4)" stroke-width="1"/>
+        <text x="640" y="72" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="8">三強共振 ████</text>
+        <rect x="590" y="82" width="75" height="16" rx="4" fill="rgba(0,229,255,.2)" stroke="rgba(0,229,255,.4)" stroke-width="1"/>
+        <text x="628" y="94" text-anchor="middle" fill="rgba(0,229,255,.9)" font-family="Share Tech Mono,monospace" font-size="8">雙機構 ███</text>
+        <rect x="590" y="104" width="50" height="16" rx="4" fill="rgba(255,214,0,.18)" stroke="rgba(255,214,0,.35)" stroke-width="1"/>
+        <text x="616" y="116" text-anchor="middle" fill="rgba(255,214,0,.9)" font-family="Share Tech Mono,monospace" font-size="8">單機構 ██</text>
+      </svg>
+    </div>
+
     <table class="cmp-table">
       <thead>
         <tr>
@@ -2914,6 +3292,31 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- NEW: 自營拐點識別卡 -->
+    <div style="margin:20px 0">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--yellow);opacity:.85;margin-bottom:14px;text-transform:uppercase">🎯 最值得關注：自營「由賣轉買」拐點識別</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:rgba(255,61,90,.05);border:1px solid rgba(255,61,90,.18);border-radius:12px;padding:16px">
+          <div style="font-family:'Orbitron',monospace;font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:10px">拐點前（賣超期）</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.8">
+            • 自行帳戶連續賣超 or 中性<br/>
+            • 外資、投信已開始買入<br/>
+            • 股價可能已初步上漲但量不大<br/>
+            • 散戶尚未追進，新聞沉默
+          </div>
+        </div>
+        <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:12px;padding:16px">
+          <div style="font-family:'Orbitron',monospace;font-size:.75rem;font-weight:700;color:var(--green);margin-bottom:10px">拐點後（轉買期）⬅ 關鍵時刻</div>
+          <div style="font-size:.78rem;color:var(--text-dim);line-height:1.8">
+            • 自行帳戶<strong style="color:var(--green)">首次轉為買超</strong><br/>
+            • 三機構形成共識<br/>
+            • 成交量開始放大<br/>
+            • 往往是行情加速段起點
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="shadow-line">
       <div class="sl-side dn"></div>
@@ -2972,6 +3375,41 @@
       </div>
     </div>
 
+    <div class="flow-step">
+      <div class="flow-num rn">✗</div>
+      <div class="flow-content">
+        <div class="flow-heading">陷阱五：用財經 App 的「自營」數字直接分析</div>
+        <div class="flow-sub">市面上大多數 App（包含部分付費軟體）顯示的「自營」只是合計數字，並未分拆自行與避險。這是最常被忽略的問題。<strong>務必到 TWSE 原始資料頁確認是否有「自行」和「避險」的拆分欄位</strong>，再進行分析。</div>
+      </div>
+    </div>
+
+    <!-- NEW: 正確 vs 錯誤速查卡 -->
+    <div style="margin:20px 0">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.75;margin-bottom:14px;text-transform:uppercase">✅ 自營商判讀速查卡（隨時可查）</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:rgba(255,61,90,.04);border:1px solid rgba(255,61,90,.18);border-radius:12px;padding:14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--red);font-weight:700;margin-bottom:10px">❌ 錯誤做法（容易踩坑）</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--red);flex-shrink:0">✗</span>直接用 App 顯示的自營「合計」數字</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--red);flex-shrink:0">✗</span>看到買超就認為方向看多</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--red);flex-shrink:0">✗</span>單日大買超就追進</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--red);flex-shrink:0">✗</span>忽略個股是否為熱門權證標的</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--red);flex-shrink:0">✗</span>大盤崩跌時仍相信自行帳戶小買超</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.18);border-radius:12px;padding:14px">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--green);font-weight:700;margin-bottom:10px">✅ 正確做法（建立好習慣）</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✓</span>只看「自行帳戶」數字</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✓</span>確認連續3日以上同方向</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✓</span>計算累積裸部位張數</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✓</span>確認個股無大量權證干擾</div>
+            <div style="font-size:.78rem;color:var(--text-dim);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">✓</span>對照外資、投信同步買超</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="sec-divider">正確使用自營商訊號的核查清單</div>
 
     <div class="flow-step">
@@ -3013,7 +3451,7 @@
     <div class="section-icon">🧠</div>
   </div>
   <div class="section-body">
-    <p class="prose">完成以下四題，測試你對本章核心概念的掌握程度。</p>
+    <p class="prose">完成以下五題，測試你對本章核心概念的掌握程度。</p>
 
     <!-- Q1 -->
     <div class="quiz-wrap">
@@ -3061,6 +3499,18 @@
         <div class="quiz-opt" onclick="answerQ('q4',this,'D')"><span class="quiz-letter">D</span>自營短線，轉買只是避險調整，無參考意義</div>
       </div>
       <div class="quiz-feedback" id="q4fb"></div>
+    </div>
+
+    <!-- Q5 NEW -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">Q5｜某股當日自營商合計買超5000張，其中避險帳戶4600張、自行帳戶400張。同日外資賣超2000張、投信小賣超100張。以下哪個操作最合適？</div>
+      <div class="quiz-opts" id="q5opts">
+        <div class="quiz-opt" onclick="answerQ('q5',this,'A')"><span class="quiz-letter">A</span>自營大買超，立刻追進，訊號明確</div>
+        <div class="quiz-opt" onclick="answerQ('q5',this,'B')"><span class="quiz-letter">B</span>自行帳戶僅400張、避險主導，且外資投信均賣超，訊號無效，暫時觀望</div>
+        <div class="quiz-opt" onclick="answerQ('q5',this,'C')"><span class="quiz-letter">C</span>外資賣超才是問題，自營強就可以了</div>
+        <div class="quiz-opt" onclick="answerQ('q5',this,'D')"><span class="quiz-letter">D</span>5000張買超代表有大資金進場，值得追</div>
+      </div>
+      <div class="quiz-feedback" id="q5fb"></div>
     </div>
   </div>
 </div>
@@ -3224,7 +3674,7 @@
 })();
 
 /* ── Quiz ── */
-var answers = { q1: 'B', q2: 'B', q3: 'C', q4: 'B' };
+var answers = { q1: 'B', q2: 'B', q3: 'C', q4: 'B', q5: 'B' };
 var feedbacks = {
   q1: {
     B: '✅ 正確！避險帳戶佔 95%，自行帳戶僅 5%，這種情況下「自營合計買超」幾乎完全反映機械避險操作，對後市方向判斷毫無意義。務必單獨查自行帳戶。',
@@ -3241,6 +3691,10 @@ var feedbacks = {
   q4: {
     B: '✅ 正確！這是「三強共振」的形成時刻。自營在外資、投信已建倉後才加入，往往是行情進入加速段的信號。自營短線敏感，其「由賣轉買」代表短線資金也開始認可這波行情，可視為催化劑。',
     default: '❌ 不對。三大法人形成共識後，自營自行帳戶的轉向是非常重要的訊號——不是賣出訊號，也不是單純的避險調整，而是行情加速的潛在觸發器。'
+  },
+  q5: {
+    B: '✅ 完全正確！三個重點：①避險帳戶佔92%，合計數字無效；②自行帳戶僅400張且單日不具連續性；③外資、投信均賣超，三機構沒有共識。這種情況下訊號無效，最佳操作是觀望等待更清晰的訊號。',
+    default: '❌ 不對。合計5000張大部分是避險帳戶，且外資與投信均賣超，三機構沒有共識。不能因為合計數字大就追進——這正是「合計數字陷阱」最典型的案例。'
   }
 };
 window.answerQ = function(qid, el, choice) {
