@@ -3427,17 +3427,44 @@
 
     /* ── SEARCH / CARD ── */
     body.theme-day #seo-intro {
-      background: linear-gradient(135deg,rgba(26,101,168,.06) 0%,rgba(0,100,200,.04) 100%);
-      border-color: rgba(26,101,168,.2);
+      background: linear-gradient(135deg,rgba(240,249,255,.92) 0%,rgba(220,240,255,.88) 100%) !important;
+      border-color: rgba(26,101,168,.22) !important;
+      box-shadow: 0 4px 24px rgba(26,80,160,.1);
     }
     body.theme-day #seo-intro h1 {
-      background: linear-gradient(90deg,#0a2d5a 60%,#1a7bbf);
+      background: linear-gradient(90deg,#0a2d5a 0%,#1265a8 55%,#1a88cc 100%);
       -webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
       background-clip:text;
     }
-    body.theme-day #seo-intro p { color: #3a5a7a; }
-    body.theme-day #seo-intro strong { color: #1a4070 !important; }
+    /* "ABOUT THIS SITE" 標籤 */
+    body.theme-day #seo-intro p[style*="letter-spacing"] { color: #1265a8 !important; }
+    /* 描述文字段落 */
+    body.theme-day #seo-intro p[style*="color:#8ab0c8"] { color: #1a3a58 !important; }
+    /* strong 標籤 */
+    body.theme-day #seo-intro strong { color: #0a2d52 !important; }
+    /* 頂部裝飾線 */
+    body.theme-day #seo-intro > div[style*="height:1px"] {
+      background: linear-gradient(90deg,transparent,rgba(26,123,191,.5),transparent) !important;
+    }
+    /* Cyan 標籤 */
+    body.theme-day #seo-intro span[style*="rgba(0,229,255,.08)"] {
+      background: rgba(13,110,168,.09) !important;
+      border-color: rgba(13,110,168,.32) !important;
+      color: #0a4a82 !important;
+    }
+    /* Purple 標籤 */
+    body.theme-day #seo-intro span[style*="rgba(140,100,255,.08)"] {
+      background: rgba(102,64,192,.09) !important;
+      border-color: rgba(102,64,192,.35) !important;
+      color: #4a20b0 !important;
+    }
+    /* Green 標籤 */
+    body.theme-day #seo-intro span[style*="rgba(0,230,118,.06)"] {
+      background: rgba(21,122,50,.08) !important;
+      border-color: rgba(21,122,50,.32) !important;
+      color: #0d5a28 !important;
+    }
     body.theme-day .search-area {
       background: rgba(255,255,255,.9);
       box-shadow: 0 8px 36px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.8);
@@ -7299,6 +7326,7 @@ function applyTheme(theme) {
   // ── SEO Static Content inline-style patch ──
   // 這些元素用 inline style 寫死顏色，CSS 選擇器覆蓋不到，需要 JS 處理
   _applySeoSectionTheme(theme);
+  _applySeoIntroTheme(theme);
 }
 
 function _applySeoSectionTheme(theme) {
@@ -7372,6 +7400,72 @@ function _applySeoSectionTheme(theme) {
         : () => { a.style.background='rgba(140,100,255,.06)';a.style.color='#a08de0'; };
     });
   }
+}
+
+function _applySeoIntroTheme(theme) {
+  const isDay = theme === 'day';
+  const intro = document.getElementById('seo-intro');
+  if (!intro) return;
+
+  // ── 容器本體背景與邊框 ──
+  intro.style.background = isDay
+    ? 'linear-gradient(135deg,rgba(240,249,255,.92) 0%,rgba(220,240,255,.88) 100%)'
+    : 'linear-gradient(135deg,rgba(0,229,255,.04) 0%,rgba(0,100,200,.03) 100%)';
+  intro.style.borderColor = isDay ? 'rgba(26,101,168,.22)' : 'rgba(0,229,255,.1)';
+  intro.style.boxShadow   = isDay ? '0 4px 24px rgba(26,80,160,.1)' : '';
+
+  // ── 頂部細線裝飾 ──
+  const topLine = intro.querySelector('div[style*="height:1px"]');
+  if (topLine) topLine.style.background = isDay
+    ? 'linear-gradient(90deg,transparent,rgba(26,123,191,.5),transparent)'
+    : 'linear-gradient(90deg,transparent,rgba(0,229,255,.5),transparent)';
+
+  // ── "ABOUT THIS SITE" 標籤 ──
+  const label = intro.querySelector('p[style*="letter-spacing"]');
+  if (label) label.style.color = isDay ? '#1265a8' : 'rgba(0,229,255,.6)';
+
+  // ── H1 標題（gradient text） ──
+  const h1 = intro.querySelector('h1');
+  if (h1) {
+    h1.style.background = isDay
+      ? 'linear-gradient(90deg,#0a2d5a 0%,#1265a8 55%,#1a88cc 100%)'
+      : 'linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8))';
+    h1.style.webkitBackgroundClip = 'text';
+    h1.style.webkitTextFillColor  = 'transparent';
+    h1.style.backgroundClip       = 'text';
+  }
+
+  // ── 描述段落 p（inline color:#8ab0c8） ──
+  intro.querySelectorAll('p[style*="color:#8ab0c8"]').forEach(p => {
+    p.style.color = isDay ? '#1a3a58' : '#8ab0c8';
+  });
+
+  // ── strong 標籤（inline color:#b0d4e8）──
+  intro.querySelectorAll('strong[style*="color:#b0d4e8"]').forEach(s => {
+    s.style.color = isDay ? '#0a2d52' : '#b0d4e8';
+  });
+
+  // ── 右側 span 標籤群 ──
+  // Cyan 標籤（外資買賣超 / 投信 / 自營商 / 融資借券 / 處置股 / 注意股）
+  intro.querySelectorAll('span[style*="rgba(0,229,255,.08)"]').forEach(sp => {
+    sp.style.background  = isDay ? 'rgba(13,110,168,.09)' : 'rgba(0,229,255,.08)';
+    sp.style.borderColor = isDay ? 'rgba(13,110,168,.32)' : 'rgba(0,229,255,.2)';
+    sp.style.color       = isDay ? '#0a4a82' : 'rgba(0,229,255,.8)';
+  });
+
+  // Purple 標籤（籌碼教學 / 技術分析教學）
+  intro.querySelectorAll('span[style*="rgba(140,100,255,.08)"]').forEach(sp => {
+    sp.style.background  = isDay ? 'rgba(102,64,192,.09)' : 'rgba(140,100,255,.08)';
+    sp.style.borderColor = isDay ? 'rgba(102,64,192,.35)' : 'rgba(140,100,255,.25)';
+    sp.style.color       = isDay ? '#4a20b0' : 'rgba(160,130,255,.9)';
+  });
+
+  // Green 標籤（TWSE / TPEx / 每日自動更新）
+  intro.querySelectorAll('span[style*="rgba(0,230,118,.06)"]').forEach(sp => {
+    sp.style.background  = isDay ? 'rgba(21,122,50,.08)' : 'rgba(0,230,118,.06)';
+    sp.style.borderColor = isDay ? 'rgba(21,122,50,.32)' : 'rgba(0,230,118,.2)';
+    sp.style.color       = isDay ? '#0d5a28' : 'rgba(0,200,100,.9)';
+  });
 }
 
 function setTheme(theme) {
@@ -7614,6 +7708,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 確保 seo-static-content 在 DOM ready 後也套用正確主題（初次載入補丁）
   const t = localStorage.getItem('jelly_global_theme') || 'space';
   _applySeoSectionTheme(t);
+  _applySeoIntroTheme(t);
 });
 // 登入/登出時重新評估 UI
 document.addEventListener('_authChanged', () => {

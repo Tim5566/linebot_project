@@ -2212,6 +2212,61 @@
     body.theme-day #site-footer a { color: #1265a8; }
     body.theme-day #site-footer a:hover { color: #0d3560; }
 
+    /* ── 第8章特有：三種籌碼型態卡片 (inline-styled divs) ── */
+    /* 底部建倉型（cyan border） */
+    body.theme-day .case-grid-3 > div:nth-child(1) {
+      background: rgba(13,110,168,.06) !important;
+      border-color: rgba(13,110,168,.28) !important;
+    }
+    body.theme-day .case-grid-3 > div:nth-child(1) > div:first-child {
+      border-bottom-color: rgba(13,110,168,.15) !important;
+      background: rgba(13,110,168,.04) !important;
+    }
+    /* 出貨分配型（red border） */
+    body.theme-day .case-grid-3 > div:nth-child(2) {
+      background: rgba(176,48,32,.05) !important;
+      border-color: rgba(176,48,32,.25) !important;
+    }
+    body.theme-day .case-grid-3 > div:nth-child(2) > div:first-child {
+      border-bottom-color: rgba(176,48,32,.12) !important;
+      background: rgba(176,48,32,.04) !important;
+    }
+    /* 健康拉升型（green border） */
+    body.theme-day .case-grid-3 > div:nth-child(3) {
+      background: rgba(21,122,50,.05) !important;
+      border-color: rgba(21,122,50,.22) !important;
+    }
+    body.theme-day .case-grid-3 > div:nth-child(3) > div:first-child {
+      border-bottom-color: rgba(21,122,50,.12) !important;
+      background: rgba(21,122,50,.04) !important;
+    }
+    /* Inner text of pattern card bodies */
+    body.theme-day .case-grid-3 > div > div:last-child > div {
+      color: #1a3550 !important;
+    }
+    /* Mobile stacking for case-grid-3 */
+    @media (max-width: 600px) {
+      body.theme-day .case-grid-3 { grid-template-columns: 1fr !important; }
+    }
+
+    /* ── 積分卡片評分系統 (score-card) ── */
+    body.theme-day .score-section {
+      background: rgba(255,255,255,.88) !important;
+      border-color: rgba(26,101,168,.18) !important;
+    }
+    body.theme-day .score-item {
+      background: rgba(255,255,255,.82) !important;
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .score-title  { color: #0a1828 !important; }
+    body.theme-day .score-desc   { color: #1a3550 !important; }
+    body.theme-day .score-points { color: #1265a8 !important; font-weight: 700; }
+
+    /* ── 籌碼生命週期 div label ── */
+    body.theme-day div[style*="font-family:'Share Tech Mono'"][style*="color:var(--text-faint)"] {
+      color: #5a8ab8 !important;
+    }
+
 
   </style>
 
@@ -2242,8 +2297,16 @@
 
     /* svg-chart-wrap light */
     body.theme-day .svg-chart-wrap {
-      background: rgba(220,238,252,.35) !important;
-      border-color: rgba(26,101,168,.18) !important;
+      background: rgba(220,238,252,.5) !important;
+      border-color: rgba(26,101,168,.22) !important;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* SVG inside svg-chart-wrap: override inline dark background */
+    body.theme-day .svg-chart-wrap svg {
+      background: rgba(230,244,255,.6) !important;
+      border-radius: 10px;
     }
 
     /* line-chart containers */
@@ -2274,6 +2337,66 @@
 
     /* force-bar-fill stays colorful but track is light */
     body.theme-day .force-bar-bg { background: rgba(26,80,160,.1) !important; }
+
+    /* ── Health Meter ── */
+    body.theme-day .health-meter {
+      background: rgba(255,255,255,.88) !important;
+      border: 1px solid rgba(26,101,168,.2) !important;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    body.theme-day .hm-title { color: #1265a8 !important; font-weight: 600; }
+    body.theme-day .hm-row { }
+    body.theme-day .hm-label { color: #1a3550 !important; }
+    body.theme-day .hm-bar-bg { background: rgba(26,80,160,.1) !important; }
+    body.theme-day .hm-val { color: #1a3550 !important; font-weight: 600; }
+
+    /* ── Role Cards (whale/mid/retail in ch8) ── */
+    body.theme-day .role-card.whale {
+      background: rgba(13,110,168,.07) !important;
+      border-color: rgba(13,110,168,.25) !important;
+    }
+    body.theme-day .role-card.mid {
+      background: rgba(21,122,50,.06) !important;
+      border-color: rgba(21,122,50,.22) !important;
+    }
+    body.theme-day .role-card.retail {
+      background: rgba(176,48,32,.06) !important;
+      border-color: rgba(176,48,32,.2) !important;
+    }
+    body.theme-day .role-card .role-name { color: #0a1828 !important; }
+    body.theme-day .role-card .role-desc { color: #1a3550 !important; }
+    body.theme-day .role-card .role-en { color: #3a6080 !important; }
+    body.theme-day .role-card .role-scale {
+      color: #1265a8 !important;
+      background: rgba(26,101,168,.08) !important;
+      border-color: rgba(26,101,168,.22) !important;
+    }
+
+    /* ── Timeline (tl-*) ── */
+    body.theme-day .tl-item {
+      border-color: rgba(26,101,168,.15) !important;
+    }
+    body.theme-day .tl-dot {
+      background: #fff !important;
+      border-color: rgba(26,101,168,.45) !important;
+    }
+    body.theme-day .tl-dot.cn { border-color: rgba(13,110,168,.6) !important; }
+    body.theme-day .tl-dot.gn { border-color: rgba(21,122,50,.6) !important; }
+    body.theme-day .tl-dot.yn { border-color: rgba(184,136,14,.6) !important; }
+    body.theme-day .tl-dot.rd { border-color: rgba(176,48,32,.6) !important; }
+    body.theme-day .tl-head { color: #1265a8 !important; font-weight: 600; }
+    body.theme-day .tl-head.gn { color: #157a32 !important; }
+    body.theme-day .tl-head.yn { color: #8a6000 !important; }
+    body.theme-day .tl-head.rd { color: #a02818 !important; }
+    body.theme-day .tl-body { color: #1a3550 !important; }
+    body.theme-day .tl-body strong { color: #0a1828 !important; }
+
+    /* ── Shadow Line sl-side cy ── */
+    body.theme-day .sl-side.cy {
+      background: linear-gradient(180deg, #1265a8, rgba(18,101,168,.4)) !important;
+    }
+    body.theme-day .sl-top.cy { color: #1265a8 !important; }
   </style>
 
   <!-- ☀️ Footer Day Mode Fix -->
@@ -3478,142 +3601,259 @@ window.answerQ=function(qid,el,choice){
 
 
 <script>
-/* ── Comprehensive Day Mode Fix v2 ── */
+/* ── Comprehensive Day Mode Fix v3 ── */
 (function() {
   const DARK_FILLS = new Set([
     '#040b15','#050c1a','#030a12','#040d18','#020810','#03080f','#060d1a',
-    '#08060a','#04080f','#050a18','#04080e','#03060d','#070d1a','#0b1220'
+    '#08060a','#04080f','#050a18','#04080e','#03060d','#070d1a','#0b1220',
+    '#050a18','#040a16','#030810','#060c1a'
   ]);
 
   function isDarkHex(c) {
     if (!c) return false;
     const low = c.toLowerCase().trim();
     if (DARK_FILLS.has(low)) return true;
-    // any hex like #0XX or #1XX that's very dark
     const hex = low.match(/^#([0-9a-f]{6})$/);
     if (hex) {
       const r=parseInt(hex[1].slice(0,2),16),g=parseInt(hex[1].slice(2,4),16),b=parseInt(hex[1].slice(4,6),16);
-      return (r+g+b) < 80;
+      return (r+g+b) < 90;
+    }
+    // 3-digit hex
+    const hex3 = low.match(/^#([0-9a-f]{3})$/);
+    if (hex3) {
+      const r=parseInt(hex3[1][0],16)*17,g=parseInt(hex3[1][1],16)*17,b=parseInt(hex3[1][2],16)*17;
+      return (r+g+b) < 90;
     }
     return false;
   }
   function isDarkRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-    if (m) return (+m[1]+ +m[2]+ +m[3]) < 60;
+    if (m) return (+m[1]+ +m[2]+ +m[3]) < 70;
     return false;
   }
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.28;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 
-  // Map neon colors → readable day colors
+  // Map neon/dark colors → readable day colors
   function mapNeon(c) {
     if (!c) return null;
-    const low = c.toLowerCase();
-    if (/rgba?\(0,\s*229,\s*255/.test(low) || low === '#00e5ff') return '#1265a8';
-    if (/rgba?\(0,\s*230,\s*118/.test(low) || /rgba?\(0,\s*232,\s*118/.test(low) || low === '#00e676') return '#157a32';
+    const low = c.toLowerCase().trim();
+    // Cyan / accent
+    if (/rgba?\(0,\s*229,\s*255/.test(low) || low === '#00e5ff') return '#0d6ea8';
+    if (/rgba?\(0,\s*170,\s*255/.test(low) || low === '#00aaff') return '#1265a8';
+    if (/rgba?\(0,\s*153,\s*187/.test(low) || low === '#0099bb') return '#0d5090';
+    // Green
+    if (/rgba?\(0,\s*23[02],\s*118/.test(low) || low === '#00e676') return '#157a32';
+    if (/rgba?\(0,\s*200,\s*90/.test(low)) return '#126828';
+    // Red
     if (/rgba?\(255,\s*61,\s*90/.test(low) || low === '#ff3d5a') return '#a02818';
+    if (/rgba?\(255,\s*[5-9]\d,\s*[5-9]\d/.test(low)) return '#a02818';
+    // Yellow/orange
     if (/rgba?\(255,\s*214,\s*0/.test(low) || low === '#ffd600') return '#8a6000';
+    if (/rgba?\(255,\s*152,\s*0/.test(low) || low === '#ff9800') return '#a05000';
+    // Purple/pink
     if (/rgba?\(178,\s*102,\s*255/.test(low) || low === '#b266ff') return '#6640c0';
     if (/rgba?\(255,\s*110,\s*180/.test(low) || low === '#ff6eb4') return '#b0206a';
-    if (/rgba?\(255,\s*152,\s*0/.test(low) || low === '#ff9800') return '#a05000';
-    if (/rgba?\(0,\s*184,\s*212/.test(low) || low === '#00b8d4') return '#0d6ea8';
+    // White (was used as chart labels on dark bg)
     if (/rgba?\(255,\s*255,\s*255/.test(low) || low === '#fff' || low === 'white') return '#1a3550';
+    if (/rgba?\(21[0-9],\s*2[2-9]\d,\s*2[3-9]\d/.test(low)) return '#1a3550'; // near-white
+    // Semitransparent white text (grid labels, axis labels)
+    if (low.startsWith('rgba(255,255,255,') || low.startsWith('rgba(255, 255, 255,')) return '#3a6080';
+    if (low.startsWith('rgba(200,2') || low.startsWith('rgba(180,2')) return '#3a6080'; // dim whites
+    if (low.startsWith('rgba(122,154,184')) return '#5a8ab8'; // dim blue-grey text
+    // Cyan with transparency (axis labels, zones text)
+    if (/rgba\(0,\s*229,\s*255/.test(low)) return '#1265a8';
+    if (/rgba\(0,\s*230,\s*118/.test(low)) return '#157a32';
+    if (/rgba\(255,\s*61,\s*90/.test(low)) return '#a02818';
+    if (/rgba\(255,\s*214,\s*0/.test(low)) return '#8a6000';
+    if (/rgba\(255,\s*152,\s*0/.test(low)) return '#a05000';
+    if (/rgba\(178,\s*102,\s*255/.test(low)) return '#6640c0';
+    if (/rgba\(255,\s*110,\s*180/.test(low)) return '#b0206a';
     return null;
   }
   function mapNeonStroke(c) {
     if (!c) return null;
-    // faint white grid lines -> light grey visible on white bg
-    if (isFaintRgba(c) && /rgba\(255,\s*255,\s*255/.test(c)) return 'rgba(26,101,168,.12)';
-    if (/rgba?\(0,\s*229,\s*255/.test(c)) return 'rgba(18,101,168,.4)';
+    if (isFaintRgba(c) && /rgba\(255,\s*255,\s*255/.test(c)) return 'rgba(26,101,168,.15)';
+    if (/rgba?\(0,\s*229,\s*255/.test(c)) return 'rgba(18,101,168,.5)';
+    if (/rgba?\(255,\s*255,\s*255/.test(c)) return 'rgba(26,101,168,.2)';
+    if (/rgba\(0,\s*229,\s*255/.test(c)) return 'rgba(18,101,168,.4)';
+    if (/rgba\(255,\s*61,\s*90/.test(c)) return 'rgba(160,40,24,.55)';
+    if (/rgba\(0,\s*23[02],\s*118/.test(c)) return 'rgba(21,122,50,.55)';
+    if (/rgba\(255,\s*214,\s*0/.test(c)) return 'rgba(138,96,0,.45)';
     return null;
   }
 
   function fixSvgsForMode(isDay) {
-    // 1. Fix SVG elements with inline style="background:..."
-    document.querySelectorAll('svg[style]').forEach(svg => {
+    // 0. Fix SVG inline style backgrounds (the main chart backgrounds)
+    document.querySelectorAll('svg').forEach(svg => {
       if (!svg.dataset.origStyle) svg.dataset.origStyle = svg.getAttribute('style') || '';
       if (isDay) {
-        const s = svg.dataset.origStyle;
-        if (s.includes('background:#') || s.includes('background: #') ||
-            s.includes('background:rgba(0,0,0') || s.includes('background: rgba(0,0,0')) {
-          svg.style.background = 'rgba(220,238,252,0.5)';
-          svg.style.borderRadius = '10px';
-        }
+        svg.style.background = 'rgba(228,242,252,0.65)';
+        svg.style.borderRadius = '10px';
       } else {
-        svg.setAttribute('style', svg.dataset.origStyle);
+        // restore original style
+        if (svg.dataset.origStyle) {
+          svg.setAttribute('style', svg.dataset.origStyle);
+        }
       }
     });
 
-    // 2. Fix SVG rect fills
+    // 1. Fix SVG rect fills (backgrounds of chart areas)
     document.querySelectorAll('svg rect').forEach(r => {
       const f = r.getAttribute('fill') || '';
       if (!r.dataset.origFill) r.dataset.origFill = f;
       const orig = r.dataset.origFill;
       if (isDay) {
-        if (isDark(orig)) r.setAttribute('fill', 'rgba(210,235,252,0.45)');
-      } else r.setAttribute('fill', orig);
+        if (isDark(orig)) {
+          r.setAttribute('fill', 'rgba(220,238,252,0.55)');
+        } else {
+          const mapped = mapNeon(orig);
+          if (mapped && orig !== 'none' && orig !== 'transparent') {
+            // Only map colored fills, keep light/transparent ones
+          }
+        }
+      } else {
+        r.setAttribute('fill', orig);
+      }
     });
 
-    // 3. Fix SVG text fills (neon -> readable day)
+    // 2. Fix SVG text fills (neon -> readable day)
     document.querySelectorAll('svg text, svg tspan').forEach(t => {
       const f = t.getAttribute('fill') || '';
       if (!t.dataset.origFill) t.dataset.origFill = f;
       const orig = t.dataset.origFill;
       if (isDay) {
         const mapped = mapNeon(orig);
-        if (mapped) { t.setAttribute('fill', mapped); t.style.opacity = '1'; }
-        else if (isFaintRgba(orig) || isDark(orig)) {
-          t.setAttribute('fill', '#1a3550'); t.style.opacity = '1';
+        if (mapped) {
+          t.setAttribute('fill', mapped);
+          t.style.opacity = '1';
+        } else if (isFaintRgba(orig)) {
+          t.setAttribute('fill', '#3a6080');
+          t.style.opacity = '1';
+        } else if (isDark(orig)) {
+          t.setAttribute('fill', '#1a3550');
+          t.style.opacity = '1';
         }
-        // CSS var
+        // Handle CSS var colors
         const v = orig.match(/var\(--(\w[\w-]*)\)/);
         if (v) {
-          const cm={accent:'#1265a8',green:'#157a32',red:'#a02818',yellow:'#8a6000',purple:'#6640c0',pink:'#b0206a',orange:'#a05000'};
+          const cm={
+            accent:'#0d6ea8', 'accent2':'#0d5090', 'accent3':'#1a88cc',
+            green:'#157a32', red:'#a02818', yellow:'#8a6000',
+            purple:'#6640c0', pink:'#b0206a', orange:'#a05000',
+            text:'#0c1c2e', 'text-dim':'#1a3550', 'text-faint':'#3a6080'
+          };
           if (cm[v[1]]) { t.setAttribute('fill', cm[v[1]]); t.style.opacity='1'; }
         }
-      } else { t.setAttribute('fill', orig); t.style.opacity = ''; }
+      } else {
+        t.setAttribute('fill', orig);
+        t.style.opacity = '';
+      }
     });
 
-    // 4. Fix SVG line/path strokes
+    // 3. Fix SVG line/path strokes
     document.querySelectorAll('svg line, svg path, svg polyline').forEach(el => {
       const s = el.getAttribute('stroke') || '';
       if (!el.dataset.origStroke) el.dataset.origStroke = s;
       const orig = el.dataset.origStroke;
-      if (isDay && orig) {
+      if (isDay && orig && orig !== 'none') {
         const mapped = mapNeonStroke(orig);
-        if (mapped) el.setAttribute('stroke', mapped);
-        else {
+        if (mapped) {
+          el.setAttribute('stroke', mapped);
+        } else {
           const nm = mapNeon(orig);
           if (nm) el.setAttribute('stroke', nm);
         }
-      } else if (!isDay && orig) el.setAttribute('stroke', orig);
+      } else if (!isDay && orig) {
+        el.setAttribute('stroke', orig);
+      }
     });
 
-    // 5. Fix SVG circle fills
+    // 4. Fix SVG circle & ellipse fills
     document.querySelectorAll('svg circle, svg ellipse').forEach(el => {
       const f = el.getAttribute('fill') || '';
       if (!el.dataset.origFill) el.dataset.origFill = f;
       const orig = el.dataset.origFill;
       if (isDay) {
         const mapped = mapNeon(orig);
-        if (mapped) el.setAttribute('fill', mapped);
-        else if (isDark(orig)) el.setAttribute('fill', 'rgba(210,235,252,0.45)');
-      } else el.setAttribute('fill', orig);
+        if (mapped && orig !== 'none' && orig !== 'transparent') {
+          el.setAttribute('fill', mapped);
+        } else if (isDark(orig)) {
+          el.setAttribute('fill', 'rgba(210,235,252,0.55)');
+        }
+        // Fix circle strokes
+        const s = el.getAttribute('stroke') || '';
+        if (!el.dataset.origStroke) el.dataset.origStroke = s;
+        const origS = el.dataset.origStroke;
+        if (origS) {
+          const ms = mapNeonStroke(origS) || mapNeon(origS);
+          if (ms) el.setAttribute('stroke', ms);
+        }
+      } else {
+        el.setAttribute('fill', orig);
+        if (el.dataset.origStroke) el.setAttribute('stroke', el.dataset.origStroke);
+      }
     });
 
-    // 6. Fix svg-chart-wrap inline border color
+    // 5. Fix polygon fills (area charts)
+    document.querySelectorAll('svg polygon').forEach(el => {
+      const f = el.getAttribute('fill') || '';
+      if (!el.dataset.origFill) el.dataset.origFill = f;
+      const orig = el.dataset.origFill;
+      if (isDay) {
+        if (isDark(orig)) el.setAttribute('fill', 'rgba(210,235,252,.4)');
+        // Keep gradient refs but lighten
+      } else {
+        el.setAttribute('fill', orig);
+      }
+    });
+
+    // 6. Fix svg-chart-wrap wrapper styling
     document.querySelectorAll('.svg-chart-wrap').forEach(w => {
       if (isDay) {
-        w.style.borderColor = 'rgba(26,101,168,.2)';
-        w.style.background = 'rgba(220,238,252,0.3)';
+        w.style.borderColor = 'rgba(26,101,168,.22)';
+        w.style.background = 'rgba(220,238,252,0.5)';
+        w.style.borderRadius = '14px';
       } else {
         w.style.borderColor = '';
         w.style.background = '';
+      }
+    });
+
+    // 7. Fix SVG marker paths (arrow markers etc.)
+    document.querySelectorAll('svg marker path') .forEach(el => {
+      const s = el.getAttribute('stroke') || '';
+      if (!el.dataset.origStroke) el.dataset.origStroke = s;
+      if (isDay) {
+        const mapped = mapNeonStroke(s) || mapNeon(s);
+        if (mapped) el.setAttribute('stroke', mapped);
+      } else if (el.dataset.origStroke) {
+        el.setAttribute('stroke', el.dataset.origStroke);
+      }
+    });
+
+    // 8. Fix linearGradient stop colors
+    document.querySelectorAll('svg linearGradient stop, svg radialGradient stop').forEach(stop => {
+      const c = stop.getAttribute('stop-color') || '';
+      if (!stop.dataset.origColor) stop.dataset.origColor = c;
+      const orig = stop.dataset.origColor;
+      if (isDay) {
+        if (isDark(orig) || /rgba?\(0,0,0/.test(orig)) {
+          stop.setAttribute('stop-color', 'rgba(200,228,248,0.0)');
+        } else if (/rgba?\(255,\s*61,\s*90/.test(orig) || orig === '#ff3d5a') {
+          stop.setAttribute('stop-color', 'rgba(160,40,24,0.25)');
+        } else if (/rgba?\(0,\s*229,\s*255/.test(orig) || orig === '#00e5ff') {
+          stop.setAttribute('stop-color', 'rgba(18,101,168,0.18)');
+        } else if (/rgba?\(0,\s*23[02],\s*118/.test(orig) || orig === '#00e676') {
+          stop.setAttribute('stop-color', 'rgba(21,122,50,0.18)');
+        }
+      } else if (orig) {
+        stop.setAttribute('stop-color', orig);
       }
     });
   }
