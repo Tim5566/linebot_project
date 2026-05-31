@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jellystockdata.com/sitemap.xml

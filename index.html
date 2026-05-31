@@ -3426,6 +3426,18 @@
     }
 
     /* ── SEARCH / CARD ── */
+    body.theme-day #seo-intro {
+      background: linear-gradient(135deg,rgba(26,101,168,.06) 0%,rgba(0,100,200,.04) 100%);
+      border-color: rgba(26,101,168,.2);
+    }
+    body.theme-day #seo-intro h1 {
+      background: linear-gradient(90deg,#0a2d5a 60%,#1a7bbf);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    body.theme-day #seo-intro p { color: #3a5a7a; }
+    body.theme-day #seo-intro strong { color: #1a4070 !important; }
     body.theme-day .search-area {
       background: rgba(255,255,255,.9);
       box-shadow: 0 8px 36px rgba(26,80,160,.1), inset 0 1px 0 rgba(255,255,255,.8);
@@ -4214,6 +4226,7 @@
       document.dispatchEvent(new Event('_authChanged'));
     };
   </script>
+  <meta property="og:image" content="https://jellystockdata.com/images/jelly.png" />
 </head>
 <body>
 
@@ -4399,14 +4412,6 @@
           <path d="M3 3v18h18"/><path d="m7 16 4-8 4 4 2-4"/>
         </svg>
         最佳均線分析
-        <span style="margin-left:auto;font-size:.45rem;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.5);color:#ff3d5a;border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">優化中</span>
-      </button>
-
-      <button class="nav-item" data-nav-id="wave" onclick="openWaveChart()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 12 Q5 5 8 12 Q11 19 14 12 Q17 5 20 12 L22 12"/>
-        </svg>
-        波浪走勢分析
         <span style="margin-left:auto;font-size:.45rem;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.5);color:#ff3d5a;border-radius:4px;padding:1px 6px;letter-spacing:.08em;white-space:nowrap">優化中</span>
       </button>
 
@@ -4934,6 +4939,69 @@
 
 <main>
 
+  <!-- ══ 靜態網站介紹（SEO / AdSense 審核用，Google 爬蟲最先讀到） ══ -->
+  <div id="seo-intro" style="
+    margin-bottom:36px;
+    padding:28px 32px 24px;
+    background:linear-gradient(135deg,rgba(0,229,255,.04) 0%,rgba(0,100,200,.03) 100%);
+    border:1px solid rgba(0,229,255,.1);
+    border-radius:18px;
+    position:relative;
+    overflow:hidden;
+  ">
+    <!-- 頂部細線裝飾 -->
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.5),transparent)"></div>
+
+    <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+      <!-- 左側文字 -->
+      <div style="flex:1;min-width:260px">
+        <p style="
+          font-family:'Share Tech Mono',monospace;
+          font-size:.6rem;
+          letter-spacing:.28em;
+          color:rgba(0,229,255,.6);
+          text-transform:uppercase;
+          margin-bottom:8px;
+        ">ABOUT THIS SITE</p>
+        <h1 style="
+          font-family:'Orbitron',monospace;
+          font-size:1rem;
+          font-weight:700;
+          color:#fff;
+          letter-spacing:.06em;
+          margin-bottom:14px;
+          background:linear-gradient(90deg,#fff 60%,rgba(0,229,255,.8));
+          -webkit-background-clip:text;
+          -webkit-text-fill-color:transparent;
+          background-clip:text;
+        ">JellyStock 盤後雷達｜台股法人數據平台</h1>
+        <p style="font-size:.82rem;line-height:1.9;color:#8ab0c8;margin-bottom:10px;max-width:780px">
+          JellyStock 盤後雷達是專為台灣股市投資人設計的盤後數據查詢平台，提供<strong style="color:#b0d4e8">三大法人（外資、投信、自營商）每日買賣超排行</strong>、個股法人動向、大盤融資餘額、借券賣出、處置股與注意股等關鍵資訊。所有數據直接串接<strong style="color:#b0d4e8">臺灣證券交易所（TWSE）與證券櫃檯買賣中心（TPEx）</strong>的官方公開 API，每個交易日盤後自動更新。
+        </p>
+        <p style="font-size:.82rem;line-height:1.9;color:#8ab0c8;max-width:780px">
+          本站同時提供完整的<strong style="color:#b0d4e8">台股籌碼分析教學</strong>與<strong style="color:#b0d4e8">技術分析教學</strong>，從基礎觀念到實戰案例共 20 章，完全免費，適合各層級投資人自學研究。資料僅供參考，不構成投資建議。
+        </p>
+      </div>
+
+      <!-- 右側標籤群 -->
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;padding-top:4px">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-width:220px">
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">外資買賣超</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">投信買賣超</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">自營商動向</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">融資借券</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">處置股</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:20px;color:rgba(0,229,255,.8);white-space:nowrap">注意股</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(140,100,255,.08);border:1px solid rgba(140,100,255,.25);border-radius:20px;color:rgba(160,130,255,.9);white-space:nowrap">籌碼教學</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(140,100,255,.08);border:1px solid rgba(140,100,255,.25);border-radius:20px;color:rgba(160,130,255,.9);white-space:nowrap">技術分析教學</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:20px;color:rgba(0,200,100,.9);white-space:nowrap">TWSE / TPEx</span>
+          <span style="font-size:.65rem;padding:3px 10px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:20px;color:rgba(0,200,100,.9);white-space:nowrap">每日自動更新</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ══ /靜態網站介紹 ══ -->
+
   <!-- SEARCH -->
   <div class="search-area">
     <div class="search-top">
@@ -5161,6 +5229,129 @@
   </div>
 
 </main>
+
+<!-- ══════════════════════════════════════════════════════════════
+     靜態 SEO 內容區塊（Google 爬蟲可直接讀取，不依賴 JavaScript）
+     ══════════════════════════════════════════════════════════════ -->
+<section id="seo-static-content" aria-label="功能介紹與教學導覽" style="
+  position:relative;
+  z-index:2;
+  background:linear-gradient(180deg,rgba(3,6,13,0) 0%,rgba(5,10,20,.97) 6%,rgba(5,10,20,.97) 94%,rgba(3,6,13,0) 100%);
+  border-top:1px solid rgba(0,229,255,.08);
+  padding:64px 40px 72px;
+  max-width:1100px;
+  margin:0 auto;
+  font-family:'Noto Sans TC',sans-serif;
+  color:#d4e4f7;
+">
+
+  <!-- ② 功能工具介紹 -->
+  <div style="margin-bottom:52px">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#00e5ff;letter-spacing:.08em;margin-bottom:24px;text-transform:uppercase">核心功能介紹</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">📊 三大法人買賣超查詢</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">輸入股票代號即可查看外資、投信、自營商當日及近期的買賣超張數，並同時顯示收盤價、漲跌幅等基本行情資訊，一頁掌握法人動向。</p>
+      </div>
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">📈 法人買賣超排行榜</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">提供當日上市、上櫃三大法人買超前50名與賣超前50名排行，可分別切換外資、投信、自營商頁籤，快速找出法人最積極布局或出脫的標的。</p>
+      </div>
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">💰 大盤融資借券監控</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">即時顯示全市場融資餘額、融券餘額、借券賣出等重要籌碼指標，協助投資人掌握市場槓桿水位與潛在賣壓，作為多空研判的重要參考依據。</p>
+      </div>
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">⚠️ 處置股與注意股追蹤</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">自動列出交易所公告的當日處置股票及注意交易股票名單，幫助投資人規避高風險標的，避免在不知情的情況下持有受管制的異常交易股票。</p>
+      </div>
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">🔔 即時新聞快訊</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">整合台股相關重要財經新聞，讓使用者在查詢盤後數據的同時，也能掌握影響市場走勢的最新消息，做到資訊與數據雙管齊下。</p>
+      </div>
+
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:20px 22px">
+        <h3 style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:8px">⭐ 自選股追蹤清單</h3>
+        <p style="font-size:.8rem;line-height:1.8;color:#8ab0c8">登入後可建立個人自選股清單，將常用的追蹤標的加入最愛，每次進站即可快速查看自選股的最新法人買賣動態，節省重複查詢的時間。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ③ 技術分析教學章節連結 -->
+  <div style="margin-bottom:52px">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#00e5ff;letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase">技術分析教學</h2>
+    <p style="font-size:.82rem;color:#7a9ab8;margin-bottom:22px;line-height:1.7">從K線判讀到均線策略，系統性學習台股技術分析的核心概念與實戰應用，共10章完整課程。</p>
+    <nav aria-label="技術分析教學章節" style="display:flex;flex-wrap:wrap;gap:10px">
+      <a href="/stock_site/features/chapter1.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第一章：K線基礎</a>
+      <a href="/stock_site/features/chapter2.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第二章：均線系統</a>
+      <a href="/stock_site/features/chapter3.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第三章：量價關係</a>
+      <a href="/stock_site/features/chapter4.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第四章：支撐與壓力</a>
+      <a href="/stock_site/features/chapter5.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第五章：型態分析</a>
+      <a href="/stock_site/features/chapter6.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第六章：MACD 應用</a>
+      <a href="/stock_site/features/chapter7.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第七章：RSI 與 KD</a>
+      <a href="/stock_site/features/chapter8.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第八章：布林通道</a>
+      <a href="/stock_site/features/chapter9.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第九章：突破與假突破</a>
+      <a href="/stock_site/features/chapter10.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;color:#a0c8e0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(0,229,255,.14)';this.style.color='#fff'" onmouseout="this.style.background='rgba(0,229,255,.06)';this.style.color='#a0c8e0'">第十章：實戰案例解析</a>
+    </nav>
+  </div>
+
+  <!-- ④ 籌碼分析教學章節連結 -->
+  <div style="margin-bottom:52px">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#00e5ff;letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase">籌碼分析教學</h2>
+    <p style="font-size:.82rem;color:#7a9ab8;margin-bottom:22px;line-height:1.7">深入解析三大法人操盤邏輯，學習如何用籌碼數據找出主力動向，共10章從基礎到實戰的完整學習路徑。</p>
+    <nav aria-label="籌碼分析教學章節" style="display:flex;flex-wrap:wrap;gap:10px">
+      <a href="/stock_site/chips/chips_chapter1.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第一章：籌碼本質與主力</a>
+      <a href="/stock_site/chips/chips_chapter2.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第二章：三大法人角色</a>
+      <a href="/stock_site/chips/chips_chapter3.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第三章：外資布局追蹤</a>
+      <a href="/stock_site/chips/chips_chapter4.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第四章：投信季底作帳</a>
+      <a href="/stock_site/chips/chips_chapter5.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第五章：自營商避險判讀</a>
+      <a href="/stock_site/chips/chips_chapter6.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第六章：融資增減與軋空</a>
+      <a href="/stock_site/chips/chips_chapter7.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第七章：借券賣出解讀</a>
+      <a href="/stock_site/chips/chips_chapter8.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第八章：集保與大戶持股</a>
+      <a href="/stock_site/chips/chips_chapter9.html"  style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第九章：法人買超與背離</a>
+      <a href="/stock_site/chips/chips_chapter10.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(140,100,255,.06);border:1px solid rgba(140,100,255,.2);border-radius:8px;color:#a08de0;font-size:.78rem;text-decoration:none;transition:all .2s" onmouseover="this.style.background='rgba(140,100,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(140,100,255,.06)';this.style.color='#a08de0'">第十章：實戰選股建立</a>
+    </nav>
+  </div>
+
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "JellyStock 教學內容",
+    "itemListElement": [
+      {"@type":"ListItem","position":1,"name":"技術分析教學第一章：K線基礎","url":"https://jellystockdata.com/stock_site/features/chapter1.html"},
+      {"@type":"ListItem","position":2,"name":"技術分析教學第二章：均線系統","url":"https://jellystockdata.com/stock_site/features/chapter2.html"},
+      {"@type":"ListItem","position":3,"name":"技術分析教學第三章：量價關係","url":"https://jellystockdata.com/stock_site/features/chapter3.html"},
+      {"@type":"ListItem","position":4,"name":"技術分析教學第四章：支撐與壓力","url":"https://jellystockdata.com/stock_site/features/chapter4.html"},
+      {"@type":"ListItem","position":5,"name":"技術分析教學第五章：型態分析","url":"https://jellystockdata.com/stock_site/features/chapter5.html"},
+      {"@type":"ListItem","position":6,"name":"技術分析教學第六章：MACD應用","url":"https://jellystockdata.com/stock_site/features/chapter6.html"},
+      {"@type":"ListItem","position":7,"name":"技術分析教學第七章：RSI與KD","url":"https://jellystockdata.com/stock_site/features/chapter7.html"},
+      {"@type":"ListItem","position":8,"name":"技術分析教學第八章：布林通道","url":"https://jellystockdata.com/stock_site/features/chapter8.html"},
+      {"@type":"ListItem","position":9,"name":"技術分析教學第九章：突破與假突破","url":"https://jellystockdata.com/stock_site/features/chapter9.html"},
+      {"@type":"ListItem","position":10,"name":"技術分析教學第十章：實戰案例解析","url":"https://jellystockdata.com/stock_site/features/chapter10.html"},
+      {"@type":"ListItem","position":11,"name":"籌碼分析教學第一章：籌碼本質與主力","url":"https://jellystockdata.com/stock_site/chips/chips_chapter1.html"},
+      {"@type":"ListItem","position":12,"name":"籌碼分析教學第二章：三大法人角色","url":"https://jellystockdata.com/stock_site/chips/chips_chapter2.html"},
+      {"@type":"ListItem","position":13,"name":"籌碼分析教學第三章：外資布局追蹤","url":"https://jellystockdata.com/stock_site/chips/chips_chapter3.html"},
+      {"@type":"ListItem","position":14,"name":"籌碼分析教學第四章：投信季底作帳","url":"https://jellystockdata.com/stock_site/chips/chips_chapter4.html"},
+      {"@type":"ListItem","position":15,"name":"籌碼分析教學第五章：自營商避險判讀","url":"https://jellystockdata.com/stock_site/chips/chips_chapter5.html"},
+      {"@type":"ListItem","position":16,"name":"籌碼分析教學第六章：融資增減與軋空","url":"https://jellystockdata.com/stock_site/chips/chips_chapter6.html"},
+      {"@type":"ListItem","position":17,"name":"籌碼分析教學第七章：借券賣出解讀","url":"https://jellystockdata.com/stock_site/chips/chips_chapter7.html"},
+      {"@type":"ListItem","position":18,"name":"籌碼分析教學第八章：集保與大戶持股","url":"https://jellystockdata.com/stock_site/chips/chips_chapter8.html"},
+      {"@type":"ListItem","position":19,"name":"籌碼分析教學第九章：法人買超與背離","url":"https://jellystockdata.com/stock_site/chips/chips_chapter9.html"},
+      {"@type":"ListItem","position":20,"name":"籌碼分析教學第十章：實戰選股建立","url":"https://jellystockdata.com/stock_site/chips/chips_chapter10.html"}
+    ]
+  }
+  </script>
+
+</section>
+<!-- ══════════════════════════════════════════════════════════════ -->
 
 </div><!-- /main-content -->
 </div><!-- /page-body -->
@@ -6761,15 +6952,6 @@ function openWatchlistModal() {
   loadWatchlist();
 }
 
-// ── 波浪走勢分析 ──
-function openWaveChart() {
-  closeDrawer();
-  const inputEl = document.getElementById('stockInput') || document.querySelector('input[placeholder*="代碼"]');
-  const kw = (inputEl ? inputEl.value.trim() : '') || (window._lastStockKeyword || '');
-  const base = '/stock_site/tools/wave_chart.html';
-  const url  = kw ? `${base}?stock=${encodeURIComponent(kw)}` : base;
-  window.location.href = url;
-}
 
 function openSnapFitMA() {
   closeDrawer();
