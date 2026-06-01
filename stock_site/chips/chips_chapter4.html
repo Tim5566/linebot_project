@@ -2396,6 +2396,45 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2518,7 +2557,8 @@
   </div>
 
   <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2528,6 +2568,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- ═══════════════════════════════════════════
@@ -2665,9 +2706,9 @@
           <line x1="55" y1="165" x2="695" y2="165" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
           <line x1="55" y1="130" x2="695" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
           <line x1="55" y1="95" x2="695" y2="95" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <text x="48" y="204" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">低</text>
-          <text x="48" y="134" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">中</text>
-          <text x="48" y="84" fill="rgba(255,255,255,.25)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">高</text>
+          <text x="48" y="204" fill="rgba(200,220,240,.7)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">低</text>
+          <text x="48" y="134" fill="rgba(200,220,240,.7)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">中</text>
+          <text x="48" y="84" fill="rgba(200,220,240,.7)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">高</text>
           <!-- Phase zones -->
           <rect x="55" y="25" width="120" height="175" fill="rgba(122,154,184,.03)"/>
           <rect x="175" y="25" width="130" height="175" fill="rgba(0,230,118,.04)"/>
@@ -2718,12 +2759,12 @@
           <rect x="641" y="188" width="17" height="12" rx="3" fill="url(#phaseE)"/>
           <rect x="662" y="192" width="17" height="8" rx="3" fill="url(#phaseE)"/>
           <!-- X labels -->
-          <text x="115" y="218" fill="rgba(255,255,255,.3)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-30 ~ D-16</text>
+          <text x="115" y="218" fill="rgba(200,220,240,.65)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-30 ~ D-16</text>
           <text x="240" y="218" fill="rgba(0,230,118,.6)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-15 ~ D-8</text>
           <text x="375" y="218" fill="rgba(0,229,255,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-7 ~ D-2</text>
           <text x="482" y="218" fill="rgba(255,214,0,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D-1 / D0</text>
           <text x="630" y="218" fill="rgba(255,61,90,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">D+1 ~ D+5</text>
-          <text x="375" y="258" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">投信作帳週期強度示意圖（橫軸為距季底天數）</text>
+          <text x="375" y="258" fill="rgba(200,220,240,.65)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">投信作帳週期強度示意圖（橫軸為距季底天數）</text>
         </svg>
       </div>
 
@@ -2946,10 +2987,10 @@
           <line x1="55" y1="173" x2="700" y2="173" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
           <line x1="55" y1="128" x2="700" y2="128" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
           <line x1="55" y1="83" x2="700" y2="83" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <text x="48" y="222" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">0%</text>
-          <text x="48" y="177" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">2%</text>
-          <text x="48" y="132" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">4%</text>
-          <text x="48" y="87" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">6%</text>
+          <text x="48" y="222" fill="rgba(200,220,240,.65)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">0%</text>
+          <text x="48" y="177" fill="rgba(200,220,240,.65)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">2%</text>
+          <text x="48" y="132" fill="rgba(200,220,240,.65)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">4%</text>
+          <text x="48" y="87" fill="rgba(200,220,240,.65)" font-size="8" text-anchor="end" font-family="Share Tech Mono, monospace">6%</text>
           <!-- Bars -->
           <rect x="60" y="207" width="24" height="11" rx="3" fill="url(#barM)"/>
           <text x="72" y="233" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono, monospace">1月</text>
@@ -3186,7 +3227,7 @@
           <text x="115" y="143" fill="rgba(0,229,255,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">試單</text>
           <circle cx="240" cy="89" r="4" fill="rgba(0,230,118,.5)" stroke="rgba(0,230,118,.8)" stroke-width="1.5"/>
           <text x="240" y="106" fill="rgba(0,230,118,.7)" font-size="7" text-anchor="middle" font-family="Share Tech Mono, monospace">加碼</text>
-          <text x="365" y="182" fill="rgba(255,255,255,.3)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">作帳行情進出場全週期示意（數字為各階段出清比例）</text>
+          <text x="365" y="182" fill="rgba(200,220,240,.65)" font-size="9" text-anchor="middle" font-family="Share Tech Mono, monospace" letter-spacing="1">作帳行情進出場全週期示意（數字為各階段出清比例）</text>
         </svg>
       </div>
 
@@ -3428,7 +3469,8 @@
 
 
         <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3438,6 +3480,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3645,7 +3688,7 @@ window.answerQ = function(qid, el, choice) {
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

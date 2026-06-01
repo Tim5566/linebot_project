@@ -2215,6 +2215,216 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+<style>
+  /* ── TOC Strip ── */
+  .toc-strip {
+    display:flex;align-items:center;flex-wrap:wrap;gap:0;
+    background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.1);
+    border-radius:12px;padding:10px 16px;margin-bottom:28px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+  }
+  .toc-item {
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    text-decoration:none;padding:4px 8px;border-radius:8px;
+    transition:background .18s;cursor:pointer;min-width:52px;
+  }
+  .toc-item:hover { background:rgba(0,229,255,.07); }
+  .toc-dot {
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Share Tech Mono',monospace;font-size:.62rem;font-weight:700;
+    border:1px solid rgba(0,229,255,.25);color:var(--text-faint);
+    background:rgba(0,0,0,.3);transition:all .2s;
+  }
+  .toc-dot.active { border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.1);box-shadow:0 0 8px rgba(0,229,255,.25); }
+  .toc-lbl { font-family:'Noto Sans TC',sans-serif;font-size:.62rem;color:var(--text-faint);white-space:nowrap; }
+  .toc-connector { flex:1;height:1px;background:rgba(0,229,255,.1);min-width:10px; }
+
+  /* ── Key Concept ── */
+  .key-concept {
+    display:flex;gap:14px;align-items:flex-start;
+    background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(0,170,255,.02));
+    border:1px solid rgba(0,229,255,.18);border-radius:12px;
+    padding:16px 20px;margin:20px 0;
+  }
+  .key-concept-label { font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);margin-bottom:6px; }
+  .key-concept-text { font-size:.86rem;color:var(--text);line-height:1.75;font-style:italic; }
+
+  /* ── Stage Grid ── */
+  .stage-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:20px 0; }
+  .stage-card {
+    background:rgba(0,0,0,.25);border:1px solid rgba(0,229,255,.1);
+    border-radius:14px;padding:18px 16px;transition:all .22s;
+  }
+  .stage-card:hover { border-color:rgba(0,229,255,.22);transform:translateY(-2px); }
+  .stage-num { font-family:'Orbitron',monospace;font-size:.65rem;font-weight:700;margin-bottom:6px;letter-spacing:.08em; }
+  .stage-title { font-size:.86rem;color:var(--text);font-weight:600;margin-bottom:6px; }
+  .stage-desc { font-size:.8rem;color:var(--text-dim);line-height:1.6; }
+
+  /* ── SOP Wrap ── */
+  .sop-wrap {
+    background:rgba(0,0,0,.2);border:1px solid rgba(0,229,255,.1);
+    border-radius:16px;padding:8px 20px 20px;margin:20px 0;
+  }
+  .sop-step { padding:16px 0; }
+  .sop-num {
+    display:inline-block;font-family:'Orbitron',monospace;font-size:.58rem;font-weight:700;
+    letter-spacing:.12em;padding:3px 10px;border-radius:6px;margin-bottom:8px;
+  }
+  .sop-heading { font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:6px; }
+  .sop-body { font-size:.84rem;color:var(--text-dim);line-height:1.75; }
+  .sop-line { height:1px;background:rgba(0,229,255,.08);margin:0; }
+
+  /* ── Case Study ── */
+  .case-study {
+    background:linear-gradient(135deg,rgba(184,136,14,.05),rgba(160,110,0,.02));
+    border:1px solid rgba(184,136,14,.2);border-radius:16px;overflow:hidden;
+  }
+  .case-header {
+    display:flex;align-items:center;gap:12px;
+    background:rgba(184,136,14,.06);border-bottom:1px solid rgba(184,136,14,.12);
+    padding:14px 20px;
+  }
+  .case-badge {
+    font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.1em;
+    padding:3px 10px;border-radius:6px;
+    background:rgba(184,136,14,.1);border:1px solid rgba(184,136,14,.28);color:var(--yellow);
+  }
+  .case-title { font-size:.92rem;color:var(--text);font-weight:600; }
+  .case-body { padding:18px 20px;font-size:.85rem;color:var(--text-dim);line-height:1.75; }
+  .case-body p { margin-bottom:8px; }
+  .case-lesson {
+    margin:0 20px 18px;padding:10px 14px;border-radius:10px;font-size:.82rem;line-height:1.65;
+    background:rgba(184,136,14,.07);border:1px solid rgba(184,136,14,.2);color:var(--yellow);
+  }
+
+  /* ── Flow Step ── */
+  .flow-step {
+    display:flex;gap:16px;align-items:flex-start;
+    padding:14px 0;border-bottom:1px solid rgba(0,229,255,.06);
+  }
+  .flow-step:last-of-type { border-bottom:none; }
+  .flow-num {
+    width:32px;height:32px;flex-shrink:0;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Orbitron',monospace;font-size:.75rem;font-weight:700;
+    margin-top:2px;
+  }
+  .flow-num.cn { background:rgba(0,229,255,.12);color:var(--accent);border:1px solid rgba(0,229,255,.25); }
+  .flow-num.rd { background:rgba(255,61,90,.12);color:var(--red);border:1px solid rgba(255,61,90,.25); }
+  .flow-num.yn { background:rgba(255,214,0,.1);color:var(--yellow);border:1px solid rgba(255,214,0,.25); }
+  .flow-num.gn { background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.25); }
+  .flow-num.pn { background:rgba(178,102,255,.1);color:var(--purple);border:1px solid rgba(178,102,255,.25); }
+  .flow-num.rn { background:rgba(255,61,90,.12);color:var(--red);border:1px solid rgba(255,61,90,.25); }
+  .flow-content { flex:1; }
+  .flow-heading { font-size:.9rem;color:var(--text);font-weight:600;margin-bottom:5px; }
+  .flow-sub { font-size:.83rem;color:var(--text-dim);line-height:1.7; }
+
+  /* ── Timeline ── */
+  .timeline { position:relative;padding-left:28px;margin:20px 0; }
+  .timeline::before {
+    content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;
+    background:linear-gradient(180deg,var(--accent),var(--purple),var(--red),var(--yellow));
+    border-radius:2px;
+  }
+  .tl-item { position:relative;margin-bottom:22px; }
+  .tl-item:last-child { margin-bottom:0; }
+  .tl-dot {
+    position:absolute;left:-24px;top:3px;width:12px;height:12px;border-radius:50%;
+    border:2px solid;background:var(--bg);
+  }
+  .tl-dot.cy { border-color:var(--accent);box-shadow:0 0 6px rgba(0,229,255,.4); }
+  .tl-dot.rd { border-color:var(--red);box-shadow:0 0 6px rgba(255,61,90,.4); }
+  .tl-dot.yn { border-color:var(--yellow);box-shadow:0 0 6px rgba(255,214,0,.4); }
+  .tl-dot.gn { border-color:var(--green);box-shadow:0 0 6px rgba(0,230,118,.4); }
+  .tl-dot.pu { border-color:var(--purple);box-shadow:0 0 6px rgba(178,102,255,.4); }
+  .tl-head { font-size:.86rem;font-weight:700;margin-bottom:6px; }
+  .tl-head.cy { color:var(--accent); }
+  .tl-head.rd { color:var(--red); }
+  .tl-head.yn { color:var(--yellow); }
+  .tl-head.gn { color:var(--green); }
+  .tl-head.pu { color:var(--purple); }
+  .tl-body { font-size:.83rem;color:var(--text-dim);line-height:1.72; }
+
+  /* Day mode overrides for new components */
+  body.theme-day .toc-strip { background:rgba(255,255,255,.85);border-color:rgba(26,101,168,.15); }
+  body.theme-day .toc-dot { border-color:rgba(26,101,168,.3);color:#3a6080;background:rgba(255,255,255,.9); }
+  body.theme-day .toc-dot.active { border-color:#1265a8;color:#1265a8;background:rgba(26,123,191,.12); }
+  body.theme-day .toc-lbl { color:#3a6080; }
+  body.theme-day .toc-connector { background:rgba(26,101,168,.15); }
+  body.theme-day .key-concept { background:rgba(26,123,191,.06);border-color:rgba(26,101,168,.2); }
+  body.theme-day .key-concept-text { color:#1a3550; }
+  body.theme-day .stage-card { background:rgba(255,255,255,.78);border-color:rgba(26,101,168,.15); }
+  body.theme-day .stage-title { color:#0a1828; }
+  body.theme-day .stage-desc { color:#1a3550; }
+  body.theme-day .sop-wrap { background:rgba(255,255,255,.78);border-color:rgba(26,101,168,.15); }
+  body.theme-day .sop-heading { color:#0a1828; }
+  body.theme-day .sop-body { color:#1a3550; }
+  body.theme-day .sop-line { background:rgba(26,101,168,.1); }
+  body.theme-day .case-study { background:rgba(255,248,220,.5);border-color:rgba(138,96,0,.2); }
+  body.theme-day .case-header { background:rgba(138,96,0,.06);border-bottom-color:rgba(138,96,0,.12); }
+  body.theme-day .case-title { color:#0a1828; }
+  body.theme-day .case-body { color:#2a3040; }
+  body.theme-day .case-lesson { background:rgba(138,96,0,.07);border-color:rgba(138,96,0,.2);color:#8a6000; }
+  body.theme-day .flow-heading { color:#0a1828; }
+  body.theme-day .flow-sub { color:#1a3550; }
+  body.theme-day .timeline::before { background:linear-gradient(180deg,#1265a8,#6640c0,#b03020,#8a6000); }
+  body.theme-day .tl-dot { background:#daeeff; }
+  body.theme-day .tl-body { color:#1a3550; }
+
+  @media (max-width:640px) {
+    .toc-strip { gap:0;padding:8px 10px; }
+    .toc-item { min-width:44px;padding:3px 4px; }
+    .toc-dot { width:22px;height:22px;font-size:.55rem; }
+    .toc-lbl { font-size:.55rem; }
+    .toc-connector { min-width:5px; }
+    .role-grid { grid-template-columns:1fr !important; }
+    .signal-grid { grid-template-columns:1fr !important; }
+    .stage-grid { grid-template-columns:1fr 1fr !important; }
+    .flow-step { gap:10px; }
+    .flow-num { width:28px;height:28px;font-size:.65rem; }
+    .case-header { flex-wrap:wrap; }
+    .sop-wrap { padding:6px 14px 16px; }
+  }
+</style>
+  <style>
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2291,308 +2501,435 @@
   </div>
 </div>
 
+
 <main>
 
   <!-- ══ HERO ══ -->
   <div class="hero">
     <div class="hero-icon">
-      <svg width="78" height="88" viewBox="0 0 78 88" xmlns="http://www.w3.org/2000/svg">
-        <!-- 借出方 stock pile -->
-        <rect x="8" y="20" width="20" height="28" rx="4" fill="rgba(0,229,255,.12)" stroke="rgba(0,229,255,.4)" stroke-width="1.2"/>
-        <text x="18" y="38" fill="rgba(0,229,255,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">LEND</text>
-        <!-- 借入方 -->
-        <rect x="50" y="20" width="20" height="28" rx="4" fill="rgba(255,61,90,.1)" stroke="rgba(255,61,90,.4)" stroke-width="1.2"/>
-        <text x="60" y="38" fill="rgba(255,61,90,.8)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">SELL</text>
-        <!-- Arrow lend→sell -->
-        <line x1="29" y1="34" x2="49" y2="34" stroke="rgba(0,229,255,.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
-        <polygon points="49,30 55,34 49,38" fill="rgba(0,229,255,.6)"/>
+      <svg width="90" height="100" viewBox="0 0 90 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background glow -->
+        <circle cx="45" cy="50" r="38" fill="rgba(0,229,255,.03)" stroke="rgba(0,229,255,.08)" stroke-width="1"/>
+        <!-- 借出方 LEND box -->
+        <rect x="6" y="22" width="26" height="34" rx="5" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.45)" stroke-width="1.4"/>
+        <text x="19" y="37" fill="rgba(0,229,255,.9)" font-size="6.5" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">LEND</text>
+        <text x="19" y="48" fill="rgba(0,229,255,.55)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace">壽險/基金</text>
+        <!-- 借入方 SELL box -->
+        <rect x="58" y="22" width="26" height="34" rx="5" fill="rgba(255,61,90,.1)" stroke="rgba(255,61,90,.45)" stroke-width="1.4"/>
+        <text x="71" y="37" fill="rgba(255,61,90,.9)" font-size="6.5" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">SELL</text>
+        <text x="71" y="48" fill="rgba(255,61,90,.55)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace">法人/大戶</text>
+        <!-- Arrow lend→sell with dash -->
+        <line x1="33" y1="36" x2="57" y2="36" stroke="rgba(0,229,255,.55)" stroke-width="1.6" stroke-dasharray="3,2"/>
+        <polygon points="57,32.5 63,36 57,39.5" fill="rgba(0,229,255,.7)"/>
         <!-- Down arrow = short pressure -->
-        <line x1="39" y1="52" x2="39" y2="72" stroke="rgba(255,61,90,.7)" stroke-width="2"/>
-        <polygon points="33,68 39,76 45,68" fill="rgba(255,61,90,.85)"/>
-        <!-- Warning glow -->
-        <circle cx="39" cy="76" r="6" fill="none" stroke="rgba(255,61,90,.3)" stroke-width="1">
-          <animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values=".5;0;.5" dur="2s" repeatCount="indefinite"/>
+        <line x1="45" y1="60" x2="45" y2="80" stroke="rgba(255,61,90,.75)" stroke-width="2.2"/>
+        <polygon points="39,76 45,86 51,76" fill="rgba(255,61,90,.9)"/>
+        <!-- Pulse ring -->
+        <circle cx="45" cy="84" r="5" fill="none" stroke="rgba(255,61,90,.35)" stroke-width="1.2">
+          <animate attributeName="r" values="4;10;4" dur="2.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".6;0;.6" dur="2.2s" repeatCount="indefinite"/>
         </circle>
-        <!-- Label -->
-        <text x="39" y="14" fill="rgba(0,229,255,.7)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1">BORROWED</text>
+        <!-- Top label -->
+        <text x="45" y="16" fill="rgba(0,229,255,.75)" font-size="7" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1">BORROWED SHORT</text>
       </svg>
     </div>
     <div class="hero-content">
       <div class="hero-label">CHAPTER 07 · 籌碼進階篇</div>
       <div class="hero-title">借券賣出<br/>的深層意義</div>
-      <div class="hero-desc">借券賣出是台灣市場中最常被誤解的籌碼指標之一。它不只是「有人看空」的訊號，背後涉及借券來源、大股東出貨手法、空頭成本結構，以及整體借券餘額增減所揭露的市場壓力。讀懂借券，才能看穿最難察覺的主力出貨動作。</div>
+      <div class="hero-desc">借券賣出是台灣市場中最常被誤解、也最具信息含量的籌碼指標之一。它不只是「有人看空」的訊號，背後涉及借券來源的機構身份、大股東隱性出貨的暗流、空頭成本結構與軋空臨界點，以及整體借券餘額增減所揭露的市場壓力前兆。深度讀懂借券，才能在機構看不見的地方，搶先看見最難察覺的主力動作。</div>
       <div class="hero-tags">
         <span class="tag tag-red">借券賣出</span>
-        <span class="tag tag-cyan">借券來源</span>
+        <span class="tag tag-cyan">借券來源解析</span>
         <span class="tag tag-yellow">大股東出貨</span>
-        <span class="tag tag-purple">空頭成本</span>
-        <span class="tag tag-green">借券餘額</span>
-        <span class="tag tag-orange">警示訊號</span>
+        <span class="tag tag-purple">空頭成本結構</span>
+        <span class="tag tag-green">借券餘額判讀</span>
+        <span class="tag tag-orange">軋空行情</span>
+        <span class="tag tag-pink">實戰警示訊號</span>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 1：什麼是借券賣出 ══ -->
-    <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+
+  <!-- ══ AD ══ -->
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-8975741363002226"
-         data-ad-slot="2321848525"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8975741363002226" data-ad-slot="2321848525" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
-<div class="section-card reveal">
+
+  <!-- ══ SECTION 1：什麼是借券賣出 ══ -->
+  <div id="s01" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—01</div>
       <div class="section-title">借券賣出是什麼？與融券的根本差異</div>
       <div class="section-icon">🔍</div>
     </div>
     <div class="section-body">
-      <p class="prose">許多人把借券賣出和融券混為一談，但兩者在<em>借方身份、成本結構、使用目的</em>上都截然不同。搞清楚這個差異，是正確解讀借券數據的第一步。</p>
+      <p class="prose">許多投資人把借券賣出和融券混為一談，但兩者在<em>借方身份、成本結構、資訊揭露方式和使用目的</em>上都截然不同。搞清楚這個差異，是正確解讀借券數據的第一步，也是避免被假訊號誤導的關鍵。</p>
 
       <div class="role-grid">
         <div class="role-card type-a">
           <div class="role-icon">📉</div>
           <div class="role-name">融券賣出</div>
           <div class="role-en">MARGIN SHORT</div>
-          <div class="role-desc">散戶或一般投資人透過券商融資系統向市場借股來賣，需繳保證金、每日計息，成本高。做空目的明確，多為短線看空操作。</div>
-          <span class="role-scale">使用者：散戶為主</span>
+          <div class="role-desc">散戶或一般投資人透過券商融資系統向市場借股來賣，需繳 90% 保證金、每日計息，成本高。做空目的明確，多為短線看空操作，融券斷頭常觸發急漲。</div>
+          <span class="role-scale">使用者：散戶為主 ／ 持有期：數日到數週</span>
         </div>
         <div class="role-card type-b">
           <div class="role-icon">🏦</div>
           <div class="role-name">借券賣出</div>
           <div class="role-en">SECURITIES LENDING</div>
-          <div class="role-desc">機構投資人或大戶透過證券借貸平台，向持股者（如壽險、基金）借入股票後賣出。成本彈性低、通常是中長線佈局，也可能是大股東隱性出貨工具。</div>
-          <span class="role-scale">使用者：法人、大戶</span>
+          <div class="role-desc">機構投資人或大戶透過證券借貸平台，向持股者（如壽險、退休基金）借入股票後賣出。成本彈性低、通常是中長線佈局，也是大股東隱性出貨的工具。</div>
+          <span class="role-scale">使用者：法人、大戶 ／ 持有期：數週至數月</span>
         </div>
         <div class="role-card type-c">
           <div class="role-icon">⚙️</div>
           <div class="role-name">避險借券</div>
           <div class="role-en">HEDGING SHORT</div>
-          <div class="role-desc">自營商或外資為對沖衍生品部位（如認售權證）而進行的借券賣出，與市場方向判斷無關，是機械性操作。</div>
-          <span class="role-scale">使用者：自營/外資</span>
+          <div class="role-desc">自營商或外資為對沖衍生品部位（如認售權證、可轉換公司債 CB）而進行的借券賣出，與市場方向判斷無關，是機械性、被動操作，不代表看空判斷。</div>
+          <span class="role-scale">使用者：自營／外資 ／ 性質：中性對沖</span>
         </div>
       </div>
 
       <div class="insight-box">
         <div class="insight-icon">💡</div>
         <div class="insight-body">
-          <div class="insight-label">核心差異</div>
-          <div class="insight-text">融券是<strong>散戶做空工具</strong>，門檻低但成本高、期間短；借券是<strong>法人與大戶工具</strong>，門檻高但成本低、可維持較長時間。兩者在籌碼分析上的意義完全不同——借券賣出通常代表更有分量的空頭力量。</div>
+          <div class="insight-label">核心差異速記</div>
+          <div class="insight-text">融券是<strong>散戶做空工具</strong>，門檻低但成本高、期間短，受強制回補機制約束；借券是<strong>法人與大戶的工具</strong>，門檻高、成本低、可維持較長時間，更具資訊含量。在籌碼分析中，<strong>借券的訊號重量遠大於融券</strong>——因為背後的參與者通常擁有更多信息優勢。</div>
         </div>
       </div>
 
-      <div class="sec-divider">融券 vs 借券：完整對照</div>
+      <div class="sec-divider">融券 vs 借券：完整對照表</div>
       <div style="overflow-x:auto;">
         <table class="cmp-table">
           <thead>
             <tr><th>比較項目</th><th style="color:var(--red)">融券賣出</th><th style="color:var(--accent)">借券賣出</th></tr>
           </thead>
           <tbody>
-            <tr><td>借用對象</td><td>向券商系統融通</td><td class="val-cyan">向持股者（壽險、基金）借入</td></tr>
-            <tr><td>使用者</td><td>散戶、一般投資人</td><td class="val-cyan">機構法人、大戶、大股東</td></tr>
-            <tr><td>保證金要求</td><td class="val-yellow">90% 保證金（較高）</td><td class="val-green">較低，依協議</td></tr>
-            <tr><td>持有期間</td><td class="val-red">通常數日～數週</td><td class="val-cyan">可達數月甚至更長</td></tr>
-            <tr><td>回補壓力</td><td class="val-orange">強迫回補機制（市況不利即斷頭）</td><td class="val-green">彈性較高，可自行決定時機</td></tr>
-            <tr><td>揭露位置</td><td>融資融券日報表</td><td class="val-cyan">借券賣出日報表（分開揭露）</td></tr>
-            <tr><td>籌碼意義</td><td>短線看空、散戶恐慌</td><td class="val-red">中長線空頭、可能為出貨工具</td></tr>
+            <tr><td>借用對象</td><td>向券商系統融通（系統撮合）</td><td class="val-cyan">向持股機構（壽險、基金）直接借入</td></tr>
+            <tr><td>主要使用者</td><td>散戶、一般投資人</td><td class="val-cyan">機構法人、大戶、大股東</td></tr>
+            <tr><td>保證金要求</td><td class="val-yellow">約 90%（相對高）</td><td class="val-green">依協議，通常較低</td></tr>
+            <tr><td>持有期間</td><td class="val-red">通常數日～數週，有強制回補</td><td class="val-cyan">可達數月，彈性高</td></tr>
+            <tr><td>利率 / 費率</td><td class="val-red">融券利率（約 6~9% 年化）</td><td class="val-green">借券費率（0.1%～10%+ 浮動）</td></tr>
+            <tr><td>回補壓力</td><td class="val-orange">強迫回補機制（市況不利即斷頭）</td><td class="val-green">彈性自決，可維持更長空頭部位</td></tr>
+            <tr><td>揭露位置</td><td>融資融券日報表（集中公告）</td><td class="val-cyan">借券賣出日報表（TDCC/MOPS 分開揭露）</td></tr>
+            <tr><td>可能用途</td><td>做空、槓桿</td><td class="val-red">做空、避險、隱性出貨、套利</td></tr>
+            <tr><td>籌碼解讀意義</td><td>短線看空、散戶恐慌情緒</td><td class="val-red">中長線空頭、大戶動向、出貨工具</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Key concept box -->
+      <div class="key-concept" style="margin-top:24px;">
+        <div class="key-concept-label">📌 一句話記住</div>
+        <div class="key-concept-text">「融券是散戶情緒的體溫計；借券是機構行動的X光片。」前者看到的是短線情緒，後者看到的是有信息優勢的資金動向。</div>
       </div>
     </div>
   </div>
 
   <!-- ══ SECTION 2：借券來源深解 ══ -->
-  <div class="section-card reveal">
+  <div id="s02" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—02</div>
       <div class="section-title">借券來源深解：誰在把股票借出去？</div>
       <div class="section-icon">🏗️</div>
     </div>
     <div class="section-body">
-      <p class="prose">借券賣出的「空頭」固然值得關注，但更關鍵的問題是：<em>股票是從誰手上借出來的？</em>借券來源決定了空頭的力道、持續性，以及背後可能隱藏的信息不對稱。</p>
+      <p class="prose">借券賣出的「空頭」固然值得關注，但更關鍵的問題是：<em>股票是從誰手上借出來的？</em>借券來源決定了空頭的力道、持續性，以及背後可能隱藏的信息不對稱程度。不同來源，代表截然不同的市場意義。</p>
+
+      <!-- 借券生態系統圖 -->
+      <div class="svg-chart-wrap" style="margin-bottom:28px;">
+        <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <!-- Title -->
+          <text x="350" y="22" fill="rgba(0,229,255,.7)" font-size="10" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1.5">借券生態系統示意圖</text>
+
+          <!-- 出借方（左側） -->
+          <rect x="30" y="40" width="160" height="50" rx="8" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.3)" stroke-width="1.2"/>
+          <text x="110" y="62" fill="rgba(0,229,255,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">出借方（借券供給）</text>
+          <text x="110" y="78" fill="rgba(0,229,255,.55)" font-size="8" text-anchor="middle" font-family="Noto Sans TC,sans-serif">壽險 ／ 退休基金 ／ 外資持股</text>
+
+          <!-- 大股東（左下） -->
+          <rect x="30" y="110" width="160" height="50" rx="8" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.3)" stroke-width="1.2"/>
+          <text x="110" y="132" fill="rgba(255,214,0,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">大股東（隱性出借）</text>
+          <text x="110" y="148" fill="rgba(255,214,0,.55)" font-size="8" text-anchor="middle" font-family="Noto Sans TC,sans-serif">董監事 ／ 創辦人持股</text>
+
+          <!-- TDCC 中間平台 -->
+          <rect x="270" y="75" width="160" height="50" rx="8" fill="rgba(178,102,255,.08)" stroke="rgba(178,102,255,.35)" stroke-width="1.5"/>
+          <text x="350" y="97" fill="rgba(178,102,255,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">TDCC 借貸平台</text>
+          <text x="350" y="113" fill="rgba(178,102,255,.6)" font-size="8" text-anchor="middle" font-family="Noto Sans TC,sans-serif">媒合 ／ 結算 ／ 公告餘額</text>
+
+          <!-- 借入方（右側）做空 -->
+          <rect x="510" y="40" width="160" height="50" rx="8" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.3)" stroke-width="1.2"/>
+          <text x="590" y="62" fill="rgba(255,61,90,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">借入方（做空）</text>
+          <text x="590" y="78" fill="rgba(255,61,90,.55)" font-size="8" text-anchor="middle" font-family="Noto Sans TC,sans-serif">空頭機構 ／ 對沖基金</text>
+
+          <!-- 借入方 避險 -->
+          <rect x="510" y="110" width="160" height="50" rx="8" fill="rgba(0,230,118,.07)" stroke="rgba(0,230,118,.3)" stroke-width="1.2"/>
+          <text x="590" y="132" fill="rgba(0,230,118,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace" font-weight="700">借入方（避險）</text>
+          <text x="590" y="148" fill="rgba(0,230,118,.55)" font-size="8" text-anchor="middle" font-family="Noto Sans TC,sans-serif">自營商 ／ 外資對沖</text>
+
+          <!-- Arrows: 出借方 → TDCC -->
+          <line x1="192" y1="65" x2="268" y2="100" stroke="rgba(0,229,255,.45)" stroke-width="1.4" stroke-dasharray="4,3"/>
+          <polygon points="264,96 272,104 272,95" fill="rgba(0,229,255,.6)"/>
+          <!-- 大股東 → TDCC -->
+          <line x1="192" y1="135" x2="268" y2="110" stroke="rgba(255,214,0,.4)" stroke-width="1.4" stroke-dasharray="4,3"/>
+          <polygon points="264,105 273,112 268,118" fill="rgba(255,214,0,.55)"/>
+          <!-- TDCC → 做空 -->
+          <line x1="432" y1="95" x2="508" y2="65" stroke="rgba(255,61,90,.4)" stroke-width="1.4" stroke-dasharray="4,3"/>
+          <polygon points="503,61 511,69 506,74" fill="rgba(255,61,90,.6)"/>
+          <!-- TDCC → 避險 -->
+          <line x1="432" y1="110" x2="508" y2="130" stroke="rgba(0,230,118,.35)" stroke-width="1.4" stroke-dasharray="4,3"/>
+          <polygon points="503,126 512,134 508,140" fill="rgba(0,230,118,.55)"/>
+
+          <!-- 市場賣出 -->
+          <rect x="270" y="185" width="160" height="42" rx="8" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.25)" stroke-width="1.2"/>
+          <text x="350" y="204" fill="rgba(255,61,90,.8)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace">公開市場賣出</text>
+          <text x="350" y="218" fill="rgba(255,61,90,.45)" font-size="7.5" text-anchor="middle" font-family="Noto Sans TC,sans-serif">→ 形成空頭賣壓 ／ 壓低股價</text>
+
+          <!-- 做空 → 市場 -->
+          <line x1="590" y1="92" x2="430" y2="185" stroke="rgba(255,61,90,.35)" stroke-width="1.4"/>
+          <polygon points="432,180 427,188 436,188" fill="rgba(255,61,90,.55)"/>
+
+          <!-- Label: 費率 -->
+          <text x="220" y="87" fill="rgba(178,102,255,.55)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace">費率收益</text>
+          <text x="470" y="83" fill="rgba(178,102,255,.55)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace">借券費率</text>
+
+          <!-- Bottom note -->
+          <text x="350" y="258" fill="rgba(200,220,240,.72)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">借券生態系統 — 出借方賺手續費，借入方建立空頭部位</text>
+        </svg>
+      </div>
 
       <div class="timeline">
         <div class="tl-item">
           <div class="tl-dot cy"></div>
-          <div class="tl-head cy">來源一：國內外壽險公司 / 退休基金</div>
-          <div class="tl-body">壽險公司通常是最大的借券出借方。<strong>他們長期持有大量藍籌股，閒置股票出借可賺取借券費用（年化約 0.5%～3%）</strong>，屬於被動增益行為。他們本身不看空，只是賺手續費。此類借出通常沒有特殊信號意義。</div>
+          <div class="tl-head cy">來源一：國內外壽險公司 ／ 退休基金</div>
+          <div class="tl-body">壽險公司通常是最大的借券出借方。<strong>他們長期持有大量藍籌股，閒置股票出借可賺取借券費用（年化約 0.5%～3%）</strong>，屬於被動增益行為，本身沒有對股票的看法，只是把庫存「租出去」賺租金。此類借出通常沒有特殊信號意義，但若某股的壽險出借量突然大增，代表市場對這張股票的借券需求旺盛，值得注意。</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot rd"></div>
-          <div class="tl-head rd">來源二：大股東（董監事）透過「隱性出貨」</div>
-          <div class="tl-body">這是最需要警惕的借券來源。<strong>大股東直接賣股會觸發申報義務，但若先借出股票讓他人賣，再於未來回補，可繞過部分申報規定。</strong>這種手法讓大股東得以在高位悄悄減碼而不驚動市場，是借券分析最核心的風險訊號。</div>
+          <div class="tl-head rd">來源二：大股東（董監事）透過「隱性出貨」——最危險</div>
+          <div class="tl-body">這是最需要警惕的借券來源。<strong>大股東直接賣股會觸發申報義務，每筆賣出在申報後即曝光，容易引發跟進賣壓。但若先借出股票讓他人賣，再於未來回補，可繞過部分即時揭露機制。</strong>這種手法讓大股東得以在高位悄悄減碼而不驚動市場，是借券分析中最核心的風險訊號。雖然借出方身份不公開，但可透過跨數據比對間接識別（詳見第7-04節）。</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot yn"></div>
-          <div class="tl-head yn">來源三：外資機構持股出借</div>
-          <div class="tl-body">部分外資機構在持股期間，也會將股票出借給其他機構賺取費用。<strong>若外資同時持股又有大量借券餘額，表示有空頭在利用外資持股做放空，形成「同一標的多空共存」的複雜結構。</strong></div>
+          <div class="tl-head yn">來源三：外資機構持股出借（雙向操作）</div>
+          <div class="tl-body">部分外資機構在持股期間，也會將股票出借給其他機構賺取費用。<strong>若外資同時持股又有大量借券餘額，表示有空頭在利用外資持股做放空，形成「同一標的多空共存」的複雜結構。</strong>此時外資的淨多頭持股量可能低於帳面數字，需搭配外資實際買超量一起判斷。</div>
         </div>
         <div class="tl-item">
           <div class="tl-dot gn"></div>
           <div class="tl-head gn">來源四：台灣集中保管結算所（TDCC）系統媒合</div>
-          <div class="tl-body">透過 TDCC 的有價證券借貸系統，出借方與借入方由平台媒合，資訊相對透明。每日公告的「借券餘額」即來自此系統，是散戶可追蹤的主要數據來源。</div>
+          <div class="tl-body">透過 TDCC 的有價證券借貸系統，出借方與借入方由平台媒合，每日公告的「借券餘額」即來自此系統。雖然出借方身份不公開，但<strong>借券總餘額、當日借出量、費率區間</strong>均可查詢，是散戶能追蹤的主要公開數據來源。</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot pu"></div>
+          <div class="tl-head pu">來源五：可轉換公司債（CB）套利出借</div>
+          <div class="tl-body">部分法人持有 CB（可轉換公司債）並計畫轉換為股票，在轉換前會先<strong>借券賣出「預先空倉」</strong>，待 CB 轉換為股票後平倉。這是一種套利行為，本質上不代表看空，但它同樣會對股價形成短期賣壓。若某股 CB 餘額高且借券同時大增，需注意此類套利賣壓。</div>
         </div>
       </div>
 
       <div class="warn-box">
         <div class="insight-icon">⚠️</div>
         <div class="insight-body">
-          <div class="insight-label">大股東借券的識別挑戰</div>
-          <div class="insight-text">大股東透過借券出貨幾乎無法從表面數據直接辨認，因為<strong>借出方的身份不會公開揭露</strong>。但可以間接觀察：若某股的借券餘額快速增加，同時大股東持股比例出現下降（需等季報公告），就可能是大股東正在隱性出貨的訊號。這種組合通常是最危險的警示。</div>
+          <div class="insight-label">大股東借券識別挑戰</div>
+          <div class="insight-text">大股東透過借券出貨幾乎無法從表面數據直接辨認，因為<strong>借出方的身份不會公開揭露</strong>。但可以間接觀察：若某股的借券餘額快速增加，同時大股東持股比例在最新季報中出現下降，就可能是大股東隱性出貨的訊號。這種「借券急增 + 大股東持股減少」的組合，是最值得警覺的危險訊號組合。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 3：借券餘額的意義 ══ -->
-  <div class="section-card reveal">
+  <!-- ══ SECTION 3：借券餘額判讀 ══ -->
+  <div id="s03" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—03</div>
       <div class="section-title">借券餘額怎麼看？增減訊號完整解析</div>
       <div class="section-icon">📊</div>
     </div>
     <div class="section-body">
-      <p class="prose">借券餘額（Shares on Loan）是市場目前仍未回補的借券賣出總量，代表空頭的<em>未平倉存量</em>。正確解讀它的增減，是判斷空頭壓力強弱的關鍵。</p>
+      <p class="prose">借券餘額（Shares on Loan）是市場目前仍未回補的借券賣出總量，代表空頭的<em>未平倉存量</em>。它不是靜態數字，而是每天都在變動的動態指標。正確解讀它的<strong>增減方向、速度和背景</strong>，是判斷空頭壓力強弱的關鍵。</p>
 
-      <!-- SVG Chart: 借券餘額示意圖 -->
+      <!-- 雙軸示意圖 -->
       <div class="svg-chart-wrap">
-        <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+        <svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
           <defs>
-            <linearGradient id="loanGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(255,61,90,.6)"/>
-              <stop offset="100%" stop-color="rgba(255,61,90,.05)"/>
+            <linearGradient id="loanGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255,61,90,.55)"/>
+              <stop offset="100%" stop-color="rgba(255,61,90,.03)"/>
             </linearGradient>
-            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(0,229,255,.7)"/>
-              <stop offset="100%" stop-color="rgba(0,229,255,.05)"/>
+            <linearGradient id="priceGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(0,229,255,.65)"/>
+              <stop offset="100%" stop-color="rgba(0,229,255,.03)"/>
             </linearGradient>
           </defs>
-          <!-- Grid lines -->
-          <line x1="60" y1="30" x2="60" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="60" y1="210" x2="670" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="60" y1="80"  x2="670" y2="80"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="60" y1="130" x2="670" y2="130" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="60" y1="170" x2="670" y2="170" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Title -->
+          <text x="350" y="18" fill="rgba(255,255,255,.45)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">借券餘額 vs 股價走勢 — 典型相對關係示意</text>
+          <!-- Grid -->
+          <line x1="60" y1="35" x2="60" y2="220" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="60" y1="220" x2="670" y2="220" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="60" y1="85" x2="670" y2="85" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="5,4"/>
+          <line x1="60" y1="135" x2="670" y2="135" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="5,4"/>
+          <line x1="60" y1="180" x2="670" y2="180" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="5,4"/>
+          <!-- Y-axis labels -->
+          <text x="50" y="88" fill="rgba(0,229,255,.45)" font-size="7.5" text-anchor="end" font-family="Share Tech Mono,monospace">高</text>
+          <text x="50" y="138" fill="rgba(0,229,255,.45)" font-size="7.5" text-anchor="end" font-family="Share Tech Mono,monospace">中</text>
+          <text x="50" y="183" fill="rgba(0,229,255,.45)" font-size="7.5" text-anchor="end" font-family="Share Tech Mono,monospace">低</text>
           <!-- Stock price line (blue) -->
-          <polyline points="60,160 130,140 200,120 270,100 340,90 380,75 420,80 460,100 500,130 560,155 620,170 670,185"
-            fill="none" stroke="rgba(0,229,255,.75)" stroke-width="2" stroke-linejoin="round"/>
-          <!-- Loan balance area (red, inversely related) -->
-          <polygon points="60,200 130,195 200,188 270,178 340,160 380,145 420,150 460,165 500,175 560,185 620,192 670,198 670,210 60,210"
-            fill="url(#loanGrad)" opacity=".7"/>
-          <polyline points="60,200 130,195 200,188 270,178 340,160 380,145 420,150 460,165 500,175 560,185 620,192 670,198"
-            fill="none" stroke="rgba(255,61,90,.8)" stroke-width="1.8" stroke-linejoin="round"/>
-          <!-- Phase labels -->
-          <text x="200" y="24" fill="rgba(0,229,255,.6)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">→ 股價上漲 借券增加</text>
-          <text x="430" y="24" fill="rgba(255,61,90,.7)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">→ 股價回落 借券回補</text>
-          <!-- Vertical divider -->
-          <line x1="400" y1="30" x2="400" y2="210" stroke="rgba(255,255,255,.1)" stroke-width="1" stroke-dasharray="6,3"/>
-          <text x="400" y="225" fill="rgba(255,255,255,.3)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">高點</text>
+          <polyline points="60,185 120,165 180,140 240,115 300,95 360,78 400,75 430,88 470,108 520,145 575,170 625,185 670,198"
+            fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- Price fill -->
+          <polygon points="60,185 120,165 180,140 240,115 300,95 360,78 400,75 430,88 470,108 520,145 575,170 625,185 670,198 670,220 60,220"
+            fill="url(#priceGrad2)" opacity=".35"/>
+          <!-- Loan balance area (red) -->
+          <polygon points="60,210 120,207 180,200 240,188 300,170 360,152 400,148 430,158 470,168 520,180 575,192 625,200 670,208 670,220 60,220"
+            fill="url(#loanGrad2)" opacity=".75"/>
+          <polyline points="60,210 120,207 180,200 240,188 300,170 360,152 400,148 430,158 470,168 520,180 575,192 625,200 670,208"
+            fill="none" stroke="rgba(255,61,90,.85)" stroke-width="1.8" stroke-linejoin="round"/>
+          <!-- Phase annotation: buildup -->
+          <text x="200" y="56" fill="rgba(255,61,90,.7)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">借券持續積累</text>
+          <line x1="200" y1="60" x2="200" y2="160" stroke="rgba(255,61,90,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <!-- Peak marker -->
+          <circle cx="400" cy="75" r="5" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.5"/>
+          <text x="400" y="68" fill="rgba(0,229,255,.65)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace">股價頂部</text>
+          <!-- Unwinding -->
+          <text x="555" y="56" fill="rgba(0,230,118,.65)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">空頭回補 股價止跌</text>
+          <line x1="555" y1="60" x2="555" y2="160" stroke="rgba(0,230,118,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          <!-- Lead arrow annotation -->
+          <line x1="310" y1="155" x2="385" y2="75" stroke="rgba(255,214,0,.5)" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <text x="320" y="148" fill="rgba(255,214,0,.65)" font-size="7.5" font-family="Share Tech Mono,monospace">借券領先頂部 1~3 週</text>
           <!-- Legend -->
-          <line x1="80" y1="240" x2="110" y2="240" stroke="rgba(0,229,255,.75)" stroke-width="2"/>
-          <text x="115" y="244" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace">股價走勢</text>
-          <rect x="200" y="234" width="30" height="10" rx="2" fill="rgba(255,61,90,.4)"/>
-          <text x="235" y="244" fill="rgba(255,61,90,.8)" font-size="9" font-family="Share Tech Mono,monospace">借券餘額</text>
-          <text x="390" y="255" fill="rgba(255,255,255,.3)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">借券餘額與股價的典型相對關係示意</text>
+          <line x1="80" y1="252" x2="112" y2="252" stroke="rgba(0,229,255,.8)" stroke-width="2.2"/>
+          <text x="117" y="256" fill="rgba(0,229,255,.7)" font-size="8.5" font-family="Share Tech Mono,monospace">股價走勢</text>
+          <rect x="215" y="246" width="32" height="10" rx="2" fill="rgba(255,61,90,.45)"/>
+          <text x="252" y="256" fill="rgba(255,61,90,.8)" font-size="8.5" font-family="Share Tech Mono,monospace">借券餘額</text>
         </svg>
       </div>
 
-      <div class="sec-divider">借券餘額四種狀態解讀</div>
+      <div class="sec-divider">借券餘額四種狀態詳解</div>
 
       <div class="shadow-line">
         <div class="sl-side dn"></div>
         <div class="sl-body">
-          <div class="sl-top dn">✅ 狀態一：借券餘額持續下降（回補）</div>
-          <div class="sl-text">空頭陸續買回股票還給出借方，代表<strong>看空動能消退</strong>，空頭認為下跌空間有限開始退場。若同時股價止跌，通常是中短線偏多訊號。<strong>大量回補往往伴隨急漲行情（軋空）。</strong></div>
+          <div class="sl-top dn">✅ 狀態一：借券餘額持續下降（空頭回補）</div>
+          <div class="sl-text">空頭陸續買回股票還給出借方，代表<strong>看空動能消退</strong>，空頭認為下跌空間有限開始退場。若同時股價止跌甚至反彈，通常是中短線偏多訊號。<strong>大量回補往往伴隨急漲行情（軋空效應），因為空頭的買回本身就是買盤。</strong>這是最能觸發短線急漲的籌碼訊號之一。</div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">⚠️ 狀態二：借券餘額快速增加</div>
-          <div class="sl-text">短期內借券餘額大幅攀升，表示<strong>空頭快速建立新部位</strong>，通常是有信息優勢的機構或大股東預期股價下跌。若此時股價仍在高位，這是一個需要高度警覺的警示訊號。</div>
+          <div class="sl-top up">⚠️ 狀態二：借券餘額快速增加（空頭積極建倉）</div>
+          <div class="sl-text">短期內借券餘額大幅攀升，表示<strong>空頭快速建立新部位</strong>，通常是有信息優勢的機構或大股東預期股價下跌。若此時股價仍在高位，這是一個需要高度警覺的警示訊號。<strong>判斷「快速」的基準：單週增幅超過股本的 0.5% 就值得關注；超過 1% 需立即評估。</strong></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side neu"></div>
         <div class="sl-body">
-          <div class="sl-top neu">〰 狀態三：借券餘額高位盤整</div>
-          <div class="sl-text">大量借券未被回補，表示<strong>空頭持續看空但尚未停損</strong>。若股價在高借券餘額下仍能上漲，代表多方力道壓過空頭，一旦多方疲軟，這批空頭就是下跌的推手。<strong>高位盤整後突然大增是最危險的前兆。</strong></div>
+          <div class="sl-top neu">〰 狀態三：借券餘額高位盤整（多空僵持）</div>
+          <div class="sl-text">大量借券未被回補，表示<strong>空頭持續看空但尚未停損，市場進入多空對峙階段</strong>。若股價在高借券餘額下仍能上漲，代表多方力道壓過空頭；一旦多方疲軟，這批空頭就成為下跌的推手。<strong>高位盤整後若借券突然再度大增，是行情反轉最危險的前兆。</strong></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side cy"></div>
         <div class="sl-body">
-          <div class="sl-top cy">💡 狀態四：低借券餘額 + 股價上漲</div>
-          <div class="sl-text">借券餘額極低代表<strong>市場幾乎沒有做空力量</strong>，股價上漲缺乏空頭干擾。若此時外資與投信也同步買進，是籌碼面最乾淨的上漲格局之一。但也要注意：低借券不代表股票沒問題，只代表市場空頭少。</div>
+          <div class="sl-top cy">💡 狀態四：低借券餘額 + 股價上漲（最純淨多頭）</div>
+          <div class="sl-text">借券餘額極低代表<strong>市場幾乎沒有做空力量</strong>，股價上漲缺乏空頭干擾。若此時外資與投信也同步買進，是籌碼面最乾淨的上漲格局。<strong>低借券 + 法人買超 + 籌碼集中</strong>，三者共振，是趨勢行情啟動的最佳組合。但也要注意：低借券不代表沒有風險，只是空頭壓力小。</div>
         </div>
       </div>
 
       <div class="gold-box">
         <div class="insight-icon">📐</div>
         <div class="insight-body">
-          <div class="insight-label">實用計算：借券佔流通股比例</div>
-          <div class="insight-text">觀察「借券餘額 ÷ 在外流通股數」比例。比例超過 <strong>3%</strong> 算中等空頭壓力；超過 <strong>5%</strong> 是重要警戒；超過 <strong>8%</strong> 代表機構有高度共識看空，需特別留意。此比例可在 JellyStock 或公開資訊觀測站查詢。</div>
+          <div class="insight-label">實用計算：借券佔流通股比例（空頭壓力指數）</div>
+          <div class="insight-text">觀察「借券餘額 ÷ 在外流通股數」。比例 <strong>3% 以下</strong>：低壓力；<strong>3%～5%</strong>：中等壓力，需留意；<strong>5%～8%</strong>：高壓力，機構有共識看空；<strong>8% 以上</strong>：極高壓力，需特別警覺。此比例可在 JellyStock、公開資訊觀測站查詢。數字本身不重要，<strong>速度的變化才是關鍵訊號</strong>。</div>
+        </div>
+      </div>
+
+      <!-- 空頭壓力指數視覺化 -->
+      <div class="force-meter-wrap" style="margin-top:24px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-faint);letter-spacing:.15em;margin-bottom:12px;">— 借券佔比 空頭壓力等級 —</div>
+        <div class="force-row">
+          <div class="force-label">佔比 &lt;1%：幾乎無空頭</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="8%" style="background:linear-gradient(90deg,var(--green),rgba(0,230,118,.4))"></div></div>
+          <div class="force-val" style="color:var(--green)">極低</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">佔比 1%～3%：正常範圍</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="28%" style="background:linear-gradient(90deg,var(--accent),rgba(0,200,255,.4))"></div></div>
+          <div class="force-val">低</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">佔比 3%～5%：需留意</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="52%" style="background:linear-gradient(90deg,var(--yellow),rgba(255,200,0,.4))"></div></div>
+          <div class="force-val" style="color:var(--yellow)">中等</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">佔比 5%～8%：高度警戒</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="74%" style="background:linear-gradient(90deg,var(--orange),rgba(255,120,0,.4))"></div></div>
+          <div class="force-val" style="color:var(--orange)">高</div>
+        </div>
+        <div class="force-row">
+          <div class="force-label">佔比 8%+ ：機構高共識</div>
+          <div class="force-bar-bg"><div class="force-bar-fill" data-width="95%" style="background:linear-gradient(90deg,var(--red),rgba(255,61,90,.4))"></div></div>
+          <div class="force-val" style="color:var(--red)">極高</div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- ══ SECTION 4：大股東出貨手法 ══ -->
-  <div class="section-card reveal">
+  <div id="s04" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—04</div>
       <div class="section-title">大股東出貨手法：借券如何成為隱形出口</div>
       <div class="section-icon">🕵️</div>
     </div>
     <div class="section-body">
-      <p class="prose">台灣上市公司的大股東若要在公開市場大量出售持股，必須進行<em>內部人申報</em>，且每筆賣出都會在申報後曝光。這讓大股東的直接出貨行為難以隱藏。然而，<strong>借券機制提供了一條「看不見的出口」。</strong></p>
+      <p class="prose">台灣上市公司的大股東若要在公開市場大量出售持股，必須進行<em>內部人申報</em>，且每筆賣出都會在申報後曝光，容易引發市場恐慌性跟賣。然而，<strong>借券機制提供了一條「看不見的出口」</strong>，讓大股東得以在高位緩慢減倉，而不被市場即時察覺。</p>
 
-      <div class="sec-divider">大股東隱性出貨的運作邏輯</div>
+      <div class="sec-divider">隱性出貨的完整運作邏輯</div>
 
+      <!-- Flow steps -->
       <div class="flow-step">
-        <div class="flow-num cn">①</div>
+        <div class="flow-num rd">①</div>
         <div class="flow-content">
-          <div class="flow-heading">大股東將持股出借給機構</div>
-          <div class="flow-sub">大股東或其關聯方將持有的股票透過 TDCC 借券系統出借給有空頭需求的機構投資人，取得一定比例的借券費用收入。此時帳面上股票「仍屬大股東持有」，但實際流通股驟然增加。</div>
+          <div class="flow-heading">大股東與借貸平台協議，將持股「出借」</div>
+          <div class="flow-sub">大股東不直接賣出，而是把股票「借」給借入方（通常是有做空需求的機構）。此行為表面上不涉及股權轉移，<strong>即時申報義務相對模糊</strong>，難以在第一時間被市場察覺。借出股票後，大股東仍可能繼續領取股息（依協議）。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num rn">②</div>
+        <div class="flow-num yn">②</div>
         <div class="flow-content">
-          <div class="flow-heading">借入方在市場上賣出股票</div>
-          <div class="flow-sub">借入機構在市場上賣出借入的股票，供給面增加，形成下跌壓力。這批賣壓表面上看來是「一般機構」的賣出，<strong>無法直接歸因於大股東</strong>，市場察覺困難。</div>
+          <div class="flow-heading">借入方在市場上賣出，股價承壓下滑</div>
+          <div class="flow-sub">借入方在公開市場賣出，<strong>形成真實賣壓</strong>。但市場上的投資人看到的是「借券餘額增加」，而非直接看到大股東賣股，無法即時判斷賣壓背後的真正來源。股價在持續的空頭賣壓下逐漸走低，散戶往往不知道是誰在賣。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num yn">③</div>
+        <div class="flow-num cn">③</div>
         <div class="flow-content">
-          <div class="flow-heading">股價下跌後大股東同步減持</div>
-          <div class="flow-sub">在借券賣出壓低股價之後，大股東可以「配合市場行情」在較低位正式申報減持，此時減持幅度看起來合理，不容易被投資人解讀為出貨訊號。<strong>借券創造了「低價申報」的掩護效果。</strong></div>
+          <div class="flow-heading">股價下跌後，大股東正式申報賣出「補倉」</div>
+          <div class="flow-sub">等到股價已被壓低，大股東再以低於原始高位的價格正式申報賣出，<strong>看似是「低位補倉」，實際上持股早已透過借券間接出清大部分</strong>。申報賣出的量小，市場衝擊小，大股東得以優雅地完成出貨。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num gn">④</div>
         <div class="flow-content">
-          <div class="flow-heading">借入方回補（或大股東補回）</div>
-          <div class="flow-sub">若大股東已成功出貨，借入方可在更低的股價買回股票還給出借方，空頭賺取價差。若大股東是最終受益者，<strong>等同以借券方式完成了一輪「先賣後補」的實質出貨。</strong></div>
+          <div class="flow-heading">借入方回補借券，大股東持股正式降低</div>
+          <div class="flow-sub">最後，借入方在低位買回股票還給大股東（或直接由大股東的正式賣出彌補），完成整個循環。<strong>整個過程中散戶看到的是股價「莫名其妙」持續下跌，卻找不到明確的賣出申報</strong>。</div>
         </div>
       </div>
 
+      <!-- 識別訊號 -->
       <div class="warn-box">
-        <div class="insight-icon">🚨</div>
+        <div class="insight-icon">🔎</div>
         <div class="insight-body">
-          <div class="insight-label">高危警示組合</div>
-          <div class="insight-text">以下三個訊號同時出現時，需高度警覺大股東正在隱性出貨：<br/>
-          <strong>① 借券餘額單週增加超過 1%（佔股本）</strong><br/>
-          <strong>② 大股東持股申報比例在最新季報中下降</strong><br/>
-          <strong>③ 股價高位震盪、成交量異常放大但無法突破前高</strong><br/>
-          三者同時出現，代表「有人在高位悄悄出貨」，應避免追高或盡快評估減倉。</div>
+          <div class="insight-label">三重警示訊號組合（需同時出現）</div>
+          <div class="insight-text">
+            <strong>① 借券餘額單週增加超過 1%（佔股本）</strong><br/>
+            <strong>② 大股東持股申報比例在最新季報中出現下降</strong><br/>
+            <strong>③ 股價高位震盪、成交量異常放大但無法突破前高</strong><br/>
+            三者同時出現，代表「有人在高位悄悄出貨」，應避免追高或盡快評估減倉。其中第②項需等季報公告（3月、5月、8月、11月），有時間落差，所以①和③的即時監控更重要。
+          </div>
         </div>
       </div>
 
@@ -2604,10 +2941,11 @@
           </thead>
           <tbody>
             <tr><td>申報揭露時間</td><td class="val-yellow">賣出前3日申報，市場能提早知情</td><td class="val-red">借出行為無需即時揭露，難以預判</td></tr>
-            <tr><td>市場衝擊</td><td class="val-yellow">申報後可能引發跟進賣壓</td><td class="val-red">間接施壓，賣壓來源模糊，衝擊更隱蔽</td></tr>
-            <tr><td>可追蹤性</td><td class="val-green">相對透明，可從內部人申報查詢</td><td class="val-red">極難追蹤，需跨比對多項數據</td></tr>
-            <tr><td>對散戶的威脅</td><td class="val-yellow">中等（可提前觀察）</td><td class="val-red">高（難以及時察覺）</td></tr>
-            <tr><td>通常使用時機</td><td>持股比例仍高、急於出清時</td><td class="val-red">高位持股、想緩慢出清而不被發現</td></tr>
+            <tr><td>市場衝擊</td><td class="val-yellow">申報後可能引發跟進賣壓，股價跳空</td><td class="val-red">間接施壓，賣壓來源模糊，衝擊更隱蔽</td></tr>
+            <tr><td>可追蹤性</td><td class="val-green">相對透明，可從內部人申報系統查詢</td><td class="val-red">極難追蹤，需跨比對多項數據</td></tr>
+            <tr><td>對散戶威脅</td><td class="val-yellow">中等（可提前觀察到信號）</td><td class="val-red">高（難以及時察覺，散戶容易被套）</td></tr>
+            <tr><td>通常使用時機</td><td>持股比例仍高、急於快速出清時</td><td class="val-red">高位持股、想緩慢出清而不被發現時</td></tr>
+            <tr><td>配合工具</td><td>可能搭配利多消息拉高後賣</td><td class="val-red">搭配題材炒作高位、法說前後出貨</td></tr>
           </tbody>
         </table>
       </div>
@@ -2615,14 +2953,50 @@
   </div>
 
   <!-- ══ SECTION 5：空頭成本結構 ══ -->
-  <div class="section-card reveal">
+  <div id="s05" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—05</div>
-      <div class="section-title">空頭成本結構：借券成本如何影響空頭行為</div>
+      <div class="section-title">空頭成本結構：借券費率如何決定空頭的行為</div>
       <div class="section-icon">💰</div>
     </div>
     <div class="section-body">
-      <p class="prose">借券空頭不是無成本的。<em>借券費率的高低，直接決定了空頭能維持多久、在哪個價位回補。</em>理解空頭的成本結構，能讓你預判他們的行為邊界。</p>
+      <p class="prose">借券空頭不是無成本的。<em>借券費率的高低，直接決定了空頭能維持多久、在哪個價位被迫回補，以及軋空行情爆發的可能性。</em>理解空頭的成本結構，你才能預判他們的行為邊界，找到市場的臨界點。</p>
+
+      <!-- 費率結構圖 -->
+      <div class="svg-chart-wrap" style="margin-bottom:28px;">
+        <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <text x="350" y="18" fill="rgba(255,255,255,.4)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace">借券費率 vs 空頭行為 vs 軋空風險</text>
+          <!-- Axes -->
+          <line x1="80" y1="30" x2="80" y2="170" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+          <line x1="80" y1="170" x2="660" y2="170" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+          <!-- X axis labels -->
+          <text x="120" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">0.1%</text>
+          <text x="210" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">0.5%</text>
+          <text x="310" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">1%</text>
+          <text x="420" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">3%</text>
+          <text x="530" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">6%</text>
+          <text x="620" y="185" fill="rgba(255,255,255,.35)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">10%+</text>
+          <text x="370" y="202" fill="rgba(200,220,240,.72)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">借券年化費率 →</text>
+          <!-- Squeezing risk curve (red, rises sharply) -->
+          <polyline points="80,165 120,163 210,158 310,148 420,120 530,82 620,42"
+            fill="none" stroke="rgba(255,61,90,.8)" stroke-width="2.2" stroke-linejoin="round"/>
+          <!-- Holding duration curve (green, falls) -->
+          <polyline points="80,40 120,42 210,55 310,75 420,110 530,145 620,162"
+            fill="none" stroke="rgba(0,230,118,.75)" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6,3"/>
+          <!-- Zone bands -->
+          <rect x="80" y="30" width="240" height="140" fill="rgba(0,230,118,.04)" rx="0"/>
+          <rect x="320" y="30" width="200" height="140" fill="rgba(255,214,0,.04)" rx="0"/>
+          <rect x="520" y="30" width="140" height="140" fill="rgba(255,61,90,.05)" rx="0"/>
+          <text x="195" y="48" fill="rgba(0,230,118,.55)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">低費率區（可長期持空）</text>
+          <text x="415" y="48" fill="rgba(255,214,0,.55)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">中費率（成本壓力漸增）</text>
+          <text x="585" y="48" fill="rgba(255,61,90,.6)" font-size="8" text-anchor="middle" font-family="Share Tech Mono,monospace">高費率（軋空風險）</text>
+          <!-- Legend -->
+          <line x1="120" y1="205" x2="150" y2="205" stroke="rgba(255,61,90,.8)" stroke-width="2.2"/>
+          <text x="155" y="209" fill="rgba(255,61,90,.7)" font-size="8" font-family="Share Tech Mono,monospace">軋空風險</text>
+          <line x1="280" y1="205" x2="310" y2="205" stroke="rgba(0,230,118,.75)" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="315" y="209" fill="rgba(0,230,118,.65)" font-size="8" font-family="Share Tech Mono,monospace">空頭可持續性</text>
+        </svg>
+      </div>
 
       <div class="signal-grid">
         <div class="signal-card">
@@ -2630,198 +3004,294 @@
             <div class="signal-dot" style="background:var(--green)"></div>
             <div class="signal-label" style="color:var(--green)">低費率期（0.1%～0.5%）</div>
           </div>
-          <div class="signal-body">空頭持有成本極低，可長期維持部位。通常出現在股票流動性高、出借方多的個股。低費率代表空頭不急於回補，可能長期壓制股價。</div>
+          <div class="signal-body">空頭持有成本極低，<strong>可長期維持部位不急於回補</strong>。通常出現在流動性高、出借方充足的個股（如大型權值股）。低費率空頭往往是長線策略性做空，不容易被軋，對股價形成持續而緩慢的壓制。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--yellow)"></div>
             <div class="signal-label" style="color:var(--yellow)">中等費率（0.5%～3%）</div>
           </div>
-          <div class="signal-body">為多數台股借券的常見費率區間。空頭有一定成本壓力，若股價遲遲不跌，時間一久成本侵蝕獲利，促使空頭提早回補。</div>
+          <div class="signal-body">台股借券的最常見費率區間。空頭有一定成本壓力，若股價遲遲不跌，<strong>時間侵蝕獲利空間，促使空頭提早回補</strong>。這個費率區間的空頭通常有較強的做空理由，但也容易在消息好轉時快速撤退。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--orange)"></div>
             <div class="signal-label" style="color:var(--orange)">高費率（3%～8%）</div>
           </div>
-          <div class="signal-body">出現在籌碼稀缺、出借方少的股票。空頭成本高，通常代表有強烈做空動機（如確知利空），但也增加了軋空爆發的風險。</div>
+          <div class="signal-body">出現在籌碼稀缺、出借方少的個股。空頭成本高，通常代表<strong>有強烈做空動機（如確知利空），願意以高成本維持部位</strong>。但高費率也大幅增加軋空爆發的潛在力道，一旦利空未如期兌現，報復性反彈可能相當猛烈。</div>
         </div>
         <div class="signal-card">
           <div class="signal-head">
             <div class="signal-dot" style="background:var(--red)"></div>
-            <div class="signal-label" style="color:var(--red)">極高費率（8%以上）</div>
+            <div class="signal-label" style="color:var(--red)">極高費率（8% 以上）</div>
           </div>
-          <div class="signal-body">市場幾乎借不到此股，願意支付高費率的空頭通常持有重要內部利空信息。費率過高也代表若股價不跌，空頭損益兩平點迅速上移，容易產生急速軋空行情。</div>
+          <div class="signal-body">市場幾乎借不到此股，<strong>願意支付極高費率的空頭通常持有重要內部利空信息</strong>，或是市場對某個特定事件的高確信度押注。費率過高時，若股價不跌，空頭損益兩平點迅速上移，<strong>極易觸發急速的軋空行情</strong>，漲幅有時超過 30%。</div>
         </div>
       </div>
 
-      <div class="sec-divider">借券費率與軋空風險</div>
+      <div class="sec-divider">軋空行情的觸發條件</div>
 
-      <p class="prose">當借券費率急速上升，意味著出借方稀少、空頭爭相借股，一旦利空消息未能兌現，空頭面臨<strong>高成本 + 股價上漲</strong>的雙重壓力，被迫快速回補，就會引爆「軋空行情」。</p>
+      <p class="prose">軋空（Short Squeeze）是借券分析中最具爆發力的行情模式。當借券費率急速上升，空頭爭相借股卻一股難求，一旦利空未兌現或出現利多催化，空頭面臨<strong>高成本 + 股價上漲</strong>的雙重壓力，被迫快速回補，而回補本身又推高股價，形成自我強化的上漲螺旋。</p>
 
-      <div class="force-meter-wrap">
-        <div class="force-row">
-          <div class="force-label">費率 0.1%：軋空風險</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" data-width="8%" style="background:linear-gradient(90deg,var(--green),rgba(0,230,118,.5))"></div></div>
-          <div class="force-val">極低</div>
+      <div class="stage-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:20px 0;">
+        <div class="stage-card">
+          <div class="stage-num" style="color:var(--red)">條件一</div>
+          <div class="stage-title">高借券餘額 + 高費率</div>
+          <div class="stage-desc">空頭部位大而昂貴，持有成本沉重，心理壓力高</div>
         </div>
-        <div class="force-row">
-          <div class="force-label">費率 1%：軋空風險</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" data-width="25%" style="background:linear-gradient(90deg,var(--accent),rgba(0,200,255,.5))"></div></div>
-          <div class="force-val">低</div>
+        <div class="stage-card">
+          <div class="stage-num" style="color:var(--yellow)">條件二</div>
+          <div class="stage-title">利空未能兌現</div>
+          <div class="stage-desc">業績優於預期、政策轉好、訂單超預期等正面消息出現</div>
         </div>
-        <div class="force-row">
-          <div class="force-label">費率 3%：軋空風險</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" data-width="50%" style="background:linear-gradient(90deg,var(--yellow),rgba(255,200,0,.5))"></div></div>
-          <div class="force-val">中等</div>
+        <div class="stage-card">
+          <div class="stage-num" style="color:var(--orange)">條件三</div>
+          <div class="stage-title">股價開始反彈</div>
+          <div class="stage-desc">多頭進場，空頭承受損失，開始陸續停損回補</div>
         </div>
-        <div class="force-row">
-          <div class="force-label">費率 6%：軋空風險</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" data-width="75%" style="background:linear-gradient(90deg,var(--orange),rgba(255,120,0,.5))"></div></div>
-          <div class="force-val">高</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label">費率 10%+：軋空風險</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" data-width="95%" style="background:linear-gradient(90deg,var(--red),rgba(255,61,90,.5))"></div></div>
-          <div class="force-val">極高</div>
+        <div class="stage-card">
+          <div class="stage-num" style="color:var(--green)">結果</div>
+          <div class="stage-title">急速軋空上漲</div>
+          <div class="stage-desc">回補買盤推高股價，觸發更多停損，漲幅常達 15%～40%</div>
         </div>
       </div>
 
       <div class="success-box">
         <div class="insight-icon">🎯</div>
         <div class="insight-body">
-          <div class="insight-label">軋空操作策略</div>
-          <div class="insight-text">若某個股借券費率在短期內從 1% 跳升至 5% 以上，同時借券餘額高位盤整、基本面未見利空，可能是<strong>軋空行情的前兆</strong>。此時做多需要謹慎設好停損（因空頭仍多），但若消息明確轉正，軋空漲幅有時可達 15%～30%，是積極操作者的機會窗口。</div>
+          <div class="insight-label">軋空行情的操作策略</div>
+          <div class="insight-text">若某個股借券費率在短期內從 1% 跳升至 5% 以上，同時借券餘額高位盤整、基本面未見利空確認，可能是軋空行情的前兆。此時做多需<strong>謹慎設停損</strong>（因空頭仍多），但若消息明確轉正，軋空漲幅有時可達 15%～30%+，是積極操作者的機會窗口。關鍵：<strong>不要在利空未消化前貿然做多</strong>，等待催化劑出現。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 6：實戰警示訊號 ══ -->
-  <div class="section-card reveal">
+  <!-- ══ SECTION 6：實戰案例解析（新增） ══ -->
+  <div id="s06" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—06</div>
-      <div class="section-title">借券增加的六大警示訊號與對應操作</div>
+      <div class="section-title">實戰案例解析：借券訊號如何預告行情反轉</div>
+      <div class="section-icon">📖</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">理論要落地，必須看真實情境。以下三個情境模型，模擬台股市場中最常出現的借券異動模式，以及散戶應如何對應。</p>
+
+      <!-- Case 1 -->
+      <div class="case-study">
+        <div class="case-header">
+          <div class="case-badge">情境 A</div>
+          <div class="case-title">科技股高位：借券急增 + 外資佯裝買進</div>
+        </div>
+        <div class="case-body">
+          <p>某科技股股價連漲三個月，外資連續10日買超，市場一片樂觀，散戶積極追買。然而，仔細觀察借券數據會發現：<strong>借券餘額在這10天內從2.1%飆升至6.3%（佔股本）</strong>，費率也從0.8%跳至4.2%。</p>
+          <p style="margin-top:12px;">這個模式代表：<strong>外資在市場端買入（可能是新增持股或填補空頭），但同時有另一批機構正在大力做空同一標的。</strong>若外資本身是「左手買、右手空」的套利操作，淨多頭部位遠低於帳面買超數字，外資買進訊號大幅失真。</p>
+        </div>
+        <div class="case-lesson">📌 教訓：外資買超不能單獨作為多頭依據，必須交叉比對借券變化。若借券增幅遠超外資買超規模，多方訊號需打折扣。</div>
+      </div>
+
+      <!-- Case 2 -->
+      <div class="case-study" style="margin-top:20px;">
+        <div class="case-header" style="background:rgba(255,61,90,.06);border-bottom-color:rgba(255,61,90,.12);">
+          <div class="case-badge" style="background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.25);color:var(--red);">情境 B</div>
+          <div class="case-title">傳產股悶漲後：借券急增先於法說利空</div>
+        </div>
+        <div class="case-body">
+          <p>某傳產股連續三季獲利成長，股價穩健走高，基本面看似良好。法說會召開前2週，借券餘額突然從1.2%一路攀升至4.8%，費率同步上揚至3.5%。散戶以為這是空頭在對抗好業績，反而加碼。</p>
+          <p style="margin-top:12px;">法說會後，公司宣布下一季展望保守、接單能見度降低，股價單日跌停。<strong>借券急增的空頭在法說前已提前佈局，用的是市場尚未掌握的信息。</strong>那些在借券急增後仍追多的散戶，成了這次下跌的受害者。</p>
+        </div>
+        <div class="case-lesson" style="background:rgba(255,61,90,.06);border-color:rgba(255,61,90,.2);color:var(--red);">📌 教訓：重大公告前借券急增是信息不對稱的紅色警報，此時持股需謹慎，至少降低部位等待公告結果。</div>
+      </div>
+
+      <!-- Case 3 -->
+      <div class="case-study" style="margin-top:20px;">
+        <div class="case-header" style="background:rgba(0,230,118,.05);border-bottom-color:rgba(0,230,118,.12);">
+          <div class="case-badge" style="background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.25);color:var(--green);">情境 C</div>
+          <div class="case-title">生技股反彈：借券大量回補 + 法人轉多</div>
+        </div>
+        <div class="case-body">
+          <p>某生技股因藥品臨床試驗結果不如預期，股價從高點大跌40%，借券餘額一路堆積至7.2%，費率維持在5.8%，看似空方大獲全勝。</p>
+          <p style="margin-top:12px;">某週，一篇國際期刊重新肯定同類藥物的療效，股價突破下降趨勢線。<strong>接下來三週，借券餘額從7.2%快速降至2.1%，每日借券回補量均超過當日成交量的15%。</strong>股價在這三週內上漲了28%，幾乎全由空頭回補推動。</p>
+        </div>
+        <div class="case-lesson" style="background:rgba(0,230,118,.05);border-color:rgba(0,230,118,.2);color:var(--green);">📌 教訓：高借券股票的「空頭解除訊號」往往比一般多頭訊號更具爆發力，因為回補買盤是被迫的、不得不為。監控借券大幅回補，可捕捉最強的短期反彈機會。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 7：實戰警示訊號 ══ -->
+  <div id="s07" class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">07—07</div>
+      <div class="section-title">借券增加的七大警示訊號與對應操作</div>
       <div class="section-icon">🚨</div>
     </div>
     <div class="section-body">
-      <p class="prose">並非所有「借券增加」都是警示，要看增加的<em>速度、背景、以及其他籌碼指標的配合</em>。以下六種模式是實戰中最常見、需要立刻反應的危險組合。</p>
+      <p class="prose">並非所有「借券增加」都是警示——要看增加的<em>速度、背景脈絡，以及是否有其他籌碼指標共振</em>。以下七種模式是實戰中最常見、需要立刻反應的危險組合，以及對應的操作建議。</p>
 
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
           <div class="sl-top up">🔴 訊號一：股價創高 + 借券急速增加</div>
-          <div class="sl-text">最經典的警示組合。<strong>股價在高位時，有分量的空頭開始大量建立空單</strong>，代表他們認為股價已到頂或即將反轉。若借券單週增加幅度超過上週的 50%，需立刻重新評估持倉。</div>
+          <div class="sl-text">最經典的警示組合。<strong>股價在高位時，有分量的空頭開始大量建立空單</strong>，代表他們認為股價已到頂或即將反轉。若借券單週增加幅度超過上週的 50%，需立刻重新評估持倉並設好停損。<em>操作建議：謹慎追高，考慮部分停利。</em></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
           <div class="sl-top up">🔴 訊號二：外資連買 + 借券同步大增</div>
-          <div class="sl-text">外資在市場上買進，同時借券賣出也在增加，代表<strong>外資可能以「左手買、右手空」方式進行套利或對沖</strong>，而非單純看多。這種情況下外資買超的正面信號要大打折扣，不能直接解讀為看多訊號。</div>
+          <div class="sl-text">外資在市場上買進，同時借券賣出也在增加，代表<strong>外資可能以「左手買、右手空」進行套利或對沖</strong>，淨多頭部位遠低於帳面買超。外資買超的正面信號要大打折扣。<em>操作建議：外資買超不能單獨信任，需確認借券動向後再判斷。</em></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side neu"></div>
         <div class="sl-body">
           <div class="sl-top neu">🟡 訊號三：投信連買 + 借券也在增加</div>
-          <div class="sl-text">投信作帳拉抬的同時，有空頭在利用高位做空。這不一定是壞事——投信的強力買盤可能壓制空頭，但<strong>作帳結束後，若借券仍高位，股價回落速度可能更快</strong>，出場時機更需精準。</div>
+          <div class="sl-text">投信作帳拉抬的同時，有空頭在利用高位做空。投信買盤可能短期壓制空頭，但<strong>作帳結束後，若借券仍高位，股價回落速度可能更快</strong>，出場時機需精準，不宜作帳期尾聲才進場。<em>操作建議：只跟作帳初中段，作帳末段高借券需提前出場。</em></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side up"></div>
         <div class="sl-body">
-          <div class="sl-top up">🔴 訊號四：法說會 / 財報前借券激增</div>
-          <div class="sl-text">重要公告（法說會、季報、年報）前一～二週，借券突然大幅增加，<strong>強烈暗示有人提前得知業績不如預期或有利空消息</strong>。這類借券行為有時被監管機構調查，但市場上仍常出現。散戶應將此視為最高級別的警示。</div>
+          <div class="sl-top up">🔴 訊號四：重大公告前借券激增</div>
+          <div class="sl-text">法說會、季報、年報、重大合約宣布前一～二週，借券突然大幅增加，<strong>強烈暗示有人提前得知業績不如預期或有利空消息</strong>。此類借券行為有時被監管機構調查，但市場上仍常出現。散戶應將此視為最高級別的警示，優先考慮降低部位。<em>操作建議：公告前借券激增 → 降低部位至等待公告。</em></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side dn"></div>
         <div class="sl-body">
-          <div class="sl-top dn">🟢 訊號五：借券大量回補 + 股價止跌</div>
-          <div class="sl-text">借券從高位快速下降，代表空頭認輸回補，<strong>做空的賣壓解除，股價可能迎來反彈</strong>。若同時外資轉為買超，是籌碼面的強烈反轉訊號，可考慮逢低進場。</div>
+          <div class="sl-top dn">🟢 訊號五：借券大量回補 + 股價止跌（反轉訊號）</div>
+          <div class="sl-text">借券從高位快速下降，代表空頭認輸回補，<strong>做空賣壓解除，股價可能迎來反彈甚至軋空行情</strong>。若同時外資轉為買超，是籌碼面的強烈反轉訊號。<em>操作建議：借券回補 + 外資買超共振，可逢低進場博反彈，但需設好停損防假突破。</em></div>
         </div>
       </div>
       <div class="shadow-line">
         <div class="sl-side cy"></div>
         <div class="sl-body">
-          <div class="sl-top cy">🔵 訊號六：新股 / 解禁後借券快速建立</div>
-          <div class="sl-text">股票上市後鎖定期解禁時（通常是上市後6個月），持股大股東或機構開始可以出借股票。若解禁日後借券餘額快速建立，<strong>需警惕持股者正在利用借券機制逐步出清</strong>，這在成長股或生技股中特別常見。</div>
+          <div class="sl-top cy">🔵 訊號六：新股 / 鎖定解禁後借券快速建立</div>
+          <div class="sl-text">股票上市鎖定期解禁（通常上市後6個月），持股大股東可開始出借股票。若解禁後借券餘額快速建立，<strong>需警惕持股者正透過借券機制逐步出清</strong>，在成長股或生技股中特別常見。這通常是高位見頂的前兆。<em>操作建議：解禁後若借券急建立，需評估大股東出清意圖，不宜盲目持股。</em></div>
         </div>
+      </div>
+      <div class="shadow-line">
+        <div class="sl-side pu"></div>
+        <div class="sl-body">
+          <div class="sl-top pu">🟣 訊號七：低借券 + 外資投信同步買超（最佳入場）</div>
+          <div class="sl-text">借券餘額極低（空頭幾乎沒有），外資、投信同步買進，籌碼集中趨勢明確。<strong>這是籌碼面最乾淨的多頭格局</strong>，沒有顯著的空頭壓制，法人資金共識強。<em>操作建議：這是最高確定度的做多環境，可積極進場並持股到籌碼出現異常。</em></div>
+        </div>
+      </div>
+
+      <!-- Summary visual -->
+      <div class="svg-chart-wrap" style="margin-top:24px;">
+        <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
+          <text x="350" y="18" fill="rgba(255,255,255,.4)" font-size="8.5" text-anchor="middle" font-family="Share Tech Mono,monospace">七大訊號 危險程度 vs 操作方向 一覽</text>
+          <!-- Bars -->
+          <!-- 訊號1 -->
+          <rect x="40" y="30" width="70" height="12" rx="3" fill="rgba(255,61,90,.65)"/>
+          <text x="75" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號1 謹慎停利</text>
+          <!-- 訊號2 -->
+          <rect x="120" y="30" width="70" height="12" rx="3" fill="rgba(255,61,90,.6)"/>
+          <text x="155" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號2 打折外資</text>
+          <!-- 訊號3 -->
+          <rect x="200" y="30" width="70" height="12" rx="3" fill="rgba(255,214,0,.6)"/>
+          <text x="235" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號3 早出場</text>
+          <!-- 訊號4 -->
+          <rect x="280" y="30" width="70" height="12" rx="3" fill="rgba(255,61,90,.75)"/>
+          <text x="315" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號4 ⚠️最高警戒</text>
+          <!-- 訊號5 -->
+          <rect x="360" y="30" width="70" height="12" rx="3" fill="rgba(0,230,118,.6)"/>
+          <text x="395" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號5 ✅反轉買進</text>
+          <!-- 訊號6 -->
+          <rect x="440" y="30" width="70" height="12" rx="3" fill="rgba(0,229,255,.5)"/>
+          <text x="475" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號6 觀察解禁</text>
+          <!-- 訊號7 -->
+          <rect x="520" y="30" width="70" height="12" rx="3" fill="rgba(178,102,255,.65)"/>
+          <text x="555" y="40" fill="#fff" font-size="7" text-anchor="middle" font-family="Noto Sans TC,sans-serif">訊號7 🟣最佳做多</text>
+          <!-- Danger bar -->
+          <text x="40" y="68" fill="rgba(255,61,90,.8)" font-size="7.5" font-family="Share Tech Mono,monospace">HIGH RISK ◄</text>
+          <line x1="130" y1="65" x2="370" y2="65" stroke="rgba(255,61,90,.3)" stroke-width="1.5"/>
+          <line x1="370" y1="65" x2="550" y2="65" stroke="rgba(0,230,118,.3)" stroke-width="1.5"/>
+          <text x="560" y="68" fill="rgba(0,230,118,.8)" font-size="7.5" font-family="Share Tech Mono,monospace">► LOW RISK</text>
+          <!-- Note -->
+          <text x="350" y="100" fill="rgba(200,220,240,.6)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace">訊號4（公告前急增）是風險最高的警示 ／ 訊號7（低借券+法人買超）是最佳進場環境</text>
+        </svg>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 7：如何查詢 ══ -->
-  <div class="section-card reveal">
+  <!-- ══ SECTION 8：查詢方法 ══ -->
+  <div id="s08" class="section-card reveal">
     <div class="section-header">
-      <div class="section-num">07—07</div>
-      <div class="section-title">實戰查詢：哪裡找借券數據？怎麼看？</div>
+      <div class="section-num">07—08</div>
+      <div class="section-title">實戰查詢：哪裡找借券數據？怎麼用？</div>
       <div class="section-icon">🖥️</div>
     </div>
     <div class="section-body">
-      <p class="prose">借券數據比融資融券更分散，需要知道去哪裡查、看哪些欄位。以下是台灣投資人最常用的查詢路徑。</p>
+      <p class="prose">借券數據比融資融券更分散，需要知道去哪裡查、看哪些欄位、如何解讀。以下是台灣投資人最常用的查詢路徑與使用建議。</p>
 
       <div class="timeline">
         <div class="tl-item">
           <div class="tl-dot cy"></div>
-          <div class="tl-head cy">路徑一：TDCC 集保中心（最完整）</div>
-          <div class="tl-body">前往 <strong>台灣集中保管結算所（TDCC）→ 有價證券借貸</strong> 查詢頁面。可查詢個股的每日借券餘額、當日借出張數、費率區間。是最原始的官方數據，但介面較不直觀。</div>
+          <div class="tl-head cy">路徑一：TDCC 集保中心（最完整 · 官方數據）</div>
+          <div class="tl-body">前往 <strong>台灣集中保管結算所（TDCC）→ 有價證券借貸</strong> 查詢頁面。可查詢個股的每日借券餘額、當日借出張數、費率區間。是最原始的官方數據，但介面較不直觀，適合進階用戶做精細分析。<strong>重點欄位：「借貸餘額變動」、「當日借出量」、「費率區間」。</strong></div>
         </div>
         <div class="tl-item">
           <div class="tl-dot gn"></div>
-          <div class="tl-head gn">路徑二：JellyStock 借券排行</div>
-          <div class="tl-body">JellyStock 的<strong>借券餘額排行 / 借券變化排行</strong>功能，可直接看單日借券增減排名，並搭配股價走勢圖比對。適合快速篩選需要注意的個股，不需逐一查詢。</div>
+          <div class="tl-head gn">路徑二：JellyStock 借券排行（最快速 · 視覺化）</div>
+          <div class="tl-body">JellyStock 的<strong>借券餘額排行 ／ 借券變化排行</strong>功能，可直接看單日借券增減排名，並搭配股價走勢圖比對。適合快速篩選需要注意的個股，不需逐一查詢。<strong>最佳用法：每日收盤後查看「借券增加最多排行」，找出異動個股再深入分析。</strong></div>
         </div>
         <div class="tl-item">
           <div class="tl-dot yn"></div>
-          <div class="tl-head yn">路徑三：公開資訊觀測站 → 融資融券及借券</div>
-          <div class="tl-body">公開資訊觀測站（MOPS）的<strong>市場觀測 → 融資融券餘額及借券</strong>欄位，可查詢個股的借券餘額歷史變化，適合做較長期的趨勢分析（例如近三個月的借券走勢）。</div>
+          <div class="tl-head yn">路徑三：公開資訊觀測站（歷史趨勢分析）</div>
+          <div class="tl-body">公開資訊觀測站（MOPS）的<strong>市場觀測 → 融資融券餘額及借券</strong>欄位，可查詢個股的借券餘額歷史變化，適合做較長期的趨勢分析（例如近三個月的借券走勢）。<strong>最佳用法：搭配季報公告時間軸，觀察大股東持股減少前後的借券變化是否有相關性。</strong></div>
         </div>
         <div class="tl-item">
           <div class="tl-dot pu"></div>
-          <div class="tl-head pu">路徑四：券商看盤軟體（元大、國泰等）</div>
-          <div class="tl-body">多數大型券商的看盤軟體都整合了借券數據，可在個股頁面直接查看當日借券異動。<strong>最適合即時追蹤</strong>，但歷史資料通常只保留數週，不適合長期比對。</div>
+          <div class="tl-head pu">路徑四：券商看盤軟體（即時追蹤）</div>
+          <div class="tl-body">多數大型券商看盤軟體（元大、國泰、富邦等）都整合了借券數據，可在個股頁面直接查看當日借券異動。<strong>最適合即時盯盤追蹤</strong>，但歷史資料通常只保留數週，不適合長期比對分析。</div>
         </div>
       </div>
 
-      <div class="sec-divider">快速判讀三步驟</div>
-      <div class="flow-step">
-        <div class="flow-num cn">1</div>
-        <div class="flow-content">
-          <div class="flow-heading">查借券餘額佔比</div>
-          <div class="flow-sub">計算借券餘額 ÷ 在外流通股，判斷目前空頭壓力等級（3% 以下低、3%～5% 中、5% 以上高）。</div>
+      <div class="sec-divider">快速判讀三步驟 SOP</div>
+
+      <div class="sop-wrap">
+        <div class="sop-step">
+          <div class="sop-num" style="background:rgba(0,229,255,.1);color:var(--accent);">STEP 1</div>
+          <div class="sop-heading">查借券餘額佔比（空頭壓力基準）</div>
+          <div class="sop-body">計算「借券餘額 ÷ 在外流通股」，判斷目前空頭壓力等級。<br/>
+            <span style="color:var(--green)">●</span> &lt;3%：低壓力，多頭友善&nbsp;&nbsp;
+            <span style="color:var(--yellow)">●</span> 3%～5%：中等，需留意&nbsp;&nbsp;
+            <span style="color:var(--red)">●</span> &gt;5%：高壓力，重度警戒
+          </div>
         </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num yn">2</div>
-        <div class="flow-content">
-          <div class="flow-heading">比對近2週的借券變化速度</div>
-          <div class="flow-sub">重點不在絕對值，而在<strong>增減速度</strong>。若單週增幅超過 0.5%（佔股本），需提高警覺；若快速下降超過 1%，可能是回補行情前兆。</div>
+        <div class="sop-line"></div>
+        <div class="sop-step">
+          <div class="sop-num" style="background:rgba(255,214,0,.1);color:var(--yellow);">STEP 2</div>
+          <div class="sop-heading">比對近兩週的借券<strong>變化速度</strong></div>
+          <div class="sop-body">重點不在絕對值，而在<strong>增減速度</strong>。單週增幅超過股本 0.5% → 提高警覺；快速回補超過 1% → 可能是反轉前兆。看速度，不要只看總量。</div>
         </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num gn">3</div>
-        <div class="flow-content">
-          <div class="flow-heading">交叉比對外資、投信動向</div>
-          <div class="flow-sub">借券數據需與法人買超方向對比：借券增加但外資也大買 → 需確認是否為對沖操作；借券增加而外資也賣超 → 多空共同看壞，最危險的格局。</div>
+        <div class="sop-line"></div>
+        <div class="sop-step">
+          <div class="sop-num" style="background:rgba(0,230,118,.1);color:var(--green);">STEP 3</div>
+          <div class="sop-heading">交叉比對外資、投信動向</div>
+          <div class="sop-body">
+            借券增加 + 外資賣超 → <span style="color:var(--red)">最危險格局，多空共向下</span><br/>
+            借券增加 + 外資大買 → <span style="color:var(--yellow)">外資訊號需打折，可能為對沖</span><br/>
+            借券回補 + 外資買超 → <span style="color:var(--green)">最強反轉訊號，空方投降</span>
+          </div>
         </div>
       </div>
 
       <div class="purple-box">
         <div class="insight-icon">⚡</div>
         <div class="insight-body">
-          <div class="insight-label">進階技巧</div>
-          <div class="insight-text">將借券餘額的歷史曲線與股價K線重疊觀察，找出「借券頂部 → 股價頂部」的時間差。在許多案例中，<strong>借券餘額在股價見頂前 1～3 週就已大幅攀升</strong>，這個時間差是機構信息優勢的體現，也是散戶可以參考的領先指標。</div>
+          <div class="insight-label">進階技巧：借券時間差分析</div>
+          <div class="insight-text">將借券餘額的歷史曲線與股價K線重疊觀察，找出「借券頂部 → 股價頂部」的時間差。在許多台股案例中，<strong>借券餘額在股價見頂前 1～3 週就已大幅攀升</strong>，這個時間差是機構信息優勢的體現，也是散戶可以參考的領先指標。若你在借券急增後 2 週內看到股價開始滯漲，這個組合的預測力極強。</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 8：測驗 ══ -->
-  <div class="section-card reveal">
+  <!-- ══ SECTION 9：測驗 ══ -->
+  <div id="s09" class="section-card reveal">
     <div class="section-header">
-      <div class="section-num">07—08</div>
+      <div class="section-num">07—09</div>
       <div class="section-title">章節知識測驗</div>
       <div class="section-icon">🎓</div>
     </div>
@@ -2871,52 +3341,70 @@
         </div>
         <div class="quiz-feedback" id="q4fb"></div>
       </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-q">Q5 · 某股借券餘額在三週內從 6.8% 快速降至 1.5%，同時股價止跌，這個組合代表什麼操作意義？</div>
+        <div class="quiz-opts" id="q5opts">
+          <div class="quiz-opt" onclick="answerQ('q5',this,'A')"><div class="quiz-letter">A</div>空頭加碼，即將再度大幅下跌</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'B')"><div class="quiz-letter">B</div>空頭大量回補，做空賣壓解除，可能觸發反彈甚至軋空</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'C')"><div class="quiz-letter">C</div>借券降低代表持股者不願出借，是負面信號</div>
+          <div class="quiz-opt" onclick="answerQ('q5',this,'D')"><div class="quiz-letter">D</div>代表法人開始賣超，需要注意風險</div>
+        </div>
+        <div class="quiz-feedback" id="q5fb"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ══ SECTION 9：重點整理 ══ -->
-  <div class="section-card reveal">
+  <!-- ══ SECTION 10：重點整理 ══ -->
+  <div id="s10" class="section-card reveal">
     <div class="section-header">
-      <div class="section-num">07—09</div>
+      <div class="section-num">07—10</div>
       <div class="section-title">本章重點整理</div>
       <div class="section-icon">✅</div>
     </div>
     <div class="section-body">
-      <p class="prose">掌握以下核心觀念，你就具備了正確解讀借券數據的完整框架。</p>
+      <p class="prose">掌握以下核心觀念，你就具備了正確解讀借券數據的完整框架，可以在機構的信息優勢縫隙中找到自己的判斷依據。</p>
 
       <div class="flow-step">
         <div class="flow-num cn">✓</div>
         <div class="flow-content">
           <div class="flow-heading">借券 ≠ 融券，兩者性質完全不同</div>
-          <div class="flow-sub">借券是法人與大戶的工具，成本低、期間長；融券是散戶工具，成本高、期間短。分析法人籌碼時，借券的重量遠大於融券。</div>
+          <div class="flow-sub">借券是法人與大戶的工具，成本低、期間長；融券是散戶工具，成本高、期間短。分析法人籌碼時，借券的信號重量遠大於融券，應分開解讀、分別追蹤。</div>
         </div>
       </div>
       <div class="flow-step">
-        <div class="flow-num rn">✓</div>
+        <div class="flow-num rd">✓</div>
         <div class="flow-content">
           <div class="flow-heading">借券來源決定信號強度</div>
-          <div class="flow-sub">壽險出借是中性的收費行為；大股東出借是最危險的隱性出貨訊號；法說會或重大公告前激增，是信息不對稱的強烈警示。</div>
+          <div class="flow-sub">壽險出借是中性收費行為；大股東出借是最危險的隱性出貨訊號；CB 套利是中性的技術性賣壓；法說會或重大公告前激增，是信息不對稱最強烈的警示。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num yn">✓</div>
         <div class="flow-content">
           <div class="flow-heading">借券餘額要看「速度」不只是絕對值</div>
-          <div class="flow-sub">單週增幅超過 0.5%（佔股本）才需警覺；快速大量回補是多頭轉機信號。搭配費率分析，可判斷軋空風險。</div>
+          <div class="flow-sub">單週增幅超過股本 0.5% 才需警覺；超過 1% 要立即評估。快速大量回補（超過 1%）是多頭轉機信號。搭配費率分析，可判斷軋空臨界點與爆發時機。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num gn">✓</div>
         <div class="flow-content">
           <div class="flow-heading">借券領先股價 1～3 週是常見規律</div>
-          <div class="flow-sub">機構信息優勢使得借券餘額有時在股價頂部出現前就已大幅攀升。將借券曲線與股價K線重疊觀察，找出這個時間差，是進階的預判工具。</div>
+          <div class="flow-sub">機構信息優勢使借券餘額有時在股價頂部出現前就已大幅攀升。將借券曲線與股價 K 線重疊觀察，找出這個時間差，是最有效的進階預判工具。</div>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num pn">✓</div>
         <div class="flow-content">
           <div class="flow-heading">三維交叉驗證：借券 + 法人 + 技術面</div>
-          <div class="flow-sub">任何單一指標都可能誤導。借券增加需同時看外資是否賣超、股價是否在高位震盪、技術面是否出現頂部訊號，三者共振才是最可靠的判斷基礎。</div>
+          <div class="flow-sub">任何單一指標都可能誤導。借券增加需同時看外資是否賣超、股價是否在高位震盪、技術面是否出現頂部訊號——三者共振才是最可靠的判斷基礎。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num cn">✓</div>
+        <div class="flow-content">
+          <div class="flow-heading">高費率 + 高借券餘額 = 軋空隨時可能引爆</div>
+          <div class="flow-sub">不要輕視高借券費率股票的反彈動能。空頭成本越高、部位越大，利空一旦落空，被迫回補的力道就越猛烈。學會識別軋空前兆，才能把握最具爆發力的反向行情。</div>
         </div>
       </div>
 
@@ -2924,23 +3412,20 @@
         <div class="insight-icon">🚀</div>
         <div class="insight-body">
           <div class="insight-label">下一章預告</div>
-          <div class="insight-text">第八章將深入解析<strong>主力散戶比：股票的「健康度」</strong>——集保戶數變化、大戶持股比例增減判讀，學會從籌碼集中度判斷主力是否仍在護盤，還是已悄悄離場。</div>
+          <div class="insight-text">第八章將深入解析<strong>主力散戶比：股票的「健康度」</strong>——集保戶數變化、大戶持股比例增減判讀，學會從籌碼集中度判斷主力是否仍在護盤，還是已悄悄離場，進一步完善你的多維籌碼判斷框架。</div>
         </div>
       </div>
     </div>
   </div>
 
-    <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- ══ AD ══ -->
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-8975741363002226"
-         data-ad-slot="1893335041"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8975741363002226" data-ad-slot="1893335041" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -2950,7 +3435,7 @@
         <div class="footer-complete-badge">✅</div>
         <div class="footer-complete-text">
           <div class="footer-complete-title">第7章完成</div>
-          <div class="footer-complete-desc">你已掌握借券來源、大股東出貨手法與借券警示訊號</div>
+          <div class="footer-complete-desc">你已掌握借券來源、大股東出貨手法、成本結構與借券警示訊號</div>
           <div class="footer-next-hint">下一章：主力散戶比：股票的「健康度」</div>
         </div>
       </div>
@@ -2969,6 +3454,7 @@
   </div>
 
 </main>
+
 
 <!-- FOOTER -->
 <footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;" data-dark-footer="1">
@@ -3048,7 +3534,7 @@
 })();
 
 /* ── Quiz ── */
-var answers={q1:'B',q2:'B',q3:'C',q4:'C'};
+var answers={q1:'B',q2:'B',q3:'C',q4:'C',q5:'B'};;
 var feedbacks={
   q1:{
     B:'✅ 正確！借券賣出主要由機構法人與大戶使用，向有價證券持有人（如壽險、基金）借入股票後賣出，成本較低、可持續較長時間，與散戶使用的高成本融券完全不同。',
@@ -3140,7 +3626,7 @@ window.answerQ=function(qid,el,choice){
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

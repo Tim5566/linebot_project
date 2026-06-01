@@ -2,6 +2,7 @@
 <html lang="zh-TW" style="scroll-behavior:smooth">
 <head>
   <meta charset="UTF-8"/>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226" crossorigin="anonymous"></script>
   <link rel="icon" type="image/png" href="/images/jelly.png" />
   <link rel="apple-touch-icon" href="/images/jelly.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -2430,6 +2431,45 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2530,7 +2570,7 @@
         <animate attributeName="r" values="5;7;5" dur="2.2s" repeatCount="indefinite"/>
         <animate attributeName="opacity" values=".6;1;.6" dur="2.2s" repeatCount="indefinite"/>
       </circle>
-      <text x="36" y="15" fill="rgba(0,230,118,.9)" font-size="6" font-family="Share Tech Mono,monospace" text-anchor="middle">♥</text>
+      <text x="36" y="15" fill="rgba(0,230,118,.9)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">♥</text>
     </svg>
   </div>
   <div class="hero-content">
@@ -2550,7 +2590,8 @@
 
 <!-- SECTION 1 -->
   <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2560,6 +2601,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 <div class="section-card reveal">
   <div class="section-header">
@@ -3434,7 +3476,8 @@
 </div>
 
   <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3444,6 +3487,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3635,7 +3679,7 @@ window.answerQ=function(qid,el,choice){
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.28;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

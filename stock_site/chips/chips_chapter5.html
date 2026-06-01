@@ -2346,6 +2346,77 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    
+    /* Venn diagram day mode */
+    body.theme-day .svg-chart-wrap svg circle { opacity: 1 !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,230,118,.3)"] { fill: rgba(21,122,50,.2) !important; stroke: rgba(21,122,50,.5) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,229,255,.25)"] { fill: rgba(18,101,168,.18) !important; stroke: rgba(18,101,168,.5) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(255,214,0,.22)"] { fill: rgba(180,130,0,.15) !important; stroke: rgba(140,100,0,.45) !important; }
+
+    /* ── 新韋恩圖 day-mode 覆蓋 ── */
+    /* 外層底色 rect */
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,0,0,.25)"] { fill: rgba(220,238,252,.5) !important; }
+    /* 三個大圓 */
+    body.theme-day .svg-chart-wrap svg circle[fill="rgba(30,120,220,.15)"]  { fill: rgba(18,80,180,.1) !important; stroke: rgba(18,80,180,.55) !important; }
+    body.theme-day .svg-chart-wrap svg circle[fill="rgba(0,190,140,.13)"]   { fill: rgba(0,130,100,.1) !important; stroke: rgba(0,150,120,.55) !important; }
+    body.theme-day .svg-chart-wrap svg circle[fill="rgba(220,160,0,.12)"]   { fill: rgba(160,110,0,.1) !important; stroke: rgba(180,130,0,.55) !important; }
+    /* 中心共振圓 */
+    body.theme-day .svg-chart-wrap svg circle[fill="rgba(0,230,100,.18)"]   { fill: rgba(0,160,80,.15) !important; stroke: rgba(0,170,90,.6) !important; }
+    /* 圖例框 */
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,220,100,.22)"]  { fill: rgba(0,140,70,.15) !important; stroke: rgba(0,160,80,.6) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(30,140,255,.18)"] { fill: rgba(18,80,180,.12) !important; stroke: rgba(18,100,200,.55) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(220,170,0,.18)"]  { fill: rgba(160,110,0,.12) !important; stroke: rgba(180,130,0,.5) !important; }
+    /* 圖例小方塊 */
+    body.theme-day .svg-chart-wrap svg rect[fill="#00e676"] { fill: #0a8040 !important; opacity:1 !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="#5bb3ff"] { fill: #1255a8 !important; opacity:1 !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="#f5c400"] { fill: #7a5800 !important; opacity:1 !important; }
+    /* 圖例文字顏色 */
+    body.theme-day .svg-chart-wrap svg text.venn-legend-title  { fill: #1a3550 !important; }
+    body.theme-day .svg-chart-wrap svg text.venn-legend-green  { fill: #0a7038 !important; }
+    body.theme-day .svg-chart-wrap svg text.venn-legend-blue   { fill: #1255a8 !important; }
+    body.theme-day .svg-chart-wrap svg text.venn-legend-amber  { fill: #7a5800 !important; }
+    /* 三強共振核心文字 */
+    body.theme-day .svg-chart-wrap svg text[fill="#ffffff"] { fill: #0a3050 !important; }
+
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2443,8 +2514,8 @@
       <!-- Self side icon -->
       <text x="50" y="42" fill="rgba(0,229,255,.85)" font-size="14" text-anchor="middle">🎯</text>
       <!-- Labels -->
-      <text x="22" y="58" fill="rgba(255,214,0,.7)" font-size="5.5" font-family="Share Tech Mono, monospace" text-anchor="middle">避險</text>
-      <text x="50" y="58" fill="rgba(0,229,255,.7)" font-size="5.5" font-family="Share Tech Mono, monospace" text-anchor="middle">自行</text>
+      <text x="22" y="58" fill="rgba(255,214,0,.7)" font-size="7" font-family="Share Tech Mono, monospace" text-anchor="middle">避險</text>
+      <text x="50" y="58" fill="rgba(0,229,255,.7)" font-size="7" font-family="Share Tech Mono, monospace" text-anchor="middle">自行</text>
       <!-- Glow pulse -->
       <circle cx="36" cy="40" r="28" fill="none" stroke="rgba(0,229,255,.08)" stroke-width="2">
         <animate attributeName="r" values="26;30;26" dur="3s" repeatCount="indefinite"/>
@@ -2484,7 +2555,8 @@
 
 <!-- SECTION 1 -->
   <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2494,6 +2566,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 <div class="section-card reveal">
   <div class="section-header">
@@ -3185,55 +3258,68 @@
 
     <!-- NEW: 三機構協同象限圖 -->
     <div class="svg-chart-wrap" style="margin:20px 0;padding:16px">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);opacity:.75;margin-bottom:12px;text-transform:uppercase">🔗 三大機構協同程度 × 訊號強度示意圖</div>
-      <svg viewBox="0 0 740 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-        <rect width="740" height="320" fill="rgba(0,0,0,.25)" rx="12"/>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.12em;color:var(--accent);opacity:1;margin-bottom:12px;text-transform:uppercase">🔗 三大機構協同程度 × 訊號強度示意圖</div>
+      <svg viewBox="0 0 740 330" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        <rect width="740" height="330" fill="rgba(0,0,0,.25)" rx="12"/>
 
-        <!-- 三個圓圈（法人） -->
-        <!-- 外資 -->
-        <circle cx="280" cy="130" r="90" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.35)" stroke-width="1.5"/>
-        <text x="195" y="80" fill="rgba(255,61,90,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">外資</text>
-        <text x="195" y="94" fill="rgba(255,61,90,.6)" font-family="Share Tech Mono,monospace" font-size="8">FOREIGN</text>
+        <!-- 外資圓：藍色系 -->
+        <circle cx="280" cy="138" r="92" fill="rgba(30,120,220,.15)" stroke="rgba(60,150,255,.65)" stroke-width="1.8"/>
+        <text x="166" y="82" fill="#5bb3ff" font-family="Share Tech Mono,monospace" font-size="13" font-weight="700">外資</text>
+        <text x="166" y="97" fill="rgba(100,180,255,.75)" font-family="Share Tech Mono,monospace" font-size="8.5">FOREIGN</text>
 
-        <!-- 投信 -->
-        <circle cx="460" cy="130" r="90" fill="rgba(0,229,255,.07)" stroke="rgba(0,229,255,.35)" stroke-width="1.5"/>
-        <text x="525" y="80" fill="rgba(0,229,255,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">投信</text>
-        <text x="525" y="94" fill="rgba(0,229,255,.6)" font-family="Share Tech Mono,monospace" font-size="8">TRUST</text>
+        <!-- 投信圓：青綠色系 -->
+        <circle cx="460" cy="138" r="92" fill="rgba(0,190,140,.13)" stroke="rgba(0,210,160,.65)" stroke-width="1.8"/>
+        <text x="530" y="82" fill="#00d4a8" font-family="Share Tech Mono,monospace" font-size="13" font-weight="700">投信</text>
+        <text x="530" y="97" fill="rgba(0,200,160,.75)" font-family="Share Tech Mono,monospace" font-size="8.5">TRUST</text>
 
-        <!-- 自營 -->
-        <circle cx="370" cy="220" r="90" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.35)" stroke-width="1.5"/>
-        <text x="370" y="312" text-anchor="middle" fill="rgba(255,214,0,.8)" font-family="Share Tech Mono,monospace" font-size="11" font-weight="700">自營（自行）</text>
-        <text x="370" y="304" text-anchor="middle" fill="rgba(255,214,0,.6)" font-family="Share Tech Mono,monospace" font-size="8">PROPRIETARY</text>
+        <!-- 自營圓：琥珀色系 -->
+        <circle cx="370" cy="228" r="92" fill="rgba(220,160,0,.12)" stroke="rgba(240,185,0,.6)" stroke-width="1.8"/>
+        <text x="370" y="324" text-anchor="middle" fill="#f5c400" font-family="Share Tech Mono,monospace" font-size="13" font-weight="700">自營（自行）</text>
+        <text x="370" y="313" text-anchor="middle" fill="rgba(240,190,0,.75)" font-family="Share Tech Mono,monospace" font-size="8.5">PROPRIETARY</text>
 
-        <!-- 交集區域標註 -->
-        <!-- 外資+投信交集 -->
-        <text x="370" y="118" text-anchor="middle" fill="rgba(200,240,255,.7)" font-family="Share Tech Mono,monospace" font-size="8">外資+投信</text>
-        <text x="370" y="130" text-anchor="middle" fill="rgba(0,230,118,.75)" font-family="Share Tech Mono,monospace" font-size="8">強多頭</text>
+        <!-- 外資+投信交集標註 -->
+        <text x="370" y="122" text-anchor="middle" fill="rgba(200,240,255,.85)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="600">外資＋投信</text>
+        <text x="370" y="136" text-anchor="middle" fill="rgba(0,230,140,.95)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">強多頭</text>
 
-        <!-- 外資+自營交集 -->
-        <text x="288" y="198" text-anchor="middle" fill="rgba(200,240,200,.7)" font-family="Share Tech Mono,monospace" font-size="8">外資+自營</text>
-        <text x="288" y="210" text-anchor="middle" fill="rgba(0,229,255,.75)" font-family="Share Tech Mono,monospace" font-size="8">短加速</text>
+        <!-- 外資+自營交集標註 -->
+        <text x="284" y="204" text-anchor="middle" fill="rgba(180,230,255,.85)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="600">外資＋自營</text>
+        <text x="284" y="218" text-anchor="middle" fill="rgba(80,190,255,.95)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">短加速</text>
 
-        <!-- 投信+自營交集 -->
-        <text x="455" y="198" text-anchor="middle" fill="rgba(200,240,200,.7)" font-family="Share Tech Mono,monospace" font-size="8">投信+自營</text>
-        <text x="455" y="210" text-anchor="middle" fill="rgba(178,102,255,.75)" font-family="Share Tech Mono,monospace" font-size="8">中線+短線</text>
+        <!-- 投信+自營交集標註 -->
+        <text x="458" y="204" text-anchor="middle" fill="rgba(180,255,230,.85)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="600">投信＋自營</text>
+        <text x="458" y="218" text-anchor="middle" fill="rgba(180,240,180,.95)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">中線＋短線</text>
 
         <!-- 三者共振核心 -->
-        <circle cx="370" cy="175" r="32" fill="rgba(0,230,118,.15)" stroke="rgba(0,230,118,.6)" stroke-width="2">
-          <animate attributeName="r" values="28;34;28" dur="2.5s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values=".8;1;.8" dur="2.5s" repeatCount="indefinite"/>
+        <circle cx="370" cy="182" r="33" fill="rgba(0,230,100,.18)" stroke="rgba(0,240,120,.75)" stroke-width="2">
+          <animate attributeName="r" values="29;35;29" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-opacity" values=".5;1;.5" dur="2.5s" repeatCount="indefinite"/>
         </circle>
-        <text x="370" y="170" text-anchor="middle" fill="#fff" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">三強</text>
-        <text x="370" y="184" text-anchor="middle" fill="rgba(0,230,118,.95)" font-family="Share Tech Mono,monospace" font-size="10" font-weight="700">共振 🔥</text>
+        <text x="370" y="177" text-anchor="middle" fill="#ffffff" font-family="Share Tech Mono,monospace" font-size="10.5" font-weight="700">三強</text>
+        <text x="370" y="192" text-anchor="middle" fill="rgba(0,240,120,.95)" font-family="Share Tech Mono,monospace" font-size="10.5" font-weight="700">共振 🔥</text>
 
-        <!-- 右側說明 -->
-        <text x="640" y="50" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">訊號強度</text>
-        <rect x="590" y="60" width="100" height="16" rx="4" fill="rgba(0,230,118,.25)" stroke="rgba(0,230,118,.4)" stroke-width="1"/>
-        <text x="640" y="72" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="8">三強共振 ████</text>
-        <rect x="590" y="82" width="75" height="16" rx="4" fill="rgba(0,229,255,.2)" stroke="rgba(0,229,255,.4)" stroke-width="1"/>
-        <text x="628" y="94" text-anchor="middle" fill="rgba(0,229,255,.9)" font-family="Share Tech Mono,monospace" font-size="8">雙機構 ███</text>
-        <rect x="590" y="104" width="50" height="16" rx="4" fill="rgba(255,214,0,.18)" stroke="rgba(255,214,0,.35)" stroke-width="1"/>
-        <text x="616" y="116" text-anchor="middle" fill="rgba(255,214,0,.9)" font-family="Share Tech Mono,monospace" font-size="8">單機構 ██</text>
+        <!-- 右側訊號強度圖例：三框等寬 120px，x=582~702 -->
+        <text x="642" y="52" text-anchor="middle" fill="rgba(200,230,200,.9)" font-family="Share Tech Mono,monospace" font-size="9.5" font-weight="700" class="venn-legend-title">訊號強度</text>
+
+        <!-- 三強共振（4格強度）-->
+        <rect x="582" y="60" width="120" height="22" rx="6" fill="rgba(0,220,100,.22)" stroke="rgba(0,230,120,.7)" stroke-width="1.5"/>
+        <text x="593" y="75" fill="#00e676" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700" class="venn-legend-green">三強共振</text>
+        <rect x="656" y="65" width="8" height="10" rx="2" fill="#00e676" opacity=".85"/>
+        <rect x="666" y="65" width="8" height="10" rx="2" fill="#00e676" opacity=".85"/>
+        <rect x="676" y="65" width="8" height="10" rx="2" fill="#00e676" opacity=".85"/>
+        <rect x="686" y="65" width="8" height="10" rx="2" fill="#00e676" opacity=".85"/>
+
+        <!-- 雙機構（3格強度）-->
+        <rect x="582" y="87" width="120" height="22" rx="6" fill="rgba(30,140,255,.18)" stroke="rgba(60,160,255,.65)" stroke-width="1.5"/>
+        <text x="593" y="102" fill="#5bb3ff" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700" class="venn-legend-blue">雙機構</text>
+        <rect x="656" y="92" width="8" height="10" rx="2" fill="#5bb3ff" opacity=".85"/>
+        <rect x="666" y="92" width="8" height="10" rx="2" fill="#5bb3ff" opacity=".85"/>
+        <rect x="676" y="92" width="8" height="10" rx="2" fill="#5bb3ff" opacity=".85"/>
+
+        <!-- 單機構（2格強度）-->
+        <rect x="582" y="114" width="120" height="22" rx="6" fill="rgba(220,170,0,.18)" stroke="rgba(240,190,0,.6)" stroke-width="1.5"/>
+        <text x="593" y="129" fill="#f5c400" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700" class="venn-legend-amber">單機構</text>
+        <rect x="656" y="119" width="8" height="10" rx="2" fill="#f5c400" opacity=".85"/>
+        <rect x="666" y="119" width="8" height="10" rx="2" fill="#f5c400" opacity=".85"/>
       </svg>
     </div>
 
@@ -3570,7 +3656,8 @@
 </div>
 
   <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3580,6 +3667,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3772,7 +3860,7 @@ window.answerQ = function(qid, el, choice) {
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

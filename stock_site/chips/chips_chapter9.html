@@ -2,6 +2,7 @@
 <html lang="zh-TW" style="scroll-behavior:smooth">
 <head>
   <meta charset="UTF-8"/>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226" crossorigin="anonymous"></script>
   <link rel="icon" type="image/png" href="/images/jelly.png" />
   <link rel="apple-touch-icon" href="/images/jelly.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -2312,6 +2313,45 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2395,51 +2435,63 @@
   <!-- HERO -->
   <div class="hero">
     <div class="hero-icon">
-      <svg width="84" height="90" viewBox="0 0 84 90" xmlns="http://www.w3.org/2000/svg">
-        <!-- Price line going up -->
-        <polyline points="10,68 22,60 34,52 46,44 58,36 70,28"
-          fill="none" stroke="rgba(0,229,255,.5)" stroke-width="2" stroke-dasharray="3,2"/>
-        <!-- Institutional line going DOWN (divergence) -->
-        <polyline points="10,30 22,36 34,44 46,52 58,60 70,68"
-          fill="none" stroke="rgba(255,61,90,.6)" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- Labels -->
-        <text x="72" y="26" fill="rgba(0,229,255,.8)" font-size="7" font-family="Share Tech Mono,monospace">股價↑</text>
-        <text x="72" y="71" fill="rgba(255,61,90,.8)" font-size="7" font-family="Share Tech Mono,monospace">法人↓</text>
-        <!-- Divergence arrow in middle -->
-        <line x1="42" y1="44" x2="42" y2="52" stroke="rgba(255,214,0,.9)" stroke-width="1.5" stroke-dasharray="2,2"/>
-        <text x="42" y="49" fill="rgba(255,214,0,.9)" font-size="6" text-anchor="middle" font-family="Share Tech Mono,monospace">背離</text>
-        <!-- Warning pulse -->
-        <circle cx="42" cy="48" r="12" fill="none" stroke="rgba(255,214,0,.15)" stroke-width="1">
-          <animate attributeName="r" values="10;16;10" dur="2.2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values=".8;0;.8" dur="2.2s" repeatCount="indefinite"/>
+      <svg width="90" height="95" viewBox="0 0 90 95" xmlns="http://www.w3.org/2000/svg">
+        <line x1="8" y1="25" x2="82" y2="25" stroke="rgba(0,229,255,.06)" stroke-width="1"/>
+        <line x1="8" y1="48" x2="82" y2="48" stroke="rgba(0,229,255,.06)" stroke-width="1"/>
+        <line x1="8" y1="71" x2="82" y2="71" stroke="rgba(0,229,255,.06)" stroke-width="1"/>
+        <polyline points="10,70 24,62 38,53 52,43 66,33 80,23"
+          fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="70" r="2.5" fill="rgba(0,229,255,.7)"/>
+        <circle cx="80" cy="23" r="2.5" fill="rgba(0,229,255,.95)"/>
+        <polyline points="10,28 24,34 38,42 52,52 66,61 80,71"
+          fill="none" stroke="rgba(255,61,90,.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="28" r="2.5" fill="rgba(255,61,90,.8)"/>
+        <circle cx="80" cy="71" r="2.5" fill="rgba(255,61,90,.95)"/>
+        <circle cx="45" cy="47" r="9" fill="none" stroke="rgba(255,214,0,.3)" stroke-width="1.2">
+          <animate attributeName="r" values="7;14;7" dur="2.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".9;0;.9" dur="2.4s" repeatCount="indefinite"/>
         </circle>
-        <!-- Crosshair dots -->
-        <circle cx="10" cy="68" r="3" fill="rgba(0,229,255,.6)"/>
-        <circle cx="70" cy="28" r="3" fill="rgba(0,229,255,.6)"/>
-        <circle cx="10" cy="30" r="3" fill="rgba(255,61,90,.7)"/>
-        <circle cx="70" cy="68" r="3" fill="rgba(255,61,90,.7)"/>
-        <!-- Bottom label -->
-        <text x="42" y="84" fill="rgba(0,229,255,.5)" font-size="6.5" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1">DIVERGENCE</text>
+        <circle cx="45" cy="47" r="3.5" fill="rgba(255,214,0,.9)"/>
+        <text x="83" y="20" fill="rgba(0,229,255,.9)" font-size="6.5" font-family="Share Tech Mono,monospace">股↑</text>
+        <text x="83" y="75" fill="rgba(255,61,90,.9)" font-size="6.5" font-family="Share Tech Mono,monospace">法↓</text>
+        <text x="45" y="43.5" fill="rgba(255,214,0,.95)" font-size="7.5" text-anchor="middle" font-family="Share Tech Mono,monospace">背離</text>
+        <text x="45" y="89" fill="rgba(0,229,255,.4)" font-size="5.8" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="1.2">DIVERGENCE</text>
       </svg>
     </div>
     <div class="hero-content">
       <div class="hero-label">CHAPTER 09 · 籌碼進階篇</div>
       <div class="hero-title">法人買賣超<br/>與股價背離訊號</div>
-      <div class="hero-desc">股價漲、法人賣——這不是矛盾，而是最強烈的危險訊號。股價跌、法人默默買——這不是奇怪，而是最珍貴的布局機會。本章帶你系統性掌握「法人行為與股價走向背離」的四大模式，從此看穿主力真實意圖，不再被表面漲跌欺騙。</div>
+      <div class="hero-desc">股價漲、法人賣——這不是矛盾，而是最強烈的危險訊號。股價跌、法人默默買——這不是奇怪，而是最珍貴的布局機會。本章帶你系統性掌握「法人行為與股價走向背離」的四大模式，教你用量化方式確認背離天數，識別三大法人協同背離的最強訊號，以及如何避開五大常見誤判陷阱，從此看穿主力真實意圖，不再被表面漲跌欺騙。</div>
       <div class="hero-tags">
-        <span class="tag tag-red">背離訊號</span>
-        <span class="tag tag-yellow">股價漲法人賣</span>
-        <span class="tag tag-green">股價跌法人買</span>
-        <span class="tag tag-cyan">三大法人協同</span>
-        <span class="tag tag-purple">主力意圖判讀</span>
-        <span class="tag tag-orange">實戰驗證</span>
+        <span class="tag tag-red">頂部背離</span>
+        <span class="tag tag-green">底部背離</span>
+        <span class="tag tag-yellow">三法人協同</span>
+        <span class="tag tag-cyan">外資8日法則</span>
+        <span class="tag tag-purple">投信季底判讀</span>
+        <span class="tag tag-pink">背離失效條件</span>
+        <span class="tag tag-orange">實戰SOP</span>
+      </div>
+      <div style="display:flex;gap:20px;margin-top:18px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 7px var(--red)"></div>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">9 個章節單元</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--yellow);box-shadow:0 0 7px var(--yellow)"></div>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">2 個實戰案例</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--purple);box-shadow:0 0 7px var(--purple)"></div>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--text-dim)">5 題互動測驗</span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- SECTION 1: 什麼是背離訊號 -->
     <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2449,6 +2501,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 <div class="section-card reveal">
     <div class="section-header">
@@ -2457,7 +2510,7 @@
       <div class="section-icon">📡</div>
     </div>
     <div class="section-body">
-      <p class="prose">在正常情況下，股價上漲時法人買超、股價下跌時法人賣超——兩者方向一致。但當<em>股價方向與法人行為出現相反走勢</em>，就是「背離」。這種背離往往意味著市場表面的行情與主力資金的真實判斷之間存在重大落差。</p>
+      <p class="prose">在正常情況下，股價上漲時法人買超、股價下跌時法人賣超——兩者方向一致。但當<em>股價方向與法人行為出現相反走勢</em>，就是「背離」。這種背離往往意味著市場表面的行情與主力資金的真實判斷之間存在重大落差，是籌碼分析中最具價值的預警訊號之一。</p>
 
       <div class="insight-box">
         <div class="insight-icon">🔍</div>
@@ -2465,6 +2518,97 @@
           <div class="insight-label">背離訊號的本質</div>
           <div class="insight-text">法人（尤其是外資）擁有比散戶更完整的資訊、更龐大的研究資源，<strong>他們的買賣行為往往比股價早幾天甚至幾週反應真實面</strong>。股價由散戶短線情緒推動可以短暫「欺騙」表面走勢，但籌碼不說謊——法人真正在做的事，才是最值得追蹤的訊號。</div>
         </div>
+      </div>
+
+      <!-- NEW: 四大背離型態 SVG 圖解 -->
+      <div class="svg-chart-wrap" style="padding:0">
+        <div style="padding:14px 18px 10px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);opacity:.8;text-transform:uppercase">📊 四大背離型態視覺圖解</div>
+        <svg viewBox="0 0 740 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+          <rect width="740" height="280" fill="rgba(0,0,0,.2)"/>
+
+          <!-- 共用說明 -->
+          <text x="20" y="16" fill="rgba(0,229,255,.6)" font-family="Share Tech Mono,monospace" font-size="7.5">─── 股價</text>
+          <text x="100" y="16" fill="rgba(255,61,90,.6)" font-family="Share Tech Mono,monospace" font-size="7.5">─── 法人</text>
+          <text x="178" y="16" fill="rgba(255,214,0,.6)" font-family="Share Tech Mono,monospace" font-size="7.5">● 背離點</text>
+
+          <!-- ── 型態一：頂部背離 ── -->
+          <rect x="14" y="24" width="168" height="118" rx="8" fill="rgba(255,61,90,.04)" stroke="rgba(255,61,90,.25)" stroke-width="1"/>
+          <text x="98" y="40" text-anchor="middle" fill="rgba(255,61,90,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">型態一：頂部背離</text>
+          <text x="98" y="52" text-anchor="middle" fill="rgba(255,61,90,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">⚠ 股價↑ × 法人↓</text>
+          <!-- price up -->
+          <polyline points="24,116 50,100 75,85 100,72 126,62 152,54 174,48" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- institution down -->
+          <polyline points="24,65 50,72 75,80 100,89 126,98 152,108 174,118" fill="none" stroke="rgba(255,61,90,.7)" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <!-- divergence zone -->
+          <rect x="90" y="46" width="90" height="80" rx="4" fill="rgba(255,61,90,.06)" stroke="rgba(255,61,90,.2)" stroke-width="1" stroke-dasharray="4,2"/>
+          <circle cx="98" cy="72" r="4" fill="rgba(255,214,0,.85)"/>
+          <circle cx="98" cy="89" r="4" fill="rgba(255,61,90,.7)"/>
+          <text x="98" y="138" text-anchor="middle" fill="rgba(255,100,100,.9)" font-family="Share Tech Mono,monospace" font-size="7">危險度 ●●●●●</text>
+
+          <!-- ── 型態二：底部背離 ── -->
+          <rect x="196" y="24" width="168" height="118" rx="8" fill="rgba(0,230,118,.04)" stroke="rgba(0,230,118,.25)" stroke-width="1"/>
+          <text x="280" y="40" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">型態二：底部背離</text>
+          <text x="280" y="52" text-anchor="middle" fill="rgba(0,230,118,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">💎 股價↓ × 法人↑</text>
+          <!-- price down -->
+          <polyline points="206,56 232,68 257,80 282,92 307,104 332,113 355,120" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- institution up -->
+          <polyline points="206,118 232,108 257,98 282,86 307,74 332,64 355,54" fill="none" stroke="rgba(0,230,118,.7)" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <!-- divergence zone -->
+          <rect x="270" y="46" width="90" height="80" rx="4" fill="rgba(0,230,118,.06)" stroke="rgba(0,230,118,.2)" stroke-width="1" stroke-dasharray="4,2"/>
+          <circle cx="282" cy="92" r="4" fill="rgba(255,214,0,.85)"/>
+          <circle cx="282" cy="86" r="4" fill="rgba(0,230,118,.7)"/>
+          <text x="280" y="138" text-anchor="middle" fill="rgba(0,230,118,.7)" font-family="Share Tech Mono,monospace" font-size="7">機會度 ●●●●●</text>
+
+          <!-- ── 型態三：弱勢背離 ── -->
+          <rect x="378" y="24" width="168" height="118" rx="8" fill="rgba(255,214,0,.04)" stroke="rgba(255,214,0,.25)" stroke-width="1"/>
+          <text x="462" y="40" text-anchor="middle" fill="rgba(255,214,0,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">型態三：弱勢背離</text>
+          <text x="462" y="52" text-anchor="middle" fill="rgba(255,214,0,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">⚡ 橫盤 × 法人↓</text>
+          <!-- price flat with slight wobble -->
+          <polyline points="388,85 414,84 439,87 464,83 489,86 514,84 545,83" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- institution suddenly sells -->
+          <polyline points="388,60 414,64 439,68 464,80 489,96 514,110 545,120" fill="none" stroke="rgba(255,61,90,.7)" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <!-- divergence trigger -->
+          <line x1="464" y1="46" x2="464" y2="128" stroke="rgba(255,214,0,.3)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="464" y="47" text-anchor="middle" fill="rgba(255,214,0,.7)" font-family="Share Tech Mono,monospace" font-size="6.5">觸發點</text>
+          <circle cx="464" cy="83" r="4" fill="rgba(255,214,0,.85)"/>
+          <text x="462" y="138" text-anchor="middle" fill="rgba(255,214,0,.7)" font-family="Share Tech Mono,monospace" font-size="7">警戒度 ●●●●○</text>
+
+          <!-- ── 型態四：強勢背離 ── -->
+          <rect x="560" y="24" width="168" height="118" rx="8" fill="rgba(178,102,255,.04)" stroke="rgba(178,102,255,.25)" stroke-width="1"/>
+          <text x="644" y="40" text-anchor="middle" fill="rgba(178,102,255,.9)" font-family="Share Tech Mono,monospace" font-size="9" font-weight="700">型態四：強勢背離</text>
+          <text x="644" y="52" text-anchor="middle" fill="rgba(178,102,255,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">🚀 橫盤 × 法人↑</text>
+          <!-- price flat with slight wobble -->
+          <polyline points="570,90 596,92 621,88 646,91 671,89 696,90 718,91" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- institution quietly accumulates -->
+          <polyline points="570,118 596,112 621,104 646,92 671,78 696,65 718,54" fill="none" stroke="rgba(0,230,118,.7)" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <!-- divergence trigger -->
+          <line x1="646" y1="46" x2="646" y2="128" stroke="rgba(178,102,255,.3)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="646" y="47" text-anchor="middle" fill="rgba(178,102,255,.7)" font-family="Share Tech Mono,monospace" font-size="6.5">建倉期</text>
+          <circle cx="646" cy="90" r="4" fill="rgba(178,102,255,.85)"/>
+          <text x="644" y="138" text-anchor="middle" fill="rgba(178,102,255,.7)" font-family="Share Tech Mono,monospace" font-size="7">潛力度 ●●●●●</text>
+
+          <!-- 底部 key insight -->
+          <rect x="14" y="158" width="712" height="30" rx="6" fill="rgba(0,229,255,.04)" stroke="rgba(0,229,255,.1)" stroke-width="1"/>
+          <text x="370" y="168" text-anchor="middle" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono,monospace" font-size="8">背離不等於立即反轉 ─── 需累積 3 日以上才具操作意義</text>
+          <text x="370" y="181" text-anchor="middle" fill="rgba(200,220,240,.5)" font-family="Share Tech Mono,monospace" font-size="7.5">日曆時間：外資連賣 1～2日=雜訊 ／ 3～5日=警戒 ／ 5日以上=採取行動</text>
+
+          <!-- 判讀流程 -->
+          <text x="14" y="215" fill="rgba(0,229,255,.5)" font-family="Share Tech Mono,monospace" font-size="7.5" font-weight="700">判讀優先順序：</text>
+          <rect x="14" y="222" width="100" height="22" rx="5" fill="rgba(255,61,90,.1)" stroke="rgba(255,61,90,.3)" stroke-width="1"/>
+          <text x="64" y="236" text-anchor="middle" fill="rgba(255,61,90,.9)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">① 外資</text>
+          <text x="120" y="234" fill="rgba(200,220,240,.4)" font-family="Share Tech Mono,monospace" font-size="8">→</text>
+          <rect x="135" y="222" width="100" height="22" rx="5" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.3)" stroke-width="1"/>
+          <text x="185" y="236" text-anchor="middle" fill="rgba(0,229,255,.9)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">② 投信（去季底）</text>
+          <text x="241" y="234" fill="rgba(200,220,240,.4)" font-family="Share Tech Mono,monospace" font-size="8">→</text>
+          <rect x="256" y="222" width="130" height="22" rx="5" fill="rgba(255,214,0,.1)" stroke="rgba(255,214,0,.3)" stroke-width="1"/>
+          <text x="321" y="236" text-anchor="middle" fill="rgba(255,214,0,.9)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">③ 自營（自行帳戶）</text>
+          <text x="392" y="234" fill="rgba(200,220,240,.4)" font-family="Share Tech Mono,monospace" font-size="8">→</text>
+          <rect x="407" y="222" width="120" height="22" rx="5" fill="rgba(0,230,118,.1)" stroke="rgba(0,230,118,.3)" stroke-width="1"/>
+          <text x="467" y="236" text-anchor="middle" fill="rgba(0,230,118,.9)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">④ 融資確認</text>
+          <text x="533" y="234" fill="rgba(200,220,240,.4)" font-family="Share Tech Mono,monospace" font-size="8">→</text>
+          <rect x="548" y="222" width="100" height="22" rx="5" fill="rgba(178,102,255,.1)" stroke="rgba(178,102,255,.3)" stroke-width="1"/>
+          <text x="598" y="236" text-anchor="middle" fill="rgba(178,102,255,.9)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">⑤ K線觸發</text>
+        </svg>
       </div>
 
       <div class="sec-divider">背離的四種基本型態</div>
@@ -2554,88 +2698,147 @@
         </div>
       </div>
 
-      <!-- SVG 外資賣超 vs 股價走勢示意圖 -->
-      <div class="svg-chart-wrap">
-        <svg viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:rgba(0,0,0,.18);">
-          <defs>
-            <linearGradient id="priceUp" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stop-color="#00e5ff" stop-opacity=".05"/>
-              <stop offset="100%" stop-color="#00e5ff" stop-opacity=".25"/>
-            </linearGradient>
-          </defs>
-          <!-- Grid lines -->
-          <line x1="70" y1="20" x2="70" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="70" y1="210" x2="670" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
-          <line x1="70" y1="120" x2="670" y2="120" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="70" y1="65"  x2="670" y2="65"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="70" y1="165" x2="670" y2="165" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
-          <!-- 股價線 (上漲後高位震盪) -->
-          <polyline points="70,185 120,165 170,140 220,112 270,90 320,78 370,72 420,75 470,80 520,85 570,95 620,88 670,78"
-            fill="none" stroke="rgba(0,229,255,.75)" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- 外資買賣超 bars (開始賣超) -->
-          <!-- 買超（正值）綠柱 -->
-          <rect x="85"  y="160" width="18" height="50" rx="3" fill="rgba(0,230,118,.45)"/>
-          <rect x="135" y="150" width="18" height="60" rx="3" fill="rgba(0,230,118,.45)"/>
-          <rect x="185" y="162" width="18" height="48" rx="3" fill="rgba(0,230,118,.4)"/>
-          <rect x="235" y="168" width="18" height="42" rx="3" fill="rgba(0,230,118,.35)"/>
-          <!-- 開始賣超（負值）紅柱，從基線向上畫 (視覺上代表賣超量) -->
-          <rect x="285" y="178" width="18" height="32" rx="3" fill="rgba(255,61,90,.35)"/>
-          <rect x="335" y="165" width="18" height="45" rx="3" fill="rgba(255,61,90,.5)"/>
-          <rect x="385" y="152" width="18" height="58" rx="3" fill="rgba(255,61,90,.6)"/>
-          <rect x="435" y="145" width="18" height="65" rx="3" fill="rgba(255,61,90,.65)"/>
-          <rect x="485" y="140" width="18" height="70" rx="3" fill="rgba(255,61,90,.7)"/>
-          <rect x="535" y="138" width="18" height="72" rx="3" fill="rgba(255,61,90,.7)"/>
-          <rect x="585" y="134" width="18" height="76" rx="3" fill="rgba(255,61,90,.75)"/>
-          <rect x="635" y="130" width="18" height="80" rx="3" fill="rgba(255,61,90,.8)"/>
-          <!-- 背離標示 -->
-          <rect x="278" y="12" width="2" height="200" rx="1" fill="rgba(255,214,0,.35)" stroke-dasharray="4,4"/>
-          <rect x="280" y="12" width="120" height="22" rx="5" fill="rgba(255,214,0,.1)" stroke="rgba(255,214,0,.4)" stroke-width="1"/>
-          <text x="340" y="27" fill="rgba(255,214,0,.9)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace">背離開始</text>
+      <!-- NEW: Improved SVG showing top divergence pattern -->
+      <div class="svg-chart-wrap" style="padding:0">
+        <div style="padding:14px 18px 8px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--red);opacity:.85;text-transform:uppercase">📉 外資賣超背離：頂部出貨結構完整圖解</div>
+        <svg viewBox="0 0 740 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+          <rect width="740" height="250" fill="rgba(0,0,0,.22)"/>
+          <!-- Grid -->
+          <line x1="80" y1="20" x2="80" y2="195" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="80" y1="195" x2="710" y2="195" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+          <line x1="80" y1="80"  x2="710" y2="80"  stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="80" y1="120" x2="710" y2="120" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="80" y1="160" x2="710" y2="160" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Y axis labels -->
+          <text x="74" y="84"  text-anchor="end" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">高</text>
+          <text x="74" y="124" text-anchor="end" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">中</text>
+          <text x="74" y="164" text-anchor="end" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">低</text>
+
+          <!-- X axis day labels -->
+          <text x="115" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D1</text>
+          <text x="170" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D3</text>
+          <text x="225" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D5</text>
+          <text x="280" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D7</text>
+          <text x="335" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D9</text>
+          <text x="390" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D11</text>
+          <text x="445" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D13</text>
+          <text x="500" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D15</text>
+          <text x="560" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D17</text>
+          <text x="620" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D19</text>
+          <text x="680" y="207" text-anchor="middle" fill="rgba(200,220,240,.7)" font-family="Share Tech Mono,monospace" font-size="7">D21</text>
+
+          <!-- Stock price line: rises, peaks, then falls after divergence accumulates -->
+          <polyline points="90,175 115,158 143,138 170,115 198,96 225,85 252,80 280,78 308,76 335,78 363,82 390,88 418,95 445,108 472,122 500,140 528,158 555,172 583,180 610,185 638,182 665,176 693,170"
+            fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Price fill area -->
+          <polygon points="90,195 90,175 115,158 143,138 170,115 198,96 225,85 252,80 280,78 308,76 335,78 363,82 390,88 418,95 445,108 472,122 500,140 528,158 555,172 583,180 610,185 638,182 665,176 693,170 693,195"
+            fill="rgba(0,229,255,.04)"/>
+
+          <!-- Foreign investor bars: green then red (selling) -->
+          <!-- Green buy bars first -->
+          <rect x="100" y="155" width="24" height="40" rx="3" fill="rgba(0,230,118,.5)"/>
+          <rect x="155" y="148" width="24" height="47" rx="3" fill="rgba(0,230,118,.5)"/>
+          <rect x="210" y="158" width="24" height="37" rx="3" fill="rgba(0,230,118,.45)"/>
+          <rect x="265" y="161" width="24" height="34" rx="3" fill="rgba(0,230,118,.4)"/>
+
+          <!-- Divergence divider line -->
+          <line x1="320" y1="20" x2="320" y2="195" stroke="rgba(255,214,0,.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <rect x="294" y="22" width="54" height="18" rx="5" fill="rgba(255,214,0,.12)" stroke="rgba(255,214,0,.4)" stroke-width="1"/>
+          <text x="321" y="34" text-anchor="middle" fill="rgba(255,214,0,.95)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">背離開始</text>
+
+          <!-- Red sell bars (growing louder) -->
+          <rect x="320" y="163" width="24" height="32" rx="3" fill="rgba(255,61,90,.4)"/>
+          <rect x="375" y="155" width="24" height="40" rx="3" fill="rgba(255,61,90,.5)"/>
+          <rect x="430" y="148" width="24" height="47" rx="3" fill="rgba(255,61,90,.6)"/>
+          <rect x="485" y="142" width="24" height="53" rx="3" fill="rgba(255,61,90,.68)"/>
+          <rect x="540" y="137" width="24" height="58" rx="3" fill="rgba(255,61,90,.73)"/>
+          <rect x="595" y="132" width="24" height="63" rx="3" fill="rgba(255,61,90,.78)"/>
+          <rect x="650" y="127" width="24" height="68" rx="3" fill="rgba(255,61,90,.83)"/>
+
           <!-- Annotations -->
-          <text x="180" y="248" fill="rgba(0,230,118,.7)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace">外資買超期間</text>
-          <text x="490" y="248" fill="rgba(255,61,90,.7)" font-size="9" text-anchor="middle" font-family="Share Tech Mono,monospace">外資連續賣超（股價仍高）</text>
+          <text x="178" y="220" text-anchor="middle" fill="rgba(0,230,118,.75)" font-family="Share Tech Mono,monospace" font-size="8">外資買超期</text>
+          <text x="510" y="220" text-anchor="middle" fill="rgba(255,61,90,.75)" font-family="Share Tech Mono,monospace" font-size="8">外資持續賣超（股價仍撐）→ 危險！</text>
+
+          <!-- Stock price label -->
+          <text x="296" y="72" fill="rgba(0,229,255,.8)" font-family="Share Tech Mono,monospace" font-size="8" font-weight="700">股價高位撐住</text>
+          <line x1="295" y1="75" x2="280" y2="78" stroke="rgba(0,229,255,.4)" stroke-width="1"/>
+
           <!-- Legend -->
-          <rect x="80" y="230" width="10" height="10" rx="2" fill="rgba(0,229,255,.6)"/>
-          <text x="95" y="239" fill="rgba(0,229,255,.7)" font-size="9" font-family="Share Tech Mono,monospace">股價走勢</text>
-          <rect x="200" y="230" width="10" height="10" rx="2" fill="rgba(0,230,118,.5)"/>
-          <text x="215" y="239" fill="rgba(0,230,118,.7)" font-size="9" font-family="Share Tech Mono,monospace">外資買超</text>
-          <rect x="310" y="230" width="10" height="10" rx="2" fill="rgba(255,61,90,.6)"/>
-          <text x="325" y="239" fill="rgba(255,61,90,.7)" font-size="9" font-family="Share Tech Mono,monospace">外資賣超（背離！）</text>
-          <!-- Title -->
-          <text x="375" y="14" fill="rgba(255,255,255,.4)" font-size="10" text-anchor="middle" font-family="Share Tech Mono,monospace" letter-spacing="2">外資賣超 vs 股價高位 — 頂部背離示意</text>
+          <rect x="84" y="232" width="10" height="8" rx="2" fill="rgba(0,229,255,.6)"/>
+          <text x="100" y="240" fill="rgba(0,229,255,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">股價走勢</text>
+          <rect x="175" y="232" width="10" height="8" rx="2" fill="rgba(0,230,118,.5)"/>
+          <text x="190" y="240" fill="rgba(0,230,118,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">外資買超</text>
+          <rect x="260" y="232" width="10" height="8" rx="2" fill="rgba(255,61,90,.65)"/>
+          <text x="275" y="240" fill="rgba(255,61,90,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">外資賣超（頂部背離）</text>
+          <line x1="430" y1="236" x2="446" y2="236" stroke="rgba(255,214,0,.7)" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="450" y="240" fill="rgba(255,214,0,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">背離觸發線</text>
         </svg>
       </div>
 
       <div class="sec-divider">外資背離的強度分級</div>
 
-      <div class="force-meter-wrap">
-        <div class="force-row">
-          <div class="force-label">外資賣超 1～2 日</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:20%;background:linear-gradient(90deg,var(--yellow),rgba(255,214,0,.5));"></div></div>
-          <div class="force-val">觀察</div>
+      <!-- NEW: Enhanced force meter with table -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
+        <div>
+          <div class="force-meter-wrap">
+            <div class="force-row">
+              <div class="force-label">外資賣超 1～2 日</div>
+              <div class="force-bar-bg"><div class="force-bar-fill" style="width:20%;background:linear-gradient(90deg,var(--yellow),rgba(255,214,0,.5));"></div></div>
+              <div class="force-val" style="color:var(--yellow)">觀察</div>
+            </div>
+            <div class="force-row">
+              <div class="force-label">外資連賣 3～5 日</div>
+              <div class="force-bar-bg"><div class="force-bar-fill" style="width:50%;background:linear-gradient(90deg,var(--orange),rgba(255,152,0,.5));"></div></div>
+              <div class="force-val" style="color:var(--orange)">警戒</div>
+            </div>
+            <div class="force-row">
+              <div class="force-label">外資連賣 6～10 日</div>
+              <div class="force-bar-bg"><div class="force-bar-fill" style="width:75%;background:linear-gradient(90deg,var(--red),rgba(255,61,90,.6));"></div></div>
+              <div class="force-val" style="color:var(--red)">高危</div>
+            </div>
+            <div class="force-row">
+              <div class="force-label">外資連賣 &gt;10 日</div>
+              <div class="force-bar-bg"><div class="force-bar-fill" style="width:98%;background:linear-gradient(90deg,#ff0033,rgba(200,0,40,.8));"></div></div>
+              <div class="force-val" style="color:var(--red)">危險!</div>
+            </div>
+          </div>
         </div>
-        <div class="force-row">
-          <div class="force-label">外資連賣 3～5 日</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:50%;background:linear-gradient(90deg,var(--orange),rgba(255,152,0,.5));"></div></div>
-          <div class="force-val">警戒</div>
+        <div style="background:rgba(255,61,90,.04);border:1px solid rgba(255,61,90,.18);border-radius:12px;padding:14px">
+          <div style="font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;color:var(--red);margin-bottom:10px">⏰ 外資8日法則</div>
+          <div style="font-size:.8rem;color:var(--text-dim);line-height:1.75;margin-bottom:10px">根據台股歷史統計，<strong style="color:var(--text)">外資連續賣超超過 8 個交易日</strong>，個股在隨後一個月內出現超過 10% 拉回的機率顯著偏高。</div>
+          <div style="background:rgba(255,61,90,.08);border-radius:8px;padding:10px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--red);margin-bottom:6px">觸發 8 日法則時的操作</div>
+            <div style="font-size:.78rem;color:var(--text-dim);line-height:1.7">✓ 至少減少一半持股<br/>✓ 停損點設 8MA 之下<br/>✓ 觀察融資是否同步攀升</div>
+          </div>
         </div>
-        <div class="force-row">
-          <div class="force-label">外資連賣 6～10 日</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:75%;background:linear-gradient(90deg,var(--red),rgba(255,61,90,.6));"></div></div>
-          <div class="force-val">高危</div>
-        </div>
-        <div class="force-row">
-          <div class="force-label">外資連賣 &gt;10 日</div>
-          <div class="force-bar-bg"><div class="force-bar-fill" style="width:95%;background:linear-gradient(90deg,#ff0033,rgba(200,0,40,.7));"></div></div>
-          <div class="force-val">危險!</div>
+      </div>
+
+      <!-- NEW: Buy divergence case -->
+      <div class="sec-divider">外資底部背離：最珍貴的逆向機會</div>
+      <div style="background:linear-gradient(135deg,rgba(0,230,118,.05),rgba(0,80,40,.02));border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:18px;margin:16px 0">
+        <div style="font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;color:var(--green);margin-bottom:12px">💎 底部吃貨型：外資連買 + 股價仍跌</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.75;margin-bottom:10px">跌勢中，法人逆勢吸籌——股價因市場恐慌仍在低位打底，但外資已連續多日買超。外資通常吃貨期間<strong style="color:var(--text)">不急於推升</strong>，而是耐心累積到足夠部位才讓股價啟動。</div>
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.75">跟進時機：<strong style="color:var(--green)">外資連買 ≥5 日 + 融資快速下降（弱手出清）+ 成交量開始萎縮</strong>，三者同時出現，代表底部接近。</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">外資連買天數 vs 後勢勝率</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.7">3日：約 52%<br/>5日：約 63%<br/>8日：約 74%<br/>10日+：約 82%</div>
+            </div>
+            <div style="font-size:.7rem;color:var(--text-faint);line-height:1.6">※ 基於台股歷史數據的統計參考值，不構成投資建議</div>
+          </div>
         </div>
       </div>
 
       <div class="gold-box">
         <div class="insight-icon">📌</div>
         <div class="insight-body">
-          <div class="insight-label">實戰關鍵數字</div>
-          <div class="insight-text">根據台股歷史統計，<strong>外資連續賣超超過 8 個交易日</strong>，個股在隨後一個月內出現超過 10% 以上拉回的機率顯著偏高。這個「8日法則」可作為風險管理的觸發點：持股若遇此訊號，應考慮至少減少一半部位。</div>
+          <div class="insight-label">實戰關鍵原則</div>
+          <div class="insight-text">外資背離的力量來自<strong>累積性</strong>，而非單日數字。連賣1天可能是短線調節；連賣8天以上，幾乎可確定是有意識的減碼。操作上，<strong>以「連賣天數」而非「單日金額」為主要判斷依據</strong>，是避免誤判的關鍵原則。</div>
         </div>
       </div>
     </div>
@@ -2649,7 +2852,91 @@
       <div class="section-icon">🏦</div>
     </div>
     <div class="section-body">
-      <p class="prose">投信背離的判讀比外資更複雜，因為投信行為受<em>季底作帳週期</em>影響，必須先區分「是否處於季底作帳期」，才能正確解讀其買賣訊號的真實意義。</p>
+      <p class="prose">投信背離的判讀比外資更複雜，因為投信行為受<em>季底作帳週期</em>影響，必須先區分「是否處於季底作帳期」，才能正確解讀其買賣訊號的真實意義。忽略季底因素，是投信背離被誤讀最常見的原因。</p>
+
+      <!-- NEW: 季底月份視覺日曆 -->
+      <div style="margin:20px 0">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--accent);opacity:.75;margin-bottom:12px;text-transform:uppercase">📅 12個月 × 投信操作邏輯速查</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+          <!-- Jan -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">1月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Feb -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">2月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Mar (Q1 end) -->
+          <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.25);border-radius:10px;padding:10px;text-align:center;position:relative">
+            <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:rgba(255,61,90,.8);color:#fff;font-family:'Share Tech Mono',monospace;font-size:.55rem;padding:1px 6px;border-radius:8px;white-space:nowrap">Q1季底</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--red);font-weight:700;margin-bottom:4px">3月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">後2週</div>
+            <div style="font-size:.62rem;color:var(--red);margin-top:4px">⚠️ 作帳</div>
+          </div>
+          <!-- Apr -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">4月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- May -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">5月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Jun (Q2 end) -->
+          <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.25);border-radius:10px;padding:10px;text-align:center;position:relative">
+            <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:rgba(255,61,90,.8);color:#fff;font-family:'Share Tech Mono',monospace;font-size:.55rem;padding:1px 6px;border-radius:8px;white-space:nowrap">Q2季底</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--red);font-weight:700;margin-bottom:4px">6月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">後2週</div>
+            <div style="font-size:.62rem;color:var(--red);margin-top:4px">⚠️ 作帳</div>
+          </div>
+          <!-- Jul -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">7月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Aug -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">8月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Sep (Q3 end) -->
+          <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.25);border-radius:10px;padding:10px;text-align:center;position:relative">
+            <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:rgba(255,61,90,.8);color:#fff;font-family:'Share Tech Mono',monospace;font-size:.55rem;padding:1px 6px;border-radius:8px;white-space:nowrap">Q3季底</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--red);font-weight:700;margin-bottom:4px">9月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">後2週</div>
+            <div style="font-size:.62rem;color:var(--red);margin-top:4px">⚠️ 作帳</div>
+          </div>
+          <!-- Oct -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">10月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Nov -->
+          <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700;margin-bottom:4px">11月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">非季底</div>
+            <div style="font-size:.62rem;color:var(--green);margin-top:4px">✅ 可信</div>
+          </div>
+          <!-- Dec (Q4 end) -->
+          <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.25);border-radius:10px;padding:10px;text-align:center;position:relative">
+            <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:rgba(255,61,90,.8);color:#fff;font-family:'Share Tech Mono',monospace;font-size:.55rem;padding:1px 6px;border-radius:8px;white-space:nowrap">Q4季底</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--red);font-weight:700;margin-bottom:4px">12月</div>
+            <div style="font-size:.68rem;color:var(--text-dim);line-height:1.5">後2週</div>
+            <div style="font-size:.62rem;color:var(--red);margin-top:4px">⚠️ 作帳</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:.75rem;color:var(--text-faint);line-height:1.6">※ 「季底後兩週」指每季最後一個月的最後10個交易日，這段時間投信買超可能帶有作帳成分，需搭配外資方向確認。</div>
+      </div>
 
       <div class="signal-grid">
         <div class="signal-card">
@@ -2872,6 +3159,170 @@
           <div class="insight-label">協同背離的最強買點</div>
           <div class="insight-text">三大法人協同買超 + 股價仍在跌 + 融資餘額快速下降（弱手出清） — 這三個條件同時出現，是<strong>台股歷史上勝率最高的低接訊號組合</strong>。不一定在最低點，但往往能在底部附近3～5% 的區間內進場，中期報酬風險比極佳。</div>
         </div>
+      </div>
+
+      <!-- NEW: Triple divergence SVG visualization -->
+      <div class="svg-chart-wrap" style="padding:0;margin-top:20px">
+        <div style="padding:14px 18px 8px;font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--red);opacity:.85;text-transform:uppercase">🔴 三重頂部背離結構圖（最危險型態）</div>
+        <svg viewBox="0 0 740 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+          <rect width="740" height="240" fill="rgba(0,0,0,.2)"/>
+
+          <!-- Phase labels at top -->
+          <rect x="84" y="8" width="135" height="16" rx="4" fill="rgba(0,229,255,.07)" stroke="rgba(0,229,255,.2)" stroke-width="1"/>
+          <text x="151" y="19" text-anchor="middle" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">① 正常漲升期</text>
+          <rect x="240" y="8" width="175" height="16" rx="4" fill="rgba(255,214,0,.07)" stroke="rgba(255,214,0,.25)" stroke-width="1"/>
+          <text x="327" y="19" text-anchor="middle" fill="rgba(255,214,0,.75)" font-family="Share Tech Mono,monospace" font-size="7.5">② 背離期（法人出貨）</text>
+          <rect x="435" y="8" width="145" height="16" rx="4" fill="rgba(255,61,90,.08)" stroke="rgba(255,61,90,.25)" stroke-width="1"/>
+          <text x="507" y="19" text-anchor="middle" fill="rgba(255,61,90,.75)" font-family="Share Tech Mono,monospace" font-size="7.5">③ 崩跌期</text>
+          <rect x="600" y="8" width="130" height="16" rx="4" fill="rgba(178,102,255,.07)" stroke="rgba(178,102,255,.2)" stroke-width="1"/>
+          <text x="665" y="19" text-anchor="middle" fill="rgba(178,102,255,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">④ 底部吸籌期</text>
+
+          <!-- Grid -->
+          <line x1="80" y1="185" x2="720" y2="185" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <line x1="80" y1="140" x2="720" y2="140" stroke="rgba(255,255,255,.04)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Vertical phase dividers -->
+          <line x1="238" y1="25" x2="238" y2="200" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="433" y1="25" x2="433" y2="200" stroke="rgba(255,61,90,.2)" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <line x1="598" y1="25" x2="598" y2="200" stroke="rgba(178,102,255,.2)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Stock price: rises, peaks in zone 2, crashes in zone 3, bottoms in zone 4 -->
+          <polyline points="84,175 120,158 155,140 192,118 228,98 264,88 300,82 336,80 372,84 408,92 444,108 480,128 516,152 552,170 588,175 624,168 660,160 696,155"
+            fill="none" stroke="rgba(0,229,255,.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Foreign investor (法人): buys in zone 1, sells in zone 2, buys in zone 4 -->
+          <!-- Zone 1: buy bars -->
+          <rect x="90"  y="155" width="16" height="30" rx="2" fill="rgba(0,230,118,.5)"/>
+          <rect x="115" y="148" width="16" height="37" rx="2" fill="rgba(0,230,118,.5)"/>
+          <rect x="140" y="155" width="16" height="30" rx="2" fill="rgba(0,230,118,.45)"/>
+          <rect x="165" y="150" width="16" height="35" rx="2" fill="rgba(0,230,118,.5)"/>
+          <rect x="192" y="160" width="16" height="25" rx="2" fill="rgba(0,230,118,.4)"/>
+          <rect x="218" y="155" width="16" height="30" rx="2" fill="rgba(0,230,118,.4)"/>
+          <!-- Zone 2: sell bars (red) — growing -->
+          <rect x="248" y="162" width="16" height="23" rx="2" fill="rgba(255,61,90,.4)"/>
+          <rect x="275" y="155" width="16" height="30" rx="2" fill="rgba(255,61,90,.5)"/>
+          <rect x="302" y="150" width="16" height="35" rx="2" fill="rgba(255,61,90,.55)"/>
+          <rect x="328" y="145" width="16" height="40" rx="2" fill="rgba(255,61,90,.6)"/>
+          <rect x="355" y="142" width="16" height="43" rx="2" fill="rgba(255,61,90,.65)"/>
+          <rect x="382" y="138" width="16" height="47" rx="2" fill="rgba(255,61,90,.7)"/>
+          <rect x="408" y="135" width="16" height="50" rx="2" fill="rgba(255,61,90,.72)"/>
+          <!-- Zone 3: neutral -->
+          <!-- Zone 4: buy again -->
+          <rect x="610" y="155" width="16" height="30" rx="2" fill="rgba(0,230,118,.45)"/>
+          <rect x="638" y="150" width="16" height="35" rx="2" fill="rgba(0,230,118,.5)"/>
+          <rect x="666" y="145" width="16" height="40" rx="2" fill="rgba(0,230,118,.55)"/>
+          <rect x="694" y="140" width="16" height="45" rx="2" fill="rgba(0,230,118,.6)"/>
+
+          <!-- Warning zone shading -->
+          <rect x="238" y="25" width="195" height="175" fill="rgba(255,61,90,.03)"/>
+
+          <!-- Peak marker -->
+          <circle cx="336" cy="80" r="5" fill="none" stroke="rgba(255,61,90,.7)" stroke-width="1.5"/>
+          <text x="336" y="72" text-anchor="middle" fill="rgba(255,61,90,.85)" font-family="Share Tech Mono,monospace" font-size="7.5">峰頂</text>
+
+          <!-- Bottom marker -->
+          <circle cx="588" cy="175" r="5" fill="none" stroke="rgba(0,230,118,.7)" stroke-width="1.5"/>
+          <text x="588" y="200" text-anchor="middle" fill="rgba(0,230,118,.85)" font-family="Share Tech Mono,monospace" font-size="7.5">底部</text>
+
+          <!-- Annotation: danger zone -->
+          <rect x="248" y="68" width="80" height="15" rx="4" fill="rgba(255,61,90,.12)" stroke="rgba(255,61,90,.35)" stroke-width="1"/>
+          <text x="288" y="79" text-anchor="middle" fill="rgba(255,61,90,.9)" font-family="Share Tech Mono,monospace" font-size="7.5" font-weight="700">散戶接刀區！</text>
+
+          <!-- Legend at bottom -->
+          <rect x="84" y="210" width="9" height="8" rx="2" fill="rgba(0,229,255,.65)"/>
+          <text x="98" y="218" fill="rgba(0,229,255,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">股價</text>
+          <rect x="145" y="210" width="9" height="8" rx="2" fill="rgba(0,230,118,.55)"/>
+          <text x="159" y="218" fill="rgba(0,230,118,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">法人買超</text>
+          <rect x="228" y="210" width="9" height="8" rx="2" fill="rgba(255,61,90,.65)"/>
+          <text x="242" y="218" fill="rgba(255,61,90,.7)" font-family="Share Tech Mono,monospace" font-size="7.5">法人賣超（頂部背離）</text>
+          <text x="430" y="218" fill="rgba(255,214,0,.65)" font-family="Share Tech Mono,monospace" font-size="7.5">╌╌ 頂部背離觸發期間</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──── NEW SEC 5.5: 背離判讀常見錯誤大全 ──── -->
+  <div class="section-card reveal">
+    <div class="section-header">
+      <div class="section-num">09—05.5</div>
+      <div class="section-title">背離判讀：五大常見錯誤 × 正確做法</div>
+      <div class="section-icon">⚠️</div>
+    </div>
+    <div class="section-body">
+      <p class="prose">背離訊號是強大的工具，但也是被誤用最多的工具之一。以下是台股投資人在判讀法人背離時最常犯的五個錯誤，每個都有清楚的「正確做法」對照。</p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0">
+
+        <!-- Error 1 -->
+        <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18)">
+          <div style="background:rgba(255,61,90,.06);padding:12px 16px;border-bottom:1px solid rgba(255,61,90,.1)">
+            <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--red)">❌ 錯誤一：看到外資「昨天」賣超就認為是背離</div>
+          </div>
+          <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.7">單日賣超可能是資金調度、ETF 調整，或純粹的短線獲利了結。<strong style="color:var(--red)">1～2 天的背離是雜訊，不是訊號。</strong></div>
+            <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確做法</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.65">需累積 <strong style="color:var(--green)">3 日以上</strong>同方向才算初步確認；5日以上才採取行動；8日法則才是強訊號。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error 2 -->
+        <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18)">
+          <div style="background:rgba(255,61,90,.06);padding:12px 16px;border-bottom:1px solid rgba(255,61,90,.1)">
+            <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--red)">❌ 錯誤二：3月/6月/9月/12月看到投信大買就以為看多</div>
+          </div>
+          <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.7">季底作帳期的投信買超可能只是為了拉抬持股淨值，讓基金績效好看，<strong style="color:var(--red)">並非真實看好</strong>，季底結束後往往反向賣出。</div>
+            <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確做法</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.65">先確認是否在 3/6/9/12 月的後兩週。若是，需外資同步買超才提升訊號可信度。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error 3 -->
+        <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18)">
+          <div style="background:rgba(255,61,90,.06);padding:12px 16px;border-bottom:1px solid rgba(255,61,90,.1)">
+            <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--red)">❌ 錯誤三：看到自營商「合計」大買超就追進</div>
+          </div>
+          <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.7">自營商合計包含避險帳戶，若個股有大量認購權證，避險帳戶的買超是<strong style="color:var(--red)">機械對沖，不是方向判斷</strong>。合計數字完全失真。</div>
+            <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確做法</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.65">只看「自行帳戶」的數字。確認個股無大量認購/認售權證發行才能使用合計數字。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error 4 -->
+        <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18)">
+          <div style="background:rgba(255,61,90,.06);padding:12px 16px;border-bottom:1px solid rgba(255,61,90,.1)">
+            <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--red)">❌ 錯誤四：底部背離剛出現就全倉進場</div>
+          </div>
+          <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.7">法人開始買不代表馬上見底。吃貨可以持續 2～4 週，期間股價可能繼續下跌，<strong style="color:var(--red)">全倉進場可能面臨短期套牢</strong>。</div>
+            <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確做法</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.65">分批進場（1/3 → 1/3 → 1/3），等 K 線出現底部型態或量縮打底後再加碼，降低成本風險。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error 5 -->
+        <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,61,90,.18)">
+          <div style="background:rgba(255,61,90,.06);padding:12px 16px;border-bottom:1px solid rgba(255,61,90,.1)">
+            <div style="font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--red)">❌ 錯誤五：不看融資，只看法人</div>
+          </div>
+          <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="font-size:.82rem;color:var(--text-dim);line-height:1.7">融資餘額是散戶槓桿部位的指標。頂部背離時若融資還在高位，<strong style="color:var(--red)">代表弱手還沒出清</strong>，底部尚未確認。</div>
+            <div style="background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;padding:10px">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--green);margin-bottom:4px">✅ 正確做法</div>
+              <div style="font-size:.78rem;color:var(--text-dim);line-height:1.65">底部確認三件套：法人連買 ≥5日 + 融資快速下降 + 成交量萎縮。三者齊備，勝率顯著提升。</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -3136,7 +3587,8 @@
   </div>
 
     <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3146,6 +3598,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3349,7 +3802,7 @@ window.answerQ = function(qid, el, choice) {
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

@@ -2159,6 +2159,61 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    
+    /* ── 資料類型卡片 day mode ── */
+    body.theme-day div[style*="border-radius:14px;padding:16px"] > div:nth-child(2) {
+      color: #0a1828 !important;
+    }
+    body.theme-day div[style*="border:1px solid rgba(0,229,255,.18)"] > div:nth-child(2) { color: #0a2040 !important; }
+    body.theme-day div[style*="border:1px solid rgba(178,102,255,.18)"] > div:nth-child(2) { color: #280a40 !important; }
+    body.theme-day div[style*="border:1px solid rgba(255,214,0,.18)"] > div:nth-child(2) { color: #3a2800 !important; }
+    body.theme-day div[style*="border:1px solid rgba(255,110,180,.18)"] > div:nth-child(2) { color: #38001a !important; }
+    /* Also fix insight-box white spans */
+    body.theme-day .insight-box span[style*="color:#fff"] { color: #0a1828 !important; }
+    body.theme-day .insight-text strong[style*="color:#fff"],
+    body.theme-day .insight-text > span[style*="color:#fff"] { color: #0a2040 !important; }
+
+    body.theme-day .card-data-title { color: #0a1828 !important; }
+
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2246,8 +2301,8 @@
         <!-- Bar chart base -->
         <rect x="8" y="52" width="8" height="14" rx="2" fill="rgba(0,229,255,0.15)" stroke="rgba(0,229,255,0.4)" stroke-width="1.2"/>
         <rect x="20" y="42" width="8" height="24" rx="2" fill="rgba(0,229,255,0.22)" stroke="rgba(0,229,255,0.5)" stroke-width="1.2"/>
-        <rect x="32" y="34" width="8" height="32" rx="2" fill="rgba(0,230,118,0.2)" stroke="rgba(0,230,118,0.5)" stroke-width="1.2"/>
-        <rect x="44" y="28" width="8" height="38" rx="2" fill="rgba(0,230,118,0.28)" stroke="rgba(0,230,118,0.6)" stroke-width="1.2"/>
+        <rect x="32" y="34" width="8" height="32" rx="2" fill="rgba(0,230,118,0.8)" stroke="rgba(0,230,118,0.5)" stroke-width="1.2"/>
+        <rect x="44" y="28" width="8" height="38" rx="2" fill="rgba(0,230,118,0.8)" stroke="rgba(0,230,118,0.6)" stroke-width="1.2"/>
         <!-- Magnifying glass -->
         <circle cx="50" cy="22" r="14" fill="rgba(0,229,255,0.04)" stroke="#00e5ff" stroke-width="2"/>
         <circle cx="50" cy="22" r="9" fill="rgba(0,229,255,0.06)" stroke="rgba(0,229,255,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
@@ -2294,7 +2349,8 @@
   <!-- SEC 1：什麼是籌碼 -->
   <!-- ─────────────────────────────────────── -->
     <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2304,6 +2360,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 <div class="section-card" id="sec1">
     <div class="card-header">
@@ -2372,7 +2429,7 @@
               <!-- Background -->
               <rect width="160" height="100" fill="rgba(0,0,0,0.2)" rx="8"/>
               <!-- Big holder block -->
-              <rect x="10" y="20" width="100" height="30" rx="5" fill="rgba(0,230,118,0.18)" stroke="rgba(0,230,118,0.6)" stroke-width="1.2"/>
+              <rect x="10" y="20" width="100" height="30" rx="5" fill="rgba(0,230,118,0.8)" stroke="rgba(0,230,118,0.6)" stroke-width="1.2"/>
               <text x="60" y="40" text-anchor="middle" fill="#00e676" font-family="Share Tech Mono" font-size="9" font-weight="700">主力 / 法人  72%</text>
               <!-- Small holders -->
               <rect x="10" y="58" width="15" height="16" rx="3" fill="rgba(0,229,255,0.1)" stroke="rgba(0,229,255,0.35)" stroke-width="1"/>
@@ -2457,7 +2514,7 @@
 
         <div style="background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,80,150,.03));border:1px solid rgba(0,229,255,.18);border-radius:14px;padding:16px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);margin-bottom:10px;opacity:.8">資料類型 01</div>
-          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px">三大法人買賣超</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px" class="card-data-title">三大法人買賣超</div>
           <div style="font-size:.8rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px">外資、投信、自營商每日進出金額。每個交易日收盤後公告，是最即時的法人動向指標。</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:6px;color:var(--accent)">每日更新</span>
@@ -2468,7 +2525,7 @@
 
         <div style="background:linear-gradient(135deg,rgba(178,102,255,.06),rgba(80,0,150,.03));border:1px solid rgba(178,102,255,.18);border-radius:14px;padding:16px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--purple);margin-bottom:10px;opacity:.8">資料類型 02</div>
-          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px">集保庫存分級</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px" class="card-data-title">集保庫存分級</div>
           <div style="font-size:.8rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px">依持股數量分層（1-9張、10-199張、200-999張、1000張以上）的持股人數與持股比例，每週更新一次。</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 8px;background:rgba(178,102,255,.08);border:1px solid rgba(178,102,255,.2);border-radius:6px;color:var(--purple)">每週更新</span>
@@ -2479,7 +2536,7 @@
 
         <div style="background:linear-gradient(135deg,rgba(255,214,0,.06),rgba(150,100,0,.03));border:1px solid rgba(255,214,0,.18);border-radius:14px;padding:16px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--yellow);margin-bottom:10px;opacity:.8">資料類型 03</div>
-          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px">融資融券餘額</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px" class="card-data-title">融資融券餘額</div>
           <div style="font-size:.8rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px">融資是散戶借錢做多、融券是做空的張數。融資增加 = 散戶看漲情緒升溫；融券增加 = 做空力道。每日公告。</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 8px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);border-radius:6px;color:var(--yellow)">每日更新</span>
@@ -2490,7 +2547,7 @@
 
         <div style="background:linear-gradient(135deg,rgba(255,110,180,.06),rgba(150,0,80,.03));border:1px solid rgba(255,110,180,.18);border-radius:14px;padding:16px">
           <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--pink);margin-bottom:10px;opacity:.8">資料類型 04</div>
-          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px">借券賣出</div>
+          <div style="font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:8px" class="card-data-title">借券賣出</div>
           <div style="font-size:.8rem;color:var(--text-dim);line-height:1.7;margin-bottom:10px">大股東或法人將持股「借出」讓人做空。借券賣出量大增往往是機構看空的警訊，與融券不同，借券門檻更高。</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span style="font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:3px 8px;background:rgba(255,110,180,.08);border:1px solid rgba(255,110,180,.2);border-radius:6px;color:var(--pink)">每日更新</span>
@@ -2863,7 +2920,7 @@
           <line x1="0" y1="120" x2="560" y2="120" stroke="rgba(0,229,255,0.05)" stroke-width="1"/>
           <!-- Phase divider: 籌碼建倉 -->
           <line x1="180" y1="10" x2="180" y2="150" stroke="rgba(0,230,118,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
-          <text x="90" y="18" text-anchor="middle" fill="rgba(0,230,118,0.6)" font-family="Share Tech Mono" font-size="9">籌碼建倉期</text>
+          <text x="90" y="18" text-anchor="middle" fill="rgba(0,230,118,0.8)" font-family="Share Tech Mono" font-size="9">籌碼建倉期</text>
           <!-- Phase divider: K線突破 -->
           <line x1="360" y1="10" x2="360" y2="150" stroke="rgba(0,229,255,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
           <text x="270" y="18" text-anchor="middle" fill="rgba(255,214,0,0.6)" font-family="Share Tech Mono" font-size="9">蠢動期</text>
@@ -2882,8 +2939,8 @@
           <text x="364" y="85" fill="rgba(0,229,255,0.8)" font-family="Share Tech Mono" font-size="8">↑K線才動</text>
           <!-- Time axis -->
           <line x1="20" y1="148" x2="540" y2="148" stroke="rgba(0,229,255,0.15)" stroke-width="1"/>
-          <text x="20" y="158" fill="rgba(0,229,255,0.35)" font-family="Share Tech Mono" font-size="8">第1週</text>
-          <text x="480" y="158" fill="rgba(0,229,255,0.35)" font-family="Share Tech Mono" font-size="8">第13週</text>
+          <text x="20" y="158" fill="rgba(0,229,255,0.75)" font-family="Share Tech Mono" font-size="8">第1週</text>
+          <text x="480" y="158" fill="rgba(0,229,255,0.75)" font-family="Share Tech Mono" font-size="8">第13週</text>
         </svg>
       </div>
 
@@ -3484,7 +3541,8 @@
   </div>
 
     <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3494,6 +3552,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3724,7 +3783,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 

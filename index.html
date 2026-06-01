@@ -1160,7 +1160,7 @@
     /* ── TWO-COL BOTTOM SECTION ── */
     .bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr;
       gap: 20px;
       align-items: start;
     }
@@ -3024,35 +3024,62 @@
     /* 主題切換按鈕組 */
     .theme-switcher {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
     .theme-btn {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      gap: 6px;
-      padding: 10px 14px;
-      border-radius: 12px;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 14px;
       border: 1px solid rgba(0,229,255,.15);
       background: rgba(0,229,255,.04);
       color: var(--text-dim);
       cursor: pointer;
-      transition: all .22s;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .6rem;
-      letter-spacing: .06em;
-      min-width: 72px;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      min-width: 130px;
+      position: relative;
+      overflow: hidden;
     }
-    .theme-btn svg { width: 20px; height: 20px; opacity: .7; transition: opacity .2s; }
-    .theme-btn:hover { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.3); color: var(--text); }
+    .theme-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,229,255,.06), transparent 60%);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .theme-btn:hover::before { opacity: 1; }
+    .theme-btn .theme-btn-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: rgba(0,229,255,.08);
+      transition: all .25s;
+    }
+    .theme-btn svg { width: 17px; height: 17px; opacity: .8; transition: all .2s; }
+    .theme-btn-text { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+    .theme-btn-label { font-size: .8rem; font-weight: 600; line-height: 1; }
+    .theme-btn-sub { font-size: .64rem; color: var(--text-faint); font-family: "Share Tech Mono", monospace; letter-spacing: .04em; }
+    .theme-btn:hover { background: rgba(0,229,255,.07); border-color: rgba(0,229,255,.28); color: var(--text); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,229,255,.1); }
+    .theme-btn:hover .theme-btn-icon { background: rgba(0,229,255,.14); }
     .theme-btn:hover svg { opacity: 1; }
     .theme-btn.active {
-      background: rgba(0,229,255,.12);
-      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(0,229,255,.13), rgba(0,150,200,.07));
+      border-color: rgba(0,229,255,.5);
       color: var(--accent);
-      box-shadow: 0 0 14px rgba(0,229,255,.2);
+      box-shadow: 0 0 20px rgba(0,229,255,.18), inset 0 1px 0 rgba(0,229,255,.15);
     }
+    .theme-btn.active .theme-btn-icon { background: rgba(0,229,255,.2); box-shadow: 0 0 10px rgba(0,229,255,.25); }
     .theme-btn.active svg { opacity: 1; }
+    .theme-btn.active .theme-btn-sub { color: rgba(0,229,255,.6); }
 
     /* ── 維護模式遮罩 ── */
     #maintenanceOverlay {
@@ -5141,6 +5168,7 @@
 
 
 <!-- ── AdSense 廣告位：主頁 — 查詢結果下方、大盤資訊上方 ── -->
+<!-- AdSense 審核通過後啟用
 <div class="ad-unit ad-unit-gap">
   <p class="ad-unit-label">贊助商廣告</p>
   <ins class="adsbygoogle"
@@ -5151,6 +5179,7 @@
        data-full-width-responsive="true"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
+-->
 <hr class="ad-divider">
   <div style="height:50px"></div>
 
@@ -5284,6 +5313,7 @@
 
 
 <!-- ── AdSense 廣告位：主頁 — 大盤資訊卡片下方 ── -->
+<!-- AdSense 審核通過後啟用
 <div class="ad-unit ad-unit-gap">
   <p class="ad-unit-label">贊助商廣告</p>
   <ins class="adsbygoogle"
@@ -5294,6 +5324,7 @@
        data-full-width-responsive="true"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
+-->
 <hr class="ad-divider">
   <!-- BOTTOM: TIMELINE + DATA NOTE -->
   <div class="bottom-grid">
@@ -5315,17 +5346,7 @@
       <ul class="timeline-list" id="timeline"></ul>
     </div>
 
-    <div class="data-note" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;">
-      <!-- ── AdSense 廣告位：主頁 — 數據說明欄（右側區塊） ── -->
-      <p class="ad-unit-label" style="margin-bottom:8px">贊助商廣告</p>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-8975741363002226"
-           data-ad-slot="2551810594"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
+
 
   </div>
 
@@ -7519,16 +7540,26 @@ function openSettingsModal() {
           </div>
           <div class="theme-switcher" style="margin-top:14px;">
             <button class="theme-btn ${curTheme === 'space' ? 'active' : ''}" data-theme="space" onclick="setTheme('space')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-              </svg>
-              太空星際
+              <div class="theme-btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+              </div>
+              <div class="theme-btn-text">
+                <span class="theme-btn-label">太空星際</span>
+                <span class="theme-btn-sub">SPACE MODE</span>
+              </div>
             </button>
             <button class="theme-btn ${curTheme === 'day' ? 'active' : ''}" data-theme="day" onclick="setTheme('day')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-              </svg>
-              白天晴空
+              <div class="theme-btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              </div>
+              <div class="theme-btn-text">
+                <span class="theme-btn-label">白天晴空</span>
+                <span class="theme-btn-sub">DAY MODE</span>
+              </div>
             </button>
           </div>
         </div>
@@ -7635,14 +7666,26 @@ async function adminToggleMaintenance(enable) {
             </div></div>
             <div class="theme-switcher" style="margin-top:14px;">
               <button class="theme-btn ${curTheme === 'space' ? 'active' : ''}" data-theme="space" onclick="setTheme('space')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-                </svg>太空星際
+                <div class="theme-btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                  </svg>
+                </div>
+                <div class="theme-btn-text">
+                  <span class="theme-btn-label">太空星際</span>
+                  <span class="theme-btn-sub">SPACE MODE</span>
+                </div>
               </button>
               <button class="theme-btn ${curTheme === 'day' ? 'active' : ''}" data-theme="day" onclick="setTheme('day')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                </svg>白天晴空
+                <div class="theme-btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                  </svg>
+                </div>
+                <div class="theme-btn-text">
+                  <span class="theme-btn-label">白天晴空</span>
+                  <span class="theme-btn-sub">DAY MODE</span>
+                </div>
               </button>
             </div>
           </div>

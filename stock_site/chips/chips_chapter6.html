@@ -2223,6 +2223,70 @@
     "isPartOf": {"@type": "Book", "name": "JellyStock 籌碼分析教學", "url": "https://jellystockdata.com"}
   }
   </script>
+  <style>
+    
+    /* ── 軋空生命週期圖 day mode ── */
+    /* 底層背景 rect */
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,0,0,.25)"] { fill: rgba(220,238,252,.5) !important; }
+    /* 五個階段卡片 */
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(255,61,90,.12)"]   { fill: rgba(200,50,40,.08) !important;  stroke: rgba(180,40,30,.5) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(255,214,0,.1)"]    { fill: rgba(160,110,0,.08) !important;  stroke: rgba(150,100,0,.45) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,229,255,.1)"]    { fill: rgba(18,90,170,.08) !important;  stroke: rgba(18,90,170,.45) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(178,102,255,.11)"] { fill: rgba(90,50,190,.08) !important;  stroke: rgba(90,50,190,.4) !important; }
+    body.theme-day .svg-chart-wrap svg rect[fill="rgba(0,230,118,.1)"]    { fill: rgba(15,130,55,.08) !important;  stroke: rgba(15,130,55,.45) !important; }
+    /* 面積填充 polygon */
+    body.theme-day .svg-chart-wrap svg polygon[fill="rgba(0,229,255,.05)"] { fill: rgba(18,90,170,.06) !important; }
+    /* 分隔線 */
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(0,229,255,.08)"] { stroke: rgba(18,90,170,.2) !important; }
+    /* 垂直虛線 */
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(255,214,0,.12)"]   { stroke: rgba(140,100,0,.25) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(0,229,255,.12)"]   { stroke: rgba(18,90,170,.25) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(178,102,255,.12)"] { stroke: rgba(90,50,190,.25) !important; }
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(0,230,118,.12)"]   { stroke: rgba(15,130,55,.25) !important; }
+    /* Y軸線 */
+    body.theme-day .svg-chart-wrap svg line[stroke="rgba(0,229,255,.18)"] { stroke: rgba(18,90,170,.3) !important; }
+    /* 曲線主線 */
+    body.theme-day .svg-chart-wrap svg polyline[stroke="#00e5ff"] { stroke: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg polyline[stroke-width="7"] { stroke: #1265a8 !important; opacity:.05 !important; }
+
+    /* ═══ ENHANCED DAY MODE SVG FIX v3 ═══
+       Fixes axis labels, footnotes, and subtitle text that remain too faint on white bg
+    ══════════════════════════════════════ */
+    body.theme-day .svg-chart-wrap svg text,
+    body.theme-day .svg-chart-wrap svg tspan {
+      fill: #1a3550 !important;
+      opacity: 1 !important;
+    }
+    /* Keep colored highlights meaningful */
+    body.theme-day .svg-chart-wrap svg text[fill="#00e5ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,229,255"] { fill: #1265a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#00e676"],
+    body.theme-day .svg-chart-wrap svg text[fill*="0,230,118"] { fill: #157a32 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff3d5a"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,61,90"] { fill: #c0200a !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ffd600"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,214,0"] { fill: #8a6000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#b266ff"],
+    body.theme-day .svg-chart-wrap svg text[fill*="178,102,255"] { fill: #5830a8 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff9800"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,152,0"] { fill: #a05000 !important; }
+    body.theme-day .svg-chart-wrap svg text[fill="#ff6eb4"],
+    body.theme-day .svg-chart-wrap svg text[fill*="255,110,180"] { fill: #a0306a !important; }
+    /* SVG rect dark bg → transparent on day */
+    body.theme-day .svg-chart-wrap svg rect[fill="#040b15"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#050c1a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#030a12"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#04080f"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#08060a"],
+    body.theme-day .svg-chart-wrap svg rect[fill="#040d18"] {
+      fill: rgba(220,238,252,0.5) !important;
+    }
+    /* SVG polyline/line strokes on day */
+    body.theme-day .svg-chart-wrap svg line[stroke*="255,255,255"],
+    body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
+      stroke: rgba(26,80,140,.25) !important;
+    }
+  </style>
 </head>
 <body spellcheck="false">
 <script>
@@ -2320,7 +2384,7 @@
         </rect>
         <!-- Danger threshold line -->
         <line x1="3" y1="30" x2="72" y2="30" stroke="#ff3d5a" stroke-width="1.4" stroke-dasharray="4,3" opacity=".9"/>
-        <text x="4" y="27" fill="#ff3d5a" font-size="5.5" font-family="Share Tech Mono,monospace" opacity=".9">130%</text>
+        <text x="4" y="27" fill="#ff5566" font-size="7.5" font-weight="700" font-family="Share Tech Mono,monospace" opacity=".9">130%</text>
         <!-- Up arrow = squeeze direction -->
         <polygon points="60.5,6 57,13 60.5,11 64,13" fill="#ff3d5a"/>
         <polygon points="60.5,6 57,13 60.5,11 64,13" fill="#ff3d5a" opacity=".4">
@@ -2345,7 +2409,8 @@
 
   <!-- ═══ SEC 1 ─ 融資融券是什麼 ═══ -->
     <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -2355,6 +2420,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 <div class="section-card reveal" id="sec1">
     <div class="section-header">
@@ -2419,7 +2485,7 @@
           <line x1="260" y1="61" x2="215" y2="100" stroke="rgba(255,61,90,.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
           <polygon points="215,100 220,90 225,98" fill="rgba(255,61,90,.5)"/>
           <line x1="400" y1="61" x2="445" y2="100" stroke="rgba(0,230,118,.5)" stroke-width="1.2" stroke-dasharray="4,3"/>
-          <polygon points="445,100 440,90 450,93" fill="rgba(0,230,118,.5)"/>
+          <polygon points="445,100 440,90 450,93" fill="rgba(0,230,118,.85)"/>
 
           <!-- Bottom labels -->
           <text x="122" y="175" fill="rgba(255,214,0,.6)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">槓桿倍數：×2.5  ·  利息成本：6–9%/年</text>
@@ -2655,86 +2721,100 @@
         </div>
       </div>
 
-      <!-- 軋空行情全流程 SVG -->
+      <!-- 軋空行情全流程 SVG — 卡片上半 / 曲線下半，完全不重疊 -->
       <div class="svg-chart-wrap" style="margin:24px 0;">
-        <svg width="100%" viewBox="0 0 660 260" xmlns="http://www.w3.org/2000/svg">
-          <rect width="660" height="260" fill="#040b15" rx="12"/>
-          <text x="330" y="22" fill="rgba(0,229,255,.75)" font-size="10.5" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">軋空行情 — 完整生命週期</text>
+        <svg width="100%" viewBox="0 0 660 340" xmlns="http://www.w3.org/2000/svg">
+          <rect width="660" height="340" fill="rgba(0,0,0,.18)" rx="12"/>
+          <text x="330" y="24" fill="#00e5ff" font-size="11" font-family="Share Tech Mono,monospace" text-anchor="middle" letter-spacing="2">軋空行情 — 完整生命週期</text>
 
-          <!-- Phase boxes -->
-          <!-- Phase 1: Accumulation -->
-          <rect x="30" y="35" width="115" height="80" rx="8" fill="rgba(255,61,90,.07)" stroke="rgba(255,61,90,.3)" stroke-width="1.2"/>
-          <text x="87" y="53" fill="#ff3d5a" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">① 空頭累積期</text>
-          <text x="87" y="68" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">融券持續增加</text>
-          <text x="87" y="82" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">券資比攀升</text>
-          <text x="87" y="96" fill="rgba(255,180,180,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">空頭自信滿滿</text>
-          <text x="87" y="108" fill="#ff3d5a" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【彈藥填充期】</text>
+          <!-- ── 上半部：五個階段卡片（y=38 ~ y=148，高110px，曲線從y=168才開始） ── -->
+
+          <!-- Phase 1: 空頭累積期 -->
+          <rect x="18" y="38" width="113" height="110" rx="8" fill="rgba(255,61,90,.12)" stroke="rgba(255,61,90,.55)" stroke-width="1.5"/>
+          <text x="74" y="56" fill="#ff3d5a" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">① 空頭累積期</text>
+          <text x="74" y="72" fill="rgba(255,200,200,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">融券持續增加</text>
+          <text x="74" y="85" fill="rgba(255,200,200,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">券資比攀升</text>
+          <text x="74" y="98" fill="rgba(255,200,200,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">空頭自信滿滿</text>
+          <text x="74" y="114" fill="#ff5566" font-size="7.5" font-weight="700" font-family="Share Tech Mono,monospace" text-anchor="middle">【彈藥填充期】</text>
 
           <!-- Arrow 1→2 -->
-          <line x1="145" y1="75" x2="163" y2="75" stroke="rgba(255,214,0,.5)" stroke-width="1.5"/>
-          <polygon points="163,75 156,71 156,79" fill="rgba(255,214,0,.5)"/>
+          <line x1="131" y1="93" x2="147" y2="93" stroke="rgba(255,214,0,.8)" stroke-width="1.8"/>
+          <polygon points="147,93 141,89.5 141,96.5" fill="rgba(255,214,0,.85)"/>
 
-          <!-- Phase 2: Catalyst -->
-          <rect x="163" y="35" width="115" height="80" rx="8" fill="rgba(255,214,0,.06)" stroke="rgba(255,214,0,.3)" stroke-width="1.2"/>
-          <text x="220" y="53" fill="#ffd600" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">② 催化劑出現</text>
-          <text x="220" y="68" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">利多消息/業績</text>
-          <text x="220" y="82" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">法人突然買超</text>
-          <text x="220" y="96" fill="rgba(255,240,150,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">股價開始上漲</text>
-          <text x="220" y="108" fill="#ffd600" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【引信點燃】</text>
+          <!-- Phase 2: 催化劑出現 -->
+          <rect x="149" y="38" width="113" height="110" rx="8" fill="rgba(255,214,0,.1)" stroke="rgba(255,214,0,.55)" stroke-width="1.5"/>
+          <text x="205" y="56" fill="#ffd600" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">② 催化劑出現</text>
+          <text x="205" y="72" fill="rgba(255,245,180,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">利多消息/業績</text>
+          <text x="205" y="85" fill="rgba(255,245,180,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">法人突然買超</text>
+          <text x="205" y="98" fill="rgba(255,245,180,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">股價開始上漲</text>
+          <text x="205" y="114" fill="#ffe040" font-size="7.5" font-weight="700" font-family="Share Tech Mono,monospace" text-anchor="middle">【引信點燃】</text>
 
           <!-- Arrow 2→3 -->
-          <line x1="278" y1="75" x2="296" y2="75" stroke="rgba(0,229,255,.5)" stroke-width="1.5"/>
-          <polygon points="296,75 289,71 289,79" fill="rgba(0,229,255,.5)"/>
+          <line x1="262" y1="93" x2="278" y2="93" stroke="rgba(0,229,255,.8)" stroke-width="1.8"/>
+          <polygon points="278,93 272,89.5 272,96.5" fill="rgba(0,229,255,.85)"/>
 
-          <!-- Phase 3: Small shorts cover -->
-          <rect x="296" y="35" width="115" height="80" rx="8" fill="rgba(0,229,255,.05)" stroke="rgba(0,229,255,.25)" stroke-width="1.2"/>
-          <text x="353" y="53" fill="#00e5ff" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">③ 小空頭回補</text>
-          <text x="353" y="68" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">止損紀律好者</text>
-          <text x="353" y="82" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">率先認賠回補</text>
-          <text x="353" y="96" fill="rgba(180,240,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">初段漲幅形成</text>
-          <text x="353" y="108" fill="#00e5ff" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【發射初段】</text>
+          <!-- Phase 3: 小空頭回補 -->
+          <rect x="280" y="38" width="113" height="110" rx="8" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.75)" stroke-width="1.8"/>
+          <text x="336" y="56" fill="#00e5ff" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">③ 小空頭回補</text>
+          <text x="336" y="72" fill="rgba(200,245,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">止損紀律好者</text>
+          <text x="336" y="85" fill="rgba(200,245,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">率先認賠回補</text>
+          <text x="336" y="98" fill="rgba(200,245,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">初段漲幅形成</text>
+          <text x="336" y="114" fill="#33ecff" font-size="7.5" font-weight="700" font-family="Share Tech Mono,monospace" text-anchor="middle">【發射初段】</text>
 
           <!-- Arrow 3→4 -->
-          <line x1="411" y1="75" x2="429" y2="75" stroke="rgba(178,102,255,.5)" stroke-width="1.5"/>
-          <polygon points="429,75 422,71 422,79" fill="rgba(178,102,255,.5)"/>
+          <line x1="393" y1="93" x2="409" y2="93" stroke="rgba(178,102,255,.8)" stroke-width="1.8"/>
+          <polygon points="409,93 403,89.5 403,96.5" fill="rgba(178,102,255,.85)"/>
 
-          <!-- Phase 4: Big shorts forced -->
-          <rect x="429" y="35" width="115" height="80" rx="8" fill="rgba(178,102,255,.06)" stroke="rgba(178,102,255,.3)" stroke-width="1.2"/>
-          <text x="486" y="53" fill="#b266ff" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">④ 大空頭強制</text>
-          <text x="486" y="68" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大部位虧損激增</text>
-          <text x="486" y="82" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">被迫高價回補</text>
-          <text x="486" y="96" fill="rgba(220,180,255,.65)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">噴出行情爆發</text>
-          <text x="486" y="108" fill="#b266ff" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">【主升段爆發】</text>
+          <!-- Phase 4: 大空頭強制 -->
+          <rect x="411" y="38" width="113" height="110" rx="8" fill="rgba(178,102,255,.11)" stroke="rgba(178,102,255,.55)" stroke-width="1.5"/>
+          <text x="467" y="56" fill="#b266ff" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">④ 大空頭強制</text>
+          <text x="467" y="72" fill="rgba(235,200,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">大部位虧損激增</text>
+          <text x="467" y="85" fill="rgba(235,200,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">被迫高價回補</text>
+          <text x="467" y="98" fill="rgba(235,200,255,.88)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">噴出行情爆發</text>
+          <text x="467" y="114" fill="#c280ff" font-size="7.5" font-weight="700" font-family="Share Tech Mono,monospace" text-anchor="middle">【主升段爆發】</text>
 
           <!-- Arrow 4→5 -->
-          <line x1="544" y1="75" x2="562" y2="75" stroke="rgba(0,230,118,.5)" stroke-width="1.5"/>
-          <polygon points="562,75 555,71 555,79" fill="rgba(0,230,118,.5)"/>
+          <line x1="524" y1="93" x2="540" y2="93" stroke="rgba(0,230,118,.8)" stroke-width="1.8"/>
+          <polygon points="540,93 534,89.5 534,96.5" fill="rgba(0,230,118,.85)"/>
 
-          <!-- Phase 5: End -->
-          <rect x="562" y="35" width="80" height="80" rx="8" fill="rgba(0,230,118,.05)" stroke="rgba(0,230,118,.22)" stroke-width="1.2"/>
-          <text x="602" y="58" fill="#00e676" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">⑤ 軋空</text>
-          <text x="602" y="72" fill="#00e676" font-size="8.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">結束</text>
-          <text x="602" y="88" fill="rgba(150,230,180,.6)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">融券歸零</text>
-          <text x="602" y="101" fill="rgba(150,230,180,.6)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">動力耗盡</text>
-          <text x="602" y="114" fill="rgba(255,61,90,.7)" font-size="7" font-family="Share Tech Mono,monospace" text-anchor="middle">⚠️ 風險反轉</text>
+          <!-- Phase 5: 軋空結束 -->
+          <rect x="542" y="38" width="100" height="110" rx="8" fill="rgba(0,230,118,.1)" stroke="rgba(0,230,118,.75)" stroke-width="1.8"/>
+          <text x="592" y="56" fill="#00e676" font-size="9.5" font-family="Share Tech Mono,monospace" text-anchor="middle" font-weight="700">⑤ 軋空結束</text>
+          <text x="592" y="72" fill="rgba(0,230,118,.95)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">融券歸零</text>
+          <text x="592" y="85" fill="rgba(0,230,118,.95)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">動力耗盡</text>
+          <text x="592" y="98" fill="rgba(255,61,90,.75)" font-size="7.5" font-family="Share Tech Mono,monospace" text-anchor="middle">⚠ 風險反轉</text>
 
-          <!-- Stock price curve - rises sharply from phase 2 onwards -->
-          <polyline points="30,220 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40"
-            fill="none" stroke="#00e5ff" stroke-width="2" opacity=".7"/>
-          <!-- Glow duplicate -->
-          <polyline points="30,220 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40"
-            fill="none" stroke="#00e5ff" stroke-width="5" opacity=".08"/>
+          <!-- ── 分隔線 ── -->
+          <line x1="18" y1="158" x2="642" y2="158" stroke="rgba(0,229,255,.08)" stroke-width="1"/>
 
-          <!-- Price axis label -->
-          <text x="18" y="225" fill="rgba(0,229,255,.5)" font-size="8" font-family="Share Tech Mono,monospace">股價</text>
-          <line x1="28" y1="140" x2="28" y2="230" stroke="rgba(0,229,255,.15)" stroke-width="1"/>
+          <!-- ── 下半部：股價曲線區域（y=168 ~ y=310）── -->
 
-          <!-- Area fill under curve -->
-          <polygon points="30,230 87,230 87,218 145,215 163,200 220,180 278,160 296,145 353,120 411,95 429,78 486,62 544,50 562,45 610,42 642,40 642,230"
-            fill="rgba(0,229,255,.04)"/>
+          <!-- Y 軸 -->
+          <line x1="38" y1="168" x2="38" y2="308" stroke="rgba(0,229,255,.18)" stroke-width="1"/>
+          <text x="28" y="304" fill="rgba(0,229,255,.55)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">股價</text>
 
-          <!-- Bottom time label -->
-          <text x="330" y="248" fill="rgba(255,255,255,.25)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">時間軸 →（從融券累積到軋空結束，典型週期 2–8 週）</text>
+          <!-- 面積填充（曲線以下） -->
+          <polygon points="38,308 74,308 131,306 205,300 262,290 280,282 336,260 393,232 411,214 467,192 524,174 542,170 592,168 640,167 640,308"
+            fill="rgba(0,229,255,.05)"/>
+
+          <!-- 股價曲線主線 -->
+          <polyline
+            points="38,308 74,306 131,302 205,294 262,280 280,270 336,248 393,222 411,204 467,188 524,174 542,170 592,168 640,167"
+            fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/>
+
+          <!-- 輝光副線 -->
+          <polyline
+            points="38,308 74,306 131,302 205,294 262,280 280,270 336,248 393,222 411,204 467,188 524,174 542,170 592,168 640,167"
+            fill="none" stroke="#00e5ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".06"/>
+
+          <!-- 各階段垂直虛線參考線 -->
+          <line x1="149" y1="162" x2="149" y2="308" stroke="rgba(255,214,0,.12)" stroke-width="1" stroke-dasharray="3,4"/>
+          <line x1="280" y1="162" x2="280" y2="270" stroke="rgba(0,229,255,.12)" stroke-width="1" stroke-dasharray="3,4"/>
+          <line x1="411" y1="162" x2="411" y2="204" stroke="rgba(178,102,255,.12)" stroke-width="1" stroke-dasharray="3,4"/>
+          <line x1="542" y1="162" x2="542" y2="170" stroke="rgba(0,230,118,.12)" stroke-width="1" stroke-dasharray="3,4"/>
+
+          <!-- 時間軸標籤 -->
+          <text x="330" y="328" fill="rgba(200,220,240,.55)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">時間軸 →（從融券累積到軋空結束，典型週期 2–8 週）</text>
         </svg>
       </div>
 
@@ -2847,7 +2927,7 @@
           <text x="402" y="147" fill="rgba(255,200,120,.65)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">配合法人買超，軋空機率最高</text>
 
           <!-- Notes row -->
-          <text x="330" y="185" fill="rgba(255,255,255,.25)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">※ 券資比需搭配融券絕對餘額判讀；小型股因融資少，券資比易失真</text>
+          <text x="330" y="185" fill="rgba(200,220,240,.62)" font-size="8" font-family="Share Tech Mono,monospace" text-anchor="middle">※ 券資比需搭配融券絕對餘額判讀；小型股因融資少，券資比易失真</text>
         </svg>
       </div>
 
@@ -3329,7 +3409,8 @@
   </div>
 
     <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <div class="ad-unit">
+  <!-- AdSense 審核通過後啟用
+<div class="ad-unit">
     <p class="ad-unit-label">贊助商廣告</p>
     <ins class="adsbygoogle"
          style="display:block"
@@ -3339,6 +3420,7 @@
          data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
+-->
   <hr class="ad-divider">
 
   <!-- CHAPTER FOOTER -->
@@ -3529,7 +3611,7 @@ window.answerQ = function(qid, el, choice) {
   function isFaintRgba(c) {
     if (!c) return false;
     const m = c.match(/rgba\(\d+,\s*\d+,\s*\d+,\s*([\d.]+)\)/);
-    return m && parseFloat(m[1]) <= 0.25;
+    return m && parseFloat(m[1]) <= 0.45;
   }
   function isDark(c) { return isDarkHex(c) || isDarkRgba(c); }
 
