@@ -11,25 +11,25 @@
 
   <!-- 功能頁面 -->
   <url>
-    <loc>https://jellystockdata.com/ma_finder.html</loc>
+    <loc>https://jellystockdata.com/stock_site/tools/ma_finder.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/disposal.html</loc>
+    <loc>https://jellystockdata.com/stock_site/news/disposal.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/news.html</loc>
+    <loc>https://jellystockdata.com/stock_site/news/news.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/notice.html</loc>
+    <loc>https://jellystockdata.com/stock_site/news/notice.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -37,61 +37,61 @@
 
   <!-- 技術分析教學 -->
   <url>
-    <loc>https://jellystockdata.com/features/chapter1.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter1.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter2.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter2.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter3.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter3.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter4.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter4.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter5.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter5.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter6.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter6.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter7.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter7.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter8.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter8.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter9.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter9.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/features/chapter10.html</loc>
+    <loc>https://jellystockdata.com/stock_site/features/chapter10.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -161,19 +161,19 @@
 
   <!-- 其他頁面 -->
   <url>
-    <loc>https://jellystockdata.com/about.html</loc>
+    <loc>https://jellystockdata.com/stock_site/legal/about.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/disclaimer.html</loc>
+    <loc>https://jellystockdata.com/stock_site/legal/disclaimer.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://jellystockdata.com/privacy.html</loc>
+    <loc>https://jellystockdata.com/stock_site/legal/privacy.html</loc>
     <lastmod>2026-05-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
