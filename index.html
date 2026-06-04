@@ -7373,14 +7373,20 @@ function _applySeoSectionTheme(theme) {
     el.style.color = isDay ? '#3a6080' : '#7a9ab8';
   });
 
-  // 功能介紹卡片（背景是 rgba(0,229,255,.04)）
-  sec.querySelectorAll('div[style*="border-radius:12px"]').forEach(el => {
+  // 功能介紹卡片（用 data attribute 確保切回太空時仍能找到）
+  sec.querySelectorAll('div[style*="rgba(0,229,255,.04)"]').forEach(el => {
+    if (!el.dataset.featureCard) el.dataset.featureCard = '1';
+  });
+  sec.querySelectorAll('div[data-feature-card]').forEach(el => {
     el.style.background = isDay
       ? 'rgba(255,255,255,.68)'
       : 'rgba(0,229,255,.04)';
     el.style.borderColor = isDay
       ? 'rgba(26,101,168,.18)'
       : 'rgba(0,229,255,.1)';
+    el.style.boxShadow = isDay ? '0 2px 12px rgba(26,80,160,.06)' : '';
+    el.style.backdropFilter = isDay ? 'blur(8px)' : '';
+    el.style.webkitBackdropFilter = isDay ? 'blur(8px)' : '';
     // 卡片內 h3
     const h3 = el.querySelector('h3');
     if (h3) h3.style.color = isDay ? '#0a1828' : '#fff';
@@ -7454,35 +7460,50 @@ function _applySeoIntroTheme(theme) {
     h1.style.webkitBackgroundClip = 'text';
     h1.style.webkitTextFillColor  = 'transparent';
     h1.style.backgroundClip       = 'text';
+    h1.style.color                = '';
   }
 
   // ── 描述段落 p（inline color:#8ab0c8） ──
-  intro.querySelectorAll('p[style*="color:#8ab0c8"]').forEach(p => {
-    p.style.color = isDay ? '#1a3a58' : '#8ab0c8';
+  intro.querySelectorAll('p').forEach(p => {
+    // 只改沒有 letter-spacing 的 p（排除 ABOUT THIS SITE 標籤）
+    if (!p.style.letterSpacing) {
+      p.style.color = isDay ? '#1a3a58' : '#8ab0c8';
+    }
   });
 
   // ── strong 標籤（inline color:#b0d4e8）──
-  intro.querySelectorAll('strong[style*="color:#b0d4e8"]').forEach(s => {
+  intro.querySelectorAll('strong').forEach(s => {
     s.style.color = isDay ? '#0a2d52' : '#b0d4e8';
   });
 
-  // ── 右側 span 標籤群 ──
-  // Cyan 標籤（外資買賣超 / 投信 / 自營商 / 融資借券 / 處置股 / 注意股）
+  // ── 右側 span 標籤群（用 data-tag-type 區分，避免 inline style 被改後 selector 失效）──
+  // 初次執行時標記 tag type（冪等）
   intro.querySelectorAll('span[style*="rgba(0,229,255,.08)"]').forEach(sp => {
+    if (!sp.dataset.tagType) sp.dataset.tagType = 'cyan';
+  });
+  intro.querySelectorAll('span[style*="rgba(140,100,255,.08)"]').forEach(sp => {
+    if (!sp.dataset.tagType) sp.dataset.tagType = 'purple';
+  });
+  intro.querySelectorAll('span[style*="rgba(0,230,118,.06)"]').forEach(sp => {
+    if (!sp.dataset.tagType) sp.dataset.tagType = 'green';
+  });
+
+  // Cyan 標籤
+  intro.querySelectorAll('span[data-tag-type="cyan"]').forEach(sp => {
     sp.style.background  = isDay ? 'rgba(13,110,168,.09)' : 'rgba(0,229,255,.08)';
     sp.style.borderColor = isDay ? 'rgba(13,110,168,.32)' : 'rgba(0,229,255,.2)';
     sp.style.color       = isDay ? '#0a4a82' : 'rgba(0,229,255,.8)';
   });
 
   // Purple 標籤（籌碼教學 / 技術分析教學）
-  intro.querySelectorAll('span[style*="rgba(140,100,255,.08)"]').forEach(sp => {
+  intro.querySelectorAll('span[data-tag-type="purple"]').forEach(sp => {
     sp.style.background  = isDay ? 'rgba(102,64,192,.09)' : 'rgba(140,100,255,.08)';
     sp.style.borderColor = isDay ? 'rgba(102,64,192,.35)' : 'rgba(140,100,255,.25)';
     sp.style.color       = isDay ? '#4a20b0' : 'rgba(160,130,255,.9)';
   });
 
   // Green 標籤（TWSE / TPEx / 每日自動更新）
-  intro.querySelectorAll('span[style*="rgba(0,230,118,.06)"]').forEach(sp => {
+  intro.querySelectorAll('span[data-tag-type="green"]').forEach(sp => {
     sp.style.background  = isDay ? 'rgba(21,122,50,.08)' : 'rgba(0,230,118,.06)';
     sp.style.borderColor = isDay ? 'rgba(21,122,50,.32)' : 'rgba(0,230,118,.2)';
     sp.style.color       = isDay ? '#0d5a28' : 'rgba(0,200,100,.9)';
