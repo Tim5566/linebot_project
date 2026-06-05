@@ -998,6 +998,34 @@
     .metric-value.warning  { color: var(--yellow); text-shadow: 0 0 12px rgba(255,214,0,.3); }
     .metric-value.neutral  { color: var(--text-dim); }
 
+    /* ── 重試倒數徽章 ── */
+    .metric-retry {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+      font-size: .62rem;
+      color: var(--yellow);
+      letter-spacing: .04em;
+      opacity: .85;
+    }
+    .metric-retry svg {
+      flex-shrink: 0;
+      animation: retrySpinPulse 2s linear infinite;
+    }
+    @keyframes retrySpinPulse {
+      0%   { transform: rotate(0deg);   opacity: 1;  }
+      50%  { transform: rotate(180deg); opacity: .5; }
+      100% { transform: rotate(360deg); opacity: 1;  }
+    }
+    .metric-retry-count {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 600;
+      color: var(--yellow);
+    }
+    body.theme-day .metric-retry       { color: #b07000; }
+    body.theme-day .metric-retry-count { color: #b07000; }
+
     .disposal-banner {
       margin: 0;
       padding: 12px 28px;
@@ -6503,6 +6531,7 @@ async function queryStock() {
       return;
     }
     renderStock(data);
+    _startRetryCountdown();
   } catch(e) {
     resultEl.innerHTML = `<div class="state-box error"><span>⚠️ 無法連線至伺服器，請稍後再試。</span></div>`;
   }
@@ -6513,6 +6542,13 @@ function colorClass(val) {
   const n = typeof val === 'string' ? parseInt(val.replace(/,/g,'')) : val;
   if (isNaN(n)) return 'neutral';
   return n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
+}
+
+// 判斷某欄位是否在後端重試清單中；是的話才回傳 retryInfo，否則回傳 null
+function _retryInfo(d, field, domId) {
+  if (!d.retry_fields || !d.retry_next_at) return null;
+  if (!d.retry_fields.includes(field)) return null;
+  return { id: domId, target: new Date(d.retry_next_at).getTime() };
 }
 
 function renderStock(d) {
@@ -6591,17 +6627,29 @@ function renderStock(d) {
     return Math.round(n / 1000).toLocaleString();
   };
 
-  const metricCell = (label, value, icon, unit='張') => {
+  const metricCell = (label, value, icon, unit='張', retryInfo=null) => {
     const raw = value != null ? parseInt(value.toString().replace(/,/g, ''), 10) : null;
     const cc = colorClass(raw != null ? raw.toString() : null);
     const zhangVal = toZhang(value);
     const display = zhangVal != null
       ? `<span>${zhangVal}</span><span class="unit">${unit}</span>`
       : '🚫 暫未更新';
+    // 若資料暫未更新且有重試資訊，顯示倒數徽章
+    const retryBadge = (zhangVal == null && retryInfo)
+      ? `<div class="metric-retry" id="${retryInfo.id}">
+           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+             <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+           </svg>
+           <span>下次重抓</span>
+           <span class="metric-retry-count" data-target="${retryInfo.target}">--:--</span>
+         </div>`
+      : '';
     return `
       <div class="metric-cell">
         <div class="metric-label">${label}</div>
         <div class="metric-value ${cc}">${display}</div>
+        ${retryBadge}
         ${icon}
       </div>`;
   };
@@ -6635,12 +6683,41 @@ function renderStock(d) {
         </div>
       </div>
       <div class="metrics-grid">
-        ${metricCell('外資買賣超',   d.foreign,      ICON_FOREIGN)}
-        ${metricCell('投信買賣超',   d.trust,        ICON_TRUST)}
-        ${metricCell('自營商買賣超', d.proprietary,  ICON_PROP)}
-        ${metricCell('借券賣出差額', d.short_sale,   ICON_SHORT)}
+        ${metricCell('外資買賣超',   d.foreign,      ICON_FOREIGN, '張', _retryInfo(d, 'foreign',     'retry-foreign'))}
+        ${metricCell('投信買賣超',   d.trust,        ICON_TRUST,   '張', _retryInfo(d, 'trust',       'retry-trust'))}
+        ${metricCell('自營商買賣超', d.proprietary,  ICON_PROP,    '張', _retryInfo(d, 'proprietary', 'retry-prop'))}
+        ${metricCell('借券賣出差額', d.short_sale,   ICON_SHORT,   '張', _retryInfo(d, 'short_sale',  'retry-short'))}
       </div>
     </div>`;
+}
+
+// ── 重試倒數計時器 ────────────────────────────────────────────────────────────
+let _retryCountdownTimer = null;
+
+function _startRetryCountdown() {
+  if (_retryCountdownTimer) clearInterval(_retryCountdownTimer);
+  _retryCountdownTimer = setInterval(() => {
+    const els = document.querySelectorAll('.metric-retry-count[data-target]');
+    if (!els.length) { clearInterval(_retryCountdownTimer); _retryCountdownTimer = null; return; }
+    const now = Date.now();
+    els.forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      const diff   = Math.max(0, Math.floor((target - now) / 1000));
+      if (diff <= 0) {
+        el.textContent = '重抓中...';
+        el.parentElement.querySelector('svg') && (el.parentElement.querySelector('svg').style.animationDuration = '.4s');
+      } else {
+        const m = String(Math.floor(diff / 60)).padStart(2, '0');
+        const s = String(diff % 60).padStart(2, '0');
+        el.textContent = `${m}:${s}`;
+        // 最後30秒變紅色提示
+        if (diff <= 30) {
+          el.style.color = 'var(--red)';
+          el.closest('.metric-retry').style.color = 'var(--red)';
+        }
+      }
+    });
+  }, 1000);
 }
 
 document.getElementById('stockInput').addEventListener('keydown', e => {

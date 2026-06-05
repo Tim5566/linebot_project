@@ -614,6 +614,17 @@ def register_api(app):
             elif line.startswith("借卷賣出"):
                 result["short_sale"]  = _extract_val(line)
 
+        # ── 附上重試狀態（後端排程失敗時，前端才顯示倒數計時）────────────────
+        try:
+            meta = firebase_db.reference(f"stock_data/{get_today()}/meta").get() or {}
+            retry_fields  = meta.get("retry_fields")   # e.g. ["foreign", "proprietary"]
+            retry_next_at = meta.get("retry_next_at")  # ISO 字串
+            if retry_fields and retry_next_at:
+                result["retry_fields"]  = retry_fields
+                result["retry_next_at"] = retry_next_at
+        except Exception:
+            pass  # 讀不到就不附，前端不顯示倒數
+
         return jsonify(result)
 
     # ── 股票代碼→中文名稱查詢（wave_chart 前端補查用）─────────────────────────

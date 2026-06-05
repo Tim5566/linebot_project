@@ -361,6 +361,7 @@ def sync_institutional(today: str = None, max_retries: int = None):
         "twse_count": len(twse_inst),
     })
     print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
+    return len(twse_inst) > 0
 
 def sync_otc_institutional(today: str = None):
     if today is None: today = get_today()
@@ -593,6 +594,14 @@ def sync_all(today: str = None, label: int = None):
             # 15:00 — 先清除昨日（含更早）舊資料，再同步今日投信 TWSE
             cleanup_old_stock_data(today)
             sync_institutional(today)
+            # 投信安全網：萬一 TWSE 15:00 也慢，每30分鐘補抓，最多到 18:00
+            if _check_data_missing(today, check_foreign=False, check_proprietary=False):
+                schedule_retry_if_missing(
+                    today, label=2,
+                    interval_minutes=30,
+                    deadline_hour=18,
+                    max_attempts=4,
+                )
 
         elif label == 1:
             # 15:10 — 大盤法人買賣金額
@@ -601,11 +610,24 @@ def sync_all(today: str = None, label: int = None):
         elif label == 9:
             # 15:30 — OTC 三大法人
             sync_otc_institutional(today)
+            # OTC 安全網：萬一 tpex 也慢，每30分鐘補抓，最多到 21:00
+            if _check_data_missing_otc(today):
+                schedule_retry_if_missing(
+                    today, label=9,
+                    interval_minutes=30,
+                    deadline_hour=21,
+                    max_attempts=6,
+                )
 
         elif label == 3:
             # 16:10 — 重跑 TWSE 三大法人（補外資 + 自營商）
-            # max_retries=6：stat 不是 OK 也會重試，最多等約 2.5 分鐘
-            sync_institutional(today, max_retries=6)
+            # 立即嘗試一次，失敗後每30分鐘背景自動重試，直到21:00或資料完整
+            schedule_retry_if_missing(
+                today, label=3,
+                interval_minutes=30,
+                deadline_hour=21,
+                max_attempts=8,
+            )
 
         elif label == 7:
             # 21:10 — 大盤融資金額（重跑 market，融資資料此時才出）
@@ -631,3 +653,225 @@ def sync_all(today: str = None, label: int = None):
 
     finally:
         _sync_lock.release()
+
+# ── 自動重試排程（TWSE/OTC 資料未更新時每30分鐘補抓）────────────────────────
+
+_retry_threads: dict = {}
+_retry_threads_lock = _threading.Lock()
+
+
+def _check_data_missing(today: str,
+                         check_foreign: bool = True,
+                         check_trust: bool = True,
+                         check_proprietary: bool = True) -> bool:
+    """
+    檢查 Firebase 今日 TWSE 資料是否完整。
+    回傳 True 表示「仍有缺失，需要重試」。
+    """
+    try:
+        _init_firebase()
+        meta = firebase_db.reference(f"stock_data/{today}/meta").get() or {}
+        twse_count = int(meta.get("twse_count", 0))
+
+        if twse_count == 0:
+            print(f"[retry_check] twse_count=0，確認需要重試")
+            return True
+
+        # 抽查第一支股票資料欄位是否齊全
+        sample_ref = firebase_db.reference(f"stock_data/{today}/twse")
+        keys = sample_ref.get(shallow=True)
+        if not keys:
+            print(f"[retry_check] twse 節點無資料，確認需要重試")
+            return True
+
+        first_key = next(iter(keys))
+        sample = firebase_db.reference(
+            f"stock_data/{today}/twse/{first_key}"
+        ).get() or {}
+
+        missing = []
+        if check_foreign and "foreign" not in sample:
+            missing.append("外資")
+        if check_trust and "trust" not in sample:
+            missing.append("投信")
+        if check_proprietary and "proprietary" not in sample:
+            missing.append("自營商")
+
+        if missing:
+            print(f"[retry_check] TWSE 缺失欄位：{missing}（sample key={first_key}）")
+            return True
+
+        print(f"[retry_check] TWSE 資料完整 ✅（sample key={first_key}）")
+        return False
+
+    except Exception as e:
+        print(f"[retry_check] Firebase 檢查失敗: {e}，視為需要重試")
+        return True
+
+
+def _check_data_missing_otc(today: str) -> bool:
+    """
+    檢查 Firebase 今日 OTC 資料是否完整。
+    回傳 True 表示「仍有缺失，需要重試」。
+    """
+    try:
+        _init_firebase()
+        meta = firebase_db.reference(f"stock_data/{today}/meta").get() or {}
+        otc_count = int(meta.get("otc_count", 0))
+
+        if otc_count == 0:
+            print(f"[retry_check_otc] otc_count=0，確認需要重試")
+            return True
+
+        sample_ref = firebase_db.reference(f"stock_data/{today}/otc")
+        keys = sample_ref.get(shallow=True)
+        if not keys:
+            print(f"[retry_check_otc] otc 節點無資料，確認需要重試")
+            return True
+
+        first_key = next(iter(keys))
+        sample = firebase_db.reference(
+            f"stock_data/{today}/otc/{first_key}"
+        ).get() or {}
+
+        missing = [f for f in ("foreign", "trust", "proprietary") if f not in sample]
+
+        if missing:
+            print(f"[retry_check_otc] OTC 缺失欄位：{missing}（sample key={first_key}）")
+            return True
+
+        print(f"[retry_check_otc] OTC 資料完整 ✅（sample key={first_key}）")
+        return False
+
+    except Exception as e:
+        print(f"[retry_check_otc] Firebase 檢查失敗: {e}，視為需要重試")
+        return True
+
+
+def schedule_retry_if_missing(
+    today: str,
+    label: int,
+    interval_minutes: int = 30,
+    deadline_hour: int = 21,
+    max_attempts: int = 8,
+):
+    """
+    若今日資料缺失，立即先嘗試一次同步；
+    若仍失敗，啟動背景 thread，每 interval_minutes 分鐘重試一次，
+    直到資料完整、超過 deadline_hour，或達到 max_attempts 為止。
+
+    label 對照：
+      2  → sync_institutional（TWSE 投信安全網）
+      3  → sync_institutional（TWSE 外資+自營商補跑）
+      9  → sync_otc_institutional（OTC 三大法人）
+      10 → sync_otc_institutional（OTC 補跑）
+    """
+    thread_key = f"retry_{label}_{today}"
+
+    with _retry_threads_lock:
+        existing = _retry_threads.get(thread_key)
+        if existing and existing.is_alive():
+            print(f"[retry] label={label} 重試 thread 已在執行中，略過")
+            return
+
+    print(f"[retry] label={label} 啟動自動重試排程（間隔{interval_minutes}分鐘，截止{deadline_hour}:00，最多{max_attempts}次）")
+
+    # label → 哪些欄位在重試中（用於寫 Firebase meta 讓前端顯示倒數）
+    _LABEL_FIELDS = {
+        2:  ["trust"],
+        3:  ["foreign", "proprietary"],
+        9:  ["foreign", "trust", "proprietary"],
+        10: ["foreign", "trust", "proprietary"],
+    }
+
+    def _write_retry_status(next_ts_iso: str):
+        """把重試狀態寫入 Firebase meta，前端讀取後顯示倒數計時。"""
+        fields = _LABEL_FIELDS.get(label, [])
+        if not fields:
+            return
+        try:
+            _init_firebase()
+            firebase_db.reference(f"stock_data/{today}/meta").update({
+                "retry_fields":  fields,
+                "retry_next_at": next_ts_iso,   # ISO 字串，前端 new Date() 可直接解析
+                "retry_label":   label,
+            })
+        except Exception as e:
+            print(f"[retry] 寫入重試狀態失敗: {e}")
+
+    def _clear_retry_status():
+        """資料補齊後清除重試狀態，前端停止顯示倒數。"""
+        try:
+            _init_firebase()
+            firebase_db.reference(f"stock_data/{today}/meta").update({
+                "retry_fields":  None,
+                "retry_next_at": None,
+                "retry_label":   None,
+            })
+        except Exception as e:
+            print(f"[retry] 清除重試狀態失敗: {e}")
+
+    def _worker():
+        tz = ZoneInfo("Asia/Taipei")
+        for attempt in range(1, max_attempts + 1):
+            now = datetime.datetime.now(tz)
+
+            # 超過截止時間就停止
+            if now.hour >= deadline_hour:
+                print(f"[retry] label={label} 已超過 {deadline_hour}:00，停止重試")
+                _clear_retry_status()
+                break
+
+            print(f"[retry] label={label} 第 {attempt}/{max_attempts} 次嘗試 {now.strftime('%H:%M:%S')}")
+
+            try:
+                if label in (9, 10):
+                    # OTC 本來就不走 _sync_lock，直接執行
+                    sync_otc_institutional(today)
+                else:
+                    # TWSE 類同步需搶 _sync_lock，避免與 label=7/8 排程同時寫 Firebase
+                    if not _sync_lock.acquire(timeout=60):
+                        print(f"[retry] label={label} 第{attempt}次搶鎖逾時，跳過本次")
+                        continue
+                    try:
+                        if label in (3, 2):
+                            sync_institutional(today, max_retries=6)
+                        elif label == 1:
+                            sync_market(today)
+                        else:
+                            sync_institutional(today, max_retries=6)
+                    finally:
+                        _sync_lock.release()
+            except Exception as e:
+                print(f"[retry] label={label} 第{attempt}次同步例外: {e}")
+
+            # 檢查資料是否已完整
+            if label in (9, 10):
+                still_missing = _check_data_missing_otc(today)
+            else:
+                still_missing = _check_data_missing(today)
+
+            if not still_missing:
+                print(f"[retry] label={label} 資料已完整，停止重試 ✅")
+                _clear_retry_status()
+                break
+
+            if attempt < max_attempts:
+                next_dt = now + datetime.timedelta(minutes=interval_minutes)
+                if next_dt.hour >= deadline_hour:
+                    print(f"[retry] label={label} 下次重試將超過截止時間，放棄")
+                    _clear_retry_status()
+                    break
+                next_time = next_dt.strftime('%H:%M')
+                # ── 寫入重試狀態讓前端顯示倒數 ────────────────────────────────
+                _write_retry_status(next_dt.isoformat())
+                print(f"[retry] label={label} 資料仍缺失，{interval_minutes}分鐘後 {next_time} 再試...")
+                _time.sleep(interval_minutes * 60)
+            else:
+                print(f"[retry] label={label} 達最大重試次數 {max_attempts}，放棄 ⚠️")
+                _clear_retry_status()
+
+    t = _threading.Thread(target=_worker, name=thread_key, daemon=True)
+    with _retry_threads_lock:
+        _retry_threads[thread_key] = t
+    t.start()
