@@ -1633,95 +1633,6 @@
       .top50-table td, .top50-table th { padding: 8px 10px; white-space: nowrap; }
       .top50-table th { font-size: .62rem; letter-spacing: .1em; }
 
-      /* ── 手機版 top50 緊湊卡片佈局 ── */
-      .top50-mobile-list { display: flex; flex-direction: column; gap: 0; width: 100%; }
-      .top50-mobile-row {
-        display: grid;
-        grid-template-columns: 36px 1fr auto;
-        grid-template-rows: auto;
-        align-items: center;
-        gap: 0 8px;
-        padding: 9px 10px;
-        border-bottom: 1px solid rgba(0,229,255,.05);
-        transition: background .15s;
-      }
-      .top50-mobile-row:hover { background: rgba(0,229,255,.05); }
-      .top50-mobile-row:last-child { border-bottom: none; }
-      .top50-mobile-rank {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: .8rem;
-        color: var(--text-faint);
-        text-align: center;
-        flex-shrink: 0;
-        line-height: 1;
-      }
-      .top50-mobile-rank.top3 { font-size: .9rem; font-weight: 700; color: var(--accent); }
-      .top50-mobile-rank.top1 { color: #ffd600; font-size: 1rem; }
-      .top50-mobile-rank.top2 { color: #c0c0c0; }
-      .top50-mobile-rank.top3-only { color: #cd7f32; }
-      .top50-mobile-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
-        overflow: hidden;
-      }
-      .top50-mobile-name {
-        font-family: 'Noto Sans TC', sans-serif;
-        font-size: .82rem;
-        font-weight: 500;
-        color: var(--text);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.2;
-      }
-      .top50-mobile-code {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: .68rem;
-        color: var(--accent);
-        letter-spacing: .06em;
-        opacity: .75;
-        line-height: 1;
-      }
-      .top50-mobile-net {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: .9rem;
-        font-weight: 700;
-        text-align: right;
-        white-space: nowrap;
-        line-height: 1;
-        flex-shrink: 0;
-      }
-      .top50-mobile-net .net-unit {
-        font-size: .62rem;
-        font-weight: 400;
-        opacity: .6;
-        margin-left: 2px;
-      }
-      .top50-mobile-net.buy { color: var(--red); text-shadow: 0 0 10px rgba(255,61,90,.35); }
-      .top50-mobile-net.sell { color: var(--green); text-shadow: 0 0 10px rgba(0,230,118,.35); }
-      .top50-mobile-header {
-        display: grid;
-        grid-template-columns: 36px 1fr auto;
-        gap: 0 8px;
-        padding: 8px 10px 6px;
-        border-bottom: 1px solid rgba(0,229,255,.12);
-        position: sticky;
-        top: 0;
-        background: var(--surface);
-        z-index: 2;
-      }
-      .top50-mobile-header span {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: .58rem;
-        letter-spacing: .15em;
-        color: rgba(0,229,255,.5);
-        text-transform: uppercase;
-      }
-      .top50-mobile-header span:first-child { text-align: center; }
-      .top50-mobile-header span:last-child { text-align: right; }
-
       /* ── Watchlist modal - 手機版重新排版 ── */
       .wl-list { padding: 8px 10px 24px; gap: 10px; display: flex; flex-direction: column; }
       .wl-list-header { display: none; }
@@ -6986,34 +6897,7 @@ function renderTop50() {
   const data = section[_top50Side] || [];
   const isBuy = _top50Side === 'buy';
 
-  const isMobile = window.innerWidth <= 600;
-  let html = '';
-
-  if (isMobile) {
-    html = `<div class="top50-mobile-list">
-      <div class="top50-mobile-header">
-        <span>#</span><span>名稱／代碼</span><span>${isBuy ? '買超' : '賣超'}</span>
-      </div>`;
-    data.forEach((item, idx) => {
-      const rank = idx + 1;
-      let rankCls = '';
-      if (rank === 1) rankCls = 'top3 top1';
-      else if (rank === 2) rankCls = 'top3 top2';
-      else if (rank === 3) rankCls = 'top3 top3-only';
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-      const netStr = Math.abs(item.net).toLocaleString();
-      html += `<div class="top50-mobile-row">
-        <div class="top50-mobile-rank ${rankCls}">${medal}</div>
-        <div class="top50-mobile-info">
-          <div class="top50-mobile-name">${item.name}</div>
-          <div class="top50-mobile-code">${item.id}</div>
-        </div>
-        <div class="top50-mobile-net ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></div>
-      </div>`;
-    });
-    html += '</div>';
-  } else {
-    html = `
+  let html = `
     <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table class="top50-table" style="min-width:420px;">
       <thead>
@@ -7025,25 +6909,25 @@ function renderTop50() {
         </tr>
       </thead>
       <tbody>`;
-    data.forEach((item, idx) => {
-      const rank    = idx + 1;
-      let rankCls = '';
-      if (rank === 1) rankCls = 'top3 top1';
-      else if (rank === 2) rankCls = 'top3 top2';
-      else if (rank === 3) rankCls = 'top3 top3-only';
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-      const netStr  = Math.abs(item.net).toLocaleString();
-      html += `
-        <tr>
-          <td class="rank-num ${rankCls}">${medal}</td>
-          <td><span class="stock-id-cell">${item.id}</span></td>
-          <td class="stock-name-cell">${item.name}</td>
-          <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
-        </tr>`;
-    });
-    html += '</tbody></table></div>';
-  }
 
+  data.forEach((item, idx) => {
+    const rank    = idx + 1;
+    let rankCls = '';
+    if (rank === 1) rankCls = 'top3 top1';
+    else if (rank === 2) rankCls = 'top3 top2';
+    else if (rank === 3) rankCls = 'top3 top3-only';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    const netStr  = Math.abs(item.net).toLocaleString();
+    html += `
+      <tr>
+        <td class="rank-num ${rankCls}">${medal}</td>
+        <td><span class="stock-id-cell">${item.id}</span></td>
+        <td class="stock-name-cell">${item.name}</td>
+        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
   document.getElementById('top50Body').innerHTML = html;
 }
 
@@ -7157,34 +7041,7 @@ function renderOtcTop50() {
   const data  = section[_otcTop50Side] || [];
   const isBuy = _otcTop50Side === 'buy';
 
-  const isMobile = window.innerWidth <= 600;
-  let html = '';
-
-  if (isMobile) {
-    html = `<div class="top50-mobile-list">
-      <div class="top50-mobile-header">
-        <span>#</span><span>名稱／代碼</span><span>${isBuy ? '買超' : '賣超'}</span>
-      </div>`;
-    data.forEach((item, idx) => {
-      const rank = idx + 1;
-      let rankCls = '';
-      if (rank === 1) rankCls = 'top3 top1';
-      else if (rank === 2) rankCls = 'top3 top2';
-      else if (rank === 3) rankCls = 'top3 top3-only';
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-      const netStr = Math.abs(item.net).toLocaleString();
-      html += `<div class="top50-mobile-row">
-        <div class="top50-mobile-rank ${rankCls}">${medal}</div>
-        <div class="top50-mobile-info">
-          <div class="top50-mobile-name">${item.name}</div>
-          <div class="top50-mobile-code">${item.id}</div>
-        </div>
-        <div class="top50-mobile-net ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></div>
-      </div>`;
-    });
-    html += '</div>';
-  } else {
-    html = `
+  let html = `
     <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table class="top50-table" style="min-width:420px;">
       <thead>
@@ -7196,25 +7053,25 @@ function renderOtcTop50() {
         </tr>
       </thead>
       <tbody>`;
-    data.forEach((item, idx) => {
-      const rank    = idx + 1;
-      let rankCls = '';
-      if (rank === 1) rankCls = 'top3 top1';
-      else if (rank === 2) rankCls = 'top3 top2';
-      else if (rank === 3) rankCls = 'top3 top3-only';
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-      const netStr  = Math.abs(item.net).toLocaleString();
-      html += `
-        <tr>
-          <td class="rank-num ${rankCls}">${medal}</td>
-          <td><span class="stock-id-cell">${item.id}</span></td>
-          <td class="stock-name-cell">${item.name}</td>
-          <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
-        </tr>`;
-    });
-    html += '</tbody></table></div>';
-  }
 
+  data.forEach((item, idx) => {
+    const rank    = idx + 1;
+    let rankCls = '';
+    if (rank === 1) rankCls = 'top3 top1';
+    else if (rank === 2) rankCls = 'top3 top2';
+    else if (rank === 3) rankCls = 'top3 top3-only';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    const netStr  = Math.abs(item.net).toLocaleString();
+    html += `
+      <tr>
+        <td class="rank-num ${rankCls}">${medal}</td>
+        <td><span class="stock-id-cell">${item.id}</span></td>
+        <td class="stock-name-cell">${item.name}</td>
+        <td class="net-cell ${isBuy ? 'buy' : 'sell'}">${isBuy ? '+' : '-'}${netStr}<span class="net-unit">張</span></td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
   document.getElementById('otcTop50Body').innerHTML = html;
 }
 // ── FAVORITES / WATCHLIST ─────────────────────────────────────────────────────
