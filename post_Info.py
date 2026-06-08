@@ -350,8 +350,9 @@ def _twse_proprietary(keyword, api_url, today):
         data = fetch_with_retry(api_url, today)
         if data is None:
             return None
+        # TWT43U: row[0]=證券代號, row[1]=證券名稱, row[10]=自營商合計買賣超
         for row in data["data"]:
-            stock_id, stock_name = row[0], row[1]
+            stock_id, stock_name = row[0].strip(), row[1].strip()
             if re.search(r'購|售|認購|認售', stock_name):
                 continue
             if keyword in stock_id or keyword in stock_name:
