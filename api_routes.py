@@ -2,7 +2,7 @@ from flask import jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from post_Info import stock_info, market_pnfo, get_today, twse_top50, otc_top50
+from post_Info import stock_info, market_pnfo, get_today, twse_top100, otc_top100
 from get_trading_holidays import get_trading_status
 import re
 import os
@@ -570,15 +570,65 @@ def register_api(app):
         return jsonify({"status": "started", "date": date, "label": label,
                         "message": f"{date} {tag} 同步已在背景執行"})
 
+
+    # ── 上市三大法人買賣超前50 資料 API ────────────────────────────────────────
+    # 優先讀 Firebase 前50快取（firebase_sync 同步後即更新）
+    # 若快取不存在（首次或 sync 尚未完成）則從全量資料即時計算並回填快取
+    @app.route("/api/top100")
+    def api_top100():
+        from firebase_sync import _calc_top100
+        today = get_today()
+        try:
+            # 讀快取
+            cached = firebase_db.reference(f"top100_cache/{today}/twse").get()
+            if cached:
+                return jsonify(cached)
+            # 快取不存在 → 從全量計算
+            raw = firebase_db.reference(f"stock_data/{today}/twse").get()
+            if not raw:
+                return jsonify({"error": "今日資料尚未更新"}), 503
+            top100 = _calc_top100(raw)
+            # 回填快取
+            try:
+                firebase_db.reference(f"top100_cache/{today}/twse").set(top100)
+            except Exception as e:
+                print(f"[api/top100] 快取回填失敗: {e}")
+            return jsonify(top100)
+        except Exception as e:
+            print(f"[api/top100] 錯誤: {e}")
+            return jsonify({"error": "資料讀取失敗"}), 500
+
+    # ── 上櫃三大法人買賣超前50 資料 API ────────────────────────────────────────
+    @app.route("/api/otc_top100")
+    def api_otc_top100():
+        from firebase_sync import _calc_top100
+        today = get_today()
+        try:
+            cached = firebase_db.reference(f"top100_cache/{today}/otc").get()
+            if cached:
+                return jsonify(cached)
+            raw = firebase_db.reference(f"stock_data/{today}/otc").get()
+            if not raw:
+                return jsonify({"error": "今日資料尚未更新"}), 503
+            top100 = _calc_top100(raw)
+            try:
+                firebase_db.reference(f"top100_cache/{today}/otc").set(top100)
+            except Exception as e:
+                print(f"[api/otc_top100] 快取回填失敗: {e}")
+            return jsonify(top100)
+        except Exception as e:
+            print(f"[api/otc_top100] 錯誤: {e}")
+            return jsonify({"error": "資料讀取失敗"}), 500
+
     # ── 上市三大法人買賣超前50 API ─────────────────────────────────────────────
-    @app.route("/api/top50")
-    def api_top50():
-        return jsonify(twse_top50())
+    @app.route("/stock_site/tools/twse_top100.html")
+    def page_twse_top100():
+        return send_from_directory('stock_site/tools', 'twse_top100.html')
 
     # ── 上櫃三大法人買賣超前50 API ─────────────────────────────────────────────
-    @app.route("/api/otc_top50")
-    def api_otc_top50():
-        return jsonify(otc_top50())
+    @app.route("/stock_site/tools/otc_top100.html")
+    def page_otc_top100():
+        return send_from_directory('stock_site/tools', 'otc_top100.html')
 
     # ── 個股查詢 API ───────────────────────────────────────────────────────────
     @app.route("/api/stock")

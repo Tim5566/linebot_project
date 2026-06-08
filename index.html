@@ -4580,19 +4580,19 @@
     <div class="drawer-section nav-group-data">
       <span class="nav-group-label">法人數據</span>
 
-      <button class="nav-item" data-nav-id="top50" onclick="openTop50Modal()">
+      <a class="nav-item" data-nav-id="top100" href="/stock_site/tools/twse_top100.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         上市買賣超前50
-      </button>
+      </a>
 
-      <button class="nav-item" data-nav-id="otctop50" onclick="openOtcTop50Modal()">
+      <a class="nav-item" data-nav-id="otctop100" href="/stock_site/tools/otc_top100.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         上櫃買賣超前50
-      </button>
+      </a>
 
       <button class="nav-item" data-nav-id="market" onclick="scrollToMarket()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -4868,7 +4868,7 @@
 <div class="main-content">
 
 <!-- TOP50 MODAL -->
-<div class="modal-overlay" id="top50Modal" onclick="handleModalClick(event)">
+<div class="modal-overlay" id="top100Modal" onclick="handleTop100ModalClick(event)">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">
@@ -4889,7 +4889,7 @@
           </span>
         </span>
       </div>
-      <button class="modal-close" onclick="closeTop50Modal()">
+      <button class="modal-close" onclick="closeTop100Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
@@ -4905,10 +4905,10 @@
     <div class="modal-toggle">
       <button class="toggle-btn buy active" onclick="switchSide('buy')">📈 買超前50</button>
       <button class="toggle-btn sell" onclick="switchSide('sell')">📉 賣超前50</button>
-      <span class="modal-date" id="top50Date">--</span>
+      <span class="modal-date" id="top100Date">--</span>
     </div>
 
-    <div class="modal-body" id="top50Body">
+    <div class="modal-body" id="top100Body">
       <div class="modal-loading">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -4920,7 +4920,7 @@
 </div>
 
 <!-- OTC TOP50 MODAL -->
-<div class="modal-overlay" id="otcTop50Modal" onclick="handleOtcModalClick(event)">
+<div class="modal-overlay" id="otcTop100Modal" onclick="handleOtcTop100ModalClick(event)">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">
@@ -4941,7 +4941,7 @@
           </span>
         </span>
       </div>
-      <button class="modal-close" onclick="closeOtcTop50Modal()">
+      <button class="modal-close" onclick="closeOtcTop100Modal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
@@ -4957,10 +4957,10 @@
     <div class="modal-toggle" id="otcModalToggle">
       <button class="toggle-btn buy active" onclick="switchOtcSide('buy')">📈 買超前50</button>
       <button class="toggle-btn sell" onclick="switchOtcSide('sell')">📉 賣超前50</button>
-      <span class="modal-date" id="otcTop50Date">--</span>
+      <span class="modal-date" id="otcTop100Date">--</span>
     </div>
 
-    <div class="modal-body" id="otcTop50Body">
+    <div class="modal-body" id="otcTop100Body">
       <div class="modal-loading">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -5534,7 +5534,7 @@
 // ── 自動判斷環境，不需要手動切換 ──────────────────────────────
 // api_routes.py 更新紀錄：
 //   - 新增 @app.route("/") → 直接 serve index.html，讓 Render 可用單一 port 提供前端
-//   - API 路由保持不變：/api/trading_status, /api/top50, /api/otc_top50, /api/stock, /api/market
+//   - API 路由保持不變：/api/trading_status, /api/top100, /api/otc_top100, /api/stock, /api/market
 const API_BASE = (() => {
   const host = window.location.hostname;
   if (host === '127.0.0.1' || host === 'localhost') {
@@ -6405,7 +6405,7 @@ const TIMELINE_ITEMS = [
   { time: '15:00', label: '投信買賣超 (TWSE)' },
   { time: '15:10', label: '法人總買賣金額 (TWSE)' },
   { time: '16:00', label: '三大法人買賣超 (OTC)' },
-  { time: '16:10', label: '外資 / 自營商買賣超 (TWSE)' },
+  { time: '16:15', label: '外資 / 自營商買賣超 (TWSE)' },
   { time: '21:10', label: '大盤融資金額 (TWSE)' },
   { time: '21:30', label: '借券賣出 (TWSE、OTC)' },
 ];
@@ -6766,8 +6766,8 @@ function closeDrawer() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeDrawer();
-    closeTop50Modal();
-    closeOtcTop50Modal();
+    closeTop100Modal();
+    closeOtcTop100Modal();
     closeWatchlistModal();
   }
 });
@@ -6806,48 +6806,48 @@ function scrollToTimeline() {
 }
 
 // ── TOP50 MODAL ───────────────────────────────────────────────────────────────
-let _top50Cache   = null;
-let _top50Tab     = 'foreign';
-let _top50Side    = 'buy';
+let _top100Cache   = null;
+let _top100Tab     = 'foreign';
+let _top100Side    = 'buy';
 
-async function openTop50Modal() {
+async function openTop100Modal() {
   closeDrawer();
-  setActiveNav('top50');
-  document.getElementById('top50Modal').classList.add('open');
+  setActiveNav('top100');
+  document.getElementById('top100Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (!_top50Cache) await loadTop50();
-  else renderTop50();
+  if (!_top100Cache) await loadTop100();
+  else renderTop100();
 }
 
-function closeTop50Modal() {
-  document.getElementById('top50Modal').classList.remove('open');
+function closeTop100Modal() {
+  document.getElementById('top100Modal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function handleModalClick(e) {
-  if (e.target === document.getElementById('top50Modal')) closeTop50Modal();
+function handleTop100ModalClick(e) {
+  if (e.target === document.getElementById('top100Modal')) closeTop100Modal();
 }
 
 
 
 function switchTab(tab) {
-  _top50Tab = tab;
-  document.querySelectorAll('#top50Modal .modal-tab').forEach((el, i) => {
+  _top100Tab = tab;
+  document.querySelectorAll('#top100Modal .modal-tab').forEach((el, i) => {
     el.classList.toggle('active', ['foreign','trust','proprietary'][i] === tab);
   });
-  renderTop50();
+  renderTop100();
 }
 
 function switchSide(side) {
-  _top50Side = side;
-  document.querySelectorAll('#top50Modal .toggle-btn').forEach(el => {
+  _top100Side = side;
+  document.querySelectorAll('#top100Modal .toggle-btn').forEach(el => {
     el.classList.toggle('active', el.classList.contains(side));
   });
-  renderTop50();
+  renderTop100();
 }
 
-async function loadTop50() {
-  document.getElementById('top50Body').innerHTML = `
+async function loadTop100() {
+  document.getElementById('top100Body').innerHTML = `
     <div class="modal-loading">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -6864,38 +6864,38 @@ async function loadTop50() {
     } catch(_) {}
 
     if (!isTradingDay) {
-      document.getElementById('top50Body').innerHTML =
+      document.getElementById('top100Body').innerHTML =
         `<div class="modal-loading" style="color:var(--text-dim)">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4">
             <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
           <span style="color:var(--yellow)">今日休市，暫無盤後資料</span>
         </div>`;
-      document.getElementById('top50Date').textContent = '休市';
+      document.getElementById('top100Date').textContent = '休市';
       return;
     }
 
-    const res  = await fetch(`${API_BASE}/api/top50`);
-    _top50Cache = await res.json();
+    const res  = await fetch(`${API_BASE}/api/top100`);
+    _top100Cache = await res.json();
     const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
-    document.getElementById('top50Date').textContent = today + ' 盤後';
-    renderTop50();
+    document.getElementById('top100Date').textContent = today + ' 盤後';
+    renderTop100();
   } catch(e) {
-    document.getElementById('top50Body').innerHTML =
+    document.getElementById('top100Body').innerHTML =
       `<div class="modal-loading" style="color:var(--red)">⚠️ 無法載入資料，請稍後再試</div>`;
   }
 }
 
-function renderTop50() {
-  if (!_top50Cache) return;
-  const section = _top50Cache[_top50Tab];
+function renderTop100() {
+  if (!_top100Cache) return;
+  const section = _top100Cache[_top100Tab];
   if (section.error) {
-    document.getElementById('top50Body').innerHTML =
+    document.getElementById('top100Body').innerHTML =
       `<div class="modal-loading" style="color:var(--text-dim)">${section.error}</div>`;
     return;
   }
-  const data = section[_top50Side] || [];
-  const isBuy = _top50Side === 'buy';
+  const data = section[_top100Side] || [];
+  const isBuy = _top100Side === 'buy';
 
   let html = `
     <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
@@ -6928,50 +6928,50 @@ function renderTop50() {
   });
 
   html += '</tbody></table>';
-  document.getElementById('top50Body').innerHTML = html;
+  document.getElementById('top100Body').innerHTML = html;
 }
 
 // ── OTC TOP50 MODAL ───────────────────────────────────────────────────────────
-let _otcTop50Cache = null;
-let _otcTop50Tab   = 'foreign';
-let _otcTop50Side  = 'buy';
+let _otcTop100Cache = null;
+let _otcTop100Tab   = 'foreign';
+let _otcTop100Side  = 'buy';
 
-async function openOtcTop50Modal() {
+async function openOtcTop100Modal() {
   closeDrawer();
-  setActiveNav('otctop50');
-  document.getElementById('otcTop50Modal').classList.add('open');
+  setActiveNav('otctop100');
+  document.getElementById('otcTop100Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (!_otcTop50Cache) await loadOtcTop50();
-  else renderOtcTop50();
+  if (!_otcTop100Cache) await loadOtcTop100();
+  else renderOtcTop100();
 }
 
-function closeOtcTop50Modal() {
-  document.getElementById('otcTop50Modal').classList.remove('open');
+function closeOtcTop100Modal() {
+  document.getElementById('otcTop100Modal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-function handleOtcModalClick(e) {
-  if (e.target === document.getElementById('otcTop50Modal')) closeOtcTop50Modal();
+function handleOtcTop100ModalClick(e) {
+  if (e.target === document.getElementById('otcTop100Modal')) closeOtcTop100Modal();
 }
 
 function switchOtcTab(tab) {
-  _otcTop50Tab = tab;
+  _otcTop100Tab = tab;
   document.querySelectorAll('#otcModalTabs .modal-tab').forEach((el, i) => {
     el.classList.toggle('active', ['foreign','trust','proprietary'][i] === tab);
   });
-  renderOtcTop50();
+  renderOtcTop100();
 }
 
 function switchOtcSide(side) {
-  _otcTop50Side = side;
+  _otcTop100Side = side;
   document.querySelectorAll('#otcModalToggle .toggle-btn').forEach(el => {
     el.classList.toggle('active', el.classList.contains(side));
   });
-  renderOtcTop50();
+  renderOtcTop100();
 }
 
-async function loadOtcTop50() {
-  document.getElementById('otcTop50Body').innerHTML = `
+async function loadOtcTop100() {
+  document.getElementById('otcTop100Body').innerHTML = `
     <div class="modal-loading">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -6988,19 +6988,19 @@ async function loadOtcTop50() {
     } catch(_) {}
 
     if (!isTradingDay) {
-      document.getElementById('otcTop50Body').innerHTML =
+      document.getElementById('otcTop100Body').innerHTML =
         `<div class="modal-loading" style="color:var(--text-dim)">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4">
             <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
           <span style="color:var(--yellow)">今日休市，暫無盤後資料</span>
         </div>`;
-      document.getElementById('otcTop50Date').textContent = '休市';
+      document.getElementById('otcTop100Date').textContent = '休市';
       return;
     }
 
-    const res  = await fetch(`${API_BASE}/api/otc_top50`);
-    _otcTop50Cache = await res.json();
+    const res  = await fetch(`${API_BASE}/api/otc_top100`);
+    _otcTop100Cache = await res.json();
 
     // ── 驗證上櫃資料日期（民國格式 "1150417" → 西元 "20260417"）──────
     const _checkOtcDateValid = (cache) => {
@@ -7022,24 +7022,24 @@ async function loadOtcTop50() {
 
     // 如果 cache 裡 item 沒帶 date 欄位就跳過驗證（API 不一定會帶）
     const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
-    document.getElementById('otcTop50Date').textContent = today + ' 盤後';
-    renderOtcTop50();
+    document.getElementById('otcTop100Date').textContent = today + ' 盤後';
+    renderOtcTop100();
   } catch(e) {
-    document.getElementById('otcTop50Body').innerHTML =
+    document.getElementById('otcTop100Body').innerHTML =
       `<div class="modal-loading" style="color:var(--red)">⚠️ 無法載入資料，請稍後再試</div>`;
   }
 }
 
-function renderOtcTop50() {
-  if (!_otcTop50Cache) return;
-  const section = _otcTop50Cache[_otcTop50Tab];
+function renderOtcTop100() {
+  if (!_otcTop100Cache) return;
+  const section = _otcTop100Cache[_otcTop100Tab];
   if (!section || section.error) {
-    document.getElementById('otcTop50Body').innerHTML =
+    document.getElementById('otcTop100Body').innerHTML =
       `<div class="modal-loading" style="color:var(--text-dim)">${section ? section.error : '資料異常'}</div>`;
     return;
   }
-  const data  = section[_otcTop50Side] || [];
-  const isBuy = _otcTop50Side === 'buy';
+  const data  = section[_otcTop100Side] || [];
+  const isBuy = _otcTop100Side === 'buy';
 
   let html = `
     <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
@@ -7072,7 +7072,7 @@ function renderOtcTop50() {
   });
 
   html += '</tbody></table>';
-  document.getElementById('otcTop50Body').innerHTML = html;
+  document.getElementById('otcTop100Body').innerHTML = html;
 }
 // ── FAVORITES / WATCHLIST ─────────────────────────────────────────────────────
 
@@ -8721,5 +8721,8 @@ setTimeout(() => {
   tick();
 })();
 </script>
+
+<!-- ── Adsterra SocialBar ── -->
+<script src="https://pl29674298.effectivecpmnetwork.com/13/3c/b9/133cb95200ea22bcf3c24c17048e60ce.js"></script>
 
 </html>

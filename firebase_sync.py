@@ -361,6 +361,14 @@ def sync_institutional(today: str = None, max_retries: int = None):
         "twse_count": len(twse_inst),
     })
     print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
+    # 同步完立即更新 TWSE 前50快取
+    if twse_inst:
+        try:
+            top100 = _calc_top100(twse_inst)
+            firebase_db.reference(f"top100_cache/{today}/twse").set(top100)
+            print(f"[top100] TWSE 快取更新 ✅")
+        except Exception as e:
+            print(f"[top100] TWSE 快取失敗: {e}")
     return len(twse_inst) > 0
 
 def sync_otc_institutional(today: str = None):
@@ -377,6 +385,14 @@ def sync_otc_institutional(today: str = None):
         "otc_count": len(otc_inst),
     })
     print(f"[sync] OTC 三大法人完成 {len(otc_inst)}筆")
+    # 同步完立即更新 OTC 前50快取
+    if otc_inst:
+        try:
+            top100 = _calc_top100(otc_inst)
+            firebase_db.reference(f"top100_cache/{today}/otc").set(top100)
+            print(f"[top100] OTC 快取更新 ✅")
+        except Exception as e:
+            print(f"[top100] OTC 快取失敗: {e}")
 
 def sync_short_sale(today: str = None):
     if today is None: today = get_today()
@@ -551,6 +567,85 @@ import threading as _threading
 _sync_lock = _threading.Lock()
 
 
+def _calc_top100(inst_dict: dict, top_n: int = 100) -> dict:
+    """
+    從全量法人資料計算買超/賣超前100。
+    inst_dict: { sid: {name, foreign, trust, proprietary} }
+    回傳: {
+      foreign:     { buy: [{id,name,net}, ...], sell: [...] },
+      trust:        { buy: [...], sell: [...] },
+      proprietary:  { buy: [...], sell: [...] },
+    }
+    """
+    buckets = {
+        "foreign":    {"buy": [], "sell": []},
+        "trust":      {"buy": [], "sell": []},
+        "proprietary":{"buy": [], "sell": []},
+    }
+    for sid, info in inst_dict.items():
+        if not sid:
+            continue
+        name = info.get("name", sid)
+        for key in ("foreign", "trust", "proprietary"):
+            raw = info.get(key)
+            if raw is None:
+                continue
+            try:
+                net = int(str(raw).replace(",", ""))
+            except (ValueError, TypeError):
+                continue
+            direction = "buy" if net > 0 else "sell" if net < 0 else None
+            if direction:
+                buckets[key][direction].append({"id": sid, "name": name, "net": net})
+
+    # 排序並截前50
+    for key in buckets:
+        buckets[key]["buy"]  = sorted(buckets[key]["buy"],  key=lambda x: -x["net"])[:top_n]
+        buckets[key]["sell"] = sorted(buckets[key]["sell"], key=lambda x:  x["net"])[:top_n]
+
+    return buckets
+
+
+def sync_top100(today: str = None):
+    """
+    從 Firebase 今日全量資料計算前100，寫入快取節點：
+      top100_cache/{today}/twse  →  { foreign:{buy:[],sell:[]}, trust:..., proprietary:... }
+      top100_cache/{today}/otc   →  同上
+    每次 sync_institutional / sync_otc_institutional 完成後自動呼叫。
+    """
+    if today is None:
+        today = get_today()
+    _init_firebase()
+
+    def _calc_and_write(market: str):
+        try:
+            data = firebase_db.reference(f"stock_data/{today}/{market}").get()
+            if not data:
+                print(f"[top100] {market} 無資料，略過")
+                return
+            top100 = _calc_top100(data)
+            firebase_db.reference(f"top100_cache/{today}/{market}").set(top100)
+            counts = {k: len(v["buy"]) for k, v in top100.items()}
+            print(f"[top100] {market} 快取寫入完成 {counts} ✅")
+        except Exception as e:
+            print(f"[top100] {market} 計算失敗: {e} ⚠️")
+
+    _calc_and_write("twse")
+    _calc_and_write("otc")
+
+    # 順便清除舊的 top100 快取（保留今日）
+    try:
+        ref  = firebase_db.reference("top100_cache")
+        keys = ref.get(shallow=True)
+        if keys:
+            for k in keys:
+                if k != today:
+                    firebase_db.reference(f"top100_cache/{k}").delete()
+                    print(f"[top100] 清除舊快取 top100_cache/{k}")
+    except Exception as e:
+        print(f"[top100] 清除舊快取失敗: {e}")
+
+
 def sync_all(today: str = None, label: int = None):
     """
     依 label 精確執行對應同步任務，避免每次全跑造成重疊與多餘 API 呼叫。
@@ -561,7 +656,7 @@ def sync_all(today: str = None, label: int = None):
       1  = 15:10  大盤法人（sync_market）
       9  = 15:30  OTC 三大法人（sync_otc_institutional）★ 不受鎖限制
       10 = 16:30  OTC 三大法人補跑（萬一 15:30 失敗）★ 不受鎖限制
-      3  = 16:10  重跑 TWSE 三大法人（補外資 + 自營商）
+      3  = 16:15  重跑 TWSE 三大法人（補外資 + 自營商）
       7  = 21:10  大盤融資（sync_market）
       8  = 21:30  借券賣出（sync_short_sale）
     """
@@ -620,7 +715,7 @@ def sync_all(today: str = None, label: int = None):
                 )
 
         elif label == 3:
-            # 16:10 — 重跑 TWSE 三大法人（補外資 + 自營商）
+            # 16:15 — 重跑 TWSE 三大法人（補外資 + 自營商）
             # 立即嘗試一次，失敗後每30分鐘背景自動重試，直到21:00或資料完整
             schedule_retry_if_missing(
                 today, label=3,

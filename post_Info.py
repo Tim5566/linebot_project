@@ -4,8 +4,8 @@ post_Info.py（Firebase 快取版）
 股票查詢邏輯：
   - stock_info()   → 優先從 Firebase 讀取，沒資料才 fallback 打 TWSE API
   - market_pnfo()  → 從 Firebase 讀取大盤資訊
-  - twse_top50()   → 仍直接打 API（資料量大，全市場排行）
-  - otc_top50()    → 仍直接打 API
+  - twse_top100()  → 仍直接打 API（資料量大，全市場排行）
+  - otc_top100()   → 仍直接打 API
 
 個股查詢流程：
   1. 檢查今日是否交易日、時間是否 ≥ 15:00
@@ -803,10 +803,10 @@ def market_pnfo() -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 上市 / 上櫃 Top50（資料量大，仍直接打 API）
+# 上市 / 上櫃 Top100（資料量大，仍直接打 API）
 # ══════════════════════════════════════════════════════════════════════════════
 
-def twse_top50(today=None):
+def twse_top100(today=None):
     if today is None:
         today = get_today()
 
@@ -826,11 +826,11 @@ def twse_top50(today=None):
                 except (ValueError, IndexError):
                     continue
                 processed.append({"id": row[id_col].strip(), "name": name, "net": net})
-            buy  = sorted(processed, key=lambda x: x["net"], reverse=True)[:50]
-            sell = sorted(processed, key=lambda x: x["net"])[:50]
+            buy  = sorted(processed, key=lambda x: x["net"], reverse=True)[:100]
+            sell = sorted(processed, key=lambda x: x["net"])[:100]
             return buy, sell
         except Exception as e:
-            print(f"[twse_top50] 失敗: {e}")
+            print(f"[twse_top100] 失敗: {e}")
             return None, None
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
@@ -847,7 +847,7 @@ def twse_top50(today=None):
     return {"foreign": _wrap(fb, fs), "trust": _wrap(tb, ts), "proprietary": _wrap(pb, ps)}
 
 
-def otc_top50():
+def otc_top100():
     API_URL = "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading?response=json"
     try:
         res  = requests.get(API_URL, headers=headers, verify=False, timeout=10)
@@ -869,8 +869,8 @@ def otc_top50():
             dl.append({"id": sid, "name": name, "net": d})
 
         def top(lst):
-            return (sorted(lst, key=lambda x: x["net"], reverse=True)[:50],
-                    sorted(lst, key=lambda x: x["net"])[:50])
+            return (sorted(lst, key=lambda x: x["net"], reverse=True)[:100],
+                    sorted(lst, key=lambda x: x["net"])[:100])
 
         fb, fs = top(fl)
         tb, ts = top(tl)
@@ -882,6 +882,6 @@ def otc_top50():
         return {"foreign": _wrap(fb, fs), "trust": _wrap(tb, ts), "proprietary": _wrap(db, ds)}
 
     except Exception as e:
-        print(f"[otc_top50] 失敗: {e}")
+        print(f"[otc_top100] 失敗: {e}")
         empty = {"buy": [], "sell": [], "error": "🚫 暫未更新"}
         return {"foreign": empty, "trust": empty, "proprietary": empty}
