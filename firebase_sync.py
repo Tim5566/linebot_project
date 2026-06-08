@@ -166,14 +166,11 @@ def _fetch_twse_institutional(today: str, max_retries: int = None) -> dict:
         url  = f"https://www.twse.com.tw/rwd/zh/fund/TWT43U?response=json&date={today}"
         data = _check_twse_stat(_fetch_with_date_check(url, today, "上市自營商", max_retries=max_retries), today, "上市自營商")
         if not data: return {}
-        # TWT43U 格式：row[0]=證券代號, row[1]=證券名稱, row[10]=自營商合計買賣超
         out = {}
         for row in data.get("data", []):
             name = row[1].strip()
             if re.search(r'購|售|認購|認售', name): continue
-            sid = row[0].strip()
-            if not sid: continue
-            out[sid] = {"net": row[10].strip(), "name": name}
+            out[row[0].strip()] = row[10].strip()
         return out
 
     foreign_map     = _parse_foreign()
@@ -185,20 +182,14 @@ def _fetch_twse_institutional(today: str, max_retries: int = None) -> dict:
 
     result = {}
     for sid in set(foreign_map) | set(trust_map) | set(proprietary_map):
-        foreign_entry = foreign_map.get(sid, {})
-        prop_entry    = proprietary_map.get(sid, {})
-        trust_entry   = trust_map.get(sid)
-        # 名稱優先順序：外資map > 自營商map > 投信map > sid
-        name = (foreign_entry.get("name")
-                or prop_entry.get("name")
-                or sid)
-        record = {"name": name}
-        if foreign_entry.get("foreign") is not None:
-            record["foreign"] = foreign_entry["foreign"]
-        if trust_entry is not None:
-            record["trust"] = trust_entry
-        if prop_entry.get("net") is not None:
-            record["proprietary"] = prop_entry["net"]
+        entry  = foreign_map.get(sid, {})
+        record = {"name": entry.get("name", sid)}
+        if entry.get("foreign") is not None:
+            record["foreign"] = entry["foreign"]
+        if sid in trust_map:
+            record["trust"] = trust_map[sid]
+        if sid in proprietary_map:
+            record["proprietary"] = proprietary_map[sid]
         result[sid] = record
 
     print(f"[twse_inst] 共 {len(result)} 筆 ✅")
