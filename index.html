@@ -8434,7 +8434,10 @@ setTimeout(() => {
   if (!cv) return;
   const ctx = cv.getContext('2d');
   let W, H;
-  let boidsInited = false;  // ✅ 移到頂端，避免 resize() 呼叫前 TDZ 錯誤
+  // ✅ 移到頂端，避免 resize() / initBoids() 呼叫前 TDZ 錯誤
+  const FLOCK     = 32;
+  const boids     = [];
+  let boidsInited = false;
 
   function resize() {
     W = cv.width  = window.innerWidth;
@@ -8542,8 +8545,6 @@ setTimeout(() => {
   //  🐦  真實鳥群 Boids（分離 / 對齊 / 聚合 + 漂移）
   //      — 初始化在 resize 後保證 W/H 已定 —
   // ════════════════════════════════════════════════════
-  const FLOCK  = 32;
-  const boids  = [];
 
   function mkBoid(scattered) {
     const angle = scattered
