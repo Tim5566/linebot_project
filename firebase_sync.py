@@ -361,12 +361,14 @@ def sync_institutional(today: str = None, max_retries: int = None):
         "twse_count": len(twse_inst),
     })
     print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
-    # 同步完立即更新 TWSE 前50快取
+    # 同步完立即更新 TWSE 前50快取，並清除舊日期快取
     if twse_inst:
         try:
             top100 = _calc_top100(twse_inst)
             firebase_db.reference(f"top100_cache/{today}/twse").set(top100)
             print(f"[top100] TWSE 快取更新 ✅")
+            # 清除非今日的 top100_cache
+            _cleanup_old_top100_cache(today)
         except Exception as e:
             print(f"[top100] TWSE 快取失敗: {e}")
     return len(twse_inst) > 0
@@ -385,12 +387,14 @@ def sync_otc_institutional(today: str = None):
         "otc_count": len(otc_inst),
     })
     print(f"[sync] OTC 三大法人完成 {len(otc_inst)}筆")
-    # 同步完立即更新 OTC 前50快取
+    # 同步完立即更新 OTC 前50快取，並清除舊日期快取
     if otc_inst:
         try:
             top100 = _calc_top100(otc_inst)
             firebase_db.reference(f"top100_cache/{today}/otc").set(top100)
             print(f"[top100] OTC 快取更新 ✅")
+            # 清除非今日的 top100_cache
+            _cleanup_old_top100_cache(today)
         except Exception as e:
             print(f"[top100] OTC 快取失敗: {e}")
 
@@ -567,6 +571,28 @@ import threading as _threading
 _sync_lock = _threading.Lock()
 
 
+def _cleanup_old_top100_cache(today: str = None):
+    """
+    刪除 top100_cache 下除了今日以外的所有日期節點，防止資料庫持續膨脹。
+    每次寫入 top100_cache 後自動呼叫；sync_top100() 末尾亦會呼叫。
+    """
+    if today is None:
+        today = get_today()
+    try:
+        ref  = firebase_db.reference("top100_cache")
+        keys = ref.get(shallow=True)
+        if not keys:
+            return
+        old_keys = [k for k in keys if k != today]
+        for key in old_keys:
+            firebase_db.reference(f"top100_cache/{key}").delete()
+            print(f"[top100] 清除舊快取 top100_cache/{key} ✅")
+        if old_keys:
+            print(f"[top100] 共清除 {len(old_keys)} 筆舊快取，保留 {today}")
+    except Exception as e:
+        print(f"[top100] 清除舊快取失敗: {e} ⚠️")
+
+
 def _calc_top100(inst_dict: dict, top_n: int = 100) -> dict:
     """
     從全量法人資料計算買超/賣超前100。
@@ -634,16 +660,7 @@ def sync_top100(today: str = None):
     _calc_and_write("otc")
 
     # 順便清除舊的 top100 快取（保留今日）
-    try:
-        ref  = firebase_db.reference("top100_cache")
-        keys = ref.get(shallow=True)
-        if keys:
-            for k in keys:
-                if k != today:
-                    firebase_db.reference(f"top100_cache/{k}").delete()
-                    print(f"[top100] 清除舊快取 top100_cache/{k}")
-    except Exception as e:
-        print(f"[top100] 清除舊快取失敗: {e}")
+    _cleanup_old_top100_cache(today)
 
 
 def sync_all(today: str = None, label: int = None):

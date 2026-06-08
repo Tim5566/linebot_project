@@ -288,6 +288,10 @@
       color:var(--text-dark);text-align:center;margin-bottom:4px;opacity:.5;text-transform:uppercase}
     .ad-unit ins{display:block;margin:0 auto}
     .ad-divider{border:none;border-top:1px solid rgba(0,229,255,.07);margin:0 0 4px}
+    @media(max-width:768px){
+      .ad-unit-tool{margin:10px 0;min-height:0}
+      .ad-unit ins{min-height:0!important;height:auto!important}
+    }
 
     /* FOOTER */
     #site-footer{position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);
@@ -944,18 +948,16 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
-  <div class="disclaimer">
-    資料來源：櫃買中心 TPEx 官方 API｜每日盤後自動更新｜本站資料僅供參考，不構成任何投資建議
-  </div>
 </div>
 
 <footer id="site-footer">
   <div class="sf-inner">
-    <p class="sf-disclaimer">本站資料來源為 TWSE / TPEx 官方 API，僅供資訊參考，不構成投資建議。投資有風險，請自行評估。</p>
+    <p class="sf-disclaimer">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
     <div class="sf-links">
       <a href="/stock_site/legal/about.html">關於我們</a><span class="sf-sep">|</span>
       <a href="/stock_site/legal/privacy.html">隱私政策</a><span class="sf-sep">|</span>
-      <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+      <a href="/stock_site/legal/disclaimer.html">免責聲明</a><span class="sf-sep">|</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
     </div>
     <p class="sf-copy">© 2024 JellyStock · jellystockdata.com</p>
   </div>
