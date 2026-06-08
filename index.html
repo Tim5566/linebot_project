@@ -8434,6 +8434,7 @@ setTimeout(() => {
   if (!cv) return;
   const ctx = cv.getContext('2d');
   let W, H;
+  let boidsInited = false;  // ✅ 移到頂端，避免 resize() 呼叫前 TDZ 錯誤
 
   function resize() {
     W = cv.width  = window.innerWidth;
@@ -8543,7 +8544,6 @@ setTimeout(() => {
   // ════════════════════════════════════════════════════
   const FLOCK  = 32;
   const boids  = [];
-  let boidsInited = false;
 
   function mkBoid(scattered) {
     const angle = scattered
