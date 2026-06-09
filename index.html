@@ -8591,7 +8591,7 @@ setTimeout(() => {
     });
   }
 
-  // 繪製單隻鳥（燕子剪影：身體 + 弧形翅膀 + 叉尾）
+  // 繪製單隻鳥（燕子：身體 + 弧形翅膀 + 叉尾）
   function drawBoid(b) {
     const angle = Math.atan2(b.vy, b.vx);
     const wing  = Math.sin(b.wingPhase);   // -1..1
