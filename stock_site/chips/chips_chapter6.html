@@ -2287,63 +2287,77 @@
       stroke: rgba(26,80,140,.25) !important;
     }
   
-    /* ── Adsterra 廣告容器統一樣式 ── */
-    .at-banner-wrap {
+    /* ── Adsterra Banner 廣告容器 ── */
+    .ad-unit {
+      display: block;
       width: 100%;
-      margin: 24px 0 8px;
       text-align: center;
       overflow: hidden;
     }
-    .at-ad-label {
+    .ad-unit-gap { margin: 28px 0; }
+    .ad-unit-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: .48rem;
+      font-size: .5rem;
       letter-spacing: .18em;
       color: var(--text-faint);
       text-align: center;
-      margin-bottom: 5px;
-      opacity: .45;
+      margin-bottom: 4px;
+      opacity: .5;
       text-transform: uppercase;
     }
-    /* 桌機顯示 728x90，手機隱藏 */
-    .at-ad-728 { display: flex; justify-content: center; }
-    .at-ad-320 { display: none;  justify-content: center; }
-    @media (max-width: 768px) {
-      .at-ad-728 { display: none; }
-      .at-ad-320 { display: flex; }
+    .ad-block {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
     }
+    .ad-728 { display: flex; }
+    .ad-320 { display: none; }
+    @media (max-width: 768px) {
+      .ad-728 { display: none; }
+      .ad-320 { display: flex; }
+    }
+    .ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 0 0 4px;
+    }
+    body.theme-day .ad-unit-label { color: #5a8ab8; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
-    /* ── 右側浮動廣告 ── */
-    .at-sidebar-float {
+    /* ── 側欄固定廣告（桌機限定，手機隱藏）── */
+    .side-ad {
       position: fixed;
-      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      z-index: 100;
+      z-index: 500;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+      max-height: calc(100vh - 120px);
     }
-    .at-sidebar-label {
-      margin-bottom: 2px;
-      font-size: .44rem;
-      opacity: .35;
+    .side-ad.visible {
+      opacity: 1;
+      pointer-events: auto;
     }
-    /* 桌機：依視窗寬度切換 160x600 或 160x300 */
-    .at-sidebar-160x600 { display: block; }
-    .at-sidebar-160x300 { display: none; }
-    /* 當視窗高度不夠放 600，改顯示 300 */
-    @media (max-height: 720px) {
-      .at-sidebar-160x600 { display: none; }
-      .at-sidebar-160x300 { display: block; }
+    .side-ad-label {
+      font-size: .55rem;
+      color: rgba(100,140,180,.45);
+      letter-spacing: .05em;
+      text-transform: uppercase;
     }
-    /* 手機 / 平板：完全隱藏右側廣告 */
-    @media (max-width: 1100px) {
-      .at-sidebar-float { display: none !important; }
+    .side-ad-right { right: calc(50% - 450px - 178px); }
+    @media (max-width: 1320px) {
+      .side-ad-right { right: 4px; }
     }
-
-    body.theme-day .at-ad-label { color: #5a8ab8; }
-    body.theme-day .ad-divider  { border-top-color: rgba(26,101,168,.1); }
+    @media (max-width: 768px) {
+      .side-ad { display: none !important; }
+    }
 
   </style>
 </head>
@@ -2426,36 +2440,6 @@
 
 <main>
 
-<!-- AD SIDEBAR FLOAT -->
-<div class="at-sidebar-float" id="atSidebarAd">
-  <p class="at-ad-label at-sidebar-label">廣告</p>
-  <div class="at-sidebar-160x600">
-    <script>
-  atOptions = {
-    'key' : '0b75586f85e116c7c680d395de31c581',
-    'format' : 'iframe',
-    'height' : 600,
-    'width' : 160,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
-  </div>
-  <div class="at-sidebar-160x300">
-    <script>
-  atOptions = {
-    'key' : '61e814ed49d74b806064a4113acee64a',
-    'format' : 'iframe',
-    'height' : 300,
-    'width' : 160,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/61e814ed49d74b806064a4113acee64a/invoke.js"></script>
-  </div>
-</div>
-
-
   <!-- HERO -->
   <div class="hero">
     <div class="hero-icon">
@@ -2497,33 +2481,32 @@
   </div>
 
   <!-- ═══ SEC 1 ─ 融資融券是什麼 ═══ -->
-    
-<!-- AD BANNER #top -->
-<div class="at-banner-wrap">
-  <p class="at-ad-label">贊助商廣告</p>
-  <div class="at-ad-728">
+    <!-- AD BANNER #top -->
+<div class="ad-unit ad-unit-gap">
+  <p class="ad-unit-label">贊助商廣告</p>
+  <div class="ad-block ad-728">
     <script>
-  atOptions = {
-    'key' : '5772ef3994b031361b8244c989020d16',
-    'format' : 'iframe',
-    'height' : 90,
-    'width' : 728,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+      atOptions = {
+        'key' : '5772ef3994b031361b8244c989020d16',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
   </div>
-  <div class="at-ad-320">
+  <div class="ad-block ad-320">
     <script>
-  atOptions = {
-    'key' : '870f277b58a349b01e24f2df2d1c7aba',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
   </div>
 </div>
 <hr class="ad-divider">
@@ -3219,37 +3202,35 @@
   </div>
 
   <!-- ═══ SEC 6 ─ 新增：融資融券與技術面的搭配 ═══ -->
-  
-<!-- AD BANNER #mid -->
-<div class="at-banner-wrap">
-  <p class="at-ad-label">贊助商廣告</p>
-  <div class="at-ad-728">
+  <!-- AD BANNER #mid -->
+<div class="ad-unit ad-unit-gap">
+  <p class="ad-unit-label">贊助商廣告</p>
+  <div class="ad-block ad-728">
     <script>
-  atOptions = {
-    'key' : '5772ef3994b031361b8244c989020d16',
-    'format' : 'iframe',
-    'height' : 90,
-    'width' : 728,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+      atOptions = {
+        'key' : '5772ef3994b031361b8244c989020d16',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
   </div>
-  <div class="at-ad-320">
+  <div class="ad-block ad-320">
     <script>
-  atOptions = {
-    'key' : '870f277b58a349b01e24f2df2d1c7aba',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
   </div>
 </div>
 <hr class="ad-divider">
-
 <div class="section-card reveal" id="sec6">
     <div class="section-header">
       <span class="section-num">SEC 06</span>
@@ -3546,36 +3527,6 @@
   </div>
 
     
-<!-- AD BANNER #bot -->
-<div class="at-banner-wrap">
-  <p class="at-ad-label">贊助商廣告</p>
-  <div class="at-ad-728">
-    <script>
-  atOptions = {
-    'key' : '5772ef3994b031361b8244c989020d16',
-    'format' : 'iframe',
-    'height' : 90,
-    'width' : 728,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-  </div>
-  <div class="at-ad-320">
-    <script>
-  atOptions = {
-    'key' : '870f277b58a349b01e24f2df2d1c7aba',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-  </div>
-</div>
-<hr class="ad-divider">
-
 
   <!-- CHAPTER FOOTER -->
   <div class="chapter-footer">
@@ -3606,6 +3557,36 @@
 
 </main>
 
+
+<!-- AD BANNER #after-main -->
+<div class="ad-unit ad-unit-gap">
+  <p class="ad-unit-label">贊助商廣告</p>
+  <div class="ad-block ad-728">
+    <script>
+      atOptions = {
+        'key' : '5772ef3994b031361b8244c989020d16',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ad-block ad-320">
+    <script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+</div>
+<hr class="ad-divider">
 <!-- FOOTER -->
 <footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;" data-dark-footer="1">
   <div style="padding:20px 40px 24px;display:flex;flex-direction:column;gap:8px;">
@@ -3889,6 +3870,56 @@ window.answerQ = function(qid, el, choice) {
   });
   // Also run immediately if DOM already ready
   if (document.readyState !== 'loading') setTimeout(run, 50);
+})();
+</script>
+
+<!-- AD SIDE RIGHT -->
+<div class="side-ad side-ad-right" id="sideAdRight">
+  <span class="side-ad-label">Ad</span>
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<script>
+(function(){
+  var HEADER_H = 100;
+  var right = document.getElementById('sideAdRight');
+  var footer = document.getElementById('site-footer');
+  function updateVisibility(){
+    var scrollY = window.scrollY;
+    var vH = window.innerHeight;
+    var adH = 600;
+    var show = scrollY > 200;
+    if(footer){
+      var footerTop = footer.getBoundingClientRect().top;
+      if(footerTop < vH) show = false;
+    }
+    if(!right) return;
+    if(show){
+      var availH = vH - HEADER_H;
+      if(adH >= availH){
+        right.style.top = HEADER_H + 'px';
+        right.style.transform = 'none';
+      } else {
+        var centerY = HEADER_H + availH / 2;
+        right.style.top = centerY + 'px';
+        right.style.transform = 'translateY(-50%)';
+      }
+      right.classList.add('visible');
+    } else {
+      right.classList.remove('visible');
+    }
+  }
+  window.addEventListener('scroll', updateVisibility, {passive:true});
+  window.addEventListener('resize', updateVisibility, {passive:true});
+  updateVisibility();
 })();
 </script>
 
