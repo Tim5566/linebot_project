@@ -2,9 +2,6 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8"/>
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226"
-       crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>均線雷達｜個股最佳均線精準定位</title>
   <meta name="description" content="台股個股最佳均線精準定位工具，輸入股票代號自動計算最具支撐效果的均線週期，協助找出最適合該股的均線參數。" />
@@ -653,17 +650,11 @@
     body.theme-day .sf-sep { color:rgba(26,123,191,.3) !important; }
     body.theme-day .sf-copy { color:#7a9cb8 !important; }
 
-    /* ── Google AdSense 廣告容器 ── */
-    .ad-unit {
-      display: block;
-      width: 100%;
-      text-align: center;
-      overflow: hidden;
-    }
-    /* 標準 margin 版本（章節頁、資訊頁） */
-    .ad-unit-gap { margin: 28px 0; }
-    /* 輕量版：工具頁面，廣告間距更緊湊，不影響工具操作感 */
-    .ad-unit-tool { margin: 20px 0; }
+    /* ── Adsterra 廣告容器 ── */
+    .ad-block { display:flex; justify-content:center; align-items:center; width:100%; overflow:hidden; }
+    .ad-728 { display:flex; }
+    .ad-320 { display:none; }
+    @media (max-width:768px) { .ad-728 { display:none; } .ad-320 { display:flex; } }
     .ad-unit-label {
       font-family: 'Share Tech Mono', monospace;
       font-size: .5rem;
@@ -888,16 +879,17 @@
   </div>
 
 
-<!-- ── AdSense 廣告位：均線工具 — 最佳均線卡片下方、訊號明細之前 ── -->
-<div class="ad-unit ad-unit-tool">
+<!-- AD：均線卡片下方、訊號明細之前（結果出現後才看到，不干擾操作） -->
+<div style="padding:16px 0 8px;">
   <p class="ad-unit-label">贊助商廣告</p>
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-8975741363002226"
-       data-ad-slot="9906036524"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <div class="ad-block ad-728">
+    <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ad-block ad-320">
+    <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
 </div>
 <hr class="ad-divider">
   <!-- SIGNAL TABLE -->
@@ -2104,16 +2096,17 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 <!-- ── FOOTER ── -->
 
-<!-- ── AdSense 廣告位：均線工具 — 頁面底部、footer 之前 ── -->
-<div class="ad-unit ad-unit-tool">
+<!-- AD：頁面底部、footer 之前 -->
+<div style="padding:20px 0 0;">
   <p class="ad-unit-label">贊助商廣告</p>
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-8975741363002226"
-       data-ad-slot="1179019177"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <div class="ad-block ad-728">
+    <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ad-block ad-320">
+    <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
 </div>
 <hr class="ad-divider">
 <footer id="site-footer">

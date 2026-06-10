@@ -26,7 +26,7 @@
     .bg-layer-scanlines { background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.055) 3px, rgba(0,0,0,.055) 4px); animation: scanShift 10s linear infinite; }
     @keyframes scanShift { from { background-position: 0 0; } to { background-position: 0 120px; } }
 
-    header { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 16px; height: 58px; border-bottom: 1px solid rgba(0,229,255,.08); background: rgba(4,8,15,.96); backdrop-filter: blur(20px); }
+    header { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 28px 0 16px; height: 58px; border-bottom: 1px solid rgba(0,229,255,.08); background: rgba(4,8,15,.96); backdrop-filter: blur(20px); }
     header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0,229,255,.7) 20%, rgba(0,170,255,.9) 50%, rgba(0,229,255,.7) 80%, transparent 100%); background-size: 200% 100%; animation: hSweep 4s linear infinite; }
     @keyframes hSweep { from { background-position: -100% 0; } to { background-position: 200% 0; } }
     .header-left { display: flex; align-items: center; padding-left: 4px; }
@@ -95,6 +95,14 @@
       footer { padding: 16px 16px 20px; flex-direction: column; }
     }
 
+    /* ── AD CONTAINERS ── */
+    .ad-block { display: flex; justify-content: center; align-items: center; width: 100%; overflow: hidden; }
+    .ad-728 { display: flex; }
+    .ad-320 { display: none; }
+    @media (max-width: 768px) { .ad-728 { display: none; } .ad-320 { display: flex; } }
+    .ad-divider { border: none; border-top: 1px solid rgba(0,229,255,.07); margin: 0 0 4px; }
+    body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
+
     /* ══ 白天主題（theme-day）══════════════════════════════════════════════ */
     body.theme-day {
       --bg:#ddeaf6; --surface:#f0f7ff; --surface2:#e4f0fa;
@@ -157,6 +165,36 @@
     body.theme-day .footer-nav a { color:#4a7090 !important; }
     body.theme-day .footer-nav a:hover,
     body.theme-day .footer-nav a.active { color:#1a7bbf !important; }
+  
+    /* ── 側欄固定廣告（桌機限定，手機隱藏）── */
+    .side-ad {
+      position: fixed;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+    }
+    .side-ad.visible { opacity: 1; pointer-events: auto; }
+    .side-ad-label {
+      font-size: .55rem;
+      color: rgba(100,140,180,.45);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .side-ad-left  { left: calc(50% - 420px - 178px); }
+    .side-ad-right { right: calc(50% - 420px - 178px); }
+    @media (max-width: 1260px) {
+      .side-ad-left  { left: 4px; }
+      .side-ad-right { right: 4px; }
+    }
+    @media (max-width: 768px) {
+      .side-ad { display: none !important; }
+    }
+
   </style>
 <script>
 /* ── 全站主題同步 ── */
@@ -274,6 +312,17 @@
     </div>
   </div>
 
+  <!-- AD: 中段橫幅 (桌機 728x90 / 手機 320x50) -->
+  <div class="ad-block ad-728" style="padding:20px 0;">
+    <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ad-block ad-320" style="padding:16px 0;">
+    <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+  <hr class="ad-divider" style="margin-bottom:20px;">
+
   <div class="doc-card">
     <div class="sec-num">Section 04</div>
     <div class="sec-title">Cookie 與廣告追蹤技術</div>
@@ -365,6 +414,16 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- AD: Footer 前橫幅 (桌機 728x90 / 手機 320x50) -->
+<div class="ad-block ad-728" style="padding:20px 0 0;">
+  <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
+  <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+</div>
+<div class="ad-block ad-320" style="padding:14px 0 0;">
+  <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
+  <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
 </div>
 
 <footer>
@@ -463,6 +522,77 @@
       .finally(function() { setTimeout(check, 30000); });
   }
   check();
+})();
+</script>
+
+
+<!-- 側欄固定廣告：桌機限定，手機隱藏 -->
+<div class="side-ad side-ad-left" id="sideAdLeft">
+  <span class="side-ad-label">Ad</span>
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<div class="side-ad side-ad-right" id="sideAdRight">
+  <span class="side-ad-label">Ad</span>
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<script>
+(function(){
+  var HEADER_H = 58;
+  var left   = document.getElementById('sideAdLeft');
+  var right  = document.getElementById('sideAdRight');
+  // 這三頁 footer 沒有 id，用 querySelector
+  var footer = document.querySelector('footer');
+
+  function update(){
+    var scrollY = window.scrollY;
+    var vH = window.innerHeight;
+    var adH = 600;
+
+    var show = scrollY > 200;
+    if(footer){
+      var fTop = footer.getBoundingClientRect().top;
+      if(fTop < vH) show = false;
+    }
+
+    [left, right].forEach(function(el){
+      if(!el) return;
+      if(show){
+        var availH = vH - HEADER_H;
+        if(adH >= availH){
+          el.style.top = HEADER_H + 'px';
+          el.style.transform = 'none';
+        } else {
+          el.style.top = (HEADER_H + availH / 2) + 'px';
+          el.style.transform = 'translateY(-50%)';
+        }
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update, {passive:true});
+  update();
 })();
 </script>
 

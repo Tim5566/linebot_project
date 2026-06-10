@@ -2,8 +2,6 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8"/>
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8975741363002226" crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>上市法人買賣超前100｜JellyStock</title>
   <meta name="description" content="台股上市三大法人買賣超前100排行，外資、投信、自營商每日更新，並可篩選法人共振（兩家或三家同步買超/賣超）個股。" />
@@ -282,16 +280,12 @@
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
     /* AD */
-    .ad-unit{display:block;width:100%;text-align:center;overflow:hidden}
-    .ad-unit-tool{margin:20px 0}
+    .ad-block{display:flex;justify-content:center;align-items:center;width:100%;overflow:hidden}
+    .ad-728{display:flex}.ad-320{display:none}
     .ad-unit-label{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.18em;
       color:var(--text-dark);text-align:center;margin-bottom:4px;opacity:.5;text-transform:uppercase}
-    .ad-unit ins{display:block;margin:0 auto}
     .ad-divider{border:none;border-top:1px solid rgba(0,229,255,.07);margin:0 0 4px}
-    @media(max-width:768px){
-      .ad-unit-tool{margin:10px 0;min-height:0}
-      .ad-unit ins{min-height:0!important;height:auto!important}
-    }
+    @media(max-width:768px){.ad-728{display:none}.ad-320{display:flex}}
 
     /* FOOTER */
     #site-footer{position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);
@@ -859,14 +853,6 @@
     <span>正在載入上市法人資料…</span>
   </div>
 
-  <!-- AD TOP -->
-  <div class="ad-unit ad-unit-tool fade-in">
-    <hr class="ad-divider"/>
-    <p class="ad-unit-label">Advertisement</p>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8975741363002226" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
-
   <!-- SYNC RESULTS -->
   <div id="syncResultArea"></div>
 
@@ -940,12 +926,17 @@
     </div>
   </div>
 
-  <!-- AD BOTTOM -->
-  <div class="ad-unit ad-unit-tool">
-    <hr class="ad-divider"/>
-    <p class="ad-unit-label">Advertisement</p>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8975741363002226" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <!-- AD BOTTOM：表格下方，footer 前 -->
+  <div style="padding:20px 0 0;">
+    <p class="ad-unit-label">贊助商廣告</p>
+    <div class="ad-block ad-728">
+      <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
+      <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+    </div>
+    <div class="ad-block ad-320">
+      <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
+      <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+    </div>
   </div>
 
 </div>

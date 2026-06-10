@@ -2990,7 +2990,60 @@
     body.theme-day .ad-unit-label { color: #5a8ab8; }
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
-  </style>
+  
+    /* ═══════════════════════════════════════════════════
+       ADSTERRA 廣告容器樣式（統一所有章節頁）
+       ═══════════════════════════════════════════════════ */
+    .ch-ad-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      overflow: hidden;
+      margin: 24px 0 8px;
+    }
+    .ch-ad-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .46rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 4px;
+      opacity: .45;
+      text-transform: uppercase;
+    }
+    body.theme-day .ch-ad-label { color: #5a8ab8; }
+    .ch-ad-divider {
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.07);
+      margin: 4px 0 0;
+    }
+    body.theme-day .ch-ad-divider { border-top-color: rgba(26,101,168,.1); }
+    /* 桌機：728x90；手機：320x50（中段） */
+    .ch-ad-728 { display: flex; }
+    .ch-ad-320 { display: none; }
+    /* 桌機：468x60；手機：320x50（章節底部，輕量） */
+    .ch-ad-468 { display: flex; }
+    @media (max-width: 768px) {
+      .ch-ad-728 { display: none; }
+      .ch-ad-320 { display: flex; }
+      .ch-ad-468 { display: none; }
+    }
+    /* ── 側欄固定廣告（左右各一，寬螢幕才顯示）── */
+    .ch-sidebar-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+    }
+    .ch-sidebar-ad-left  { left: calc(50% - 600px); }
+    .ch-sidebar-ad-right { right: calc(50% - 600px); }
+    @media (max-width: 1320px) {
+      .ch-sidebar-ad { display: none; }
+    }
+</style>
   <script>
 (function(){
   function applyTheme(t){if(t==='day')document.body.classList.add('theme-day');else document.body.classList.remove('theme-day');}
@@ -3081,6 +3134,32 @@
   </div>
 </div>
 
+<!-- ── Adsterra 側欄廣告：左側 160x600（桌機寬螢幕）── -->
+<div class="ch-sidebar-ad ch-sidebar-ad-left">
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<!-- ── Adsterra 側欄廣告：右側 160x600（桌機寬螢幕）── -->
+<div class="ch-sidebar-ad ch-sidebar-ad-right">
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
 <main>
 
 
@@ -3139,7 +3218,34 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 -->
-  <hr class="ad-divider">
+    <!-- ── Adsterra 廣告：章節頂部（目錄與正文之間）── -->
+  <p class="ch-ad-label">廣告贊助</p>
+  <div class="ch-ad-wrap ch-ad-728">
+    <script>
+      atOptions = {
+        'key' : '5772ef3994b031361b8244c989020d16',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ch-ad-wrap ch-ad-320">
+    <script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+  <hr class="ch-ad-divider">
+
   <div class="section-card reveal" id="sec1">
     <div class="card-header">
       <div class="card-icon">💧</div>
@@ -3764,7 +3870,34 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 -->
-  <hr class="ad-divider">
+    <!-- ── Adsterra 廣告：章節底部（完成章節前）── -->
+  <p class="ch-ad-label">廣告贊助</p>
+  <div class="ch-ad-wrap ch-ad-468">
+    <script>
+      atOptions = {
+        'key' : 'f8369218a9a6d1d181e17e8ac7efbae7',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/f8369218a9a6d1d181e17e8ac7efbae7/invoke.js"></script>
+  </div>
+  <div class="ch-ad-wrap ch-ad-320">
+    <script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+  <hr class="ch-ad-divider">
+
   <div class="section-card reveal" id="sec7">
     <div class="card-header">
       <div class="card-icon">🎮</div>
@@ -4418,6 +4551,35 @@
 
   <!-- ── CHAPTER FOOTER ── -->
 
+
+  
+  <!-- ── Adsterra 廣告：章節中段（正文後、Bonus 前）── -->
+  <p class="ch-ad-label">廣告贊助</p>
+  <div class="ch-ad-wrap ch-ad-728">
+    <script>
+      atOptions = {
+        'key' : '5772ef3994b031361b8244c989020d16',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="ch-ad-wrap ch-ad-320">
+    <script>
+      atOptions = {
+        'key' : '870f277b58a349b01e24f2df2d1c7aba',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+  <hr class="ch-ad-divider">
 
   <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
   <!-- AdSense 審核通過後啟用

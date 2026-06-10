@@ -2469,6 +2469,65 @@
     body.theme-day .svg-chart-wrap svg polyline[stroke*="255,255,255"] {
       stroke: rgba(26,80,140,.25) !important;
     }
+  
+    /* ── Adsterra 廣告容器統一樣式 ── */
+    .at-banner-wrap {
+      width: 100%;
+      margin: 24px 0 8px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .at-ad-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .48rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-align: center;
+      margin-bottom: 5px;
+      opacity: .45;
+      text-transform: uppercase;
+    }
+    /* 桌機顯示 728x90，手機隱藏 */
+    .at-ad-728 { display: flex; justify-content: center; }
+    .at-ad-320 { display: none;  justify-content: center; }
+    @media (max-width: 768px) {
+      .at-ad-728 { display: none; }
+      .at-ad-320 { display: flex; }
+    }
+
+    /* ── 右側浮動廣告 ── */
+    .at-sidebar-float {
+      position: fixed;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .at-sidebar-label {
+      margin-bottom: 2px;
+      font-size: .44rem;
+      opacity: .35;
+    }
+    /* 桌機：依視窗寬度切換 160x600 或 160x300 */
+    .at-sidebar-160x600 { display: block; }
+    .at-sidebar-160x300 { display: none; }
+    /* 當視窗高度不夠放 600，改顯示 300 */
+    @media (max-height: 720px) {
+      .at-sidebar-160x600 { display: none; }
+      .at-sidebar-160x300 { display: block; }
+    }
+    /* 手機 / 平板：完全隱藏右側廣告 */
+    @media (max-width: 1100px) {
+      .at-sidebar-float { display: none !important; }
+    }
+
+    body.theme-day .at-ad-label { color: #5a8ab8; }
+    body.theme-day .ad-divider  { border-top-color: rgba(26,101,168,.1); }
+
   </style>
 </head>
 <body spellcheck="false">
@@ -2550,6 +2609,36 @@
 
 <main>
 
+<!-- AD SIDEBAR FLOAT -->
+<div class="at-sidebar-float" id="atSidebarAd">
+  <p class="at-ad-label at-sidebar-label">廣告</p>
+  <div class="at-sidebar-160x600">
+    <script>
+  atOptions = {
+    'key' : '0b75586f85e116c7c680d395de31c581',
+    'format' : 'iframe',
+    'height' : 600,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+  </div>
+  <div class="at-sidebar-160x300">
+    <script>
+  atOptions = {
+    'key' : '61e814ed49d74b806064a4113acee64a',
+    'format' : 'iframe',
+    'height' : 300,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/61e814ed49d74b806064a4113acee64a/invoke.js"></script>
+  </div>
+</div>
+
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-icon">
@@ -2589,20 +2678,37 @@
 </div>
 
 <!-- SECTION 1 -->
-  <!-- ── AdSense 廣告位：章節開頭 — Hero 之後、第一節之前 ── -->
-  <!-- AdSense 審核通過後啟用
-<div class="ad-unit">
-    <p class="ad-unit-label">贊助商廣告</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-8975741363002226"
-         data-ad-slot="2321848525"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  
+<!-- AD BANNER #top -->
+<div class="at-banner-wrap">
+  <p class="at-ad-label">贊助商廣告</p>
+  <div class="at-ad-728">
+    <script>
+  atOptions = {
+    'key' : '5772ef3994b031361b8244c989020d16',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
   </div>
--->
-  <hr class="ad-divider">
+  <div class="at-ad-320">
+    <script>
+  atOptions = {
+    'key' : '870f277b58a349b01e24f2df2d1c7aba',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+</div>
+<hr class="ad-divider">
+
 <div class="section-card reveal">
   <div class="section-header">
     <div class="section-num">8-1</div>
@@ -3007,6 +3113,37 @@
 </div>
 
 <!-- SECTION 6 -->
+
+<!-- AD BANNER #mid -->
+<div class="at-banner-wrap">
+  <p class="at-ad-label">贊助商廣告</p>
+  <div class="at-ad-728">
+    <script>
+  atOptions = {
+    'key' : '5772ef3994b031361b8244c989020d16',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+  </div>
+  <div class="at-ad-320">
+    <script>
+  atOptions = {
+    'key' : '870f277b58a349b01e24f2df2d1c7aba',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+</div>
+<hr class="ad-divider">
+
 <div class="section-card reveal">
   <div class="section-header">
     <div class="section-num">8-6</div>
@@ -3475,20 +3612,37 @@
   </div>
 </div>
 
-  <!-- ── AdSense 廣告位：章節底部 — 完成閱讀後 ── -->
-  <!-- AdSense 審核通過後啟用
-<div class="ad-unit">
-    <p class="ad-unit-label">贊助商廣告</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-8975741363002226"
-         data-ad-slot="1893335041"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  
+<!-- AD BANNER #bot -->
+<div class="at-banner-wrap">
+  <p class="at-ad-label">贊助商廣告</p>
+  <div class="at-ad-728">
+    <script>
+  atOptions = {
+    'key' : '5772ef3994b031361b8244c989020d16',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
   </div>
--->
-  <hr class="ad-divider">
+  <div class="at-ad-320">
+    <script>
+  atOptions = {
+    'key' : '870f277b58a349b01e24f2df2d1c7aba',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  </div>
+</div>
+<hr class="ad-divider">
+
 
   <!-- CHAPTER FOOTER -->
 <div class="chapter-footer">

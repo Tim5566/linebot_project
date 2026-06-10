@@ -24,10 +24,11 @@
     html, body {
       background: var(--bg); color: var(--text);
       font-family: 'Noto Sans TC', sans-serif;
-      min-height: 100vh; overflow-x: hidden;
+      min-height: 100vh; 
       scrollbar-width: thin;
       scrollbar-color: rgba(0,229,255,.2) transparent;
     }
+    body{ overflow-x: hidden; }
     body::-webkit-scrollbar { width: 5px; }
     body::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); border-radius: 4px; }
 
@@ -66,7 +67,7 @@
 
     /* ── HEADER ── */
     header {
-      position: sticky; top: 0; z-index: 200;
+      position: sticky; top: 0; z-index: 1000;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 24px 0 16px; height: 58px;
       border-bottom: 1px solid rgba(0,229,255,.09);
@@ -380,11 +381,11 @@
       width: 100%;
       overflow: hidden;
     }
-    .ad-728 { display: flex; }   /* 桌機顯示 728x90 */
-    .ad-320 { display: none; }   /* 桌機隱藏 320x50 */
+    .ad-728 { display: flex; }
+    .ad-320 { display: none; }
     @media (max-width: 768px) {
-      .ad-728 { display: none; }  /* 手機隱藏 728x90 */
-      .ad-320 { display: flex; }  /* 手機顯示 320x50 */
+      .ad-728 { display: none; }
+      .ad-320 { display: flex; }
     }
 
     /* 淡分隔線 */
@@ -396,7 +397,44 @@
     body.theme-day .ad-unit-label { color: #5a8ab8; }
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
-  </style>
+  
+    /* ── 側欄固定廣告（桌機限定，手機隱藏）── */
+    .side-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 500;           /* 低於 header(1000)，不遮 navbar */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+      /* 頂部不超過 header 底部：header=58px + 8px 緩衝 */
+      max-height: calc(100vh - 80px);
+    }
+    .side-ad.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .side-ad-label {
+      font-size: .55rem;
+      color: rgba(100,140,180,.45);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .side-ad-left  { left: calc(50% - 450px - 178px); }
+    .side-ad-right { right: calc(50% - 450px - 178px); }
+    @media (max-width: 1320px) {
+      .side-ad-left  { left: 4px; }
+      .side-ad-right { right: 4px; }
+    }
+    @media (max-width: 768px) {
+      .side-ad { display: none !important; }
+    }
+
+    </style>
   <link rel="canonical" href="https://jellystockdata.com/notice.html" />
   <meta name="robots" content="index, follow" />
   <meta property="og:image" content="https://jellystockdata.com/images/jelly.png" />
@@ -505,10 +543,9 @@
   </div>
 </section>
 
-<!-- AD：橫幅廣告 桌機 728x90 / 手機 320x50 -->
-<div style="padding:24px 0 8px; position:relative; z-index:1; text-align:center;">
+<!-- AD：橫幅 桌機728x90 / 手機320x50 -->
+<div style="padding:24px 0 8px; text-align:center;">
   <p class="ad-unit-label">贊助商廣告</p>
-  <!-- 桌機 728x90 -->
   <div class="ad-block ad-728">
     <script>
       atOptions = {
@@ -521,7 +558,6 @@
     </script>
     <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
   </div>
-  <!-- 手機 320x50 -->
   <div class="ad-block ad-320">
     <script>
       atOptions = {
@@ -893,9 +929,9 @@ loadNotice();
 })();
 </script>
 
-<!-- ── FOOTER ──
+<!-- ── FOOTER ── -->
 
-<!-- AD：Footer 前橫幅 桌機 728x90 / 手機 320x50 -->
+<!-- AD：Footer前橫幅 桌機728x90 / 手機320x50 -->
 <div class="ad-block ad-728" style="padding:20px 0 0;">
   <script>
     atOptions = {
@@ -973,6 +1009,80 @@ loadNotice();
       .finally(function() { setTimeout(check, 30000); });
   }
   check();
+})();
+</script>
+
+
+<!-- 側欄固定廣告：桌機限定，手機隱藏 -->
+<div class="side-ad side-ad-left" id="sideAdLeft">
+  <span class="side-ad-label">Ad</span>
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<div class="side-ad side-ad-right" id="sideAdRight">
+  <span class="side-ad-label">Ad</span>
+  <script>
+    atOptions = {
+      'key' : '0b75586f85e116c7c680d395de31c581',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+</div>
+<script>
+(function(){
+  var HEADER_H = 58;
+  var left  = document.getElementById('sideAdLeft');
+  var right = document.getElementById('sideAdRight');
+  var footer = document.getElementById('site-footer');
+
+  function updateVisibility(){
+    var scrollY = window.scrollY;
+    var vH = window.innerHeight;
+    var adH = 600;
+
+    // footer 進入畫面就隱藏
+    var show = scrollY > 200;
+    if(footer){
+      var footerTop = footer.getBoundingClientRect().top;
+      if(footerTop < vH) show = false;
+    }
+
+    [left, right].forEach(function(el){
+      if(!el) return;
+      if(show){
+        var availH = vH - HEADER_H;          // header 以下可用高度
+        if(adH >= availH){
+          // 廣告比可用高度還高：直接貼 header 底部往下
+          el.style.top = HEADER_H + 'px';
+          el.style.transform = 'none';
+        } else {
+          // 廣告比可用高度小：垂直置中於 header 以下區域
+          var centerY = HEADER_H + availH / 2;
+          el.style.top = centerY + 'px';
+          el.style.transform = 'translateY(-50%)';
+        }
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateVisibility, {passive:true});
+  window.addEventListener('resize', updateVisibility, {passive:true});
+  updateVisibility();
 })();
 </script>
 
