@@ -5208,7 +5208,34 @@
 
 
 <hr class="ad-divider">
-  <div style="height:50px"></div>
+  <!-- AD: Native Banner — Hero 下方 -->
+  <div class="native-banner-wrap" id="nativeBannerHero" style="margin:0 0 32px;">
+    <div class="native-banner-label">贊助內容</div>
+    <div class="native-banner-inner">
+      <script async="async" data-cfasync="false" src="https://revolthem.com/ee7f0a3d1fa3ff3fed7566f8d557417a/invoke.js"></script>
+      <div id="container-ee7f0a3d1fa3ff3fed7566f8d557417a"></div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    var wrap = document.getElementById('nativeBannerHero');
+    var container = wrap ? wrap.querySelector('[id^="container-ee7f0a"]') : null;
+    if (!wrap || !container) return;
+    var observer = new MutationObserver(function(mutations) {
+      for (var m of mutations) {
+        if (m.addedNodes.length > 0) {
+          wrap.classList.add('is-loaded');
+          observer.disconnect();
+          break;
+        }
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
+    setTimeout(function() {
+      if (!wrap.classList.contains('is-loaded')) wrap.style.display = 'none';
+    }, 3000);
+  })();
+  </script>
 
   <!-- MARKET OVERVIEW -->
   <div class="market-section">
@@ -5380,34 +5407,7 @@
 
 
 
-<!-- AD: Native Banner — Footer 前 -->
-<div class="native-banner-wrap" id="nativeBannerFooter" style="margin:20px 32px 0;">
-  <div class="native-banner-label">贊助內容</div>
-  <div class="native-banner-inner">
-    <script async="async" data-cfasync="false" src="https://revolthem.com/ee7f0a3d1fa3ff3fed7566f8d557417a/invoke.js"></script>
-    <div id="container-ee7f0a3d1fa3ff3fed7566f8d557417a"></div>
-  </div>
-</div>
-<script>
-(function() {
-  var wrap = document.getElementById('nativeBannerFooter');
-  var container = wrap ? wrap.querySelector('[id^="container-ee7f0a"]') : null;
-  if (!wrap || !container) return;
-  var observer = new MutationObserver(function(mutations) {
-    for (var m of mutations) {
-      if (m.addedNodes.length > 0) {
-        wrap.classList.add('is-loaded');
-        observer.disconnect();
-        break;
-      }
-    }
-  });
-  observer.observe(container, { childList: true, subtree: true });
-  setTimeout(function() {
-    if (!wrap.classList.contains('is-loaded')) wrap.style.display = 'none';
-  }, 3000);
-})();
-</script>
+
 
 <!-- FOOTER -->
 <footer>
