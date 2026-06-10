@@ -356,11 +356,21 @@ def sync_institutional(today: str = None, max_retries: int = None):
         _write_batch(f"stock_data/{today}/twse", twse_inst)
     else:
         print("[sync] 上市三大法人無資料，略過 ⚠️")
+
+    # ✅ 修正：記錄各 API 實際回傳筆數，而非只記合計
+    # 三大法人各自的 API 回傳清單不同，用各別筆數判斷是否抓到，比抽樣股票更準確
+    foreign_count     = sum(1 for v in twse_inst.values() if "foreign"     in v)
+    trust_count       = sum(1 for v in twse_inst.values() if "trust"       in v)
+    proprietary_count = sum(1 for v in twse_inst.values() if "proprietary" in v)
+    print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆（外資:{foreign_count} 投信:{trust_count} 自營商:{proprietary_count}）")
+
     firebase_db.reference(f"stock_data/{today}/meta").update({
         "twse_institutional_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
-        "twse_count": len(twse_inst),
+        "twse_count":            len(twse_inst),
+        "twse_foreign_count":    foreign_count,      # ✅ 新增：外資筆數
+        "twse_trust_count":      trust_count,         # ✅ 新增：投信筆數
+        "twse_proprietary_count":proprietary_count,   # ✅ 新增：自營商筆數
     })
-    print(f"[sync] TWSE 三大法人完成 {len(twse_inst)}筆")
     # 同步完立即更新 TWSE 前50快取，並清除舊日期快取
     if twse_inst:
         try:
@@ -382,11 +392,19 @@ def sync_otc_institutional(today: str = None):
         _write_batch(f"stock_data/{today}/otc", otc_inst)
     else:
         print("[sync] 上櫃三大法人無資料，略過 ⚠️")
+    # ✅ 修正：記錄各欄位實際筆數，供 _check_data_missing_otc 判斷
+    otc_foreign_count     = sum(1 for v in otc_inst.values() if "foreign"     in v)
+    otc_trust_count       = sum(1 for v in otc_inst.values() if "trust"       in v)
+    otc_proprietary_count = sum(1 for v in otc_inst.values() if "proprietary" in v)
+    print(f"[sync] OTC 三大法人完成 {len(otc_inst)}筆（外資:{otc_foreign_count} 投信:{otc_trust_count} 自營商:{otc_proprietary_count}）")
+
     firebase_db.reference(f"stock_data/{today}/meta").update({
         "otc_institutional_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
-        "otc_count": len(otc_inst),
+        "otc_count":            len(otc_inst),
+        "otc_foreign_count":    otc_foreign_count,      # ✅ 新增
+        "otc_trust_count":      otc_trust_count,         # ✅ 新增
+        "otc_proprietary_count":otc_proprietary_count,   # ✅ 新增
     })
-    print(f"[sync] OTC 三大法人完成 {len(otc_inst)}筆")
     # 同步完立即更新 OTC 前50快取，並清除舊日期快取
     if otc_inst:
         try:
@@ -782,6 +800,10 @@ def _check_data_missing(today: str,
     """
     檢查 Firebase 今日 TWSE 資料是否完整。
     回傳 True 表示「仍有缺失，需要重試」。
+
+    ✅ 修正：改用 meta 裡各 API 實際筆數判斷，不再抽樣單一股票。
+    原因：三大法人三支 API 的股票清單本來就不完全相同（例如投信當天
+    沒買賣的股票不會出現），單一股票缺某欄位是正常現象，不代表 API 沒抓到。
     """
     try:
         _init_firebase()
@@ -792,31 +814,25 @@ def _check_data_missing(today: str,
             print(f"[retry_check] twse_count=0，確認需要重試")
             return True
 
-        # 抽查第一支股票資料欄位是否齊全
-        sample_ref = firebase_db.reference(f"stock_data/{today}/twse")
-        keys = sample_ref.get(shallow=True)
-        if not keys:
-            print(f"[retry_check] twse 節點無資料，確認需要重試")
-            return True
-
-        first_key = next(iter(keys))
-        sample = firebase_db.reference(
-            f"stock_data/{today}/twse/{first_key}"
-        ).get() or {}
-
         missing = []
-        if check_foreign and "foreign" not in sample:
+        if check_foreign and int(meta.get("twse_foreign_count", 0)) == 0:
             missing.append("外資")
-        if check_trust and "trust" not in sample:
+        if check_trust and int(meta.get("twse_trust_count", 0)) == 0:
             missing.append("投信")
-        if check_proprietary and "proprietary" not in sample:
+        if check_proprietary and int(meta.get("twse_proprietary_count", 0)) == 0:
             missing.append("自營商")
 
         if missing:
-            print(f"[retry_check] TWSE 缺失欄位：{missing}（sample key={first_key}）")
+            print(f"[retry_check] TWSE 缺失：{missing}（meta counts: "
+                  f"外資={meta.get('twse_foreign_count',0)} "
+                  f"投信={meta.get('twse_trust_count',0)} "
+                  f"自營商={meta.get('twse_proprietary_count',0)}）")
             return True
 
-        print(f"[retry_check] TWSE 資料完整 ✅（sample key={first_key}）")
+        print(f"[retry_check] TWSE 資料完整 ✅（"
+              f"外資={meta.get('twse_foreign_count')} "
+              f"投信={meta.get('twse_trust_count')} "
+              f"自營商={meta.get('twse_proprietary_count')}）")
         return False
 
     except Exception as e:
@@ -828,6 +844,9 @@ def _check_data_missing_otc(today: str) -> bool:
     """
     檢查 Firebase 今日 OTC 資料是否完整。
     回傳 True 表示「仍有缺失，需要重試」。
+
+    ✅ 修正：改用 meta 裡 otc_foreign_count 等筆數判斷，不再抽樣單一股票。
+    OTC API 一次回傳三大法人全部欄位，只要各筆數 > 0 即視為完整。
     """
     try:
         _init_firebase()
@@ -838,24 +857,25 @@ def _check_data_missing_otc(today: str) -> bool:
             print(f"[retry_check_otc] otc_count=0，確認需要重試")
             return True
 
-        sample_ref = firebase_db.reference(f"stock_data/{today}/otc")
-        keys = sample_ref.get(shallow=True)
-        if not keys:
-            print(f"[retry_check_otc] otc 節點無資料，確認需要重試")
-            return True
-
-        first_key = next(iter(keys))
-        sample = firebase_db.reference(
-            f"stock_data/{today}/otc/{first_key}"
-        ).get() or {}
-
-        missing = [f for f in ("foreign", "trust", "proprietary") if f not in sample]
+        missing = []
+        if int(meta.get("otc_foreign_count", 0)) == 0:
+            missing.append("外資")
+        if int(meta.get("otc_trust_count", 0)) == 0:
+            missing.append("投信")
+        if int(meta.get("otc_proprietary_count", 0)) == 0:
+            missing.append("自營商")
 
         if missing:
-            print(f"[retry_check_otc] OTC 缺失欄位：{missing}（sample key={first_key}）")
+            print(f"[retry_check_otc] OTC 缺失：{missing}（meta counts: "
+                  f"外資={meta.get('otc_foreign_count',0)} "
+                  f"投信={meta.get('otc_trust_count',0)} "
+                  f"自營商={meta.get('otc_proprietary_count',0)}）")
             return True
 
-        print(f"[retry_check_otc] OTC 資料完整 ✅（sample key={first_key}）")
+        print(f"[retry_check_otc] OTC 資料完整 ✅（"
+              f"外資={meta.get('otc_foreign_count')} "
+              f"投信={meta.get('otc_trust_count')} "
+              f"自營商={meta.get('otc_proprietary_count')}）")
         return False
 
     except Exception as e:
