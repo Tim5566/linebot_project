@@ -1185,11 +1185,10 @@
     /* ── TWO-COL BOTTOM SECTION ── */
     .bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 180px;
+      grid-template-columns: 1fr;
       gap: 20px;
       align-items: start;
     }
-    @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
 
     /* ── UPDATE TIMELINE ── */
     .timeline {
@@ -4115,6 +4114,59 @@
     body.theme-day .ad-unit-label { color: #5a8ab8; }
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
+    /* ── NATIVE BANNER WRAPPER ── */
+    .native-banner-wrap {
+      position: relative;
+      margin: 12px 0 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,229,255,.10);
+      background: rgba(7,13,26,.6);
+      overflow: hidden;
+      max-height: 220px;
+      /* 預設隱藏，有廣告才顯示 */
+      display: none;
+    }
+    .native-banner-wrap.is-loaded {
+      display: block;
+    }
+    .native-banner-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.4), transparent);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .native-banner-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+    }
+    .native-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(0,229,255,.35);
+    }
+    .native-banner-inner {
+      padding: 4px 8px 4px;
+      overflow: hidden;
+    }
+    body.theme-day .native-banner-wrap {
+      background: rgba(240,246,255,.6);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .native-banner-label { color: #8aaac8; }
+
     /* ═══════════════════════════════════════════════════════
        ☀️ DAY THEME — #seo-static-content 完整補丁
        修正：核心功能介紹、技術分析教學、籌碼分析教學 區塊
@@ -5167,6 +5219,8 @@
   <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
 </div>
 
+<!-- AD: Native Banner — 搜尋結果下方已移至 Footer 前 -->
+
 <hr class="ad-divider">
   <div style="height:50px"></div>
 
@@ -5364,31 +5418,34 @@
 
 
 
-<!-- AD: Footer 前橫幅 (桌機 728x90 / 手機 320x50) -->
-<div class="ad-block ad-728" style="padding:20px 0 0;">
-  <script>
-    atOptions = {
-      'key' : '5772ef3994b031361b8244c989020d16',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+<!-- AD: Native Banner — Footer 前 -->
+<div class="native-banner-wrap" id="nativeBannerFooter" style="margin:20px 32px 0;">
+  <div class="native-banner-label">贊助內容</div>
+  <div class="native-banner-inner">
+    <script async="async" data-cfasync="false" src="https://revolthem.com/ee7f0a3d1fa3ff3fed7566f8d557417a/invoke.js"></script>
+    <div id="container-ee7f0a3d1fa3ff3fed7566f8d557417a"></div>
+  </div>
 </div>
-<div class="ad-block ad-320" style="padding:16px 0 0;">
-  <script>
-    atOptions = {
-      'key' : '870f277b58a349b01e24f2df2d1c7aba',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-</div>
+<script>
+(function() {
+  var wrap = document.getElementById('nativeBannerFooter');
+  var container = wrap ? wrap.querySelector('[id^="container-ee7f0a"]') : null;
+  if (!wrap || !container) return;
+  var observer = new MutationObserver(function(mutations) {
+    for (var m of mutations) {
+      if (m.addedNodes.length > 0) {
+        wrap.classList.add('is-loaded');
+        observer.disconnect();
+        break;
+      }
+    }
+  });
+  observer.observe(container, { childList: true, subtree: true });
+  setTimeout(function() {
+    if (!wrap.classList.contains('is-loaded')) wrap.style.display = 'none';
+  }, 3000);
+})();
+</script>
 
 <!-- FOOTER -->
 <footer>
