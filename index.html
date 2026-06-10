@@ -538,8 +538,33 @@
     }
 
     /* ── RESULT CARD ── */
-    #result { min-height: 160px; transition: opacity .3s; }
+    #result { transition: opacity .3s; }
     #result.loading { opacity: .4; }
+    /* result 內的 stock-card 融入 search-area，移除多餘外框 */
+    #result .stock-card {
+      border: none;
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      border-top: none;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+      animation: fadeUp .38s cubic-bezier(.22,1,.36,1);
+      margin: 0 -36px;
+      padding: 0 36px;
+    }
+    #result .stock-card::before { display: none; }
+    #result .card-header {
+      margin: 0 -36px;
+      padding-left: 36px;
+      padding-right: 36px;
+    }
+    #result .metrics-grid {
+      margin: 0 -36px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
 
     .stock-card {
       background: linear-gradient(135deg, rgba(8,15,30,.97) 0%, rgba(6,12,24,.98) 100%);
@@ -5190,15 +5215,15 @@
       </button>
     </div>
     <p class="hint">支援上市 &amp; 上櫃個股 ・ 按 <kbd>Enter</kbd> 快速查詢</p>
-  </div>
 
-  <!-- RESULT -->
-  <div id="result">
-    <div class="state-box">
-      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#2a3d5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      <span>輸入股票代碼或名稱開始查詢</span>
+    <!-- RESULT -->
+    <div id="result" style="border-top:1px solid rgba(0,229,255,.09);margin-top:20px;">
+      <div class="state-box" style="padding:32px 24px;">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#2a3d5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>輸入股票代碼或名稱開始查詢</span>
+      </div>
     </div>
   </div>
 
