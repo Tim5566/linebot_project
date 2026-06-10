@@ -733,13 +733,16 @@ def sync_all(today: str = None, label: int = None):
 
         elif label == 3:
             # 16:15 — 重跑 TWSE 三大法人（補外資 + 自營商）
-            # 立即嘗試一次，失敗後每30分鐘背景自動重試，直到21:00或資料完整
-            schedule_retry_if_missing(
-                today, label=3,
-                interval_minutes=30,
-                deadline_hour=21,
-                max_attempts=8,
-            )
+            # ✅ 先立即執行一次同步（與 label=2 一致）
+            sync_institutional(today, max_retries=6)
+            # 若仍有欄位缺失，再啟動背景自動重試，每30分鐘直到21:00或資料完整
+            if _check_data_missing(today, check_trust=False):
+                schedule_retry_if_missing(
+                    today, label=3,
+                    interval_minutes=30,
+                    deadline_hour=21,
+                    max_attempts=8,
+                )
 
         elif label == 7:
             # 21:10 — 大盤融資金額（重跑 market，融資資料此時才出）
