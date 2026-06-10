@@ -4241,6 +4241,17 @@
       color: #2d1880 !important;
     }
 
+    /* ── SOCIAL BAR 左下角 ── */
+    #adsterra-social-bar,
+    .adsterra-social-bar,
+    [id*="social-bar"],
+    [class*="social-bar"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: auto !important;
+      z-index: 9999 !important;
+    }
   </style>
   <!-- Google Identity Services（點登入時才載入，避免開站閃爍） -->
   <script>
@@ -5205,21 +5216,7 @@
 
 
 
-<!-- AD: Banner 728x90 — 搜尋結果下方 -->
-<div style="display:flex;justify-content:center;padding:20px 0 4px;">
-  <script>
-    atOptions = {
-      'key' : '5772ef3994b031361b8244c989020d16',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-</div>
 
-<!-- AD: Native Banner — 搜尋結果下方已移至 Footer 前 -->
 
 <hr class="ad-divider">
   <div style="height:50px"></div>
@@ -5355,31 +5352,7 @@
 
 
 
-<!-- AD: 大盤下方橫幅 (桌機 728x90 / 手機 320x50) -->
-<div class="ad-block ad-728" style="padding:8px 0 20px;">
-  <script>
-    atOptions = {
-      'key' : '5772ef3994b031361b8244c989020d16',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-</div>
-<div class="ad-block ad-320" style="padding:8px 0 16px;">
-  <script>
-    atOptions = {
-      'key' : '870f277b58a349b01e24f2df2d1c7aba',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-</div>
+
 
 <hr class="ad-divider">
   <!-- BOTTOM: TIMELINE + DATA NOTE -->
@@ -8664,6 +8637,9 @@ setTimeout(() => {
 })();
 </script>
 
+
+<!-- AD: Social Bar -->
+<script src="https://revolthem.com/13/3c/b9/133cb95200ea22bcf3c24c17048e60ce.js"></script>
 
 </body>
 </html>
