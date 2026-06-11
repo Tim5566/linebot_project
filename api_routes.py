@@ -7,6 +7,7 @@ from get_trading_holidays import get_trading_status
 import re
 import os
 import threading
+import time as _time_module
 from firebase_admin import db as firebase_db
 
 
@@ -14,6 +15,24 @@ from firebase_admin import db as firebase_db
 # 同一支股票同時只有一個請求去打 TWSE，其他等它存完快取再拿
 _wave_locks      = {}
 _wave_locks_meta = threading.Lock()
+
+# ── API endpoint 記憶體快取（避免前端輪詢狂打 TWSE / Firebase）──────────────
+
+# /api/market → 快取 5 分鐘（前端偶爾刷新即可，TWSE 盤後才有資料）
+_market_api_cache:      dict | None = None
+_market_api_cache_time: float       = 0.0
+_market_api_cache_date: str         = ""
+_MARKET_API_TTL = 300   # 5 分鐘
+
+# /api/trading_status → 快取 1 小時（假日清單一天最多更新一次）
+_trading_status_cache:      dict | None = None
+_trading_status_cache_time: float       = 0.0
+_TRADING_STATUS_TTL = 3600  # 1 小時
+
+# /api/maintenance → 快取 30 秒（前端每 20 秒輪詢，多數請求命中快取）
+_maintenance_cache:      dict | None = None
+_maintenance_cache_time: float       = 0.0
+_MAINTENANCE_TTL = 30   # 30 秒
 
 def _get_stock_lock(stock_no, cache_key):
     key = f"{stock_no}_{cache_key}"
@@ -513,7 +532,16 @@ def register_api(app):
     # ── 交易日狀態 API ─────────────────────────────────────────────────────────
     @app.route("/api/trading_status")
     def api_trading_status():
-        return jsonify(get_trading_status())
+        global _trading_status_cache, _trading_status_cache_time
+        now_ts = _time_module.time()
+        # 快取命中（1 小時內）→ 直接回傳，不打 TWSE holidays API
+        if (_trading_status_cache is not None
+                and (now_ts - _trading_status_cache_time) < _TRADING_STATUS_TTL):
+            return jsonify(_trading_status_cache)
+        result = get_trading_status()
+        _trading_status_cache      = result
+        _trading_status_cache_time = now_ts
+        return jsonify(result)
 
     # ── 手動觸發 Firebase 同步（支援 label 精確同步）──────────────────────────
     @app.route("/api/sync_test")
@@ -938,6 +966,16 @@ def register_api(app):
     # ── 大盤資訊 API ───────────────────────────────────────────────────────────
     @app.route("/api/market")
     def api_market():
+        global _market_api_cache, _market_api_cache_time, _market_api_cache_date
+        now_ts = _time_module.time()
+        today  = get_today()
+
+        # 快取命中（同一天且 5 分鐘內）→ 不呼叫 market_pnfo()，直接回傳
+        if (_market_api_cache is not None
+                and _market_api_cache_date == today
+                and (now_ts - _market_api_cache_time) < _MARKET_API_TTL):
+            return jsonify(_market_api_cache)
+
         raw    = market_pnfo()
         result = {
             "foreign":     None,
@@ -962,8 +1000,13 @@ def register_api(app):
             elif "融資額金水位" in line or "融資水位" in line:
                 result["margin_level"] = _extract_float(line)
 
-        return jsonify(result)
+        # 有資料才存快取（避免全空結果被快取）
+        if any(v is not None for v in result.values()):
+            _market_api_cache      = result
+            _market_api_cache_time = now_ts
+            _market_api_cache_date = today
 
+        return jsonify(result)
     # ── 訪客統計 API ──────────────────────────────────────────────────────────
     @app.route("/api/visitor", methods=["POST"])
     def api_visitor():
@@ -1016,13 +1059,23 @@ def register_api(app):
     @app.route("/api/maintenance", methods=["GET"])
     def api_maintenance_get():
         """任何人都可以查詢目前維護狀態（前端需要知道要不要顯示維護畫面）"""
+        global _maintenance_cache, _maintenance_cache_time
+        now_ts = _time_module.time()
+        # 快取命中（30 秒內）→ 直接回傳，不打 Firebase
+        # 管理員開關維護模式時（POST）會清除此快取
+        if (_maintenance_cache is not None
+                and (now_ts - _maintenance_cache_time) < _MAINTENANCE_TTL):
+            return jsonify(_maintenance_cache)
         try:
             ref  = firebase_db.reference("maintenance")
             data = ref.get() or {}
-            return jsonify({
+            result = {
                 "enabled": bool(data.get("enabled", False)),
                 "message": data.get("message", "本網站暫時維護中，請稍後再試。"),
-            })
+            }
+            _maintenance_cache      = result
+            _maintenance_cache_time = now_ts
+            return jsonify(result)
         except Exception as e:
             print(f"[Maintenance] 讀取失敗: {e}")
             # Firebase 讀取失敗時預設不維護（不影響一般用戶）
@@ -1052,6 +1105,9 @@ def register_api(app):
                 "updated_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),
             })
             print(f"[Maintenance] {'開啟' if enabled else '關閉'} by {email}")
+            # 清除 GET 快取，讓前端下次輪詢立即拿到最新狀態
+            global _maintenance_cache
+            _maintenance_cache = None
             return jsonify({"ok": True, "enabled": enabled})
         except Exception as e:
             print(f"[Maintenance] 寫入失敗: {e}")

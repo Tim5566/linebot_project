@@ -743,28 +743,50 @@ def stock_info(keyword: str) -> str:
 # 大盤總體資訊（從 Firebase 讀，無資料才打 API）
 # ══════════════════════════════════════════════════════════════════════════════
 
-def market_pnfo() -> str:
-    today = get_today()
+# ── 大盤記憶體快取（防止 Firebase miss 時每 30 秒狂打 TWSE）────────────────
+_market_mem_cache: dict | None = None   # 上次成功的解析結果（dict）
+_market_mem_date:  str         = ""     # 快取對應的日期
+_market_mem_time:  float       = 0.0    # 上次打 API 的時間戳（只在真正打 API 時更新）
+_MARKET_API_COOLDOWN = 300              # 5 分鐘內最多打一次 TWSE API（秒）
 
-    # 嘗試從 Firebase 讀
+def _build_market_reply(mkt: dict) -> str:
+    reply = "📉大盤盤後詳細資訊📈\n"
+    for label in ["自營商", "投信", "外資及陸資", "外資"]:
+        if label in mkt:
+            reply += f"{label} : {mkt[label]}億\n"
+    if "合計金額" in mkt:
+        reply += f"合計金額 : {mkt['合計金額']}億\n"
+    reply += "---------------------------------------------\n"
+    if "融資金額增減" in mkt:
+        reply += f"融資金額增減 : {mkt['融資金額增減']}億\n"
+    if "融資額金水位" in mkt:
+        reply += f"融資額金水位 : {mkt['融資額金水位']}億\n"
+    return reply.strip()
+
+def market_pnfo() -> str:
+    global _market_mem_cache, _market_mem_date, _market_mem_time
+
+    today  = get_today()
+    now_ts = _time.time()
+
+    # ① Firebase 有資料 → 直接用，順便更新記憶體快取
     mkt = _read_firebase_market(today)
     if mkt:
-        reply = "📉大盤盤後詳細資訊📈\n"
-        labels = ["自營商", "投信", "外資及陸資", "外資"]
-        for label in labels:
-            if label in mkt:
-                reply += f"{label} : {mkt[label]}億\n"
-        if "合計金額" in mkt:
-            reply += f"合計金額 : {mkt['合計金額']}億\n"
-        reply += "---------------------------------------------\n"
-        if "融資金額增減" in mkt:
-            reply += f"融資金額增減 : {mkt['融資金額增減']}億\n"
-        if "融資額金水位" in mkt:
-            reply += f"融資額金水位 : {mkt['融資額金水位']}億\n"
-        return reply.strip()
+        _market_mem_cache = mkt
+        _market_mem_date  = today
+        # 不更新 _market_mem_time，保留給 API 呼叫紀錄
+        return _build_market_reply(mkt)
 
-    # Fallback：直接打 API
+    # ② Firebase miss，但記憶體快取有效（同一天，且冷卻期內）→ 直接回傳，不打 TWSE
+    if (_market_mem_cache and _market_mem_date == today
+            and (now_ts - _market_mem_time) < _MARKET_API_COOLDOWN):
+        print("[market_pnfo] 記憶體快取命中，跳過 TWSE API")
+        return _build_market_reply(_market_mem_cache)
+
+    # ③ 真正需要打 TWSE API（冷卻期過了或第一次）
+    #    ★ 只有在這裡才更新 _market_mem_time，避免 Firebase miss 就重置計時器
     print("[market_pnfo] Firebase miss，fallback to API")
+    _market_mem_time = now_ts
     reply = "📉大盤盤後詳細資訊📈\n"
 
     try:
@@ -800,7 +822,6 @@ def market_pnfo() -> str:
         reply += "融資金額增減 : 🚫 暫未更新\n融資額金水位 : 🚫 暫未更新\n"
 
     return reply.strip()
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 上市 / 上櫃 Top100（資料量大，仍直接打 API）
