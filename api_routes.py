@@ -1,3 +1,4 @@
+from typing import Optional
 from flask import jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -19,18 +20,18 @@ _wave_locks_meta = threading.Lock()
 # ── API endpoint 記憶體快取（避免前端輪詢狂打 TWSE / Firebase）──────────────
 
 # /api/market → 快取 5 分鐘（前端偶爾刷新即可，TWSE 盤後才有資料）
-_market_api_cache:      dict | None = None
+_market_api_cache:      Optional[dict] = None
 _market_api_cache_time: float       = 0.0
 _market_api_cache_date: str         = ""
 _MARKET_API_TTL = 300   # 5 分鐘
 
 # /api/trading_status → 快取 1 小時（假日清單一天最多更新一次）
-_trading_status_cache:      dict | None = None
+_trading_status_cache:      Optional[dict] = None
 _trading_status_cache_time: float       = 0.0
 _TRADING_STATUS_TTL = 3600  # 1 小時
 
 # /api/maintenance → 快取 30 秒（前端每 20 秒輪詢，多數請求命中快取）
-_maintenance_cache:      dict | None = None
+_maintenance_cache:      Optional[dict] = None
 _maintenance_cache_time: float       = 0.0
 _MAINTENANCE_TTL = 30   # 30 秒
 

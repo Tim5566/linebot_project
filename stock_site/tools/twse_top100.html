@@ -280,12 +280,14 @@
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
     /* AD */
-    .ad-block{display:flex;justify-content:center;align-items:center;width:100%;overflow:hidden}
-    .ad-728{display:flex}.ad-320{display:none}
-    .ad-unit-label{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.18em;
-      color:var(--text-dark);text-align:center;margin-bottom:4px;opacity:.5;text-transform:uppercase}
     .ad-divider{border:none;border-top:1px solid rgba(0,229,255,.07);margin:0 0 4px}
-    @media(max-width:768px){.ad-728{display:none}.ad-320{display:flex}}
+    /* NATIVE BANNER */
+    .native-banner-wrap{position:relative;margin:28px 0 8px;border-radius:14px;border:1px solid rgba(0,229,255,.10);background:rgba(7,13,26,.6);overflow:hidden;max-height:220px;display:none}
+    .native-banner-wrap.is-loaded{display:block}
+    .native-banner-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.4),transparent);z-index:2;pointer-events:none}
+    .native-banner-label{display:flex;align-items:center;gap:6px;padding:7px 14px 4px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.18em;color:var(--text-dark);opacity:.5;text-transform:uppercase;border-bottom:1px solid rgba(0,229,255,.05)}
+    .native-banner-label::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(0,229,255,.35)}
+    .native-banner-inner{padding:4px 8px 4px;overflow:hidden}
 
     /* FOOTER */
     #site-footer{position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);
@@ -926,18 +928,27 @@
     </div>
   </div>
 
-  <!-- AD BOTTOM：表格下方，footer 前 -->
-  <div style="padding:20px 0 0;">
-    <p class="ad-unit-label">贊助商廣告</p>
-    <div class="ad-block ad-728">
-      <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
-      <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-    </div>
-    <div class="ad-block ad-320">
-      <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
-      <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  <!-- AD：表格下方 footer 前，native 廣告 -->
+  <hr class="ad-divider" style="margin:24px 0 0;">
+  <div class="native-banner-wrap" id="nativeBannerMain" style="margin:8px 0 28px;">
+    <div class="native-banner-label">贊助內容</div>
+    <div class="native-banner-inner">
+      <script async="async" data-cfasync="false" src="https://revolthem.com/ee7f0a3d1fa3ff3fed7566f8d557417a/invoke.js"></script>
+      <div id="container-ee7f0a3d1fa3ff3fed7566f8d557417a"></div>
     </div>
   </div>
+  <script>
+  (function(){
+    var wrap=document.getElementById('nativeBannerMain');
+    var container=wrap?wrap.querySelector('[id^="container-ee7f0a"]'):null;
+    if(!wrap||!container)return;
+    var obs=new MutationObserver(function(m){
+      for(var x of m){if(x.addedNodes.length>0){wrap.classList.add('is-loaded');obs.disconnect();break;}}
+    });
+    obs.observe(container,{childList:true,subtree:true});
+    setTimeout(function(){if(!wrap.classList.contains('is-loaded'))wrap.style.display='none';},3000);
+  })();
+  </script>
 
 </div>
 
