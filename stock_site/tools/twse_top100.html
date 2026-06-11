@@ -928,27 +928,41 @@
     </div>
   </div>
 
-  <!-- AD：表格下方 footer 前，native 廣告 -->
+  <!-- PROMO: 推廣品牌卡片 — 表格下方 footer 前 -->
   <hr class="ad-divider" style="margin:24px 0 0;">
-  <div class="native-banner-wrap" id="nativeBannerMain" style="margin:8px 0 28px;">
-    <div class="native-banner-label">贊助內容</div>
-    <div class="native-banner-inner">
-      <script async="async" data-cfasync="false" src="https://revolthem.com/ee7f0a3d1fa3ff3fed7566f8d557417a/invoke.js"></script>
-      <div id="container-ee7f0a3d1fa3ff3fed7566f8d557417a"></div>
+  <div class="native-banner-wrap is-loaded" style="margin:8px 0 28px;">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="display:flex; gap:16px; flex-wrap:wrap; padding:12px 16px;">
+      <a href="https://affckr.site/track/clicks/6949/c627c2bc9b0521dffb83ec23d62e9e452d6f4acb63b2a0f90169b60c71401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:6px; padding:14px 18px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s, background .2s; background:rgba(0,229,255,.03);"
+         onmouseover="this.style.borderColor='rgba(0,229,255,.35)';this.style.background='rgba(0,229,255,.06)'" onmouseout="this.style.borderColor='';this.style.background='rgba(0,229,255,.03)'">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">台股課程 ・ 投資教育</span>
+        <span style="font-size:1rem; font-weight:700;">Firm Bond 股票道場</span>
+        <span style="font-size:.82rem; color:var(--text-dim);">系統化學習台股操作，適合各階段投資人。</span>
+      </a>
+      <a href="https://afftck.site/track/clicks/6967/c627c2bc9b0521dffa8bec23d62e9e452d6f4acb63b2a0f90169b40271401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:6px; padding:14px 18px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s, background .2s; background:rgba(0,229,255,.03);"
+         onmouseover="this.style.borderColor='rgba(0,229,255,.35)';this.style.background='rgba(0,229,255,.06)'" onmouseout="this.style.borderColor='';this.style.background='rgba(0,229,255,.03)'">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">量價分析 ・ 操盤技術</span>
+        <span style="font-size:1rem; font-weight:700;">For You Rich 量價操盤術</span>
+        <span style="font-size:.82rem; color:var(--text-dim);">掌握量價關係，提升選股與進出場精準度。</span>
+      </a>
+      <a href="https://affclkr.com/track/clicks/6047/c627c2bc9b0521dffa8aec23d62e9e452d6f4acb63b2a0f90160b60271401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:6px; padding:14px 18px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s, background .2s; background:rgba(0,229,255,.03);"
+         onmouseover="this.style.borderColor='rgba(0,229,255,.35)';this.style.background='rgba(0,229,255,.06)'" onmouseout="this.style.borderColor='';this.style.background='rgba(0,229,255,.03)'">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">線上開戶 ・ 美股交易</span>
+        <span style="font-size:1rem; font-weight:700;">SogoTrade 網路股票交易</span>
+        <span style="font-size:.82rem; color:var(--text-dim);">海外券商開戶推薦，介面簡潔，適合新手入門。</span>
+      </a>
+      <a href="https://affclkr.com/track/clicks/5434/c627c2bc9b0521dffa88ec23d62e9e452d6f4acb63b2a0f90264b10171401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:6px; padding:14px 18px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s, background .2s; background:rgba(0,229,255,.03);"
+         onmouseover="this.style.borderColor='rgba(0,229,255,.35)';this.style.background='rgba(0,229,255,.06)'" onmouseout="this.style.borderColor='';this.style.background='rgba(0,229,255,.03)'">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">證券帳戶 ・ 台股交易</span>
+        <span style="font-size:1rem; font-weight:700;">富蘭克林國民e帳戶</span>
+        <span style="font-size:.82rem; color:var(--text-dim);">線上開立證券帳戶，交易台股、申購基金一站完成。</span>
+      </a>
     </div>
   </div>
-  <script>
-  (function(){
-    var wrap=document.getElementById('nativeBannerMain');
-    var container=wrap?wrap.querySelector('[id^="container-ee7f0a"]'):null;
-    if(!wrap||!container)return;
-    var obs=new MutationObserver(function(m){
-      for(var x of m){if(x.addedNodes.length>0){wrap.classList.add('is-loaded');obs.disconnect();break;}}
-    });
-    obs.observe(container,{childList:true,subtree:true});
-    setTimeout(function(){if(!wrap.classList.contains('is-loaded'))wrap.style.display='none';},3000);
-  })();
-  </script>
 
 </div>
 
