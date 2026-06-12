@@ -58,7 +58,8 @@ def register_api(app):
     # ── HTTP 安全 Headers ──────────────────────────────────────────────────────
     @app.after_request
     def set_security_headers(response):
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        # 移除 X-Frame-Options：改由 CSP frame-ancestors 統一管理，
+        # 避免與廣告 iframe（adotone / affiliates.one）衝突
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         response.headers['Content-Security-Policy'] = (
@@ -68,8 +69,10 @@ def register_api(app):
             "font-src 'self' https:; "
             "img-src 'self' data: https:; "
             "connect-src 'self' https:; "
-            "frame-src 'self' https:; "
+            # frame-src：允許 adotone / affiliates.one 廣告 iframe
+            "frame-src 'self' https://cdn.adotone.com https://*.adotone.com https://*.affiliates.one https:; "
             "media-src 'self'; "
+            # frame-ancestors：只允許自己被嵌入（防 clickjacking），不影響廣告 iframe 顯示
             "frame-ancestors 'self';"
         )
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'

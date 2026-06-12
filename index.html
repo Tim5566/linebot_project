@@ -4146,7 +4146,8 @@
       border-radius: 14px;
       border: 1px solid rgba(0,229,255,.10);
       background: rgba(7,13,26,.6);
-      overflow: visible;
+      overflow: hidden;
+      max-height: 220px;
       /* 預設隱藏，有廣告才顯示 */
       display: none;
     }
@@ -4183,13 +4184,46 @@
     }
     .native-banner-inner {
       padding: 4px 8px 4px;
-      overflow: visible;
+      overflow: hidden;
     }
     body.theme-day .native-banner-wrap {
       background: rgba(240,246,255,.6);
       border-color: rgba(26,101,168,.15);
     }
     body.theme-day .native-banner-label { color: #8aaac8; }
+
+    /* ── 船井生醫廣告版位 ── */
+    .adslot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 0 24px;
+    }
+    .adslot-label {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .adslot-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(0,229,255,.35);
+    }
+    .adslot-container {
+      width: 100%;
+      max-width: 728px;
+      min-height: 90px;
+      overflow: visible;
+    }
 
     /* ═══════════════════════════════════════════════════════
        ☀️ DAY THEME — #seo-static-content 完整補丁
@@ -5232,11 +5266,22 @@
 
 
 <hr class="ad-divider">
-  <!-- PROMO: 船井生醫 倍熱-纖維粉_顏醫師 優惠版位 — Hero 下方 -->
+  <!-- PROMO: 推廣品牌卡片 — Hero 下方 -->
   <div class="native-banner-wrap is-loaded" style="margin:0 0 32px;">
     <div class="native-banner-label">推廣連結</div>
-    <div class="native-banner-inner">
-      <script type="text/javascript" src="https://cdn.adotone.com/production/adslots/545ae3397239faddb4f807742ae27f70d95928ca4c14e29ecfb7bbd392bd0e2d.js"></script>
+    <div class="native-banner-inner" style="display:flex; gap:16px; flex-wrap:wrap;">
+      <a href="https://afftck.com/track/clicks/6047/c627c2bc9b0521dffa8aec23d62e9e452d6f4acb63b2a0f90160b60271401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:240px; display:flex; flex-direction:column; gap:6px; padding:16px 20px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s;">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">線上開戶 ・ 美股交易</span>
+        <span style="font-size:1.05rem; font-weight:700;">SogoTrade 網路股票交易</span>
+        <span style="font-size:.85rem; color:var(--text-dim);">海外券商開戶推薦，介面簡潔，適合新手入門。</span>
+      </a>
+      <a href="https://affone.site/track/clicks/5434/c627c2bc9b0521dffa88ec23d62e9e452d6f4acb63b2a0f90264b10171401de3c021e7e5593c99616c" target="_blank" rel="nofollow sponsored noopener"
+         style="flex:1; min-width:240px; display:flex; flex-direction:column; gap:6px; padding:16px 20px; border:1px solid var(--border2); border-radius:var(--radius-sm); text-decoration:none; color:var(--text); transition:border-color .2s;">
+        <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em;">證券帳戶 ・ 台股交易</span>
+        <span style="font-size:1.05rem; font-weight:700;">富蘭克林國民e帳戶</span>
+        <span style="font-size:.85rem; color:var(--text-dim);">線上開立證券帳戶，交易台股、申購基金一站完成。</span>
+      </a>
     </div>
   </div>
 
@@ -5373,13 +5418,14 @@
 
 
 
-<!-- PROMO: 船井生醫 晶擊對策EX 優惠版位 — 大盤資訊下方 -->
-  <div class="native-banner-wrap is-loaded" style="margin:0 0 32px;">
-    <div class="native-banner-label">推廣連結</div>
-    <div class="native-banner-inner">
-      <script type="text/javascript" src="https://cdn.adotone.com/production/adslots/f19a23abe3277b459e768507786f14b69af1b784e5e245aed5c93110aa799844.js"></script>
-    </div>
+<!-- 船井生醫廣告 -->
+<div class="adslot-wrap">
+  <div class="adslot-label">推廣連結</div>
+  <div class="adslot-container">
+    <script type="text/javascript" src="https://cdn.adotone.com/production/adslots/f19a23abe3277b459e768507786f14b69af1b784e5e245aed5c93110aa799844.js"></script>
+    <script type="text/javascript" src="https://cdn.adotone.com/production/adslots/545ae3397239faddb4f807742ae27f70d95928ca4c14e29ecfb7bbd392bd0e2d.js"></script>
   </div>
+</div>
 
 <hr class="ad-divider">
   <!-- BOTTOM: TIMELINE + DATA NOTE -->
@@ -8638,7 +8684,6 @@ setTimeout(() => {
 </script>
 
 
-<!-- 船井生醫 adlinks 全站聯盟追蹤 -->
 <script>var ConverlyCustomData = {channelId: null};</script>
 <script async defer src="https://cdn.adotone.com/production/adlinks/e3717c12c94ec086f5d80c8c23c98c6b54e2e64ba250ffb5e0fcbd20841cd54a.js"></script>
 
