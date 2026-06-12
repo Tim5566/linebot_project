@@ -69,8 +69,8 @@ def register_api(app):
             "font-src 'self' https:; "
             "img-src 'self' data: https:; "
             "connect-src 'self' https:; "
-            # frame-src：允許 adotone / affiliates.one 廣告 iframe
-            "frame-src 'self' https://cdn.adotone.com https://*.adotone.com https://*.affiliates.one https:; "
+            # frame-src：允許 adotone / affiliates.one 廣告 iframe（含 http）
+            "frame-src 'self' http://cdn.adotone.com https://cdn.adotone.com http://*.adotone.com https://*.adotone.com https://*.affiliates.one https: http:; "
             "media-src 'self'; "
             # frame-ancestors：只允許自己被嵌入（防 clickjacking），不影響廣告 iframe 顯示
             "frame-ancestors 'self';"
