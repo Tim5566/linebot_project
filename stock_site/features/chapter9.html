@@ -2834,7 +2834,90 @@
     @media (max-width: 1320px) {
       .ch-sidebar-ad { display: none; }
     }
-</style>
+
+    /* ── 側欄固定廣告（右側，桌機限定，手機隱藏）── */
+    .side-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+      max-height: calc(100vh - 80px);
+    }
+    .side-ad.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .side-ad-label {
+      font-size: .55rem;
+      color: rgba(100,140,180,.45);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .side-ad-right { right: calc(50% - 450px - 178px); }
+    @media (max-width: 1320px) {
+      .side-ad-right { right: 4px; }
+    }
+    @media (max-width: 768px) {
+      .side-ad { display: none !important; }
+    }
+
+
+    /* ── NATIVE BANNER WRAPPER ── */
+    .native-banner-wrap {
+      position: relative;
+      margin: 12px 0 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,229,255,.10);
+      background: rgba(7,13,26,.6);
+      overflow: hidden;
+    }
+    .native-banner-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.4), transparent);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .native-banner-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+    }
+    .native-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(0,229,255,.35);
+    }
+    .native-banner-inner {
+      padding: 4px 8px 4px;
+      overflow: hidden;
+    }
+    body.theme-day .native-banner-wrap {
+      background: rgba(240,246,255,.6);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .native-banner-label { color: #8aaac8; }
+    .native-banner-wrap.ch-ad-728,
+    .native-banner-wrap.ch-ad-320 { flex-direction: column; }
+    </style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -2976,31 +3059,13 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 -->
-    <!-- ── Adsterra 廣告：章節頂部（目錄與正文之間）── -->
-  <p class="ch-ad-label">廣告贊助</p>
-  <div class="ch-ad-wrap ch-ad-728">
-    <script>
-      atOptions = {
-        'key' : '5772ef3994b031361b8244c989020d16',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-  </div>
-  <div class="ch-ad-wrap ch-ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+      <!-- ── 船井廣告：低頭族 ── -->
+  <div class="native-banner-wrap is-loaded" id="nativeBannerFooter" style="margin:20px 0 8px;">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®高單位葉黃素熱銷組(游離型/添加維生素A) ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://tlcafftrax.com/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9e46246644cb63bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-avx3%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3DAFF_20211224_funcare-avx3%26utm_term%3Dtransaction_id%26utm_content%3Daffiliates' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/131992/c627c2bc9b0521dffc8aec2bd32e9e46246644cb63bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
   <hr class="ch-ad-divider">
 
@@ -4324,31 +4389,13 @@
     </div>
   </div>
 
-<!-- ── Adsterra 廣告：章節底部（完成章節前）── -->
-  <p class="ch-ad-label">廣告贊助</p>
-  <div class="ch-ad-wrap ch-ad-468">
-    <script>
-      atOptions = {
-        'key' : 'f8369218a9a6d1d181e17e8ac7efbae7',
-        'format' : 'iframe',
-        'height' : 60,
-        'width' : 468,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/f8369218a9a6d1d181e17e8ac7efbae7/invoke.js"></script>
-  </div>
-  <div class="ch-ad-wrap ch-ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+  <!-- ── 船井廣告：成長 ── -->
+  <div class="native-banner-wrap is-loaded" id="nativeBannerFooter" style="margin:20px 0 8px;">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井高成長®閃購價3980元★配方高人一等【牛奶鈣魚膠原粉】 ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://twshop4coupon.com/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9e40226b44c863bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-as10x6%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3Daffiliates_20220810_funcare-as10x6%26utm_content%3D%E4%BB%81%E7%94%AB%E8%A6%AA%E5%AD%90OK%E5%9C%96' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/157491/c627c2bc9b0521dffc8aec2bd32e9e40226b44c863bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
   <hr class="ch-ad-divider">
 
@@ -4997,6 +5044,48 @@ function mktSignal(btn, key) {
       .finally(function() { setTimeout(check, 30000); });
   }
   check();
+})();
+</script>
+
+<!-- 側欄固定廣告：右側，桌機限定 -->
+<div class="side-ad side-ad-right" id="sideAdRight">
+  <a href='https://affckr.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9746236e45df24bbebf50768b202651200a8cd33a5e6566e9f663499abdb4aee7abb970d?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-aaax4%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3DAFF_20200907_funcare-aaax4%26utm_term%3D-transaction_id-%26utm_content%3Daffiliates' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/83618/c627c2bc9b0521dffc8aec2bd32e9746236e45df24bbebf50768b202651200a8cd33a5e6566e9d2634ddffd81d' width="160" height="600" border='0' style="display:block;"/></a>
+</div>
+
+<script>
+(function(){
+  var HEADER_H = 58;
+  var right = document.getElementById('sideAdRight');
+  var footer = document.getElementById('site-footer');
+  function updateVisibility(){
+    var scrollY = window.scrollY;
+    var vH = window.innerHeight;
+    var adH = 600;
+    var show = scrollY > 200;
+    if(footer){
+      var footerTop = footer.getBoundingClientRect().top;
+      if(footerTop < vH) show = false;
+    }
+    if(right){
+      if(show){
+        var availH = vH - HEADER_H;
+        if(adH >= availH){
+          right.style.top = HEADER_H + 'px';
+          right.style.transform = 'none';
+        } else {
+          var centerY = HEADER_H + availH / 2;
+          right.style.top = centerY + 'px';
+          right.style.transform = 'translateY(-50%)';
+        }
+        right.classList.add('visible');
+      } else {
+        right.classList.remove('visible');
+      }
+    }
+  }
+  window.addEventListener('scroll', updateVisibility, {passive:true});
+  window.addEventListener('resize', updateVisibility, {passive:true});
+  updateVisibility();
 })();
 </script>
 

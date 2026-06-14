@@ -2972,7 +2972,90 @@
     @media (max-width: 1320px) {
       .ch-sidebar-ad { display: none; }
     }
-</style>
+
+    /* ── 側欄固定廣告（右側，桌機限定，手機隱藏）── */
+    .side-ad {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+      max-height: calc(100vh - 80px);
+    }
+    .side-ad.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .side-ad-label {
+      font-size: .55rem;
+      color: rgba(100,140,180,.45);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .side-ad-right { right: calc(50% - 450px - 178px); }
+    @media (max-width: 1320px) {
+      .side-ad-right { right: 4px; }
+    }
+    @media (max-width: 768px) {
+      .side-ad { display: none !important; }
+    }
+
+
+    /* ── NATIVE BANNER WRAPPER ── */
+    .native-banner-wrap {
+      position: relative;
+      margin: 12px 0 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,229,255,.10);
+      background: rgba(7,13,26,.6);
+      overflow: hidden;
+    }
+    .native-banner-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.4), transparent);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .native-banner-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+    }
+    .native-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(0,229,255,.35);
+    }
+    .native-banner-inner {
+      padding: 4px 8px 4px;
+      overflow: hidden;
+    }
+    body.theme-day .native-banner-wrap {
+      background: rgba(240,246,255,.6);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .native-banner-label { color: #8aaac8; }
+    .native-banner-wrap.ch-ad-728,
+    .native-banner-wrap.ch-ad-320 { flex-direction: column; }
+    </style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -3116,31 +3199,13 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 -->
-    <!-- ── Adsterra 廣告：章節頂部（目錄與正文之間）── -->
-  <p class="ch-ad-label">廣告贊助</p>
-  <div class="ch-ad-wrap ch-ad-728">
-    <script>
-      atOptions = {
-        'key' : '5772ef3994b031361b8244c989020d16',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-  </div>
-  <div class="ch-ad-wrap ch-ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+      <!-- ── 船井廣告：視力眼睛 ── -->
+  <div class="native-banner-wrap is-loaded" id="nativeBannerFooter" style="margin:20px 0 8px;">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®高單位葉黃素EX(游離型/添加維生素A) ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://affclk.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9d4523664fcd63bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-aau%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3Daffiliates_20250402_funcare-aau%26utm_content%3D20250402_funcare-aau_%25E4%25B8%25BB%25E8%25A6%2596%25E8%25A6%25BAGDN' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/206924/c627c2bc9b0521dffc8aec2bd32e9d4523664fcd63bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
   <hr class="ch-ad-divider">
 
@@ -4872,10 +4937,10 @@
     </div>
 
     <!-- Final Score (extended) -->
-    <div id="finalScore2" style="display:none;margin-top:32px;padding:28px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(178,102,255,.05));border:1px solid rgba(0,229,255,.2);text-align:center">
+    <div id="finalScore" style="display:none;margin-top:32px;padding:28px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(178,102,255,.05));border:1px solid rgba(0,229,255,.2);text-align:center">
       <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--accent);margin-bottom:10px">── 強化測驗成績 ──</div>
-      <div id="scoreNum2" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--accent);text-shadow:0 0 30px rgba(0,229,255,.4)"></div>
-      <div id="scoreMsg2" style="font-size:.88rem;color:var(--text-dim);margin-top:12px;line-height:1.75"></div>
+      <div id="scoreNum" style="font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:var(--accent);text-shadow:0 0 30px rgba(0,229,255,.4)"></div>
+      <div id="scoreMsg" style="font-size:.88rem;color:var(--text-dim);margin-top:12px;line-height:1.75"></div>
     </div>
   </div>
 
@@ -4921,31 +4986,13 @@
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 -->
-    <!-- ── Adsterra 廣告：章節底部（完成章節前）── -->
-  <p class="ch-ad-label">廣告贊助</p>
-  <div class="ch-ad-wrap ch-ad-468">
-    <script>
-      atOptions = {
-        'key' : 'f8369218a9a6d1d181e17e8ac7efbae7',
-        'format' : 'iframe',
-        'height' : 60,
-        'width' : 468,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/f8369218a9a6d1d181e17e8ac7efbae7/invoke.js"></script>
-  </div>
-  <div class="ch-ad-wrap ch-ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
+      <!-- ── 船井廣告：關節 ── -->
+  <div class="native-banner-wrap is-loaded" id="nativeBannerFooter" style="margin:20px 0 8px;">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®日本進口關健對策EX錠(超越足量UC-II) ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://afftck.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9d452c6b49c163bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-aav%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3Daffiliates_20250619_funcare-aav%26utm_content%3D20250619_funcare-aav_%25E7%2594%25A2%25E5%2593%2581%25E4%25B8%258A%25E5%25B8%2582' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/209448/c627c2bc9b0521dffc8aec2bd32e9d452c6b49c163bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
   <hr class="ch-ad-divider">
 
@@ -5190,18 +5237,16 @@ const feedbackMap = {
 };
 
 // Extend quizScore and totalQuiz for sec14
-const quizScore2 = { q8:false, q9:false, q10:false, q11:false, q12:false, q13:false, q14:false, q15:false, q16:false, q17:false };
-let answeredCount2 = 0;
-const totalQuiz2 = Object.keys(quizScore2).length;
+const quizScore = { q8:false, q9:false, q10:false, q11:false, q12:false, q13:false, q14:false, q15:false, q16:false, q17:false };
+let answeredCount = 0;
+const totalQuiz = Object.keys(quizScore).length;
 
 function answer(el, quizId, correctLetter, chosenLetter) {
   const block = document.getElementById(quizId);
   if (block.dataset.answered) return;
   block.dataset.answered = 'true';
 
-  // Determine which quiz set
-  const isSet2 = quizScore2.hasOwnProperty(quizId);
-  if (isSet2) answeredCount2++; else answeredCount++;
+  answeredCount++;
 
   const opts = block.querySelectorAll('.quiz-opt');
   opts.forEach(o => o.classList.add('disabled'));
@@ -5218,27 +5263,22 @@ function answer(el, quizId, correctLetter, chosenLetter) {
   fb.textContent = isCorrect ? feedbackMap[quizId].correct : feedbackMap[quizId].wrong;
   fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'fail');
 
-  if (isSet2) {
-    quizScore2[quizId] = isCorrect;
-    if (answeredCount2 === totalQuiz2) setTimeout(showFinalScore2, 600);
-  } else {
-    quizScore[quizId] = isCorrect;
-    updateProgress();
-    if (answeredCount === totalQuiz) setTimeout(showFinalScore, 600);
-  }
+  quizScore[quizId] = isCorrect;
+  updateProgress();
+  if (answeredCount === totalQuiz) setTimeout(showFinalScore, 600);
 }
 
-function showFinalScore2() {
-  const correct = Object.values(quizScore2).filter(Boolean).length;
-  const pct = Math.round(correct / totalQuiz2 * 100);
-  const el = document.getElementById('finalScore2');
-  const numEl = document.getElementById('scoreNum2');
-  const msgEl = document.getElementById('scoreMsg2');
+function showFinalScore() {
+  const correct = Object.values(quizScore).filter(Boolean).length;
+  const pct = Math.round(correct / totalQuiz * 100);
+  const el = document.getElementById('finalScore');
+  const numEl = document.getElementById('scoreNum');
+  const msgEl = document.getElementById('scoreMsg');
   let msg = '';
   if (pct === 100) msg = '🏆 完美！你對進階K棒型態、缺口判讀和週期應用的理解已達到專業水準。';
   else if (pct >= 70) msg = '🎯 優秀！進階概念掌握良好。建議複習答錯的題目，尤其是缺口型態和週期判斷。';
   else msg = '📖 建議重讀 SEC 11～13，特別是週期應用和缺口型態的部分，這些是實戰中最常用的判斷依據。';
-  numEl.textContent = correct + ' / ' + totalQuiz2;
+  numEl.textContent = correct + ' / ' + totalQuiz;
   msgEl.textContent = msg;
   el.style.display = 'block';
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
@@ -6048,6 +6088,48 @@ secIds.forEach(id => {
       .finally(function() { setTimeout(check, 30000); });
   }
   check();
+})();
+</script>
+
+<!-- 側欄固定廣告：右側，桌機限定 -->
+<div class="side-ad side-ad-right" id="sideAdRight">
+  <a href='https://affckr.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9746236e45df24bbebf50768b202651200a8cd33a5e6566e9f663499abdb4aee7abb970d?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-aaax4%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3DAFF_20200907_funcare-aaax4%26utm_term%3D-transaction_id-%26utm_content%3Daffiliates' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/83618/c627c2bc9b0521dffc8aec2bd32e9746236e45df24bbebf50768b202651200a8cd33a5e6566e9d2634ddffd81d' width="160" height="600" border='0' style="display:block;"/></a>
+</div>
+
+<script>
+(function(){
+  var HEADER_H = 58;
+  var right = document.getElementById('sideAdRight');
+  var footer = document.getElementById('site-footer');
+  function updateVisibility(){
+    var scrollY = window.scrollY;
+    var vH = window.innerHeight;
+    var adH = 600;
+    var show = scrollY > 200;
+    if(footer){
+      var footerTop = footer.getBoundingClientRect().top;
+      if(footerTop < vH) show = false;
+    }
+    if(right){
+      if(show){
+        var availH = vH - HEADER_H;
+        if(adH >= availH){
+          right.style.top = HEADER_H + 'px';
+          right.style.transform = 'none';
+        } else {
+          var centerY = HEADER_H + availH / 2;
+          right.style.top = centerY + 'px';
+          right.style.transform = 'translateY(-50%)';
+        }
+        right.classList.add('visible');
+      } else {
+        right.classList.remove('visible');
+      }
+    }
+  }
+  window.addEventListener('scroll', updateVisibility, {passive:true});
+  window.addEventListener('resize', updateVisibility, {passive:true});
+  updateVisibility();
 })();
 </script>
 
