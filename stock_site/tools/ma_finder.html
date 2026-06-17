@@ -712,6 +712,58 @@
   </div>
   <hr class="ad-divider">
 
+  <!-- GUIDE PANEL -->
+  <div class="guide-panel fade-in" id="guidePanel">
+    <div class="guide-inner">
+      <div class="guide-header">
+        <span class="guide-icon">🧭</span>
+        <div>
+          <div class="guide-title">怎麼使用？</div>
+          <div class="guide-sub">輸入股票代碼，系統自動找出最有效的均線參數</div>
+        </div>
+        <button class="guide-collapse-btn" id="guideCollapseBtn" onclick="toggleGuide()">展開 ▼</button>
+      </div>
+      <div class="guide-body collapsed" id="guideBody">
+        <div class="guide-steps">
+          <div class="guide-step">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-text"><b>輸入股票代碼或名稱</b>，例如 2330 或「台積電」，按「分析均線」</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-text"><b>選擇分析期間</b>（6M / 9M / 12M），系統自動定位短、中、長期的最佳均線</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-text"><b>看卡片的「近期準度」</b>，數字愈高代表這條均線近期訊號愈可靠</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-text"><b>圖表上的彩色線</b>即最佳均線，可觀察股價如何在均線附近反應</div>
+          </div>
+        </div>
+        <div class="guide-exp">
+          <div class="guide-exp-title">📊 分析期間怎麼選？</div>
+          <div class="guide-exp-text">
+            <b>· 6 個月</b> — 聚焦當前趨勢，訊號較新鮮，適合短線或波段操作。<br>
+            <b>· 9 個月</b> — 兼顧中期走勢與近期節奏，準確率通常更穩定。<br>
+            <b>· 12 個月</b> — 涵蓋完整年度，適合中長線佈局的投資人。<br><br>
+            建議三個期間都跑一次，<b>挑準確率最高且訊號次數足夠的那個</b>，就是最適合這檔股票的分析週期。
+          </div>
+        </div>
+        <div class="guide-exp guide-exp-what">
+          <div class="guide-exp-title">💡 卡片數字怎麼看？</div>
+          <div class="guide-exp-text">
+            <b>近期準度</b> — 後 30% 區間的訊號準確率，最能反映當前均線效能。<br>
+            <b>整體準確率</b> — 全期加權勝率，愈新的訊號影響比重愈大。<br>
+            <b>⚡ 近期下滑</b> — 代表這條均線最近效能已衰退，建議搭配其他期間再確認。<br>
+            <b>訊號次數</b> — 有效訊號數，低於 5 次時準確率僅供參考。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SEARCH PANEL -->
   <div class="search-panel fade-in">
     <div class="search-row">
@@ -759,57 +811,6 @@
     </div>
   </div>
 
-  <!-- GUIDE PANEL -->
-  <div class="guide-panel fade-in" id="guidePanel">
-    <div class="guide-inner">
-      <div class="guide-header">
-        <span class="guide-icon">🧭</span>
-        <div>
-          <div class="guide-title">怎麼使用？</div>
-          <div class="guide-sub">輸入股票代碼，系統自動找出最有效的均線參數</div>
-        </div>
-        <button class="guide-collapse-btn" id="guideCollapseBtn" onclick="toggleGuide()">收起 ▲</button>
-      </div>
-      <div class="guide-body" id="guideBody">
-        <div class="guide-steps">
-          <div class="guide-step">
-            <div class="guide-step-num">1</div>
-            <div class="guide-step-text"><b>輸入股票代碼或名稱</b>，例如 2330 或「台積電」，按「分析均線」</div>
-          </div>
-          <div class="guide-step">
-            <div class="guide-step-num">2</div>
-            <div class="guide-step-text"><b>選擇分析期間</b>（6M / 9M / 12M），系統自動定位短、中、長期的最佳均線</div>
-          </div>
-          <div class="guide-step">
-            <div class="guide-step-num">3</div>
-            <div class="guide-step-text"><b>看卡片的「近期準度」</b>，數字愈高代表這條均線近期訊號愈可靠</div>
-          </div>
-          <div class="guide-step">
-            <div class="guide-step-num">4</div>
-            <div class="guide-step-text"><b>圖表上的彩色線</b>即最佳均線，可觀察股價如何在均線附近反應</div>
-          </div>
-        </div>
-        <div class="guide-exp">
-          <div class="guide-exp-title">📊 分析期間怎麼選？</div>
-          <div class="guide-exp-text">
-            <b>· 6 個月</b> — 聚焦當前趨勢，訊號較新鮮，適合短線或波段操作。<br>
-            <b>· 9 個月</b> — 兼顧中期走勢與近期節奏，準確率通常更穩定。<br>
-            <b>· 12 個月</b> — 涵蓋完整年度，適合中長線佈局的投資人。<br><br>
-            建議三個期間都跑一次，<b>挑準確率最高且訊號次數足夠的那個</b>，就是最適合這檔股票的分析週期。
-          </div>
-        </div>
-        <div class="guide-exp guide-exp-what">
-          <div class="guide-exp-title">💡 卡片數字怎麼看？</div>
-          <div class="guide-exp-text">
-            <b>近期準度</b> — 後 30% 區間的訊號準確率，最能反映當前均線效能。<br>
-            <b>整體準確率</b> — 全期加權勝率，愈新的訊號影響比重愈大。<br>
-            <b>⚡ 近期下滑</b> — 代表這條均線最近效能已衰退，建議搭配其他期間再確認。<br>
-            <b>訊號次數</b> — 有效訊號數，低於 5 次時準確率僅供參考。
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="status-bar fade-in" id="statusBar">
     <span class="status-dot"></span>
     <span id="statusText">請輸入股票代碼或名稱，按「分析均線」開始</span>
@@ -2058,6 +2059,11 @@ async function doSearch(){
   document.getElementById('maCanvas').style.display='none';
   document.getElementById('volArea').style.display='none';
   document.getElementById('chartToolbar').style.display='none';
+  // ✅ 按下分析後自動滾到 statusBar，讓使用者看到「數據抓取中」
+  setTimeout(()=>{
+    const bar=document.getElementById('statusBar');
+    if(bar){bar.scrollIntoView({behavior:'smooth',block:'start'});}
+  },50);
   const t0=performance.now();
   try{
     const res=await fetch(`${API_BASE}/api/wave_data?keyword=${encodeURIComponent(KEYWORD)}&months=${MONTHS}`);
