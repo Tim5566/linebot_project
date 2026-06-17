@@ -79,7 +79,8 @@ def _cache_key(keyword: str) -> str:
     return f"{get_today()}_{keyword}"
 
 def _is_complete_result(reply: str) -> bool:
-    return "暫未更新" not in reply
+    # ✅ 修正：None 也視為不完整；只要沒有「暫未更新」就視為完整（包含 0 張的情況）
+    return reply is not None and "暫未更新" not in reply
 
 def get_today():
     return datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
@@ -583,6 +584,11 @@ def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: 
     """
     從 Firebase 組出回覆字串。
     若 Firebase 完全沒有該股資料，回傳 None（交由 fallback 處理）。
+
+    ✅ 修正：區分兩種情況
+      - data 為 None / 三大法人欄位全部都沒有 → Firebase 尚未同步，走 fallback
+      - 某欄位值為 None → 該法人 API 當天尚未更新，顯示「暫未更新」
+      - 某欄位值為 "0" 或 0   → 當天買賣 0 張，正常顯示 0
     """
     data = _read_firebase_stock(today, market, stock_id)
     if not data:
@@ -594,7 +600,7 @@ def _build_reply_from_firebase(keyword: str, stock_id: str, market: str, today: 
     prop     = data.get("proprietary")
     short    = data.get("short_sale")
 
-    # 若三大法人都沒有，也走 fallback（可能 15:10 尚未同步）
+    # 三大法人欄位全部缺失（連 "0" 都沒有）→ 走 fallback（15:10 前尚未同步）
     if foreign is None and trust is None and prop is None:
         return None
 

@@ -180,19 +180,61 @@ def _fetch_twse_institutional(today: str, max_retries: int = None) -> dict:
     if not foreign_map and not trust_map and not proprietary_map:
         print("[twse_inst] 三大法人全部未取得，略過寫入"); return {}
 
+    # ✅ 修正：各法人 API 只回傳「當日有買賣」的股票，0 張的股票不出現。
+    #
+    # 判斷邏輯：
+    #   foreign_ok / trust_ok / proprietary_ok = True
+    #     → 該法人 API「今日已成功取得資料」（不管筆數多少，只要非空就算成功）
+    #     → 若某股不在該法人清單，代表今日買賣 0 張，補寫 "0"
+    #
+    #   foreign_ok / trust_ok / proprietary_ok = False
+    #     → 該法人 API「今日尚未取得資料」（官方還沒更新或抓取失敗）
+    #     → 不寫入 Firebase，前端顯示「暫未更新」
+    #
+    # 注意各 map 結構：
+    #   foreign_map     = { sid: {"name": 名稱, "foreign": 數值字串} }
+    #   trust_map       = { sid: 數值字串 }          ← 只存淨買賣值
+    #   proprietary_map = { sid: 數值字串 }          ← 只存淨買賣值
+    foreign_ok     = bool(foreign_map)
+    trust_ok       = bool(trust_map)
+    proprietary_ok = bool(proprietary_map)
+
     result = {}
     for sid in set(foreign_map) | set(trust_map) | set(proprietary_map):
-        entry  = foreign_map.get(sid, {})
-        record = {"name": entry.get("name", sid)}
-        if entry.get("foreign") is not None:
-            record["foreign"] = entry["foreign"]
-        if sid in trust_map:
+        # 名稱：外資 map 有就用，沒有就用代碼代替
+        name = foreign_map.get(sid, {}).get("name", "") or sid
+
+        record = {"name": name}
+
+        # ── 外資 ────────────────────────────────────────────────────────────
+        # foreign_map 的值是 dict，取 "foreign" 欄位
+        if foreign_ok:
+            # API 成功：在清單內就用實際值，不在清單內補 "0"（今日 0 張）
+            record["foreign"] = foreign_map.get(sid, {}).get("foreign", "0")
+        elif sid in foreign_map:
+            # API 失敗但剛好有資料（理論上不會走到，保險用）
+            record["foreign"] = foreign_map[sid].get("foreign")
+        # else: foreign_ok=False 且 sid 不在 foreign_map → 不寫，保持 None（暫未更新）
+
+        # ── 投信 ────────────────────────────────────────────────────────────
+        # trust_map 的值直接是數值字串
+        if trust_ok:
+            record["trust"] = trust_map.get(sid, "0")
+        elif sid in trust_map:
             record["trust"] = trust_map[sid]
-        if sid in proprietary_map:
+
+        # ── 自營商 ──────────────────────────────────────────────────────────
+        if proprietary_ok:
+            record["proprietary"] = proprietary_map.get(sid, "0")
+        elif sid in proprietary_map:
             record["proprietary"] = proprietary_map[sid]
+
         result[sid] = record
 
-    print(f"[twse_inst] 共 {len(result)} 筆 ✅")
+    print(f"[twse_inst] 共 {len(result)} 筆 ✅"
+          f"（外資API={'✅' if foreign_ok else '❌'} "
+          f"投信API={'✅' if trust_ok else '❌'} "
+          f"自營商API={'✅' if proprietary_ok else '❌'}）")
     return result
 
 def _fetch_twse_short_sale(today: str) -> dict:
