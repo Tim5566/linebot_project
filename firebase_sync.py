@@ -795,13 +795,15 @@ def sync_all(today: str = None, label: int = None):
             # 16:15 — 重跑 TWSE 三大法人（補外資 + 自營商）
             # ✅ 先立即執行一次同步（與 label=2 一致）
             sync_institutional(today, max_retries=6)
-            # 若仍有欄位缺失，再啟動背景自動重試，每30分鐘直到21:00或資料完整
+            # 若仍有欄位缺失，再啟動背景自動重試，每5分鐘直到21:00或資料完整
+            # 間隔從30分鐘縮短為5分鐘：TWSE API 實測約在排程後10~20分鐘才就緒，
+            # 縮短間隔讓系統能在API更新後盡快自動補抓，不需手動介入
             if _check_data_missing(today, check_trust=False):
                 schedule_retry_if_missing(
                     today, label=3,
-                    interval_minutes=30,
+                    interval_minutes=5,
                     deadline_hour=21,
-                    max_attempts=8,
+                    max_attempts=20,
                 )
 
         elif label == 7:
