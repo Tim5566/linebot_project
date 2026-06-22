@@ -997,8 +997,70 @@ let bsState = { foreign:'buy', trust:'buy', prop:'buy' };
 let activeSync = null;       // { type, dir } 共振模式 | null
 
 /* ── Load Data ── */
+/* ── 交易日判斷：問後端 /api/trading_status（含國定假日，非單純看星期）── */
+async function checkTradingStatus(){
+  try {
+    const res  = await fetch('/api/trading_status', { cache:'no-store' });
+    const data = await res.json();
+    return {
+      isTrading:      !!data.is_trading_day,
+      nextTradingDay: data.next_trading_day || null,
+    };
+  } catch(e){
+    console.error('[top100] trading_status 查詢失敗，退回星期判斷:', e);
+    const d = new Date().getDay();
+    return { isTrading: d >= 1 && d <= 5, nextTradingDay: null };
+  }
+}
+
+/* ── 顯示休市狀態：鎖面板、清空表格、不打 /api/otc_top100 ── */
+function showClosedState(nextTradingDay){
+  const dow = new Date().getDay();
+  const dayNames = ['日','一','二','三','四','五','六'];
+  let nextStr = '—';
+  if (nextTradingDay){
+    const next = new Date(`${nextTradingDay}T00:00:00+08:00`);
+    nextStr = `${next.getMonth()+1}/${next.getDate()} (週${dayNames[next.getDay()]})`;
+  }
+
+  document.getElementById('dataDate').textContent = `資料日期：${getTodayStr()}`;
+
+  const banner = document.getElementById('readinessBanner');
+  const panel  = document.querySelector('.ctrl-panel');
+  banner.className = 'readiness-banner';
+  banner.innerHTML = `
+    <div class="rb-icon">🏖️</div>
+    <div class="rb-body">
+      <div class="rb-title">${dow === 0 || dow === 6 ? '週末休市' : '今日休市（國定假日）'}</div>
+      <div class="rb-desc">今日交易所休市，無三大法人買賣超資料<br>下一個交易日：<strong style="color:var(--green)">${nextStr}</strong></div>
+    </div>`;
+  banner.style.display = 'flex';
+  panel.classList.add('data-locked');
+
+  // 清空三張表格與筆數顯示，顯示休市訊息而非「尚未更新」
+  ['tbodyForeign','tbodyTrust','tbodyProp'].forEach(id => {
+    const tbody = document.getElementById(id);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="3" class="table-empty">🏖️ 今日休市，無資料</td></tr>`;
+  });
+  ['foreignCount','trustCount','propCount'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '共 0 筆';
+  });
+
+  setStatus('ok','今日休市，無盤後資料');
+}
+
+/* ── Load Data ── */
 async function loadData(){
   setStatus('load','正在載入上櫃法人資料…');
+
+  // 先問後端是否為交易日（含國定假日）→ 休市就不打 /api/otc_top100
+  const { isTrading, nextTradingDay } = await checkTradingStatus();
+  if (!isTrading){
+    showClosedState(nextTradingDay);
+    return;
+  }
+
   try {
     const res  = await fetch('/api/otc_top100');
     const data = await res.json();

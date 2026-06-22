@@ -670,9 +670,22 @@
 function getTWTime() {
   return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
 }
-function isTradingWeekday() {
-  const d = getTWTime().getDay();
-  return d >= 1 && d <= 5;
+// 是否為交易日：問後端 /api/trading_status（已含國定假日判斷，非單純看星期）
+// 回傳 { isTrading, nextTradingDay } —— nextTradingDay 失敗或無資料時為 null
+async function checkTradingStatus() {
+  try {
+    const res  = await fetch('/api/trading_status', { cache: 'no-store' });
+    const data = await res.json();
+    return {
+      isTrading:      !!data.is_trading_day,
+      nextTradingDay: data.next_trading_day || null,
+    };
+  } catch (e) {
+    console.error('[disposal] trading_status 查詢失敗，退回星期判斷:', e);
+    // API 失敗時退回原本的星期判斷，至少擋掉週末（無法判斷國定假日）
+    const d = getTWTime().getDay();
+    return { isTrading: d >= 1 && d <= 5, nextTradingDay: null };
+  }
 }
 function isDataReady() {
   const tw = getTWTime();
@@ -721,17 +734,21 @@ function showPendingState() {
   _countdownTimer = setInterval(tick, 1000);
 }
 
-function showClosedState() {
+function showClosedState(nextTradingDay) {
   const tw = getTWTime();
   const dow = tw.getDay();
   const dayNames = ['日','一','二','三','四','五','六'];
-  let next = new Date(tw);
-  do { next.setDate(next.getDate()+1); } while (next.getDay() === 0 || next.getDay() === 6);
-  const nextStr = `${next.getMonth()+1}/${next.getDate()} (週${dayNames[next.getDay()]})`;
+
+  let nextStr = '—';
+  if (nextTradingDay) {
+    const next = new Date(`${nextTradingDay}T00:00:00+08:00`);
+    nextStr = `${next.getMonth()+1}/${next.getDate()} (週${dayNames[next.getDay()]})`;
+  }
+
   document.getElementById('disposalContent').innerHTML = `
     <div class="state-wrap">
       <div class="state-icon">🏖️</div>
-      <div class="state-title">${dow === 0 || dow === 6 ? '週末休市' : '今日非交易日'}</div>
+      <div class="state-title">${dow === 0 || dow === 6 ? '週末休市' : '今日休市（國定假日）'}</div>
       <div class="state-sub">
         今日（週${dayNames[dow]}）交易所休市，無處置股資料<br>
         下一個交易日：<strong style="color:var(--accent)">${nextStr}</strong>
@@ -836,8 +853,10 @@ function renderDisposal(items, date) {
 async function loadDisposal() {
   clearInterval(_countdownTimer);
 
-  if (!isTradingWeekday()) {
-    showClosedState();
+  // 休市判斷（含國定假日，問後端 get_trading_holidays）→ 休市就不打 /api/disposal
+  const { isTrading, nextTradingDay } = await checkTradingStatus();
+  if (!isTrading) {
+    showClosedState(nextTradingDay);
     return;
   }
 

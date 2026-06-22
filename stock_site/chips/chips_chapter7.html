@@ -587,6 +587,54 @@
     body.theme-day .ad-unit-label { color: #5a8ab8; }
     body.theme-day .ad-divider { border-top-color: rgba(26,101,168,.1); }
 
+    /* ── NATIVE BANNER WRAPPER (船井廣告) ── */
+    .native-banner-wrap {
+      position: relative;
+      margin: 12px 0 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,229,255,.10);
+      background: rgba(7,13,26,.6);
+      overflow: hidden;
+    }
+    .native-banner-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.4), transparent);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .native-banner-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,229,255,.05);
+    }
+    .native-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(0,229,255,.35);
+    }
+    .native-banner-inner {
+      padding: 4px 8px 4px;
+      overflow: hidden;
+    }
+    body.theme-day .native-banner-wrap {
+      background: rgba(240,246,255,.6);
+      border-color: rgba(26,101,168,.15);
+    }
+    body.theme-day .native-banner-label { color: #8aaac8; }
+
+
   
     /* ═══════════════════════════════════════════════════════════
        SPACE MODE VISUAL ENHANCEMENTS — 統一增強版
@@ -2624,34 +2672,14 @@
 
 
   <!-- AD BANNER #top -->
-<div class="ad-unit ad-unit-gap">
-  <p class="ad-unit-label">贊助商廣告</p>
-  <div class="ad-block ad-728">
-    <script>
-      atOptions = {
-        'key' : '5772ef3994b031361b8244c989020d16',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+<div class="native-banner-wrap is-loaded">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®兒童專用益生菌口嚼錠健康防護組(加碼送3C葉黃素凍) ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://twshop4coupon.com/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9746236c4cdf24bbebf50768b202651200a8cd33a5e6566e9f663499abdb4aee7abb970d?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-aaax4%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3DAFF_20200907_funcare-aaax4%26utm_term%3D-transaction_id-%26utm_content%3Daffiliates' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/83631/c627c2bc9b0521dffc8aec2bd32e9746236c4cdf24bbebf50768b202651200a8cd33a5e6566e9d2634ddffd81d' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
-  <div class="ad-block ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-  </div>
-</div>
-<hr class="ad-divider">
+  <hr class="ad-divider">
 
 
   <!-- ══ SECTION 1：什麼是借券賣出 ══ -->
@@ -3162,34 +3190,14 @@
 
   <!-- ══ SECTION 6：實戰案例解析（新增） ══ -->
   <!-- AD BANNER #mid -->
-<div class="ad-unit ad-unit-gap">
-  <p class="ad-unit-label">贊助商廣告</p>
-  <div class="ad-block ad-728">
-    <script>
-      atOptions = {
-        'key' : '5772ef3994b031361b8244c989020d16',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+<div class="native-banner-wrap is-loaded">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®burner®倍熱®夜孅超燃力GABA睡眠速攻組 ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://afftck.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9d45236d4cc863bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Fburner-sv5%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3Daffiliates_20250206_burner-sv5%26utm_content%3D20250206_burner-sv5_%25E5%25AF%25A6%25E6%25B8%25AC2%25E9%25A1%2586%25E5%25A4%259C%25E5%25AD%2585' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/206211/c627c2bc9b0521dffc8aec2bd32e9d45236d4cc863bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
-  <div class="ad-block ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-  </div>
-</div>
-<hr class="ad-divider">
+  <hr class="ad-divider">
 <div id="s06" class="section-card reveal">
     <div class="section-header">
       <div class="section-num">07—06</div>
@@ -3540,17 +3548,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ══ AD ══ -->
-  <!-- AdSense 審核通過後啟用
-<div class="ad-unit">
-    <p class="ad-unit-label">贊助商廣告</p>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8975741363002226" data-ad-slot="1893335041" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
--->
-  
-
 <!-- CHAPTER FOOTER -->
   <div class="chapter-footer">
     <div class="footer-inner">
@@ -3581,34 +3578,14 @@
 
 
 <!-- AD BANNER #after-main -->
-<div class="ad-unit ad-unit-gap">
-  <p class="ad-unit-label">贊助商廣告</p>
-  <div class="ad-block ad-728">
-    <script>
-      atOptions = {
-        'key' : '5772ef3994b031361b8244c989020d16',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
+<div class="native-banner-wrap is-loaded">
+    <div class="native-banner-label">推廣連結</div>
+    <div class="native-banner-inner" style="text-align:center;">
+      <span style="font-size:.78rem; color:var(--accent); letter-spacing:.05em; display:inline-block; margin-bottom:8px;">船井®FIP100膳食纖維粉/調節血脂/血糖/膽固醇/三酸甘油脂/胃腸功能改善超值組 ⬇⬇⬇⬇⬇點擊</span>
+      <a href='https://twcouponcenter.com/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9d45236d4fcb63bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Fburner-bv15x8%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3Daffiliates_20250310_burner-bv15x8%26utm_content%3D20250310_burner-bv15x8_%25E7%258E%258B%25E5%25BD%25A9%25E6%25A8%25BAKV' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/206222/c627c2bc9b0521dffc8aec2bd32e9d45236d4fcb63bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' border='0' style="max-width:100%;display:block;margin:0 auto;"/></a>
+    </div>
   </div>
-  <div class="ad-block ad-320">
-    <script>
-      atOptions = {
-        'key' : '870f277b58a349b01e24f2df2d1c7aba',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-  </div>
-</div>
-<hr class="ad-divider">
+  <hr class="ad-divider">
 <!-- FOOTER -->
 <footer id="site-footer" style="position:relative;z-index:10;border-top:1px solid rgba(0,229,255,.08);background:linear-gradient(180deg,rgba(3,6,14,.97),rgba(2,4,10,.99));box-shadow:0 -2px 30px rgba(0,0,0,.4);margin-top:40px;" data-dark-footer="1">
   <div style="padding:20px 40px 24px;display:flex;flex-direction:column;gap:8px;">
@@ -3908,17 +3885,7 @@ window.answerQ=function(qid,el,choice){
 
 <!-- AD SIDE RIGHT -->
 <div class="side-ad side-ad-right" id="sideAdRight">
-  <span class="side-ad-label">Ad</span>
-  <script>
-    atOptions = {
-      'key' : '0b75586f85e116c7c680d395de31c581',
-      'format' : 'iframe',
-      'height' : 600,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
+  <a href='https://affclk.site/track/clicks/4412/c627c2bc9b0521dffc8aec2bd32e9e46246645ce63bcb0f90660ba05600649b1863aa5e3557acd607b94bd8b0ee133bd901d51?t=https%3A%2F%2Fwww.funaicare.com%2Fproducts%2Ffuncare-avx3%3Futm_source%3Daffiliates%26utm_medium%3Dcpa%26utm_campaign%3DAFF_20211224_funcare-avx3%26utm_term%3Dtransaction_id%26utm_content%3Daffiliates' target="_blank" rel="nofollow sponsored noopener"><img src='https://vbtrax.com/track/imp/img/131987/c627c2bc9b0521dffc8aec2bd32e9e46246645ce63bcb0f90660ba05600649b1863aa5e3557acd623b94f9df0db6' width="160" height="600" border='0' style="display:block;"/></a>
 </div>
 <script>
 (function(){
