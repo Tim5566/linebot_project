@@ -404,23 +404,42 @@ def sync_institutional(today: str = None, max_retries: int = None):
     twse_inst = _fetch_twse_institutional(today, max_retries=max_retries)
     _init_firebase()
 
-    # ✅ 修正：投信沒抓到時，從 Firebase 讀回現有投信資料補進來，避免覆蓋掉 15:00 已寫好的投信
+    # ✅ 修正：三大法人任一沒抓到時，從 Firebase 讀回現有資料補進來
     # 原因：_write_batch 用 ref.update()，每支股票整個 dict 覆蓋寫入（非 merge），
-    # trust_ok=False 時 record 裡沒有 trust 欄位，寫入後 Firebase 原有 trust 欄位會消失。
-    trust_count_before = sum(1 for v in twse_inst.values() if "trust" in v)
-    if trust_count_before == 0 and twse_inst:
-        print(f"[sync] 投信未抓到，嘗試從 Firebase 讀回現有投信資料補入...")
+    # 某欄位沒抓到時 record 裡沒有該欄位，寫入後 Firebase 原有資料會消失。
+    # 保護邏輯：外資/投信/自營商各自獨立判斷，有抓到用新的，沒抓到補舊的。
+    foreign_count_before     = sum(1 for v in twse_inst.values() if "foreign"     in v)
+    trust_count_before       = sum(1 for v in twse_inst.values() if "trust"       in v)
+    proprietary_count_before = sum(1 for v in twse_inst.values() if "proprietary" in v)
+
+    need_rescue = (
+        (foreign_count_before == 0 or trust_count_before == 0 or proprietary_count_before == 0)
+        and twse_inst
+    )
+
+    if need_rescue:
+        missing = []
+        if foreign_count_before == 0:     missing.append("外資")
+        if trust_count_before == 0:       missing.append("投信")
+        if proprietary_count_before == 0: missing.append("自營商")
+        print(f"[sync] {missing} 未抓到，嘗試從 Firebase 讀回現有資料補入...")
         try:
             existing = firebase_db.reference(f"stock_data/{today}/twse").get() or {}
-            rescued = 0
+            rescued = {"foreign": 0, "trust": 0, "proprietary": 0}
             for sid, record in twse_inst.items():
-                fb_trust = (existing.get(sid) or {}).get("trust")
-                if fb_trust is not None:
-                    record["trust"] = fb_trust
-                    rescued += 1
-            print(f"[sync] 從 Firebase 補回投信資料 {rescued} 筆 ✅")
+                fb = existing.get(sid) or {}
+                if foreign_count_before == 0 and fb.get("foreign") is not None:
+                    record["foreign"]      = fb["foreign"]
+                    rescued["foreign"]    += 1
+                if trust_count_before == 0 and fb.get("trust") is not None:
+                    record["trust"]        = fb["trust"]
+                    rescued["trust"]      += 1
+                if proprietary_count_before == 0 and fb.get("proprietary") is not None:
+                    record["proprietary"]  = fb["proprietary"]
+                    rescued["proprietary"] += 1
+            print(f"[sync] 從 Firebase 補回：外資 {rescued['foreign']} 筆、投信 {rescued['trust']} 筆、自營商 {rescued['proprietary']} 筆 ✅")
         except Exception as e:
-            print(f"[sync] 補回投信資料失敗: {e} ⚠️")
+            print(f"[sync] 補回資料失敗: {e} ⚠️")
 
     if twse_inst:
         _write_batch(f"stock_data/{today}/twse", twse_inst)
