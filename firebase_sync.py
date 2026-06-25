@@ -173,18 +173,9 @@ def _fetch_twse_institutional(today: str, max_retries: int = None) -> dict:
             out[row[0].strip()] = row[10].strip()
         return out
 
-    # ✅ 修正：改為並行抓取，外資/自營商不再被投信重試卡住
-    # 原本循序執行時，投信 6次×30秒=180秒重試期間外資已抓到但無法寫入 Firebase，
-    # 前端在 16:15~16:18 這段時間看不到外資數據。
-    # 改並行後三個 API 同時抓，外資和自營商幾秒內就能寫入，不受投信影響。
-    import concurrent.futures as _cf
-    with _cf.ThreadPoolExecutor(max_workers=3) as _pool:
-        _ff = _pool.submit(_parse_foreign)
-        _ft = _pool.submit(_parse_trust)
-        _fp = _pool.submit(_parse_proprietary)
-        foreign_map     = _ff.result()
-        trust_map       = _ft.result()
-        proprietary_map = _fp.result()
+    foreign_map     = _parse_foreign()
+    trust_map       = _parse_trust()
+    proprietary_map = _parse_proprietary()
 
     if not foreign_map and not trust_map and not proprietary_map:
         print("[twse_inst] 三大法人全部未取得，略過寫入"); return {}
@@ -403,25 +394,6 @@ def sync_institutional(today: str = None, max_retries: int = None):
     print(f"[sync] 開始同步 TWSE 三大法人 date={today}{retries_info}")
     twse_inst = _fetch_twse_institutional(today, max_retries=max_retries)
     _init_firebase()
-
-    # ✅ 修正：投信沒抓到時，從 Firebase 讀回現有投信資料補進來，避免覆蓋掉 15:00 已寫好的投信
-    # 原因：_write_batch 用 ref.update()，每支股票整個 dict 覆蓋寫入（非 merge），
-    # trust_ok=False 時 record 裡沒有 trust 欄位，寫入後 Firebase 原有 trust 欄位會消失。
-    trust_count_before = sum(1 for v in twse_inst.values() if "trust" in v)
-    if trust_count_before == 0 and twse_inst:
-        print(f"[sync] 投信未抓到，嘗試從 Firebase 讀回現有投信資料補入...")
-        try:
-            existing = firebase_db.reference(f"stock_data/{today}/twse").get() or {}
-            rescued = 0
-            for sid, record in twse_inst.items():
-                fb_trust = (existing.get(sid) or {}).get("trust")
-                if fb_trust is not None:
-                    record["trust"] = fb_trust
-                    rescued += 1
-            print(f"[sync] 從 Firebase 補回投信資料 {rescued} 筆 ✅")
-        except Exception as e:
-            print(f"[sync] 補回投信資料失敗: {e} ⚠️")
-
     if twse_inst:
         _write_batch(f"stock_data/{today}/twse", twse_inst)
     else:
