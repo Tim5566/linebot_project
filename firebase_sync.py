@@ -24,7 +24,9 @@ from zoneinfo import ZoneInfo
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ── 重試設定 ──────────────────────────────────────────────────────────────────
-MAX_DATE_RETRIES = 2
+# ✅ 修正：改為只試1次，失敗就放棄，交給外層每5分鐘排程補抓
+# 原本密集重試（最多6次×30秒=3分鐘）會導致 TWSE 限流封鎖 IP
+MAX_DATE_RETRIES = 1
 DATE_RETRY_WAIT  = 30
 
 # ── Firebase 初始化（單例）────────────────────────────────────────────────────
@@ -840,11 +842,9 @@ def sync_all(today: str = None, label: int = None):
 
         elif label == 3:
             # 16:15 — 重跑 TWSE 三大法人（補外資 + 自營商）
-            # ✅ 先立即執行一次同步（與 label=2 一致）
-            sync_institutional(today, max_retries=6)
-            # 若仍有欄位缺失，再啟動背景自動重試，每5分鐘直到21:00或資料完整
-            # 間隔從30分鐘縮短為5分鐘：TWSE API 實測約在排程後10~20分鐘才就緒，
-            # 縮短間隔讓系統能在API更新後盡快自動補抓，不需手動介入
+            # ✅ 修正：只試1次，失敗交給下面的 schedule_retry_if_missing 每5分鐘補抓
+            sync_institutional(today, max_retries=1)
+            # 若仍有欄位缺失，啟動背景自動重試，每5分鐘直到21:00或資料完整
             if _check_data_missing(today, check_trust=False):
                 schedule_retry_if_missing(
                     today, label=3,
@@ -1061,11 +1061,12 @@ def schedule_retry_if_missing(
                         continue
                     try:
                         if label in (3, 2):
-                            sync_institutional(today, max_retries=6)
+                            # ✅ 修正：只試1次，失敗交給外層排程5分鐘後再試
+                            sync_institutional(today, max_retries=1)
                         elif label == 1:
                             sync_market(today)
                         else:
-                            sync_institutional(today, max_retries=6)
+                            sync_institutional(today, max_retries=1)
                     finally:
                         _sync_lock.release()
             except Exception as e:

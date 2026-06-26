@@ -119,7 +119,10 @@ def _read_firebase_market(today: str) -> dict | None:
 # 代碼清單（用來判斷個股屬於上市或上櫃，以及名稱 ↔ 代碼互查）
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fetch_with_retry(url, today, date_key="date", retries=4, delay=1.2):
+def fetch_with_retry(url, today, date_key="date", retries=1, delay=1.2):
+    # ✅ 修正：只試1次，失敗就回傳 None，不密集重試導致 TWSE 限流
+    # 個股查詢優先走 Firebase，Firebase miss 才 fallback 到 API，
+    # 若 API 也失敗（資料未就緒或被限流），前端顯示「暫無資料」即可
     today_d = re.sub(r"[^\d]", "", today)
     try:
         y = int(today_d[:4]) - 1911
@@ -396,16 +399,16 @@ def _otc_institutional(keyword, api_url, today):
                     (minguo_today and (minguo_today in api_d or api_d in minguo_today)))
 
         inst_data = None
-        for attempt in range(4):
+        # ✅ 修正：只試1次，失敗交給外層排程5分鐘後再試
+        for attempt in range(1):
             try:
                 res = requests.get(api_url, headers=headers, verify=False, timeout=12)
                 inst_data = res.json()
                 if otc_date_ok(inst_data):
                     break
-                print(f"[otc_inst retry {attempt+1}/4] 日期不符")
+                print(f"[otc_inst retry {attempt+1}/1] 日期不符")
             except Exception as e:
-                print(f"[otc_inst retry {attempt+1}/4] 失敗: {e}")
-            _time.sleep(0.8 if attempt == 0 else 1.5)
+                print(f"[otc_inst retry {attempt+1}/1] 失敗: {e}")
 
         if not inst_data or not otc_date_ok(inst_data):
             return None, None, None
@@ -431,7 +434,8 @@ def _otc_institutional(keyword, api_url, today):
 
 def _otc_short_sale(keyword, api_url, today):
     try:
-        data = fetch_with_retry(api_url, today, date_key="date", retries=4, delay=1.5)
+        # ✅ 修正：只試1次
+        data = fetch_with_retry(api_url, today, date_key="date", retries=1, delay=1.5)
         if data is None:
             return None
         kw = keyword if keyword.isdigit() else OTC_NAME2CODE.get(keyword, keyword)
