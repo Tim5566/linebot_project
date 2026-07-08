@@ -781,7 +781,9 @@ def sync_all(today: str = None, label: int = None):
       2  = 15:00  投信 TWSE（sync_institutional，只有投信先出）
       1  = 15:10  大盤法人（sync_market）
       9  = 15:30  OTC 三大法人（sync_otc_institutional）★ 不受鎖限制
+             缺資料時啟動背景重試：每15分鐘一次，最多20次，撐到21:00
       10 = 16:30  OTC 三大法人補跑（萬一 15:30 失敗）★ 不受鎖限制
+             同樣會檢查缺資料並視需要啟動背景重試（沿用 label=9 的重試鍵，避免重複）
       3  = 16:15  重跑 TWSE 三大法人（補外資 + 自營商）
       7  = 21:10  大盤融資（sync_market）
       8  = 21:30  借券賣出（sync_short_sale）
@@ -797,6 +799,19 @@ def sync_all(today: str = None, label: int = None):
         print(f"[sync_all] 開始同步 date={today} {tag}（OTC 獨立執行，不受鎖限制）")
         try:
             sync_otc_institutional(today)
+            # ✅ 修正：先前這裡直接 return，導致下面的安全網（missing 檢查 +
+            # 背景重試排程）永遠執行不到，OTC 全天只有 label=9/10 兩次單槍嘗試。
+            # 現在補上：TPEx 常常在 15:30/16:30 這兩個瞬間還沒發布完當日資料，
+            # 缺資料就啟動背景重試，每15分鐘一次，最多20次，撐到 21:00。
+            # 統一用 label=9 當重試 key，避免 label=9 和 label=10 各自開一條
+            # 重試 thread 而重複運作。
+            if _check_data_missing_otc(today):
+                schedule_retry_if_missing(
+                    today, label=9,
+                    interval_minutes=15,
+                    deadline_hour=21,
+                    max_attempts=20,
+                )
             print(f"[sync_all] 完成 date={today} {tag}")
         except Exception as e:
             print(f"[sync_all] OTC 同步失敗 {tag}: {e} ⚠️")
@@ -827,18 +842,6 @@ def sync_all(today: str = None, label: int = None):
         elif label == 1:
             # 15:10 — 大盤法人買賣金額
             sync_market(today)
-
-        elif label == 9:
-            # 15:30 — OTC 三大法人
-            sync_otc_institutional(today)
-            # OTC 安全網：萬一 tpex 也慢，每30分鐘補抓，最多到 21:00
-            if _check_data_missing_otc(today):
-                schedule_retry_if_missing(
-                    today, label=9,
-                    interval_minutes=30,
-                    deadline_hour=21,
-                    max_attempts=6,
-                )
 
         elif label == 3:
             # 16:15 — 重跑 TWSE 三大法人（補外資 + 自營商）

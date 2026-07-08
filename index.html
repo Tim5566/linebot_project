@@ -1422,6 +1422,16 @@
       letter-spacing: .1em;
     }
     .footer-legal-links a:hover { color: var(--accent); opacity: 1; }
+
+    /* ── Footer FB link ── */
+    .footer-fb-link {
+      display: inline-flex;
+      align-items: center;
+      color: #5b8fd4 !important;
+    }
+    .footer-fb-link:hover {
+      color: #1877F2 !important;
+    }
     .footer-sep {
       color: var(--text-faint);
       font-size: .6rem;
@@ -3172,6 +3182,36 @@
     .maint-title { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:700; color:#ffd600; letter-spacing:.06em; margin-bottom:12px; }
     .maint-msg { font-family:'Noto Sans TC',sans-serif; font-size:.85rem; color:var(--text-dim); line-height:1.7; }
     .maint-sub { margin-top:22px; font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:.18em; color:rgba(0,229,255,.35); text-transform:uppercase; }
+    .maint-fb-note {
+      margin-top: 18px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .75rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      opacity: .8;
+    }
+    .maint-fb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 9px 20px;
+      background: rgba(24,119,242,.12);
+      border: 1px solid rgba(24,119,242,.35);
+      border-radius: 20px;
+      color: #5b9bf5;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: .78rem;
+      text-decoration: none;
+      letter-spacing: .04em;
+      transition: background .2s, border-color .2s, box-shadow .2s, color .2s;
+    }
+    .maint-fb-btn:hover {
+      background: rgba(24,119,242,.24);
+      border-color: rgba(24,119,242,.65);
+      box-shadow: 0 0 16px rgba(24,119,242,.30);
+      color: #88bbff;
+    }
     /* 管理員維護工具列（管理員看得到，用戶看不到） */
     #adminMaintBar {
       display: none;
@@ -5443,6 +5483,12 @@
       <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
       <span class="footer-sep">·</span>
       <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
+      <span class="footer-sep">·</span>
+      <a href="https://www.facebook.com/share/1BXgFFBvrU/" target="_blank" rel="noopener noreferrer" class="footer-fb-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:middle;margin-right:4px;">
+          <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+        </svg>官方粉絲團
+      </a>
     </div>
   </div>
 </footer>
@@ -7889,9 +7935,14 @@ setTimeout(() => {
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </div>
-    <div class="maint-title">系統維護中</div>
-    <div class="maint-msg" id="maintMsgText">本網站暫時維護中，請稍後再試。</div>
-    <div class="maint-sub">SYSTEM MAINTENANCE · PLEASE WAIT</div>
+    <div class="maint-title">⚙️ 系統維護中，稍後再試</div>
+    <div class="maint-fb-note">官方粉絲團不定期公告維護時間、新增工具與相關資訊</div>
+    <a href="https://www.facebook.com/share/1BXgFFBvrU/" target="_blank" rel="noopener noreferrer" class="maint-fb-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+      </svg>
+      前往官方粉絲團
+    </a>
   </div>
 </div>
 

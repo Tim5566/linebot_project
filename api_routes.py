@@ -613,7 +613,7 @@ def register_api(app):
     # ── 上櫃三大法人買賣超前50 資料 API ────────────────────────────────────────
     @app.route("/api/otc_top100")
     def api_otc_top100():
-        from firebase_sync import _calc_top100
+        from firebase_sync import _calc_top100, sync_otc_institutional
         today = get_today()
         try:
             cached = firebase_db.reference(f"top100_cache/{today}/otc").get()
@@ -621,7 +621,21 @@ def register_api(app):
                 return jsonify(cached)
             raw = firebase_db.reference(f"stock_data/{today}/otc").get()
             if not raw:
-                return jsonify({"error": "今日資料尚未更新"}), 503
+                # ✅ 修正：排程批次同步（label=9/10）可能還沒抓到，
+                # 這裡現場補打一次，跟個股查詢一樣有 fallback，
+                # 而不是直接回 503 讓使用者整天看不到資料。
+                print(f"[api/otc_top100] Firebase 無快取，現場補抓一次 date={today}")
+                try:
+                    sync_otc_institutional(today)
+                except Exception as e:
+                    print(f"[api/otc_top100] 現場補抓失敗: {e}")
+                raw = firebase_db.reference(f"stock_data/{today}/otc").get()
+                if not raw:
+                    return jsonify({"error": "今日資料尚未更新，請稍後再試"}), 503
+                # sync_otc_institutional 內部已經算好並寫入 top100_cache，直接讀回即可
+                cached = firebase_db.reference(f"top100_cache/{today}/otc").get()
+                if cached:
+                    return jsonify(cached)
             top100 = _calc_top100(raw)
             try:
                 firebase_db.reference(f"top100_cache/{today}/otc").set(top100)
