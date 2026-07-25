@@ -239,17 +239,17 @@
     .sig-tab-btn:not(.active){opacity:.45}
     .sig-tab-btn:hover{opacity:1}
     .signal-table-wrap{overflow-x:auto}
-    table.sig-table{width:100%;border-collapse:collapse;font-size:.74rem;font-family:'JetBrains Mono',monospace}
-    table.sig-table th{padding:7px 12px;text-align:left;color:var(--accent);opacity:.7;font-weight:600;border-bottom:1px solid var(--border2);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}
-    table.sig-table td{padding:8px 12px;border-bottom:1px solid rgba(15,30,48,.8);color:var(--text)}
+    table.sig-table{width:100%;border-collapse:collapse;font-size:.82rem;font-family:'JetBrains Mono',monospace}
+    table.sig-table th{padding:6px 12px;text-align:left;color:var(--accent);opacity:.7;font-weight:600;border-bottom:1px solid var(--border2);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+    table.sig-table td{padding:6px 12px;border-bottom:1px solid rgba(15,30,48,.8);color:var(--text)}
     table.sig-table tr:last-child td{border-bottom:none}
     table.sig-table tr:hover td{background:rgba(0,229,255,.04)}
-    .sig-type{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:.62rem;font-weight:700}
+    .sig-type{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.68rem;font-weight:700}
     .sig-break-up{background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.35);color:#ff6b6b}
     .sig-break-dn{background:rgba(0,200,150,.13);border:1px solid rgba(0,200,150,.35);color:#00e6a0}
     .sig-touch{background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.28);color:var(--yellow)}
-    .sig-valid{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:.62rem;font-weight:700;background:rgba(0,230,118,.13);border:1px solid rgba(0,230,118,.38);color:#00e676}
-    .sig-fake{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:.62rem;font-weight:700;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.32);color:var(--yellow)}
+    .sig-valid{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.68rem;font-weight:700;background:rgba(0,230,118,.13);border:1px solid rgba(0,230,118,.38);color:#00e676}
+    .sig-fake{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.68rem;font-weight:700;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.32);color:var(--yellow)}
     .sig-filter-row{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
     .sig-filter-label{font-size:.62rem;color:var(--accent);opacity:.65;font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
     .sig-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:8px;border:1.5px solid transparent;background:transparent;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .18s;user-select:none}
@@ -1102,6 +1102,39 @@ function calcVolMA20(data) {
   });
 }
 
+// ── 量張單位換算（沿用既有換算慣例：>=100000 視為「股」換算成「張」）──
+function toLots(v) {
+  if (!v) return 0;
+  return v >= 100000 ? v / 1000 : v;
+}
+
+// ── 訊號當日量能比（相對前 N 日均量，不含當日）──
+function calcVolRatio(data, idx, lookback = 5) {
+  const start = Math.max(0, idx - lookback);
+  const slice = data.slice(start, idx);
+  if (!slice.length) return null;
+  const avg = slice.reduce((a, d) => a + (d.volume || 0), 0) / slice.length;
+  if (!avg) return null;
+  return (data[idx].volume || 0) / avg;
+}
+
+// ── 糾結／小箱型偵測：4 天內 3 天股價與均線交叉 ──
+function detectCongestion(closes, ma) {
+  const n = closes.length;
+  const congested = new Array(n).fill(false);
+  for (let i = 3; i < n; i++) {
+    let crossCount = 0;
+    for (let j = i - 2; j <= i; j++) {
+      if (ma[j] == null || ma[j - 1] == null) continue;
+      const prevAbove = closes[j - 1] > ma[j - 1];
+      const curAbove  = closes[j]   > ma[j];
+      if (prevAbove !== curAbove) crossCount++;
+    }
+    if (crossCount >= 3) congested[i] = true;
+  }
+  return congested;
+}
+
 // ── 核心評分函式 ──
 function scoreMA(data, closes, period, volCtx, atrPcts) {
   const ma  = calcMA(closes, period);
@@ -1185,10 +1218,26 @@ function scoreMA(data, closes, period, volCtx, atrPcts) {
     const ageFrac = i / (n - 1);  // 0 = 最早，1 = 最新
     const weight  = Math.exp(LAMBDA * ageFrac);
 
+    // ── 量價過濾（僅針對真突破 break_up / break_dn）──
+    // 帶量標準：當日量 ≥ 前5日均量 1.3 倍；< 0.85 倍視為量縮（價漲量縮警訊）
+    let volRatio = null, volConfirmed = null, priceVolWarn = false;
+    if (type === 'break_up' || type === 'break_dn') {
+      volRatio = calcVolRatio(data, i, 5);
+      if (volRatio != null) {
+        volConfirmed = volRatio >= 1.3;
+        if (type === 'break_up' && volRatio < 0.85) priceVolWarn = true;
+      }
+    }
+
     signals.push({ idx: i, type, price: closes[i], maVal: ma[i],
       day2Price, valid, weight, slope,
-      hit2, hit3, hit5, hitCount });
+      hit2, hit3, hit5, hitCount,
+      volRatio, volConfirmed, priceVolWarn });
   }
+
+  // ── 糾結／小箱型偵測（與訊號數無關，只看均線本身的最新型態）──
+  const congestedArr = detectCongestion(closes, ma);
+  const congestedNow = congestedArr[n - 1] === true;
 
   const total = signals.length;
   if (total === 0) return {
@@ -1197,6 +1246,7 @@ function scoreMA(data, closes, period, volCtx, atrPcts) {
     recentWinRate: 0, recentTotal: 0, recentValid: 0,
     densityPenalty: 1, streakPenalty: 1, precisionBonus: 1,
     regimeDecay: 1, sigPerMonth: 0, score: 0, ma,
+    congestedNow, volConfirmRate: null, volConfirmedCount: 0, volBreakoutTotal: 0, recentPriceVolWarn: false,
     anomaly: { triggered: true, reason: '無訊號' }
   };
 
@@ -1246,10 +1296,20 @@ function scoreMA(data, closes, period, volCtx, atrPcts) {
     precisionBonus = Math.min(1.60, 1.0 + (weightedWinRate - 0.70) * 2.0);
   }
 
+  // ── 量價確認加權（僅統計真突破訊號中有量能資料者）──
+  const breakoutSigs = signals.filter(s => (s.type === 'break_up' || s.type === 'break_dn') && s.volRatio != null);
+  const volBreakoutTotal = breakoutSigs.length;
+  const volConfirmedCount = breakoutSigs.filter(s => s.volConfirmed).length;
+  const volConfirmRate = volBreakoutTotal > 0 ? volConfirmedCount / volBreakoutTotal : null;
+  // 帶量確認率高給小幅加分、偏低給小幅扣分，避免蓋過主要的勝率評分
+  const volBonus = volConfirmRate != null ? (0.92 + volConfirmRate * 0.16) : 1.0;
+  // 近 5 筆訊號內是否出現「價漲量縮」警訊
+  const recentPriceVolWarn = signals.slice(-5).some(s => s.priceVolWarn);
+
   // 最終評分
-  // = 衰減加權勝率 × log(有效訊號+1) × 斜率過濾已內建 × 衰退係數 × 密度懲罰 × 連敗懲罰 × 精準獎勵
+  // = 衰減加權勝率 × log(有效訊號+1) × 斜率過濾已內建 × 衰退係數 × 密度懲罰 × 連敗懲罰 × 精準獎勵 × 量價確認加權
   const score = total >= 3
-    ? weightedWinRate * Math.log(validN + 1) * regimeDecay * densityPenalty * streakPenalty * precisionBonus
+    ? weightedWinRate * Math.log(validN + 1) * regimeDecay * densityPenalty * streakPenalty * precisionBonus * volBonus
     : 0;
 
   // 特例偵測（異常警示）
@@ -1262,6 +1322,8 @@ function scoreMA(data, closes, period, volCtx, atrPcts) {
     anomaly = { triggered: true, reason: `近期 ${recentFail}/6 連敗，最近完全失效` };
   } else if (regimeDecayLabel) {
     anomaly = { triggered: true, reason: `⚡ ${regimeDecayLabel}，建議重新確認` };
+  } else if (recentPriceVolWarn) {
+    anomaly = { triggered: true, reason: '⚠ 近期出現價漲量縮，慎防假突破' };
   }
 
   return {
@@ -1272,7 +1334,8 @@ function scoreMA(data, closes, period, volCtx, atrPcts) {
     regimeDecay, regimeDecayLabel,
     sigPerMonth: +sigPerMonth.toFixed(2),
     score: +score.toFixed(3), ma, anomaly,
-    earlyWR: +earlyWR.toFixed(3), lateWR: +lateWR.toFixed(3)
+    earlyWR: +earlyWR.toFixed(3), lateWR: +lateWR.toFixed(3),
+    volConfirmRate, volConfirmedCount, volBreakoutTotal, recentPriceVolWarn, congestedNow
   };
 }
 
@@ -1313,11 +1376,22 @@ function computeStabilityBadge(currentPeriod, rangeType) {
   return               { label: '漂移中', color: '#ff9a3c' };
 }
 
+// ── 流動性參考（近20日均量，張）── 僅供使用者自行評估，不做自動排除
+// 資料庫目前沒有股本/市值欄位，因此無法比照原方法自動排除「股本 <30億」
+// 的個股；改為顯示均量供使用者自行判斷流動性風險。
+function calcLiquidityRef(data) {
+  const win = data.slice(-20);
+  if (!win.length) return null;
+  const avgLots = win.reduce((a, d) => a + toLots(d.volume || 0), 0) / win.length;
+  return { avgLots: Math.round(avgLots), thin: avgLots < 3000 };
+}
+
 function analyzeMA(data) {
   const closes  = data.map(d => d.close);
   const volCtx  = classifyVolRegime(data);
   // 預計算全局 ATR%，傳入所有 scoreMA 呼叫
   const atrPcts = calcAtrPcts(data);
+  const liquidity = calcLiquidityRef(data);
 
   const shortResult = findBestMA(data, closes, 16, 25, volCtx, atrPcts);
   const midResult   = findBestMA(data, closes, 26, 44, volCtx, atrPcts);
@@ -1330,7 +1404,7 @@ function analyzeMA(data) {
     shortDual: shortResult,
     midDual:   midResult,
     longDual:  longResult,
-    volCtx, closes, data
+    volCtx, closes, data, liquidity
   };
   if (!window._maHistory) window._maHistory = {};
   window._maHistory[MONTHS] = { short: result.short, mid: result.mid, long: result.long };
@@ -1377,6 +1451,11 @@ function analyzeMA(data) {
   .badge-score{background:rgba(0,200,255,.12);border:1px solid rgba(0,200,255,.35);color:#00cfff}
   .badge-winrate{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.35);color:#00e676}
   .dual-now-label{font-size:.58rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;text-align:center;margin:2px 0 6px;opacity:.7}
+  /* 量價過濾 / 糾結箱型 */
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+  .mini-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.58rem;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02)}
+  .mini-tag-box{color:#9c6aff;border-color:rgba(156,106,255,.4);background:rgba(156,106,255,.08)}
+  .leg-check{color:#ff3d5a;font-weight:700}
   `;
   document.head.appendChild(s);
 })();
@@ -1419,7 +1498,7 @@ function gradeAccuracy(pct){
 }
 
 // Render cards — 簡潔使用者友善版
-function renderCards({short,mid,long,shortDual,midDual,longDual,closes,volCtx}){
+function renderCards({short,mid,long,shortDual,midDual,longDual,closes,volCtx,liquidity}){
   const el=document.getElementById('maCards');el.innerHTML='';
 
   const dualMap = { short: shortDual, mid: midDual, long: longDual };
@@ -1445,6 +1524,10 @@ function renderCards({short,mid,long,shortDual,midDual,longDual,closes,volCtx}){
 
     // v7 dual selector (score only)
     let dualHTML = '';
+
+    // 帶量確認：用「幾次中有幾次」取代百分比，小樣本更直覺；顏色沿用與準確度相同的門檻
+    const volRate  = activeRes.volBreakoutTotal>0 ? activeRes.volConfirmedCount/activeRes.volBreakoutTotal : null;
+    const volGrade = volRate!=null ? gradeAccuracy(Math.round(volRate*100)) : null;
 
     const card=document.createElement('div');
     card.className=`ma-card ${cls}${hidden}${anomaly?' anomaly-card':''}`;
@@ -1490,6 +1573,12 @@ function renderCards({short,mid,long,shortDual,midDual,longDual,closes,volCtx}){
           <div class="simple-sig-val" style="color:#ff3d5a">${totalSig-validSig}</div>
           <div class="simple-sig-lbl">失準次數</div>
         </div>
+      </div>
+
+      <!-- 輔助標籤：帶量確認 / 糾結整理，都用同一套顏色邏輯 -->
+      <div class="tag-row">
+        ${volRate!=null?`<span class="mini-tag" style="color:${volGrade.color};border-color:${volGrade.color}66">🔥 帶量確認 ${activeRes.volConfirmedCount}/${activeRes.volBreakoutTotal}次</span>`:''}
+        ${activeRes.congestedNow?'<span class="mini-tag mini-tag-box">🔲 目前整理中</span>':''}
       </div>
 
       ${lowSample?'<div class="simple-warn">⚠ 訊號次數偏少，準確率僅供參考</div>':''}
@@ -1602,7 +1691,7 @@ function initCanvasEvents(){
     const chg=prev?d.close-prev.close:0,pct=prev?chg/prev.close*100:0;
     const dir=chg>=0?'▲':'▼',col=chg>=0?'var(--cup)':'var(--cdn)';
     const rawVol=d.volume||0;
-    const volLabel=(rawVol>=1000?Math.round(rawVol/1000).toLocaleString()+'K':rawVol.toLocaleString());
+    const volLabel=Math.round(toLots(rawVol)).toLocaleString();
     // calc vol bar pct vs max in visible range
     const viVols=DATA.slice(viStart,viEnd).map(x=>x.volume||0);
     const maxVol=Math.max(...viVols,1);
@@ -1610,7 +1699,7 @@ function initCanvasEvents(){
     document.getElementById('tt-date').textContent=`${d.date}`;
     document.getElementById('tt-ohlc').innerHTML=
       `開 <b>${d.open?.toFixed(2)}</b>　高 <b style="color:var(--cup)">${d.high?.toFixed(2)}</b>　低 <b style="color:var(--cdn)">${d.low?.toFixed(2)}</b>　收 <b style="color:${col}">${d.close?.toFixed(2)}</b> <span style="color:${col}">${dir} ${Math.abs(chg).toFixed(2)} (${pct>=0?'+':''}${pct.toFixed(2)}%)</span>`;
-    document.getElementById('tt-vol-text').textContent=`VOL ${volLabel} 張`;
+    document.getElementById('tt-vol-text').textContent=`成交量 ${volLabel} 張`;
     document.getElementById('tt-vol-bar').style.width=`${volPct}px`;
     tip.style.display='block';
 
@@ -1907,8 +1996,8 @@ function drawMAChart(){
       return `<div class="leg-item" style="opacity:${opacity};filter:${grayscale};transition:opacity .3s,filter .3s;cursor:pointer" onclick="toggleMA('${d.key}')"><div class="leg-line" style="background:${d.color}"></div>MA${d.res.period}</div>`;
     }).join('')+
     '<div class="leg-sep"></div>'+
-    '<div class="leg-item"><div class="leg-dot" style="background:#00e676;box-shadow:0 0 4px #00e676"></div>有效</div>'+
-    '<div class="leg-item"><div class="leg-dot" style="background:#ffd600;box-shadow:0 0 4px #ffd600"></div>假訊號</div>';
+    `<div class="leg-item"><div class="leg-dot" style="background:#00e676;box-shadow:0 0 4px #00e676"></div>有效${SIG_FILTER.valid?' <span class="leg-check">✓</span>':''}</div>`+
+    `<div class="leg-item"><div class="leg-dot" style="background:#ffd600;box-shadow:0 0 4px #ffd600"></div>假訊號${SIG_FILTER.fake?' <span class="leg-check">✓</span>':''}</div>`;
 
   // Draw volume chart
   drawVolChart();
@@ -1945,36 +2034,24 @@ function renderSignalTable(res,data){
   if(!filtered.length){wrap.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-dark);font-size:.74rem;font-family:\'JetBrains Mono\',monospace">目前篩選條件無符合訊號</div>';return}
   const rows=filtered.map(s=>{
     const chg=((s.day2Price-s.price)/s.price*100).toFixed(2);
-    const slopeVal=s.slope||0;
-    const slopeHTML=slopeVal>0.002
-      ?'<span style="color:#00e676;font-size:.6rem">↗上彎</span>'
-      :slopeVal<-0.002
-        ?'<span style="color:#ff3d5a;font-size:.6rem">↘下彎</span>'
-        :'<span style="color:#7a9ab8;font-size:.6rem">→平</span>';
-    // 多日驗證顯示
+    // 多日驗證顯示（沿用原本逐日打勾樣式）
     const h2=s.hit2,h3=s.hit3,h5=s.hit5;
-    const dot=ok=>`<span style="color:${ok?'#00e676':'#ff3d5a'};font-size:.62rem">${ok?'✔':'✘'}</span>`;
+    const dot=ok=>`<span style="color:${ok?'#00e676':'#ff3d5a'};font-size:.68rem">${ok?'✔':'✘'}</span>`;
     const multiDay = (h2!==undefined)
-      ? `<span style="font-size:.58rem;color:var(--text-dim)">${dot(h2)}D2 ${dot(h3)}D3 ${dot(h5)}D5</span>`
+      ? `<span style="font-size:.66rem;color:var(--text-dim)">${dot(h2)}D2 ${dot(h3)}D3 ${dot(h5)}D5</span>`
       : '';
-    // 指數衰減權重
-    const wDisp=s.weight?`<span style="color:var(--text-dim);font-size:.56rem">×${s.weight.toFixed(2)}</span>`:'';
     return`<tr>
       <td>${data[s.idx]?.date||''}</td>
       <td>${tl[s.type]||s.type}</td>
       <td>${s.price.toFixed(2)}</td>
-      <td>${s.maVal.toFixed(2)}</td>
-      <td>${slopeHTML}</td>
-      <td>${s.day2Price.toFixed(2)}</td>
       <td class="${chg>0?'chg-pos':chg<0?'chg-neg':'chg-neu'}">${chg>0?'+':''}${chg}%</td>
       <td>${multiDay}</td>
-      <td>${s.valid?'<span class="sig-valid">✔ 有效</span>':'<span class="sig-fake">✘ 假訊號</span>'} ${wDisp}</td>
+      <td>${s.valid?'<span class="sig-valid">✔ 有效</span>':'<span class="sig-fake">✘ 假訊號</span>'}</td>
     </tr>`;
   }).join('');
   wrap.innerHTML=`<table class="sig-table">
     <thead><tr>
-      <th>日期</th><th>訊號</th><th>當日收盤</th><th>MA值</th>
-      <th>均線斜率</th><th>次日收盤</th><th>次日漲跌</th><th>多日驗證</th><th>結果 (衰減權重)</th>
+      <th>日期</th><th>訊號</th><th>當日收盤</th><th>次日漲跌</th><th>驗證</th><th>結果</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;

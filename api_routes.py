@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from post_Info import stock_info, market_pnfo, get_today, twse_top100, otc_top100
-from get_trading_holidays import get_trading_status
+from get_trading_holidays import get_trading_status, is_trading_day
 import re
 import os
 import threading
@@ -784,12 +784,32 @@ def register_api(app):
                 print(f"[wave_data] Firebase 讀取失敗: {e}")
                 return None
 
+        def _expected_trading_date():
+            """回傳現在這個時間點『應該』要有的最新收盤資料日期（YYYYMMDD）。
+            - 若今天是交易日且已過收盤資料產生時間（>=15:00）→ 預期今天
+            - 否則往前找最近一個平日（週末近似；遇到國定假日頂多差一天，
+              下次重新抓取時會自動用正確日期覆蓋，不影響資料正確性）
+            """
+            try:
+                today_is_trading = is_trading_day()
+            except Exception as e:
+                print(f"[wave_data] is_trading_day() 失敗，改用平日判斷: {e}")
+                today_is_trading = now.weekday() < 5
+
+            if today_is_trading and is_after_close:
+                return today_str
+
+            d = now.date() - _dt.timedelta(days=1)
+            while d.weekday() >= 5:
+                d -= _dt.timedelta(days=1)
+            return d.strftime("%Y%m%d")
+
         def _cache_valid(c):
             if not c or not c.get("data"):
                 return False
-            if not is_after_close:
-                return True                              # 盤中：快取永遠有效
-            return c.get("trading_date", "") == today_str  # 盤後：需要今日快取
+            # 不論盤中或盤後，一律跟「預期最新交易日」比對，
+            # 避免舊快取在盤中被永遠視為有效而不更新
+            return c.get("trading_date", "") == _expected_trading_date()
 
         # ── 先在鎖外檢查快取（命中直接回傳，不需要進鎖）────────────────────
         cache = _read_cache()
@@ -962,19 +982,31 @@ def register_api(app):
                 "data":    rows,
             }
 
-            # ── 盤後才寫快取（今日 K 棒 15:00 後才完整）─────────────────────
-            if is_after_close:
+            # ── 快取標籤：用「這次實際抓到的最後一筆資料日期」，而不是用現在
+            #    時間去猜。這樣不管盤中或盤後查，只要這次抓到的已經是當下
+            #    能拿到的最新資料，就存進快取，之後同一天內其他人查同一支
+            #    股票可以直接命中，不用每次都重打 TWSE / OTC API。
+            def _last_row_trading_date():
+                """把資料最後一筆的民國日期（如 '115/05/04'）轉成 YYYYMMDD"""
                 try:
-                    cache_ref.set({
-                        "data":         result,
-                        "cached_at":    now.isoformat(),
-                        "trading_date": today_str,
-                    })
-                    print(f"[wave_data] cache saved: {stock_no} {cache_key} trading_date={today_str}")
+                    roc_y, m, d = rows[-1]["date"].split("/")
+                    return f"{int(roc_y) + 1911:04d}{int(m):02d}{int(d):02d}"
                 except Exception as e:
-                    print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
-            else:
-                print(f"[wave_data] 盤中，不寫快取")
+                    print(f"[wave_data] 解析最後一筆日期失敗: {e}")
+                    return None
+
+            actual_trading_date = _last_row_trading_date()
+
+            try:
+                cache_ref.set({
+                    "data":         result,
+                    "cached_at":    now.isoformat(),
+                    # 找不到就退回用預期日期，至少不會讓快取完全沒有標籤
+                    "trading_date": actual_trading_date or _expected_trading_date(),
+                })
+                print(f"[wave_data] cache saved: {stock_no} {cache_key} trading_date={actual_trading_date}")
+            except Exception as e:
+                print(f"[wave_data] Firebase 快取寫入失敗（不影響回傳）: {e}")
 
             return jsonify(result)
 
