@@ -35,6 +35,26 @@ _maintenance_cache:      Optional[dict] = None
 _maintenance_cache_time: float       = 0.0
 _MAINTENANCE_TTL = 30   # 30 秒
 
+# ── 全域對外請求節流（防止短時間內大量不同股票同時打爆 TWSE/OTC）─────────
+# 不分使用者、不分股票，所有打 TWSE/OTC 的請求都排隊經過這裡，
+# 強制每兩次對外請求之間至少間隔 _MIN_OUTBOUND_INTERVAL 秒。
+_outbound_lock          = threading.Lock()
+_last_outbound_call_time = 0.0
+_MIN_OUTBOUND_INTERVAL   = 0.25  # 秒；可依觀察到的失敗率再調整
+
+def _throttled_get(url, **kwargs):
+    """統一由這裡發送對 TWSE/OTC 的請求，取代直接呼叫 requests.get，
+    確保全站對外請求速度有上限，降低被來源網站限流/鎖 IP 的風險。"""
+    global _last_outbound_call_time
+    with _outbound_lock:
+        wait = _MIN_OUTBOUND_INTERVAL - (_time_module.time() - _last_outbound_call_time)
+        if wait > 0:
+            _time_module.sleep(wait)
+        _last_outbound_call_time = _time_module.time()
+    import requests as _throttled_req
+    return _throttled_req.get(url, **kwargs)
+
+
 def _get_stock_lock(stock_no, cache_key):
     key = f"{stock_no}_{cache_key}"
     with _wave_locks_meta:
@@ -723,12 +743,16 @@ def register_api(app):
 
     # ── 最佳均線分析資料 Proxy API ─────────────────────────────────────────────────
     #
-    # 三層保護：
-    #   Layer 1｜Rate Limit    每個IP 每分鐘10次、每小時60次
-    #                          全站    每分鐘100次（防瞬間爆量打到 TWSE）
-    #   Layer 2｜Firebase快取  cache hit 直接回傳，不打 TWSE
-    #   Layer 3｜in-memory鎖   同一支股票 cache miss 時只允許一個請求打 TWSE
-    #                          其他請求等鎖釋放後二次確認快取，直接拿結果
+    # 四層保護：
+    #   Layer 1｜Rate Limit      每個IP 每分鐘10次、每小時60次
+    #                            全站    每分鐘100次（防瞬間爆量打到 TWSE）
+    #   Layer 2｜Firebase快取    cache hit 直接回傳，不打 TWSE
+    #   Layer 3｜in-memory鎖     同一支股票 cache miss 時只允許一個請求打 TWSE
+    #                            其他請求等鎖釋放後二次確認快取，直接拿結果
+    #   Layer 4｜全域對外節流    不分股票、不分使用者，所有真的要打 TWSE/OTC
+    #                            的請求統一排隊，強制間隔 _MIN_OUTBOUND_INTERVAL
+    #                            秒才送出下一筆，避免大量不同股票同時湧入時
+    #                            瞬間對外送出過多請求而被限流/鎖 IP
     # ──────────────────────────────────────────────────────────────────────────
     @app.route("/api/wave_data")
     @limiter.limit("10 per minute")
@@ -849,7 +873,7 @@ def register_api(app):
                     f"?response=json&date={yyyymm}01&stockNo={stock_no}"
                 )
                 try:
-                    r = _req.get(url, headers=hdrs, timeout=12, verify=False)
+                    r = _throttled_get(url, headers=hdrs, timeout=12, verify=False)
                     j = r.json()
                     if j.get("stat") == "OK" and j.get("data"):
                         if not name_from_api and j.get("title"):
@@ -897,7 +921,7 @@ def register_api(app):
                     url    = "https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock"
                     params = {"code": stock_no, "date": date_q, "id": "", "response": "json"}
                     try:
-                        r = _req.get(url, params=params, headers=otc_hdrs, timeout=15, verify=False)
+                        r = _throttled_get(url, params=params, headers=otc_hdrs, timeout=15, verify=False)
 
                         # 確認 HTTP 狀態
                         if r.status_code != 200:
