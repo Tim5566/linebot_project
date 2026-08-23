@@ -320,17 +320,6 @@
     </div>
   </div>
 
-  <!-- AD: 中段橫幅 (桌機 728x90 / 手機 320x50) -->
-  <div class="ad-block ad-728" style="padding:20px 0;">
-    <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
-    <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-  </div>
-  <div class="ad-block ad-320" style="padding:16px 0;">
-    <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
-    <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
-  </div>
-  <hr class="ad-divider" style="margin-bottom:20px;">
-
   <div class="doc-card">
     <div class="sec-num">Section 04</div>
     <div class="sec-title">Cookie 與廣告追蹤技術</div>
@@ -422,16 +411,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<!-- AD: Footer 前橫幅 (桌機 728x90 / 手機 320x50) -->
-<div class="ad-block ad-728" style="padding:20px 0 0;">
-  <script>atOptions={'key':'5772ef3994b031361b8244c989020d16','format':'iframe','height':90,'width':728,'params':{}};</script>
-  <script src="https://revolthem.com/5772ef3994b031361b8244c989020d16/invoke.js"></script>
-</div>
-<div class="ad-block ad-320" style="padding:14px 0 0;">
-  <script>atOptions={'key':'870f277b58a349b01e24f2df2d1c7aba','format':'iframe','height':50,'width':320,'params':{}};</script>
-  <script src="https://revolthem.com/870f277b58a349b01e24f2df2d1c7aba/invoke.js"></script>
 </div>
 
 <footer>
@@ -534,75 +513,6 @@
 </script>
 
 
-<!-- 側欄固定廣告：桌機限定，手機隱藏 -->
-<div class="side-ad side-ad-left" id="sideAdLeft">
-  <span class="side-ad-label">Ad</span>
-  <script>
-    atOptions = {
-      'key' : '0b75586f85e116c7c680d395de31c581',
-      'format' : 'iframe',
-      'height' : 600,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
-</div>
-<div class="side-ad side-ad-right" id="sideAdRight">
-  <span class="side-ad-label">Ad</span>
-  <script>
-    atOptions = {
-      'key' : '0b75586f85e116c7c680d395de31c581',
-      'format' : 'iframe',
-      'height' : 600,
-      'width' : 160,
-      'params' : {}
-    };
-  </script>
-  <script src="https://revolthem.com/0b75586f85e116c7c680d395de31c581/invoke.js"></script>
-</div>
-<script>
-(function(){
-  var HEADER_H = 58;
-  var left   = document.getElementById('sideAdLeft');
-  var right  = document.getElementById('sideAdRight');
-  // 這三頁 footer 沒有 id，用 querySelector
-  var footer = document.querySelector('footer');
-
-  function update(){
-    var scrollY = window.scrollY;
-    var vH = window.innerHeight;
-    var adH = 600;
-
-    var show = scrollY > 200;
-    if(footer){
-      var fTop = footer.getBoundingClientRect().top;
-      if(fTop < vH) show = false;
-    }
-
-    [left, right].forEach(function(el){
-      if(!el) return;
-      if(show){
-        var availH = vH - HEADER_H;
-        if(adH >= availH){
-          el.style.top = HEADER_H + 'px';
-          el.style.transform = 'none';
-        } else {
-          el.style.top = (HEADER_H + availH / 2) + 'px';
-          el.style.transform = 'translateY(-50%)';
-        }
-        el.classList.add('visible');
-      } else {
-        el.classList.remove('visible');
-      }
-    });
-  }
-
-  window.addEventListener('scroll', update, {passive:true});
-  window.addEventListener('resize', update, {passive:true});
-  update();
-})();
-</script>
 
 </body>
 </html>
