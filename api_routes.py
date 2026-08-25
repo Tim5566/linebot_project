@@ -1,5 +1,5 @@
 from typing import Optional
-from flask import jsonify, request, send_from_directory
+from flask import jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -9,6 +9,8 @@ import re
 import os
 import threading
 import time as _time_module
+import datetime
+from zoneinfo import ZoneInfo
 from firebase_admin import db as firebase_db
 
 
@@ -115,9 +117,64 @@ def register_api(app):
     def ads_txt():
         return send_from_directory('.', 'ads.txt', mimetype='text/plain')
 
+    # ── Sitemap：動態產生，每日更新型頁面自動帶入今天日期 ────────────────────
+    # 「daily」的頁面 lastmod 每次請求都算成今天（Asia/Taipei），
+    # 其餘教學文章/法律頁面維持固定日期（因為內容本來就不常變動）。
+    _SITEMAP_PAGES = [
+        # (路徑, changefreq, priority, 是否每日更新, 固定lastmod-僅daily=False時用)
+        ("/",                                              "daily",   "1.0", True,  None),
+        ("/stock_site/tools/ma_finder.html",                "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/tools/twse_top100.html",              "daily",   "0.9", True,  None),
+        ("/stock_site/tools/otc_top100.html",               "daily",   "0.9", True,  None),
+        ("/stock_site/news/disposal.html",                  "daily",   "0.7", True,  None),
+        ("/stock_site/news/news.html",                      "daily",   "0.7", True,  None),
+        ("/stock_site/news/notice.html",                    "daily",   "0.7", True,  None),
+        ("/stock_site/features/chapter1.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter2.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter3.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter4.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter5.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter6.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter7.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter8.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter9.html",              "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/features/chapter10.html",             "monthly", "0.8", False, "2026-05-20"),
+        ("/stock_site/chips/chips_chapter1.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter2.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter3.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter4.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter5.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter6.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter7.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter8.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter9.html",           "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/chips/chips_chapter10.html",          "monthly", "0.8", False, "2026-05-30"),
+        ("/stock_site/legal/about.html",                    "monthly", "0.5", False, "2026-05-20"),
+        ("/stock_site/legal/disclaimer.html",               "yearly",  "0.3", False, "2026-05-20"),
+        ("/stock_site/legal/privacy.html",                  "yearly",  "0.3", False, "2026-05-20"),
+    ]
+
     @app.route("/sitemap.xml")
     def sitemap():
-        return send_from_directory('.', 'sitemap.xml', mimetype='application/xml')
+        today_str = datetime.datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
+        base_url = "https://jellystockdata.com"
+
+        parts = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+        for path, changefreq, priority, is_daily, fixed_lastmod in _SITEMAP_PAGES:
+            lastmod = today_str if is_daily else fixed_lastmod
+            parts.append(
+                "  <url>"
+                f"<loc>{base_url}{path}</loc>"
+                f"<lastmod>{lastmod}</lastmod>"
+                f"<changefreq>{changefreq}</changefreq>"
+                f"<priority>{priority}</priority>"
+                "</url>"
+            )
+        parts.append("</urlset>")
+
+        xml_body = "\n".join(parts)
+        return Response(xml_body, mimetype="application/xml")
 
     @app.route("/images/<path:filename>")
     def serve_images(filename):
@@ -1109,7 +1166,7 @@ def register_api(app):
     #   3. Firebase 的維護狀態只有後端可寫入（Security Rules 鎖住）
     ADMIN_EMAILS = set(
         e.strip() for e in
-        os.environ.get("ADMIN_EMAILS", "llomoll5566@gmail.com").split(",")
+        os.environ.get("ADMIN_EMAILS", "").split(",")
         if e.strip()
     )
 
