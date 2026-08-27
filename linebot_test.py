@@ -22,34 +22,40 @@ LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-register_api(app)  # 建立網站
+register_api(app)  # 建立網站（本地/正式環境都需要，用來測試網頁與 API）
 
-# ✅ 啟動排程（gunicorn 也會執行）
-start_scheduler(line_bot_api)
+# ✅ 正式環境判斷：用 RENDER_EXTERNAL_URL 判斷（這個變數已經在下面 self-ping 邏輯中被證實
+# 會由 Render 平台自動注入且正常運作，本機執行 python 檔案時不會有這個變數）
+IS_PRODUCTION = os.environ.get("RENDER_EXTERNAL_URL", "") != ""
 
+if IS_PRODUCTION:
+    # ✅ 啟動排程（gunicorn 也會執行）
+    start_scheduler(line_bot_api)
 
-# ── 自我 ping，防止 Render 休眠（完全不依賴 UptimeRobot）───────────────────────
-def _self_ping():
-    """啟動 30 秒後立刻 ping 自己，之後每 10 分鐘一次。
-    Render 免費方案閒置 15 分鐘才會休眠，10 分鐘間隔足以保持常駐。"""
-    base_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
-    if not base_url:
-        print("[self-ping] 未設定 RENDER_EXTERNAL_URL，自我 ping 停用")
-        return
+    # ── 自我 ping，防止 Render 休眠（完全不依賴 UptimeRobot）───────────────────
+    def _self_ping():
+        """啟動 30 秒後立刻 ping 自己，之後每 10 分鐘一次。
+        Render 免費方案閒置 15 分鐘才會休眠，10 分鐘間隔足以保持常駐。"""
+        base_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+        if not base_url:
+            print("[self-ping] 未設定 RENDER_EXTERNAL_URL，自我 ping 停用")
+            return
 
-    time.sleep(30)  # 等 server 啟動完成再開始 ping
-    while True:
-        try:
-            resp = _req.get(f"{base_url}/ping", timeout=10)
-            print(f"[self-ping] {resp.status_code} OK")
-        except Exception as e:
-            print(f"[self-ping] 失敗: {e}")
-        time.sleep(10 * 60)  # ping 完等 10 分鐘（Render 閒置 15 分鐘才休眠）
+        time.sleep(30)  # 等 server 啟動完成再開始 ping
+        while True:
+            try:
+                resp = _req.get(f"{base_url}/ping", timeout=10)
+                print(f"[self-ping] {resp.status_code} OK")
+            except Exception as e:
+                print(f"[self-ping] 失敗: {e}")
+            time.sleep(10 * 60)  # ping 完等 10 分鐘（Render 閒置 15 分鐘才休眠）
 
-# daemon=True：主程式結束時這條 thread 自動跟著結束，不會卡住 gunicorn
-_ping_thread = threading.Thread(target=_self_ping, daemon=True)
-_ping_thread.start()
-# ─────────────────────────────────────────────────────────────────────────────
+    # daemon=True：主程式結束時這條 thread 自動跟著結束，不會卡住 gunicorn
+    _ping_thread = threading.Thread(target=_self_ping, daemon=True)
+    _ping_thread.start()
+    # ─────────────────────────────────────────────────────────────────────────
+else:
+    print("[本地開發模式] RENDER 環境變數未偵測到，排程與 self-ping 已停用，避免影響正式資料與正式 LINE 推播")
 
 
 # 保活用的 ping 路由
