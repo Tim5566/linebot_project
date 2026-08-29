@@ -188,6 +188,10 @@ def register_api(app):
     def serve_fonts(filename):
         return send_from_directory('fonts', filename)
 
+    @app.route("/stock_site/assets/<path:filename>")
+    def serve_stock_assets(filename):
+        return send_from_directory('stock_site/assets', filename)
+
     # ── Legal 頁面 ─────────────────────────────────────────────────────────────
     @app.route("/stock_site/legal/about.html")
     def page_about():
