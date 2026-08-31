@@ -2504,6 +2504,13 @@
     body.theme-day .compare-table th{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.1em;color:#1b3a6b;padding:10px 15px;border-bottom:1px solid rgba(27,58,107,.18);text-align:left;background:rgba(27,58,107,.05);}
     body.theme-day .compare-table td{padding:11px 15px;border-bottom:1px solid rgba(27,58,107,.08);color:#26313f;line-height:1.65;vertical-align:top;}
 </style>
+<style>
+/* 手機版頁首修正：隱藏跑馬時鐘，確保返回鈕不換行 */
+@media (max-width: 640px){
+  #subClock, .hd-clock { display: none !important; }
+  .btn-back { white-space: nowrap; flex-shrink: 0; }
+}
+</style>
 </head>
 <body class="theme-day" spellcheck="false">
 <a href="#main-content" class="skip-link">跳至主要內容</a>

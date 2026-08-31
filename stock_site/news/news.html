@@ -52,6 +52,10 @@
       transition: color .18s, border-color .18s, background .18s;
     }
     .mops-global-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+    @media (max-width: 600px){
+      .filter-bar { gap: 6px; }
+      .mops-global-btn { margin-left: 0; }
+    }
 
     .stats-bar {
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
@@ -115,6 +119,13 @@
       .card-body { padding: 11px 13px; }
     }
   </style>
+<style>
+/* 手機版頁首修正：隱藏跑馬時鐘，確保返回鈕不換行 */
+@media (max-width: 640px){
+  #subClock, .hd-clock { display: none !important; }
+  .btn-back { white-space: nowrap; flex-shrink: 0; }
+}
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">跳至主要內容</a>
@@ -124,8 +135,7 @@
     <div class="logo">
       <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'" width="40" height="40"/></div>
       <div>
-        <div class="logo-text">盤後雷達</div>
-        <div class="logo-sub">JellyStock</div>
+        <div class="logo-text">JellyStock</div>
       </div>
     </div>
   </div>

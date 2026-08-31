@@ -49,6 +49,9 @@
     }
     .meta-date { color: var(--accent); font-weight: 600; }
     .meta-count strong { color: var(--accent); }
+    @media (max-width: 600px){
+      .meta-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
 
     .market-filter { display: flex; align-items: center; gap: 6px; }
     .mf-tab {
@@ -123,6 +126,13 @@
       .disposal-card-body { padding: 11px 13px; }
     }
   </style>
+<style>
+/* 手機版頁首修正：隱藏跑馬時鐘，確保返回鈕不換行 */
+@media (max-width: 640px){
+  #subClock, .hd-clock { display: none !important; }
+  .btn-back { white-space: nowrap; flex-shrink: 0; }
+}
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">跳至主要內容</a>
@@ -132,8 +142,7 @@
     <div class="logo">
       <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'" width="40" height="40"/></div>
       <div>
-        <div class="logo-text">盤後雷達</div>
-        <div class="logo-sub">JellyStock</div>
+        <div class="logo-text">JellyStock</div>
       </div>
     </div>
   </div>
