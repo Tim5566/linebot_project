@@ -26,12 +26,6 @@
       --sell: var(--down);   /* 賣超 / 下跌 → 綠（#17805a） */
     }
 
-    .hd-clock {
-      font-family: var(--font-mono); font-size: .74rem; color: var(--accent);
-      letter-spacing: .04em; background: var(--accent-soft);
-      border: 1px solid var(--line); border-radius: 20px; padding: 5px 14px; white-space: nowrap;
-    }
-
     .app { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
 
     /* ── 頁首標題 + 市場切換 ── */
@@ -141,6 +135,9 @@
       .rank-amt { grid-column: 2 / 4; grid-row: 2; text-align: left; }
       .chart-legend { width: 100%; }
     }
+
+    /* 手機版頁首修正：此工具不放時鐘，並確保返回鈕不換行 */
+    .btn-back { white-space: nowrap; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -156,7 +153,6 @@
     </div>
   </div>
   <div class="header-right">
-    <span class="hd-clock" id="hdTime"></span>
     <a class="btn-back" href="/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       返回首頁
@@ -270,15 +266,6 @@
 </footer>
 
 <script>
-/* ── Clock ── */
-function updateClock(){
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  document.getElementById('hdTime').textContent =
-    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-}
-setInterval(updateClock, 1000); updateClock();
-
 /* ── State ── */
 const state = {
   market: 'twse',
@@ -416,7 +403,7 @@ function computeLayout(){
   const wrap = $('chartBody');
   const cssW = wrap.clientWidth || 900;
   const isNarrow = cssW < 560;
-  const cssH = clamp(Math.round(cssW * (isNarrow ? 1.05 : 0.72)), 380, 620);
+  const cssH = clamp(Math.round(cssW * (isNarrow ? 1.8 : 0.72)), 380, isNarrow ? 700 : 620);
   const dpr = window.devicePixelRatio || 1;
   canvas.width = cssW * dpr;
   canvas.height = cssH * dpr;
@@ -435,14 +422,14 @@ function computeLayout(){
   const maxSell = Math.max(1e-6, ...bubbles.filter(b => b.amt <  0).map(b => -b.amt));
   const maxChg  = Math.max(3, ...bubbles.map(b => Math.abs(b.chg)));
 
-  const marginX = isNarrow ? 44 : 60;
-  const marginY = isNarrow ? 28 : 36;
+  const marginX = isNarrow ? 30 : 60;
+  const marginY = isNarrow ? 22 : 36;
   const halfW = P.w / 2 - marginX, halfH = P.h / 2 - marginY;
   const amtToX = a => a >= 0 ? cx + (a / maxBuy) * halfW : cx - (-a / maxSell) * halfW;
   const chgToY = c => cy - (c / maxChg) * halfH;
 
-  const rMax = isNarrow ? 20 : 25;
-  const rMin = isNarrow ? 11 : 13;
+  const rMax = isNarrow ? 16 : 25;
+  const rMin = isNarrow ? 8.5 : 13;
   /* 大小 ＝ 該側買賣超金額（sqrt 壓縮，每側各自正規化）*/
   const rOf = b => rMin + (rMax - rMin) *
       Math.sqrt(clamp(Math.abs(b.amt) / (b.amt >= 0 ? maxBuy : maxSell), 0, 1));
