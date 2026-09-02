@@ -63,7 +63,8 @@
     ├── tools/                  # 資料查詢工具頁
     │   ├── twse_top100.html    # 上市法人買賣超前100
     │   ├── otc_top100.html     # 上櫃法人買賣超前100
-    │   └── ma_finder.html      # 均線雷達
+    │   ├── ma_finder.html      # 均線雷達
+    │   └── fund_flow.html      # 資金強度流向前20（法人買賣超金額 × 當日漲跌幅 散布圖＋排行）
     ├── news/                   # 公告/警示類頁面
     │   ├── news.html           # 重大訊息
     │   ├── notice.html         # 注意股查詢
@@ -141,7 +142,8 @@
 def twse_top100_page():
     return send_from_directory(...)
 ```
-共涵蓋：首頁、20 篇教學文、3 個工具頁、3 個公告頁、3 個法律頁 = 30 頁，跟 `sitemap.xml` 完全對應。
+共涵蓋：首頁、20 篇教學文、4 個工具頁、3 個公告頁、3 個法律頁 = 31 頁，跟 `sitemap.xml` 完全對應。
+（`sitemap.xml` 由 `api_routes.py` 的 `_SITEMAP_PAGES` + `/sitemap.xml` 路由「動態產生」，根目錄的靜態 `sitemap.xml` 檔已無效、未被送出。）
 
 另有靜態資源路由（仿 `/images`、`/music`、`/fonts` 寫法，純檔案服務）：
 ```python
@@ -157,6 +159,7 @@ def serve_stock_assets(filename):
 |---|---|
 | `/api/top100` | 上市法人買賣超前 100（讀 `top100_cache`） |
 | `/api/otc_top100` | 上櫃法人買賣超前 100 |
+| `/api/fund_flow?market=twse\|otc` | 資金強度流向前20（`fund_flow.html` 用）。讀 `stock_data/{date}/{market}`（法人股數）＋ `stock_data/{date}/price_all/{market}`（收盤價，缺就現場補抓一次）→ `calc_fund_flow()` 算散布圖＋排行 → 快取 `fundflow_cache/{date}/{market}`。16:30 前顯示前一交易日；`?preview=1` 略過限制 |
 | `/api/stock` | 查詢單一個股資料 |
 | `/api/stock_name` | 股票代碼查名稱 |
 | `/api/news` | 重大訊息 |
@@ -186,6 +189,9 @@ def serve_stock_assets(filename):
 | `sync_top100()` / `_calc_top100()` | 從法人資料算出買賣超前 100 名並快取 |
 | `sync_all(label=N)` | **總入口**，依 `label` 決定要跑上面哪一組任務（label 對應表見 5.4） |
 | `_check_data_missing()` / `schedule_retry_if_missing()` | 資料檢查與補跑機制，避免官方 API 當天資料還沒更新時抓到空值 |
+| `_fetch_price_all_twse(date)` / `_fetch_price_all_otc()` / `sync_price_all()` | 抓全市場當日收盤價＋漲跌價差，寫 `stock_data/{date}/price_all/{twse\|otc}`。上市來源＝證交所 `MI_INDEX?type=ALLBUT0999&date=`（帶日期參數），上櫃＝TPEx openapi。內含資料日期比對防呆。**目前只由 `/api/fund_flow` 現場呼叫，未進 `SCHEDULE`。** |
+| `calc_fund_flow()` | 資金強度流向計算：選買超金額前20＋賣超金額前20＝40 檔，用「金額百分位＋漲跌幅百分位」算強勢分數，回傳散布圖 bubbles＋資金強度流入/流出排行 |
+| `_cleanup_old_fundflow_cache()` | 清 `fundflow_cache` 舊日期（比照 `_cleanup_old_top100_cache`；`price_all` 因是 `stock_data/{date}` 子節點，由 `cleanup_old_stock_data()` 連帶清除） |
 
 Firebase 資料庫路徑結構（Realtime DB，非 Firestore）：
 ```
@@ -193,8 +199,12 @@ stock_data/{YYYY-MM-DD}/twse           # 當天 TWSE 法人資料
 stock_data/{YYYY-MM-DD}/otc            # 當天 OTC 法人資料
 stock_data/{YYYY-MM-DD}/market         # 當天大盤總覽
 stock_data/{YYYY-MM-DD}/meta           # 當天同步狀態 metadata（成功/失敗/時間戳）
+stock_data/{YYYY-MM-DD}/price_all/twse # 當天上市全市場收盤價＋漲跌價差 {代碼:{c,d}}（資金強度流向用）
+stock_data/{YYYY-MM-DD}/price_all/otc  # 當天上櫃全市場收盤價＋漲跌價差
 top100_cache/{YYYY-MM-DD}/twse         # 當天 TWSE 買賣超前100快取
 top100_cache/{YYYY-MM-DD}/otc          # 當天 OTC 買賣超前100快取
+fundflow_cache/{YYYY-MM-DD}/twse       # 當天上市資金強度流向計算結果快取
+fundflow_cache/{YYYY-MM-DD}/otc        # 當天上櫃資金強度流向計算結果快取
 stock_list/twse/{股票代碼} = 股票名稱    # 全市場代碼對照表（上市）
 stock_list/otc/{股票代碼}  = 股票名稱    # 全市場代碼對照表（上櫃）
 stock_list/meta                        # 代碼清單最後更新時間
@@ -220,6 +230,11 @@ label=0 時發休市通知）→ 呼叫 `_call_sync_test(label)` 打自己的 `/
 上直接用瀏覽器打這個網址手動補跑某個 label）→ 依 label 決定要不要對 LINE 使用者廣播。
 
 另外每週日 08:00 有獨立排程跑 `_sync_stock_list_weekly()`。
+
+> ⚠️ **資金強度流向（fund_flow）尚未進 `SCHEDULE`**：`sync_price_all()` 目前只由 `/api/fund_flow`
+> 在快取未命中時「現場補抓一次」。因此每個交易日第一個開該頁的訪客會觸發一次即時抓取（約 1～2 秒），
+> 之後走 `fundflow_cache`。之後若要讓它準時預先算好，可在 `sync_all()` 的 `label==3`（16:15）尾端
+> 加呼叫，不需動 `SCHEDULE` 時間表。
 
 ### 5.5 `post_Info.py`（917 行，查詢結果組裝）
 LINE Bot 使用者輸入關鍵字（股票代碼或名稱）→ `stock_info(keyword)` 是主入口函式，
@@ -292,6 +307,9 @@ Google 帳號登入、大盤即時數據、設定彈窗（僅保留管理員維�
   以及「共振篩選」（找出多個法人同步買超/賣超的股票），資料來源是 `/api/top100` 或
   `/api/otc_top100`
 - **ma_finder.html**：均線雷達，核心運算在後端 `/api/wave_data`
+- **fund_flow.html**：資金強度流向前20。前端 canvas 手繪散布圖（X＝法人買賣超金額、Y＝當日漲跌幅%，
+  買賣兩側各自比例尺；氣泡大小＝金額、明顯度＝漲跌幅）＋資金強度流入/流出雙向排行。資料來源 `/api/fund_flow`。
+  漲跌幅顯示到小數點第 2 位、漲紅跌綠平盤白。**收盤價來源用證交所 MI_INDEX（openapi 的 STOCK_DAY_ALL 常延遲更新，不用）。**
 
 ### 6.3 公告類（`stock_site/news/`）
 - **news.html**：重大訊息（`/api/news`）

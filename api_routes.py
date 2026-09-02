@@ -126,6 +126,7 @@ def register_api(app):
         ("/stock_site/tools/ma_finder.html",                "monthly", "0.8", False, "2026-05-20"),
         ("/stock_site/tools/twse_top100.html",              "daily",   "0.9", True,  None),
         ("/stock_site/tools/otc_top100.html",               "daily",   "0.9", True,  None),
+        ("/stock_site/tools/fund_flow.html",                "daily",   "0.8", True,  None),
         ("/stock_site/news/disposal.html",                  "daily",   "0.7", True,  None),
         ("/stock_site/news/news.html",                      "daily",   "0.7", True,  None),
         ("/stock_site/news/notice.html",                    "daily",   "0.7", True,  None),
@@ -736,6 +737,109 @@ def register_api(app):
     @app.route("/stock_site/tools/otc_top100.html")
     def page_otc_top100():
         return send_from_directory('stock_site/tools', 'otc_top100.html')
+
+    # ── 個股資金流向 頁面 ──────────────────────────────────────────────────────
+    @app.route("/stock_site/tools/fund_flow.html")
+    def page_fund_flow():
+        return send_from_directory('stock_site/tools', 'fund_flow.html')
+
+    # ── 個股資金流向 資料 API ─────────────────────────────────────────────────
+    # 把「三大法人買賣超金額」與「當日漲跌幅」join 成散布圖 + 排行榜。
+    #   法人股數：讀 Firebase 現有 stock_data/{date}/{twse|otc}
+    #   收盤價  ：讀 stock_data/{date}/price_all/{market}；缺且為當日 → 現場補抓一次
+    #             （比照 /api/otc_top100 的現場 fallback 做法）
+    #   結果快取：fundflow_cache/{date}/{market}
+    #   開放時間：當日盤後資料每個交易日 16:30 後才納入；在那之前顯示最近一個交易日資料。
+    #   preview=1：略過 16:30 限制，直接用目前可取得的最新資料（測試 / 上線複查用）。
+    @app.route("/api/fund_flow")
+    def api_fund_flow():
+        from firebase_sync import (calc_fund_flow, sync_price_all,
+                                   _cleanup_old_fundflow_cache)
+
+        market = request.args.get("market", "twse")
+        if market not in ("twse", "otc"):
+            market = "twse"
+        preview = request.args.get("preview") == "1"
+
+        today  = get_today()
+        now_tp = datetime.datetime.now(ZoneInfo("Asia/Taipei"))
+        try:
+            trading = is_trading_day()
+        except Exception:
+            trading = now_tp.weekday() < 5
+        before_open = (trading and (now_tp.hour, now_tp.minute) < (16, 30)
+                       and not preview)
+
+        try:
+            # 1) 決定服務的日期節點：
+            #    16:30 後且今日有法人資料 → 今日；否則往前抓最近一個有資料的交易日
+            date_key = None
+            all_keys = sorted(firebase_db.reference("stock_data").get(shallow=True) or {},
+                              reverse=True)
+            if not before_open:
+                for k in all_keys:
+                    if k <= today and firebase_db.reference(
+                            f"stock_data/{k}/{market}").get(shallow=True):
+                        date_key = k
+                        break
+            else:
+                # 未到開放時間：略過今日，取今日之前最近一個有資料的日期
+                for k in all_keys:
+                    if k < today and firebase_db.reference(
+                            f"stock_data/{k}/{market}").get(shallow=True):
+                        date_key = k
+                        break
+
+            if date_key is None:
+                return jsonify({
+                    "status": "nodata",
+                    "message": "目前查無可用的三大法人買賣超資料。",
+                }), 503
+
+            # 2) 讀該日期的結果快取
+            cached = firebase_db.reference(f"fundflow_cache/{date_key}/{market}").get()
+            if not cached:
+                # 3) 現場計算並寫入快取
+                inst = firebase_db.reference(f"stock_data/{date_key}/{market}").get()
+                if not inst:
+                    return jsonify({"status": "nodata",
+                                    "message": "目前查無可用的三大法人買賣超資料。"}), 503
+
+                price = firebase_db.reference(
+                    f"stock_data/{date_key}/price_all/{market}").get()
+                if not price:
+                    # price_all 尚未同步 → 現場補抓一次（sync_price_all 內含資料日期比對，
+                    # 來源日期與 date_key 不符時不會寫入，確保不會用錯日期的收盤價）
+                    print(f"[api/fund_flow] price_all 無資料，現場補抓一次 "
+                          f"market={market} date={date_key}")
+                    try:
+                        sync_price_all(date_key, market=market)
+                    except Exception as e:
+                        print(f"[api/fund_flow] 現場補抓失敗: {e}")
+                    price = firebase_db.reference(
+                        f"stock_data/{date_key}/price_all/{market}").get()
+
+                if not price:
+                    return jsonify({"status": "nodata",
+                                    "message": "收盤價資料尚未就緒，請稍後再試。"}), 503
+
+                cached = calc_fund_flow(inst, price, date_key)
+                try:
+                    firebase_db.reference(
+                        f"fundflow_cache/{date_key}/{market}").set(cached)
+                    _cleanup_old_fundflow_cache(date_key)
+                except Exception as e:
+                    print(f"[api/fund_flow] 快取寫入失敗: {e}")
+
+            cached["status"] = "ok"
+            cached["market"] = market
+            cached["is_today"] = (date_key == today)
+            cached["is_trading_day"] = trading
+            return jsonify(cached)
+
+        except Exception as e:
+            print(f"[api/fund_flow] 錯誤: {e}")
+            return jsonify({"status": "error", "message": "資料讀取失敗，請稍後再試。"}), 500
 
     # ── 個股查詢 API ───────────────────────────────────────────────────────────
     @app.route("/api/stock")

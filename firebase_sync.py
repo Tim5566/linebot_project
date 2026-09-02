@@ -1105,3 +1105,318 @@ def schedule_retry_if_missing(
     with _retry_threads_lock:
         _retry_threads[thread_key] = t
     t.start()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 個股資金流向（fund flow）
+#
+#   概念：把「三大法人買賣超金額」與「當日漲跌幅」畫成散布圖。
+#
+#   資料來源：
+#     法人買賣超股數  → Firebase 現有 stock_data/{today}/{twse|otc}
+#                        （sync_institutional / sync_otc_institutional 已每日同步，單位：股）
+#     當日收盤價/漲跌  → 本區塊新增同步：
+#                        上市 https://www.twse.com.tw/exchangeReport/MI_INDEX?type=ALLBUT0999&date=YYYYMMDD
+#                             （「每日收盤行情(全部)」，帶 date 參數、盤後 ~14:30 更新；
+#                              openapi 的 STOCK_DAY_ALL 常拖數小時甚至隔天才更新，故不用）
+#                        上櫃 https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes
+#                        寫入 stock_data/{today}/price_all/{twse|otc}/{代碼} = {"c":收盤價,"d":漲跌價差}
+#
+#   計算（calc_fund_flow）：
+#     買賣超金額(億元) = (外資 + 投信 + 自營商 買賣超股數) × 收盤價 ÷ 1e8   （正=買超）
+#     漲跌幅%          = 漲跌價差 ÷ (收盤價 − 漲跌價差) × 100
+#     選檔（純金額法）：依買賣超金額排序，取買超金額前 20 名（資金流入）與
+#                       賣超金額前 20 名（資金流出），不看當日漲跌；漲跌幅只決定散布圖高低。
+#     備註：外資欄位為官方「外陸資（不含外資自營商）」，與「三大法人合計」定義略有差異，數字為概算。
+#
+#   注意：兩個 openapi 端點都「只回最新交易日」，沒有日期參數。
+#   舊資料清理：price_all 是 stock_data/{date} 的子節點，cleanup_old_stock_data() 會連帶刪除，
+#              fundflow_cache 另由 _cleanup_old_fundflow_cache() 清理（比照 top100_cache）。
+# ══════════════════════════════════════════════════════════════════════════════
+
+_PRICE_ALL_TWSE_URL = ("https://www.twse.com.tw/exchangeReport/MI_INDEX"
+                       "?response=json&type=ALLBUT0999&date={date}")
+_PRICE_ALL_OTC_URL  = "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"
+
+# 只收「個股」：4 碼數字、且不以 0 開頭的代號（台股一般公司代號為 1101～9962）。
+# 排除所有 ETF（00 開頭）、權證、6 碼槓桿/反向 ETF、興櫃等，避免資金流向圖被非個股標的干擾。
+_STOCK_CODE_RE = re.compile(r"^[1-9]\d{3}$")
+
+
+def _parse_price_num(raw):
+    """把 '2,440.00' / '+35.00' / '-0.2200' / '--' 轉成 float，失敗回 None。"""
+    if raw is None:
+        return None
+    s = str(raw).replace(",", "").strip()
+    if not s or not re.match(r"^[+-]?\d+(?:\.\d+)?$", s):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _minguo_row_date(raw) -> str:
+    """上櫃 daily_close 的 'Date' 欄（民國 '1150901'）→ 西元 '20260901'；失敗回 ''。"""
+    d = re.sub(r"[^\d]", "", str(raw or ""))
+    if len(d) == 7:
+        try:
+            return str(int(d[:3]) + 1911) + d[3:]
+        except ValueError:
+            return ""
+    return d if len(d) == 8 else ""
+
+
+def _fetch_price_all_twse(date_str: str):
+    """回傳 (資料西元日期字串, {sid: {"c":收盤價,"d":漲跌價差}})。
+    來源：證交所 MI_INDEX「每日收盤行情(全部)」，帶 date 參數指定交易日；
+    漲跌方向在 '漲跌(+/-)' 欄以 color:red/green 標示，'漲跌價差' 欄為絕對值。"""
+    date_d = re.sub(r"[^\d]", "", str(date_str or ""))
+    data = _fetch(_PRICE_ALL_TWSE_URL.format(date=date_d))
+    if not isinstance(data, dict) or data.get("stat") != "OK":
+        stat = data.get("stat") if isinstance(data, dict) else "無回應"
+        print(f"[price_all] 上市收盤價 API 無資料（stat={stat}）⚠️")
+        return "", {}
+    src_date = re.sub(r"[^\d]", "", str(data.get("date") or ""))
+
+    tbl = None
+    for t in (data.get("tables") or []):
+        f = t.get("fields") or []
+        if "證券代號" in f and "收盤價" in f and "漲跌價差" in f:
+            tbl = t
+            break
+    if not tbl:
+        print("[price_all] 上市收盤價 API 找不到收盤行情表 ⚠️")
+        return src_date, {}
+
+    f = tbl["fields"]
+    ci, close_i, dir_i, diff_i = (f.index("證券代號"), f.index("收盤價"),
+                                  f.index("漲跌(+/-)"), f.index("漲跌價差"))
+    need = max(ci, close_i, dir_i, diff_i)
+    out = {}
+    for row in (tbl.get("data") or []):
+        if len(row) <= need:
+            continue
+        sid = str(row[ci]).strip()
+        if not _STOCK_CODE_RE.match(sid):
+            continue
+        close = _parse_price_num(row[close_i])
+        diff  = _parse_price_num(row[diff_i])
+        if close is None or diff is None or close <= 0:
+            continue
+        mark = str(row[dir_i])
+        sign = 1 if "color:red" in mark else (-1 if "color:green" in mark else 0)
+        out[sid] = {"c": close, "d": round(diff * sign, 4)}
+    print(f"[price_all] 上市收盤價 {len(out)} 筆（資料日期 {src_date or '?'}）✅")
+    return src_date, out
+
+
+def _fetch_price_all_otc():
+    """回傳 (資料西元日期字串, {sid: {"c":收盤價,"d":漲跌價差}})"""
+    data = _fetch(_PRICE_ALL_OTC_URL)
+    if not isinstance(data, list) or not data:
+        print("[price_all] 上櫃收盤價 API 無資料 ⚠️")
+        return "", {}
+    src_date = _minguo_row_date(data[0].get("Date"))
+    out = {}
+    for row in data:
+        sid = str(row.get("SecuritiesCompanyCode", "")).strip()
+        if not _STOCK_CODE_RE.match(sid):
+            continue
+        close = _parse_price_num(row.get("Close"))
+        chg   = _parse_price_num(row.get("Change"))
+        if close is None or chg is None or close <= 0:
+            continue
+        out[sid] = {"c": close, "d": chg}
+    print(f"[price_all] 上櫃收盤價 {len(out)} 筆（資料日期 {src_date or '?'}）✅")
+    return src_date, out
+
+
+def sync_price_all(today: str = None, market: str = "both") -> dict:
+    """
+    同步全市場當日收盤價 + 漲跌價差到 Firebase：
+      stock_data/{today}/price_all/{twse|otc}/{代碼} = {"c":收盤價,"d":漲跌價差}
+    market: "twse" | "otc" | "both"
+
+    兩個來源 API 都「只回最新交易日」，沒有日期參數。為避免把「今天的收盤價」誤寫進
+    「昨天的節點」，這裡會比對來源資料日期：與 today 不符就不寫入該市場。
+    回傳實際寫入筆數，例如 {"twse": 985, "otc": 812}
+    """
+    if today is None:
+        today = get_today()
+    today_d = re.sub(r"[^\d]", "", today)
+    _init_firebase()
+    result = {}
+
+    if market in ("twse", "both"):
+        src_date, twse_px = _fetch_price_all_twse(today_d)
+        if twse_px and src_date == today_d:
+            _write_batch(f"stock_data/{today}/price_all/twse", twse_px)
+            result["twse"] = len(twse_px)
+        else:
+            if twse_px:
+                print(f"[price_all] 上市資料日期 {src_date} ≠ {today_d}，略過寫入 ⚠️")
+            result["twse"] = 0
+
+    if market in ("otc", "both"):
+        src_date, otc_px = _fetch_price_all_otc()
+        if otc_px and src_date == today_d:
+            _write_batch(f"stock_data/{today}/price_all/otc", otc_px)
+            result["otc"] = len(otc_px)
+        else:
+            if otc_px:
+                print(f"[price_all] 上櫃資料日期 {src_date} ≠ {today_d}，略過寫入 ⚠️")
+            result["otc"] = 0
+
+    try:
+        firebase_db.reference(f"stock_data/{today}/meta").update({
+            "price_all_updated": datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
+        })
+    except Exception as e:
+        print(f"[price_all] meta 更新失敗: {e}")
+    print(f"[price_all] 同步完成 {result}")
+    return result
+
+
+def _fmt_date_key(date_key: str) -> str:
+    """'20260901' → '2026-09-01'；非預期格式原樣回傳。"""
+    d = re.sub(r"[^\d]", "", str(date_key or ""))
+    return f"{d[:4]}-{d[4:6]}-{d[6:8]}" if len(d) == 8 else str(date_key)
+
+
+def calc_fund_flow(inst_dict: dict, price_dict: dict, date_key: str = "",
+                   bubble_half: int = 20, rank_n: int = 20) -> dict:
+    """
+    把法人買賣超（股數）與收盤價 join 起來，算出「雙向」資金流向散布圖 + 排行榜。
+
+    inst_dict:  { sid: {name, foreign, trust, proprietary} }   （值為股數字串，正=買超）
+    price_dict: { sid: {"c": 收盤價, "d": 漲跌價差} }
+
+    流程：
+    1. 選檔（純金額）：全市場算買賣超金額 → 取買超金額前 bubble_half 名 + 賣超金額前
+       bubble_half 名 = 40 檔。
+    2. 強勢分數：只在這 40 檔之間算「買賣超金額百分位 + 漲跌幅百分位」（各 0~1）。
+    3. 排行：資金流入 = 買超那組照分數高→低；資金流出 = 賣超那組照分數低→高。
+    散布圖座標由前端用真實 amt（億元，正=買超→右）與 chg（漲跌幅%，正=漲→上）繪製。
+
+    回傳：
+    {
+      "trade_date", "updated", "count",
+      "inflow":  [ {rank,id,name,amt,chg,score} ... ]  買超那 20 檔（強勢分數高→低）
+      "outflow": [ {rank,id,name,amt,chg,score} ... ]  賣超那 20 檔（強勢分數低→高）
+      "bubbles": [ {grp:'in'|'out', grank, id,name,amt,chg} ... ]
+                 40 檔；amt/chg=真實值；grank=該股在對應排行的名次（與 inflow/outflow 一致）
+    }
+    """
+    rows = []
+    for sid, info in (inst_dict or {}).items():
+        if not sid:
+            continue
+        px = (price_dict or {}).get(sid)
+        if not px:
+            continue
+        close = px.get("c")
+        chg   = px.get("d")
+        if close is None or chg is None or close <= 0:
+            continue
+
+        net_shares = 0
+        has_val = False
+        for key in ("foreign", "trust", "proprietary"):
+            raw = info.get(key)
+            if raw is None or raw == "":
+                continue
+            try:
+                net_shares += int(str(raw).replace(",", ""))
+                has_val = True
+            except (ValueError, TypeError):
+                continue
+        if not has_val:
+            continue
+
+        prev_close = close - chg
+        if prev_close <= 0:
+            continue
+
+        rows.append({
+            "id":   sid,
+            "name": (info.get("name") or sid).strip(),
+            "amt":  round(net_shares * close / 1e8, 4),   # 正=買超
+            "chg":  round(chg / prev_close * 100, 3),
+        })
+
+    n = len(rows)
+    out = {
+        "trade_date": _fmt_date_key(date_key),
+        "updated":    datetime.datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
+        "count":      n, "bubbles": [], "inflow": [], "outflow": [],
+    }
+    if n == 0:
+        return out
+
+    # 1) 選檔（純金額）：買超金額前 N + 賣超金額前 N
+    rows.sort(key=lambda r: -r["amt"])
+    buy_side  = rows[:bubble_half]                     # amt 大→小（買超最多在前）
+    sell_side = list(reversed(rows))[:bubble_half]     # amt 小→大（賣超最多在前）
+    sel = buy_side + sell_side
+    m = len(sel)
+
+    # 2) 強勢分數：只在這 40 檔之間算百分位（0=最低、1=最高）
+    def _pct_within(key):
+        order = sorted(range(m), key=lambda i: sel[i][key])
+        d = [0.0] * m
+        for pos, i in enumerate(order):
+            d[i] = pos / (m - 1) if m > 1 else 0.5
+        return d
+
+    amt_p = _pct_within("amt")
+    chg_p = _pct_within("chg")
+    for i, r in enumerate(sel):
+        r["score"] = round(amt_p[i] + chg_p[i], 4)
+
+    # 3) 排行：資金流入 = 買超組分數高→低；資金流出 = 賣超組分數低→高
+    inflow_sorted  = sorted(buy_side,  key=lambda r: (-r["score"], -r["amt"]))
+    outflow_sorted = sorted(sell_side, key=lambda r: (r["score"], r["amt"]))
+
+    def _entry(r, rank):
+        return {"rank": rank, "id": r["id"], "name": r["name"],
+                "amt": r["amt"], "chg": r["chg"], "score": r["score"]}
+
+    inflow  = [_entry(r, i) for i, r in enumerate(inflow_sorted, 1)]
+    outflow = [_entry(r, i) for i, r in enumerate(outflow_sorted, 1)]
+
+    # 氣泡：帶真實 amt / chg（前端畫散布圖用）；grank = 該股在對應排行的名次
+    in_rank  = {r["id"]: i for i, r in enumerate(inflow_sorted, 1)}
+    out_rank = {r["id"]: i for i, r in enumerate(outflow_sorted, 1)}
+
+    def _bub(r, grp):
+        rk = (in_rank if grp == "in" else out_rank).get(r["id"], 0)
+        return {"grp": grp, "grank": rk, "id": r["id"], "name": r["name"],
+                "amt": r["amt"], "chg": r["chg"]}
+
+    bubbles  = [_bub(r, "in")  for r in buy_side]
+    bubbles += [_bub(r, "out") for r in sell_side]
+
+    out["inflow"] = inflow
+    out["outflow"] = outflow
+    out["bubbles"] = bubbles
+    return out
+
+
+def _cleanup_old_fundflow_cache(today: str = None):
+    """刪除 fundflow_cache 下除了今日以外的所有日期節點（比照 _cleanup_old_top100_cache）。"""
+    if today is None:
+        today = get_today()
+    try:
+        ref  = firebase_db.reference("fundflow_cache")
+        keys = ref.get(shallow=True)
+        if not keys:
+            return
+        old_keys = [k for k in keys if k != today]
+        for key in old_keys:
+            firebase_db.reference(f"fundflow_cache/{key}").delete()
+            print(f"[fundflow] 清除舊快取 fundflow_cache/{key} ✅")
+        if old_keys:
+            print(f"[fundflow] 共清除 {len(old_keys)} 筆舊快取，保留 {today}")
+    except Exception as e:
+        print(f"[fundflow] 清除舊快取失敗: {e} ⚠️")

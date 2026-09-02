@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS848460QV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS848460QV');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#e8ebf1" />
+  <title>資金強度流向前20｜JellyStock</title>
+  <meta name="description" content="台股三大法人買超金額前20名、賣超金額前20名個股，對照當日漲跌幅畫成散布圖，並以「金額＋漲跌幅」強勢分數排出資金強度流入／流出排行。資料來源 TWSE / TPEx 公開資訊，每個交易日 16:30 後更新。" />
+  <meta name="keywords" content="台股,資金強度,資金流向,三大法人買賣超,外資買超,投信買超,自營商,買超排行,賣超排行,盤後數據,JellyStock" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jellystockdata.com/stock_site/tools/fund_flow.html" />
+  <link rel="icon" type="image/png" href="/images/jelly.png"/>
+  <link rel="stylesheet" href="/stock_site/assets/site.css?v=2026-08-29" />
+  <style>
+    /* fund_flow.html 專屬元件（顏色一律走 site.css token） */
+    :root {
+      --buy:  var(--up);     /* 買超 / 上漲 → 紅（#c62828，台股慣例） */
+      --sell: var(--down);   /* 賣超 / 下跌 → 綠（#17805a） */
+    }
+
+    .hd-clock {
+      font-family: var(--font-mono); font-size: .74rem; color: var(--accent);
+      letter-spacing: .04em; background: var(--accent-soft);
+      border: 1px solid var(--line); border-radius: 20px; padding: 5px 14px; white-space: nowrap;
+    }
+
+    .app { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
+
+    /* ── 頁首標題 + 市場切換 ── */
+    .ff-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .ff-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--ink); line-height: 1.3; }
+    .ff-sub { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: 6px; letter-spacing: .02em; }
+    .ff-date { color: var(--accent); }
+
+    .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-shrink: 0; }
+    .seg button {
+      font-family: var(--font-mono); font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+      padding: 7px 18px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-faint); cursor: pointer;
+      transition: background .18s, color .18s;
+    }
+    .seg button.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-sm); }
+
+    /* ── 使用說明（可收合）── */
+    .guide { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+    .guide-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; background: var(--surface-2); }
+    .guide-head:hover { background: var(--accent-soft); }
+    .guide-ico { font-size: 1rem; }
+    .guide-ttl { flex: 1; font-family: var(--font-display); font-weight: 700; color: var(--ink); font-size: .92rem; }
+    .guide-tgl { font-family: var(--font-mono); font-size: .66rem; color: var(--accent); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; background: var(--surface); }
+    .guide-body { max-height: 900px; overflow: hidden; transition: max-height .3s ease; }
+    .guide-body.collapsed { max-height: 0; }
+    .guide-inner { padding: 14px 18px; font-size: .85rem; color: var(--ink-body); line-height: 1.8; }
+    .guide-inner b { color: var(--ink); }
+    .guide-inner .g-in  { color: var(--buy); font-weight: 700; }
+    .guide-inner .g-out { color: var(--sell); font-weight: 700; }
+    .guide-inner ul { margin: 8px 0 0; padding-left: 18px; }
+    .guide-inner li { margin: 3px 0; }
+
+    /* ── 狀態橫幅 ── */
+    .ff-banner {
+      display: none; align-items: center; gap: 14px;
+      background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      padding: 16px 20px; margin-bottom: 14px;
+    }
+    .ff-banner .rb-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .ff-banner .rb-title { font-family: var(--font-display); font-weight: 700; color: var(--ink); font-size: .98rem; margin-bottom: 3px; }
+    .ff-banner .rb-desc { font-size: .84rem; color: var(--ink-body); line-height: 1.7; }
+
+    /* ── 圖表卡 ── */
+    .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+    .chart-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); flex-wrap: wrap; }
+    .chart-label { font-family: var(--font-mono); font-size: .72rem; color: var(--accent); letter-spacing: .05em; }
+    .chart-legend { display: flex; gap: 14px; }
+    .lg-item { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: .68rem; color: var(--ink-body); }
+    .lg-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .lg-dot.buy  { background: color-mix(in srgb, var(--buy) 22%, transparent);  border: 1.5px solid var(--buy); }
+    .lg-dot.sell { background: color-mix(in srgb, var(--sell) 22%, transparent); border: 1.5px solid var(--sell); }
+
+    .chart-body { position: relative; background: var(--surface); }
+    canvas#ffCanvas { display: block; width: 100%; touch-action: pan-y; }
+    .chart-empty { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; gap: 10px; padding: 30px; text-align: center; }
+    .chart-empty .ce-icon { font-size: 1.8rem; }
+    .chart-empty .ce-text { font-size: .88rem; color: var(--ink-faint); line-height: 1.7; }
+
+    .ff-tooltip {
+      position: absolute; pointer-events: none; z-index: 20; display: none;
+      background: var(--ink); color: #fff; border-radius: var(--radius-sm);
+      padding: 9px 12px; font-family: var(--font-mono); font-size: .72rem; line-height: 1.7;
+      box-shadow: var(--shadow-md); white-space: nowrap; transform: translate(-50%, -115%);
+    }
+    .ff-tooltip .tt-name { font-weight: 700; margin-bottom: 2px; }
+    .ff-tooltip .tt-buy  { color: #ff9d9d; }   /* 買超 / 漲 → 紅 */
+    .ff-tooltip .tt-sell { color: #7fe3bf; }   /* 賣超 / 跌 → 綠 */
+    .ff-tooltip .tt-flat { color: #fff; }      /* 平盤 → 白 */
+
+    /* ── 排行榜卡 ── */
+    .rank-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .rank-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+    .rank-tab {
+      font-family: var(--font-display); font-size: .94rem; font-weight: 700;
+      padding: 13px 8px; border: 0; border-bottom: 2px solid transparent; background: var(--surface-2);
+      color: var(--ink-faint); cursor: pointer; transition: background .18s, color .18s, border-color .18s;
+    }
+    .rank-tab.active#tabIn  { background: var(--surface); color: var(--up);   border-bottom-color: var(--up); }
+    .rank-tab.active#tabOut { background: var(--surface); color: var(--down); border-bottom-color: var(--down); }
+    .rank-list { padding: 4px 0; }
+    .rank-row { display: grid; grid-template-columns: 34px 1fr auto 70px; align-items: center; column-gap: 12px; row-gap: 2px; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+    .rank-row:last-child { border-bottom: 0; }
+    .rank-row:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+    .rank-no { font-family: var(--font-mono); font-size: .8rem; font-weight: 700; color: var(--ink-faint); text-align: center; }
+    .rank-no.m1 { color: #b8860b; }
+    .rank-no.m2 { color: #8a94a2; }
+    .rank-no.m3 { color: #a9744f; }
+    .rank-name { font-size: .9rem; color: var(--ink); font-weight: 600; }
+    .rank-name .rn-code { font-family: var(--font-mono); font-size: .74rem; color: var(--ink-faint); font-weight: 400; margin-left: 5px; }
+    .rank-amt { font-family: var(--font-mono); font-size: .82rem; font-weight: 700; white-space: nowrap; }
+    .rank-amt.buy  { color: var(--buy); }
+    .rank-amt.sell { color: var(--sell); }
+    .rank-chg { font-family: var(--font-mono); font-size: .82rem; font-weight: 700; text-align: right; white-space: nowrap; }
+    .rank-chg.up   { color: var(--up); }
+    .rank-chg.down { color: var(--down); }
+    .rank-chg.flat { color: var(--ink-faint); }
+    .rank-empty { padding: 26px 18px; text-align: center; color: var(--ink-faint); font-size: .84rem; }
+
+
+    @media (max-width: 640px) {
+      .ff-title { font-size: 1.2rem; }
+      .rank-tab { font-size: .8rem; padding: 11px 4px; line-height: 1.35; }
+      .rank-row { grid-template-columns: 28px 1fr auto; column-gap: 10px; padding: 10px 14px; }
+      .rank-no { grid-row: 1 / 3; }
+      .rank-name { grid-column: 2; grid-row: 1; font-size: .86rem; }
+      .rank-chg { grid-column: 3; grid-row: 1; }
+      .rank-amt { grid-column: 2 / 4; grid-row: 2; text-align: left; }
+      .chart-legend { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">跳至主要內容</a>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'" width="40" height="40"/></div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="hd-clock" id="hdTime"></span>
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<div class="app" id="main-content">
+
+  <h1 class="visually-hidden">資金強度流向前20 — 三大法人買超金額前20名與賣超金額前20名個股，對照當日漲跌幅</h1>
+
+  <div class="ff-head">
+    <div>
+      <div class="ff-title">資金強度流向前20</div>
+      <div class="ff-sub" id="ffSub">資料載入中…</div>
+    </div>
+    <div class="seg" role="group" aria-label="選擇市場">
+      <button id="segTwse" class="active" onclick="switchMarket('twse')">上市</button>
+      <button id="segOtc" onclick="switchMarket('otc')">上櫃</button>
+    </div>
+  </div>
+
+  <div class="guide" id="guide">
+    <div class="guide-head" onclick="toggleGuide()">
+      <span class="guide-ico">📖</span>
+      <span class="guide-ttl">使用說明</span>
+      <span class="guide-tgl" id="guideTgl">展開 ▼</span>
+    </div>
+    <div class="guide-body collapsed" id="guideBody">
+      <div class="guide-inner">
+        <b>「資金強度」</b>是把三大法人買賣超金額，和個股當天漲跌幅合起來看：法人大買、股價又同步大漲，代表資金<span class="g-in">進場力道強</span>；法人大賣、股價又大跌，代表資金<span class="g-out">出場力道強</span>。
+        <br><br>
+        每個交易日 <b>16:30</b> 後，本工具挑出當天三大法人「<b>買超金額前 20 名</b>」與「<b>賣超金額前 20 名</b>」共 40 檔，畫成散布圖：
+        <ul>
+          <li>橫軸：中間＝買賣超 0，越往右法人<b>買超</b>金額越大、越往左<b>賣超</b>金額越大（買、賣兩側各自以當天最大金額為滿刻度，圖上方有標示）。</li>
+          <li>縱軸：中間＝當天平盤，越往上<b>漲</b>越多、越往下<b>跌</b>越多。</li>
+          <li>氣泡<b>大小</b>＝買賣超金額；氣泡<b>越鮮明</b>＝當天漲跌越劇烈（漲跌小的會比較淡，但仍看得見）。</li>
+          <li><span class="g-in">右上角（紅底）</span>＝法人大買＋股價上漲；<span class="g-out">左下角（綠底）</span>＝法人大賣＋股價下跌。游標移到氣泡上可看該股金額與漲跌幅。</li>
+        </ul>
+        下方排行的名次，是每檔在這 40 檔內的「買賣超金額排名＋漲跌幅排名」合計出的<b>資金強度分數</b>：
+        <span class="g-in">資金強度流入排行</span>取買超那 20 檔（分數高→低，買得多又漲得多的排前面），
+        <span class="g-out">資金強度流出排行</span>取賣超那 20 檔（分數低→高，賣得多又跌得多的排前面）。
+        <br><br>
+        買賣超金額＝（外資＋投信＋自營商 淨買賣股數）×當天收盤價，為概算值；資料僅涵蓋 4 碼代號的上市／上櫃個股（不含權證、ETF）。
+      </div>
+    </div>
+  </div>
+
+  <div class="ff-banner" id="ffBanner" aria-live="polite">
+    <div class="rb-icon" id="ffBannerIcon">⏳</div>
+    <div>
+      <div class="rb-title" id="ffBannerTitle">資料準備中</div>
+      <div class="rb-desc" id="ffBannerDesc"></div>
+    </div>
+  </div>
+
+  <div class="chart-card fade-in" id="chartCard">
+    <div class="chart-toolbar">
+      <span class="chart-label">▸ 資金強度散布圖</span>
+      <div class="chart-legend">
+        <span class="lg-item"><span class="lg-dot buy"></span>法人買超</span>
+        <span class="lg-item"><span class="lg-dot sell"></span>法人賣超</span>
+      </div>
+    </div>
+    <div class="chart-body" id="chartBody">
+      <canvas id="ffCanvas" role="img" aria-label="三大法人買超前20、賣超前20個股 對照當日漲跌幅散布圖"></canvas>
+      <div class="chart-empty" id="chartEmpty">
+        <div class="ce-icon">📊</div>
+        <div class="ce-text" id="chartEmptyText">載入中…</div>
+      </div>
+      <div class="ff-tooltip" id="ffTooltip"></div>
+    </div>
+  </div>
+
+  <div class="rank-card fade-in">
+    <div class="rank-tabs" role="tablist">
+      <button class="rank-tab active" id="tabIn" role="tab" aria-selected="true" onclick="switchRankTab('in')">資金強度流入排行 前20名</button>
+      <button class="rank-tab" id="tabOut" role="tab" aria-selected="false" onclick="switchRankTab('out')">資金強度流出排行 前20名</button>
+    </div>
+    <div class="rank-list" id="rankList" aria-live="polite">
+      <div class="rank-empty">載入中…</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-disclaimer">
+    <div class="footer-disclaimer-top">
+      <div class="footer-disclaimer-title">【 資料來源與免責聲明 】</div>
+      <div class="footer-brand">
+        <div class="footer-brand-name">盤後雷達</div>
+        <div class="footer-brand-sub">© 2026 JellyStock</div>
+      </div>
+    </div>
+    <p class="footer-disclaimer-text">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div class="footer-legal-links">
+      <a href="/stock_site/legal/about.html">關於本站</a>
+      <span class="footer-sep">·</span>
+      <a href="/stock_site/legal/privacy.html">隱私政策</a>
+      <span class="footer-sep">·</span>
+      <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+      <span class="footer-sep">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
+      <span class="footer-sep">·</span>
+      <a href="https://www.facebook.com/share/1BXgFFBvrU/" target="_blank" rel="noopener noreferrer" class="footer-fb-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>官方粉絲團
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Clock ── */
+function updateClock(){
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('hdTime').textContent =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+setInterval(updateClock, 1000); updateClock();
+
+/* ── State ── */
+const state = {
+  market: 'twse',
+  rankTab: 'in',
+  data: null,        // { bubbles, inflow, outflow, trade_date, ... }
+  layout: null,
+  hover: -1,
+  t0: 0,             // 動畫起始時間
+  raf: 0,
+  motion: !matchMedia('(prefers-reduced-motion: reduce)').matches,
+};
+
+const $ = id => document.getElementById(id);
+
+/* ── 使用說明收合 ── */
+function toggleGuide(){
+  const b = $('guideBody'), collapsed = b.classList.toggle('collapsed');
+  $('guideTgl').textContent = collapsed ? '展開 ▼' : '收合 ▲';
+}
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const fmtAmt = v => Math.abs(v).toFixed(1);
+const fmtChg = v => {
+  const s = v.toFixed(2);
+  return (s === '0.00' || s === '-0.00') ? '0.00%' : (v > 0 ? '+' : '') + s + '%';
+};
+const chgTone = v => {
+  const s = v.toFixed(2);
+  return (s === '0.00' || s === '-0.00') ? 'flat' : (v > 0 ? 'up' : 'down');
+};
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+/* 台股慣例：買超／上漲 → 紅、賣超／下跌 → 綠 */
+const COL = (() => {
+  const css = getComputedStyle(document.documentElement);
+  return {
+    buy:   css.getPropertyValue('--up').trim()   || '#c62828',
+    sell:  css.getPropertyValue('--down').trim() || '#17805a',
+    line:  css.getPropertyValue('--line-strong').trim() || '#c7cdd8',
+    faint: css.getPropertyValue('--ink-faint').trim()   || '#8a94a2',
+    body:  css.getPropertyValue('--ink-body').trim()     || '#3f4a5a',
+    ink:   css.getPropertyValue('--ink').trim()          || '#16233a',
+  };
+})();
+const RGB = { buy: [198, 40, 40], sell: [23, 128, 90] };
+
+function showBanner(icon, title, desc){
+  $('ffBannerIcon').textContent = icon;
+  $('ffBannerTitle').textContent = title;
+  $('ffBannerDesc').innerHTML = desc;
+  $('ffBanner').style.display = 'flex';
+}
+function hideBanner(){ $('ffBanner').style.display = 'none'; }
+
+function showChartMessage(icon, text){
+  $('chartEmpty').style.display = 'flex';
+  $('ffCanvas').style.display = 'none';
+  $('chartEmpty').querySelector('.ce-icon').textContent = icon;
+  $('chartEmptyText').textContent = text;
+}
+function showChartCanvas(){
+  $('chartEmpty').style.display = 'none';
+  $('ffCanvas').style.display = 'block';
+}
+
+/* ── 市場切換 ── */
+function switchMarket(m){
+  if(m === state.market) return;
+  state.market = m;
+  $('segTwse').classList.toggle('active', m === 'twse');
+  $('segOtc').classList.toggle('active', m === 'otc');
+  $('segTwse').setAttribute('aria-pressed', m === 'twse');
+  $('segOtc').setAttribute('aria-pressed', m === 'otc');
+  load();
+}
+
+/* ── 排行榜頁籤切換 ── */
+function switchRankTab(t){
+  state.rankTab = t;
+  $('tabIn').classList.toggle('active', t === 'in');
+  $('tabOut').classList.toggle('active', t === 'out');
+  $('tabIn').setAttribute('aria-selected', t === 'in');
+  $('tabOut').setAttribute('aria-selected', t === 'out');
+  renderRankTab();
+}
+
+/* ── 載入資料 ── */
+async function load(){
+  hideBanner();
+  showChartMessage('📊', '載入中…');
+  $('rankList').innerHTML = '<div class="rank-empty">載入中…</div>';
+  state.data = null; state.layout = null; state.hover = -1;
+  cancelAnimationFrame(state.raf);
+
+  let j;
+  try{
+    const r = await fetch(`/api/fund_flow?market=${state.market}`, { cache:'no-store' });
+    j = await r.json();
+  }catch(e){
+    showChartMessage('⚠️', '資料載入失敗，請稍後再試。');
+    $('rankList').innerHTML = '<div class="rank-empty">資料載入失敗</div>';
+    return;
+  }
+
+  if(j.status !== 'ok' || !j.bubbles || !j.bubbles.length){
+    const msg = j.message || '目前查無資料';
+    showChartMessage('📭', msg);
+    $('rankList').innerHTML = `<div class="rank-empty">${msg}</div>`;
+    return;
+  }
+
+  state.data = j;
+  $('ffSub').innerHTML =
+    `<span class="ff-date">資料日期 ${j.trade_date || '—'}</span>　·　全市場 ${j.count || 0} 檔`;
+
+  if(!j.is_trading_day){
+    showBanner('🗂️', '交易所今日休市',
+      `以下為最近一個交易日 <strong>${j.trade_date || ''}</strong> 的盤後資料。`);
+  }else if(!j.is_today){
+    showBanner('⏳', '今日盤後資料尚未更新',
+      `資金強度流向每個交易日 <strong>16:30</strong> 後更新，目前顯示 <strong>${j.trade_date || ''}</strong> 資料。`);
+  }
+
+  showChartCanvas();
+  computeLayout();
+  startAnim();
+  renderRankTab();
+}
+
+/* ── 版面計算：真實座標散布圖（X＝買賣超金額、Y＝漲跌幅%，中央＝0/0）── */
+function computeLayout(){
+  const d = state.data;
+  if(!d || !d.bubbles || !d.bubbles.length) return;
+
+  const canvas = $('ffCanvas');
+  const wrap = $('chartBody');
+  const cssW = wrap.clientWidth || 900;
+  const isNarrow = cssW < 560;
+  const cssH = clamp(Math.round(cssW * (isNarrow ? 1.05 : 0.72)), 380, 620);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+
+  const pad = { t: 28, r: 18, b: 16, l: 26 };
+  const P = { x0: pad.l, y0: pad.t, w: cssW - pad.l - pad.r, h: cssH - pad.t - pad.b };
+  const cx = P.x0 + P.w / 2, cy = P.y0 + P.h / 2;
+
+  const bubbles = d.bubbles;
+
+  /* 刻度：X 買/賣兩側各自以自己最大金額為滿刻度（Q1，比例尺不同）；
+           Y 對稱，用當天 40 檔最大絕對漲跌幅、但至少 ±3%（Q2）。 */
+  const maxBuy  = Math.max(1e-6, ...bubbles.filter(b => b.amt >= 0).map(b => b.amt));
+  const maxSell = Math.max(1e-6, ...bubbles.filter(b => b.amt <  0).map(b => -b.amt));
+  const maxChg  = Math.max(3, ...bubbles.map(b => Math.abs(b.chg)));
+
+  const marginX = isNarrow ? 44 : 60;
+  const marginY = isNarrow ? 28 : 36;
+  const halfW = P.w / 2 - marginX, halfH = P.h / 2 - marginY;
+  const amtToX = a => a >= 0 ? cx + (a / maxBuy) * halfW : cx - (-a / maxSell) * halfW;
+  const chgToY = c => cy - (c / maxChg) * halfH;
+
+  const rMax = isNarrow ? 20 : 25;
+  const rMin = isNarrow ? 11 : 13;
+  /* 大小 ＝ 該側買賣超金額（sqrt 壓縮，每側各自正規化）*/
+  const rOf = b => rMin + (rMax - rMin) *
+      Math.sqrt(clamp(Math.abs(b.amt) / (b.amt >= 0 ? maxBuy : maxSell), 0, 1));
+  /* 明顯度 ＝ 當日漲跌幅絕對值（越大越鮮明，最低 0.4 仍看得見）*/
+  const opOf = b => 0.4 + 0.6 * clamp(Math.abs(b.chg) / maxChg, 0, 1);
+
+  const box = bubbles.map(b => {
+    const seed = b.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    const tx = clamp(amtToX(b.amt), P.x0 + 6, P.x0 + P.w - 6);
+    const ty = clamp(chgToY(b.chg), P.y0 + 6, P.y0 + P.h - 6);
+    return {
+      b, r: rOf(b), op: opOf(b),
+      tx, ty,                                        // 真實座標（錨點）
+      cx: tx + ((seed % 7) - 3) * 0.6,               // 加一點抖動避免完全重疊
+      cy: ty + ((seed * 3 % 7) - 3) * 0.6,
+      px: 0, py: 0,
+      ph1: seed % 6.28, ph2: (seed * 1.7) % 6.28,
+      sp1: 0.0003 + (seed % 5) * 0.00004,
+      sp2: 0.0004 + (seed % 7) * 0.00003,
+      amp: 1.2 + (seed % 3) * 0.35,                  // 飄動幅度很小，不影響判讀
+    };
+  });
+
+  /* 輕量防重疊（Q3）：重疊就沿連線推開，每輪再拉回真實座標一點點 */
+  for(let iter = 0; iter < 90; iter++){
+    for(let i = 0; i < box.length; i++){
+      for(let j = i + 1; j < box.length; j++){
+        const a = box[i], c = box[j];
+        let dx = c.cx - a.cx, dy = c.cy - a.cy;
+        let dist = Math.hypot(dx, dy) || 0.01;
+        const min = a.r + c.r + 2.5;
+        if(dist < min){
+          const push = (min - dist) / 2;
+          dx /= dist; dy /= dist;
+          a.cx -= dx * push; a.cy -= dy * push;
+          c.cx += dx * push; c.cy += dy * push;
+        }
+      }
+    }
+    box.forEach(s => {
+      s.cx += (s.tx - s.cx) * 0.02;
+      s.cy += (s.ty - s.cy) * 0.02;
+      s.cx = clamp(s.cx, P.x0 + s.r, P.x0 + P.w - s.r);
+      s.cy = clamp(s.cy, P.y0 + s.r, P.y0 + P.h - s.r);
+    });
+  }
+
+  /* 名稱：一律放氣泡內，字級縮到塞得下、必要時截字（最少 2 字）*/
+  box.forEach(s => {
+    let name = s.b.name, fs = s.r >= 22 ? 11 : s.r >= 18 ? 10 : 9;
+    const fits = () => { ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
+                         return ctx.measureText(name).width <= s.r * 1.8; };
+    while(!fits() && fs > 7) fs -= 0.5;
+    while(!fits() && name.length > 2) name = name.slice(0, -1);
+    s.label = name; s.fs = fs;
+  });
+
+  state.layout = { ctx, cssW, cssH, dpr, P, box, COL, cx, cy };
+}
+
+/* ── 動畫迴圈：進場 + 持續飄動（畫面看不到時自動暫停）── */
+function startAnim(){
+  cancelAnimationFrame(state.raf);
+  state.t0 = performance.now();
+  if(!state.motion){ render(state.t0); return; }
+  const loop = now => {
+    if(state.layout){
+      if(state.visible !== false && !document.hidden) render(now);
+      state.raf = requestAnimationFrame(loop);
+    }
+  };
+  state.raf = requestAnimationFrame(loop);
+}
+
+/* ── 繪製 ── */
+function render(now){
+  const L = state.layout;
+  if(!L) return;
+  const { ctx, cssW, cssH, dpr, P, box, cx, cy } = L;
+  const intro = state.motion ? clamp((now - state.t0) / 850, 0, 1) : 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  /* 象限底色：右上（買超＋漲＝資金流入）淡紅、左下（賣超＋跌＝資金流出）淡綠 */
+  ctx.fillStyle = 'rgba(198,40,40,.045)';
+  ctx.fillRect(cx, P.y0, P.x0 + P.w - cx, cy - P.y0);
+  ctx.fillStyle = 'rgba(23,128,90,.045)';
+  ctx.fillRect(P.x0, cy, cx - P.x0, P.y0 + P.h - cy);
+
+  /* 外框 + 十字軸（中心＝買賣超 0、漲跌幅 0%）*/
+  ctx.strokeStyle = L.COL.line;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(P.x0, P.y0, P.w, P.h);
+  ctx.strokeStyle = L.COL.faint;
+  ctx.beginPath();
+  ctx.moveTo(P.x0, cy); ctx.lineTo(P.x0 + P.w, cy);
+  ctx.moveTo(cx, P.y0); ctx.lineTo(cx, P.y0 + P.h);
+  ctx.stroke();
+
+  /* ── 軸標籤（只留中央軸名，左負右正 / 下負上正）── */
+  ctx.fillStyle = L.COL.body;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.font = '700 11px "Noto Sans TC", sans-serif';
+
+  ctx.fillText('-　法人買賣超　+', cx, P.y0 - 14);
+
+  ctx.save();
+  ctx.translate(P.x0 - 14, cy); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('-　股價漲幅(%)　+', 0, 0);
+  ctx.restore();
+
+  /* 氣泡：大的先畫（底層）、小的後畫（上層）；極輕微飄動 */
+  const order = box.map((_, i) => i).sort((a, b) => box[b].r - box[a].r);
+  const drift = state.motion ? 1 : 0;
+  order.forEach((i, oi) => {
+    const s = box[i];
+    const ap = easeOut(clamp((intro - oi / order.length * 0.4) / 0.6, 0, 1));
+    const hot = i === state.hover;
+    s.px = s.cx + (hot ? 0 : drift * Math.sin(now * s.sp1 + s.ph1) * s.amp);
+    s.py = s.cy + (hot ? 0 : drift * Math.cos(now * s.sp2 + s.ph2) * s.amp);
+    if(ap <= 0.01) return;
+    const r = s.r * (0.6 + 0.4 * ap) * (hot ? 1.12 : 1);
+    const buy = s.b.amt >= 0;
+    const rgb = buy ? RGB.buy : RGB.sell;
+    const col = buy ? L.COL.buy : L.COL.sell;
+    const dim = state.hover >= 0 && !hot;
+    const op = hot ? 1 : s.op;                       // 明顯度＝漲跌幅（hover 時全亮）
+
+    const g = ctx.createRadialGradient(s.px - r * 0.35, s.py - r * 0.35, r * 0.1, s.px, s.py, r);
+    g.addColorStop(0, `rgba(${rgb},${(hot ? 0.5 : 0.34) * op})`);
+    g.addColorStop(1, `rgba(${rgb},${(hot ? 0.2 : 0.12) * op})`);
+    ctx.globalAlpha = (dim ? 0.3 : 1) * ap;
+    ctx.beginPath();
+    ctx.arc(s.px, s.py, r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = hot ? 2.6 : 1.3;
+    ctx.strokeStyle = col;
+    ctx.globalAlpha = (dim ? 0.3 : 1) * ap * (hot ? 1 : 0.45 + 0.55 * op);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  /* 名稱：一律在氣泡內 */
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  order.forEach((i, oi) => {
+    const s = box[i];
+    const ap = easeOut(clamp((intro - oi / order.length * 0.4 - 0.1) / 0.5, 0, 1));
+    if(ap < 0.4) return;
+    const col = s.b.amt >= 0 ? L.COL.buy : L.COL.sell;
+    const faded = state.hover >= 0 && i !== state.hover;
+    ctx.font = `700 ${s.fs}px "Noto Sans TC", sans-serif`;
+    ctx.globalAlpha = (faded ? 0.28 : Math.max(0.55, s.op)) * ap;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,.96)';
+    ctx.strokeText(s.label, s.px, s.py);
+    ctx.fillStyle = col;
+    ctx.fillText(s.label, s.px, s.py);
+    ctx.globalAlpha = 1;
+  });
+}
+
+/* ── tooltip + hover ── */
+function bindChartInteraction(){
+  const canvas = $('ffCanvas');
+  const tip = $('ffTooltip');
+  const pick = (clientX, clientY) => {
+    const L = state.layout;
+    if(!L) return -1;
+    const rect = canvas.getBoundingClientRect();
+    const mx = clientX - rect.left, my = clientY - rect.top;
+    let hit = -1, best = 1e9;
+    L.box.forEach((s, i) => {
+      const dist = Math.hypot(mx - (s.px || s.cx), my - (s.py || s.cy));
+      if(dist <= s.r + 4 && dist < best){ best = dist; hit = i; }
+    });
+    return hit;
+  };
+  const show = (clientX, clientY) => {
+    const L = state.layout;
+    const i = pick(clientX, clientY);
+    if(i !== state.hover){ state.hover = i; if(!state.motion) render(performance.now()); }
+    if(i < 0){ tip.style.display = 'none'; return; }
+    const s = L.box[i];
+    const dir = s.b.amt >= 0 ? 'buy' : 'sell';
+    const grpTxt = s.b.grp === 'in' ? '資金強度流入' : '資金強度流出';
+    tip.innerHTML =
+      `<div class="tt-name">${grpTxt} #${s.b.grank}　${s.b.name} <span style="opacity:.7">${s.b.id}</span></div>` +
+      `<div class="tt-${dir}">法人${s.b.amt >= 0 ? '買超' : '賣超'} ${fmtAmt(s.b.amt)} 億</div>` +
+      `<div class="${ {up:'tt-buy',down:'tt-sell',flat:'tt-flat'}[chgTone(s.b.chg)] }">當日 ${fmtChg(s.b.chg)}</div>`;
+    const w = canvas.clientWidth;
+    tip.style.left = clamp(s.px || s.cx, 82, w - 82) + 'px';
+    tip.style.top = (s.py || s.cy) + 'px';
+    tip.style.transform = (s.py || s.cy) < 70 ? 'translate(-50%, 20%)' : 'translate(-50%, -118%)';
+    tip.style.display = 'block';
+  };
+  canvas.addEventListener('mousemove', e => show(e.clientX, e.clientY));
+  canvas.addEventListener('mouseleave', () => {
+    if(state.hover !== -1){ state.hover = -1; if(!state.motion) render(performance.now()); }
+    tip.style.display = 'none';
+  });
+  canvas.addEventListener('touchstart', e => {
+    if(e.touches[0]) show(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+}
+
+/* ── 排行榜（雙向頁籤，各前 30）── */
+function renderRankTab(){
+  const d = state.data;
+  const box = $('rankList');
+  const list = d && (state.rankTab === 'in' ? d.inflow : d.outflow);
+  if(!list || !list.length){
+    box.innerHTML = '<div class="rank-empty">今日無足夠資料</div>';
+    return;
+  }
+  box.innerHTML = list.map(r => {
+    const amtCls = r.amt >= 0 ? 'buy' : 'sell';
+    const dirTxt = r.amt >= 0 ? '買超' : '賣超';
+    const chgCls = chgTone(r.chg);
+    const medal = r.rank <= 3 ? ` m${r.rank}` : '';
+    return `<div class="rank-row">
+      <span class="rank-no${medal}">${r.rank}</span>
+      <span class="rank-name">${r.name}<span class="rn-code">${r.id}</span></span>
+      <span class="rank-amt ${amtCls}">${dirTxt} ${fmtAmt(r.amt)} 億</span>
+      <span class="rank-chg ${chgCls}">${fmtChg(r.chg)}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── resize 重繪 ── */
+let _rz;
+window.addEventListener('resize', () => {
+  clearTimeout(_rz);
+  _rz = setTimeout(() => {
+    if(!state.data) return;
+    computeLayout();
+    startAnim();
+  }, 200);
+});
+
+bindChartInteraction();
+try{
+  new IntersectionObserver(es => { state.visible = es[0].isIntersecting; },
+    { threshold: 0.01 }).observe($('chartCard'));
+}catch(e){ state.visible = true; }
+load();
+</script>
+</body>
+</html>
