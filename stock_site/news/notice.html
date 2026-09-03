@@ -249,50 +249,60 @@ function formatCountdown(secs) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
+// ── 資料日期一律顯示「日期：YYYY-MM-DD」（跨頁一致）──
+function fmtDate(s) {
+  let d = String(s || '').replace(/\D/g, '');
+  if (d.length === 7) d = (parseInt(d.slice(0,3), 10) + 1911) + d.slice(3);  // 民國 → 西元
+  return d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : String(s || '—');
+}
+function todayYmd() {
+  const t = getTWTime();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function setMetaDate(txt) {
+  const el = document.getElementById('metaDate');
+  if (el) el.textContent = '日期：' + txt;
+}
+
 // ── 設定狀態列 ──────────────────────────────────────────────────────────────
 function setStatus(dotClass, text, count, timeText) {
-  // legacy status bar (hidden, kept for compatibility)
+  // legacy status bar (hidden, kept for compatibility)；#metaDate 由 setMetaDate() 單獨管理
   const dotEl = document.getElementById('statusDot');
   const textEl = document.getElementById('statusText');
   if (dotEl) dotEl.className = `status-dot ${dotClass}`;
   if (textEl) textEl.textContent = text;
   if (count != null) document.getElementById('noticeCount').textContent = count;
-  // Update meta date display
-  if (timeText != null) {
-    const dateEl = document.getElementById('metaDate');
-    if (dateEl && timeText !== '--') dateEl.textContent = `更新時間：${timeText}`;
-  }
 }
 
-// ── 顯示等待更新中（倒數）──────────────────────────────────────────────────
-let _countdownTimer = null;
+// ── 今日盤後數據尚未更新（倒數 + 到點後輪詢）────────────────────────────────
+let _countdownTimer = null, _pollTimer = null;
+function clearPending() {
+  clearInterval(_countdownTimer); clearTimeout(_pollTimer);
+  _countdownTimer = _pollTimer = null;
+}
 function showPendingState() {
-  clearInterval(_countdownTimer);
+  clearPending();
   const content = document.getElementById('noticeContent');
   content.innerHTML = `
     <div class="state-wrap">
       <div class="state-icon">⏳</div>
-      <div class="state-title">等待今日資料更新</div>
+      <div class="state-title">今日盤後數據尚未更新</div>
       <div class="state-sub">
-        TWSE 注意股資料每日盤後約 <strong style="color:var(--orange)">17:45</strong> 更新<br>
-        距離更新時間還有
+        注意股資料於每個交易日盤後約 <strong style="color:var(--orange)">17:45</strong> 更新，距離更新還有
       </div>
-      <div class="state-timer" id="pendingCountdown">--:--</div>
-      <div class="state-sub" style="margin-top:4px;font-size:.62rem">
-        目前顯示的為前一個交易日資料，或尚無資料
+      <div class="state-timer" id="pendingCountdown" aria-hidden="true">--:--</div>
+      <div class="state-sub" style="margin-top:4px">
+        到時間後畫面會自動載入，你也可以稍後自行重新整理。
       </div>
     </div>`;
-  setStatus('pending', '等待 17:45 更新中', '--', getTWTime().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'}));
+  setStatus('pending', '等待 17:45 更新中', '--');
+  setMetaDate('今日尚未更新');
 
   function tick() {
     const secs = secsTo1745();
     const el = document.getElementById('pendingCountdown');
-    if (el) el.textContent = formatCountdown(secs);
-    if (secs <= 0) {
-      clearInterval(_countdownTimer);
-      // 到時間後自動重新載入
-      setTimeout(loadNotice, 2000);
-    }
+    if (el) el.textContent = secs > 0 ? formatCountdown(secs) : '資料更新中…';
+    if (secs <= 0 && !_pollTimer) _pollTimer = setTimeout(loadNotice, 90000);
   }
   tick();
   _countdownTimer = setInterval(tick, 1000);
@@ -320,18 +330,20 @@ function showClosedState(nextTradingDay) {
         下一個交易日：<strong style="color:var(--accent)">${nextStr}</strong>
       </div>
     </div>`;
-  setStatus('closed', '今日休市', '0', '無資料');
+  setStatus('closed', '今日休市', '0');
+  setMetaDate('今日休市');
 }
 
 // ── 顯示空資料 ──────────────────────────────────────────────────────────
-function showEmptyState() {
+function showEmptyState(date) {
   document.getElementById('noticeContent').innerHTML = `
     <div class="state-wrap">
       <div class="state-icon">✅</div>
       <div class="state-title">今日無注意股</div>
       <div class="state-sub">今日盤後尚無注意股公告，或資料尚未更新完成</div>
     </div>`;
-  setStatus('live', '資料已載入', '0', getTWTime().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));
+  setStatus('live', '資料已載入', '0');
+  setMetaDate(fmtDate(date || todayYmd()));
 }
 
 // ── 篩選狀態 ─────────────────────────────────────────────────────────────────
@@ -358,7 +370,7 @@ function setNoticeFilter(filter) {
 
 // ── 渲染注意股清單 ─────────────────────────────────────────────────────────
 function renderNotice(items, date, twseCount, otcCount) {
-  if (!items || items.length === 0) { showEmptyState(); return; }
+  if (!items || items.length === 0) { showEmptyState(date); return; }
 
   _noticeItems = items;
   _noticeFilter = 'all';
@@ -399,9 +411,8 @@ function renderNotice(items, date, twseCount, otcCount) {
   content.innerHTML = `<div class="notice-list">${html}</div>`;
 
   // 更新日期與筆數
-  const dateEl  = document.getElementById('metaDate');
   const splitEl = document.getElementById('metaSplit');
-  if (dateEl) dateEl.textContent = date ? `更新時間：${date}` : `更新時間：${getTWTime().toLocaleDateString('zh-TW')}`;
+  setMetaDate(fmtDate(date || todayYmd()));
   if (splitEl) splitEl.textContent = `上市 ${twseN} ／ 上櫃 ${otcN}`;
 
   // 更新 tab 數字
@@ -421,7 +432,7 @@ function renderNotice(items, date, twseCount, otcCount) {
 
 // ── 主載入函式 ─────────────────────────────────────────────────────────────
 async function loadNotice() {
-  clearInterval(_countdownTimer);
+  clearPending();
 
   // 1. 休市判斷（含國定假日，問後端 get_trading_holidays）→ 休市就不打 /api/notice
   const { isTrading, nextTradingDay } = await checkTradingStatus();

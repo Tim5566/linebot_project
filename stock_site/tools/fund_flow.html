@@ -67,6 +67,12 @@
     .ff-banner .rb-icon { font-size: 1.6rem; flex-shrink: 0; }
     .ff-banner .rb-title { font-family: var(--font-display); font-weight: 700; color: var(--ink); font-size: .98rem; margin-bottom: 3px; }
     .ff-banner .rb-desc { font-size: .84rem; color: var(--ink-body); line-height: 1.7; }
+    /* 今日盤後資料尚未就緒（比照法人買賣超前100 的 readiness-banner）*/
+    .ff-banner.pending { align-items: flex-start; background: var(--orange-soft); border-color: #ecdcc8; }
+    .ff-banner.pending .rb-icon { font-size: 1.4rem; margin-top: 1px; }
+    .ff-banner.pending .rb-title { color: var(--orange); }
+    /* 未就緒時鎖住市場切換 */
+    .seg.locked { opacity: .45; pointer-events: none; }
 
     /* ── 圖表卡 ── */
     .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
@@ -169,7 +175,7 @@
       <div class="ff-title">資金強度流向前20</div>
       <div class="ff-sub" id="ffSub">資料載入中…</div>
     </div>
-    <div class="seg" role="group" aria-label="選擇市場">
+    <div class="seg" id="mktSeg" role="group" aria-label="選擇市場">
       <button id="segTwse" class="active" onclick="switchMarket('twse')">上市</button>
       <button id="segOtc" onclick="switchMarket('otc')">上櫃</button>
     </div>
@@ -275,10 +281,34 @@ const state = {
   hover: -1,
   t0: 0,             // 動畫起始時間
   raf: 0,
+  locked: false,     // 今日資料未就緒時鎖住市場切換
   motion: !matchMedia('(prefers-reduced-motion: reduce)').matches,
 };
 
 const $ = id => document.getElementById(id);
+
+/* ── 今日盤後資料未就緒：倒數 + 到點後輪詢 ──
+   資金強度流向於每個交易日 16:30 後（後端關卡）才納入當日資料。
+   倒數只跑本地計時、不打網路；歸零後才每 90 秒輪詢一次，資料到齊即停。 */
+const UPDATE_HH = 16, UPDATE_MM = 30;
+const POLL_MS = 90000;
+let _pollTimer = null, _pendTick = null;
+const twNow = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+function secsToUpdate(){
+  const t = twNow(), tgt = new Date(t);
+  tgt.setHours(UPDATE_HH, UPDATE_MM, 0, 0);
+  return Math.floor((tgt - t) / 1000);   // 可為負
+}
+function fmtHMS(s){
+  s = Math.max(0, s);
+  const p = n => String(n).padStart(2, '0');
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return (h > 0 ? h + ':' : '') + p(m) + ':' + p(s % 60);
+}
+function clearPending(){
+  clearInterval(_pendTick); clearTimeout(_pollTimer);
+  _pendTick = _pollTimer = null;
+}
 
 /* ── 使用說明收合 ── */
 function toggleGuide(){
@@ -311,13 +341,18 @@ const COL = (() => {
 })();
 const RGB = { buy: [198, 40, 40], sell: [23, 128, 90] };
 
-function showBanner(icon, title, desc){
+function showBanner(icon, title, desc, variant){
   $('ffBannerIcon').textContent = icon;
   $('ffBannerTitle').textContent = title;
   $('ffBannerDesc').innerHTML = desc;
+  $('ffBanner').className = 'ff-banner' + (variant ? ' ' + variant : '');
   $('ffBanner').style.display = 'flex';
 }
-function hideBanner(){ $('ffBanner').style.display = 'none'; }
+function hideBanner(){ $('ffBanner').style.display = 'none'; $('ffBanner').className = 'ff-banner'; }
+
+/* 市場切換鎖 */
+function lockMarket(){   state.locked = true;  $('mktSeg').classList.add('locked'); }
+function unlockMarket(){ state.locked = false; $('mktSeg').classList.remove('locked'); }
 
 function showChartMessage(icon, text){
   $('chartEmpty').style.display = 'flex';
@@ -332,7 +367,7 @@ function showChartCanvas(){
 
 /* ── 市場切換 ── */
 function switchMarket(m){
-  if(m === state.market) return;
+  if(state.locked || m === state.market) return;
   state.market = m;
   $('segTwse').classList.toggle('active', m === 'twse');
   $('segOtc').classList.toggle('active', m === 'otc');
@@ -354,6 +389,8 @@ function switchRankTab(t){
 /* ── 載入資料 ── */
 async function load(){
   hideBanner();
+  clearPending();
+  unlockMarket();
   showChartMessage('📊', '載入中…');
   $('rankList').innerHTML = '<div class="rank-empty">載入中…</div>';
   state.data = null; state.layout = null; state.hover = -1;
@@ -369,6 +406,13 @@ async function load(){
     return;
   }
 
+  // 交易日、但今日盤後資料還沒就緒 → 比照法人買賣超前100：顯示提示、鎖住市場切換、
+  // 不再退而顯示前一交易日資料（避免使用者誤以為在看今天的資料）
+  if(j.is_trading_day && !j.is_today){
+    showNotReady();
+    return;
+  }
+
   if(j.status !== 'ok' || !j.bubbles || !j.bubbles.length){
     const msg = j.message || '目前查無資料';
     showChartMessage('📭', msg);
@@ -380,18 +424,46 @@ async function load(){
   $('ffSub').innerHTML =
     `<span class="ff-date">資料日期 ${j.trade_date || '—'}</span>　·　全市場 ${j.count || 0} 檔`;
 
+  // 休市日：最近一個交易日的資料就是最新完整資料，照常顯示並標明
   if(!j.is_trading_day){
     showBanner('🗂️', '交易所今日休市',
       `以下為最近一個交易日 <strong>${j.trade_date || ''}</strong> 的盤後資料。`);
-  }else if(!j.is_today){
-    showBanner('⏳', '今日盤後資料尚未更新',
-      `資金強度流向每個交易日 <strong>16:30</strong> 後更新，目前顯示 <strong>${j.trade_date || ''}</strong> 資料。`);
   }
 
   showChartCanvas();
   computeLayout();
   startAnim();
   renderRankTab();
+}
+
+/* ── 今日盤後數據尚未更新 ── */
+function showNotReady(){
+  state.data = null; state.layout = null; state.hover = -1;
+  cancelAnimationFrame(state.raf);
+  clearPending();
+  lockMarket();
+
+  $('ffSub').textContent = '今日盤後數據尚未更新';
+
+  showBanner('⏳', '今日盤後數據尚未更新',
+    '資金強度流向於每個交易日盤後約 <strong>16:30</strong> 更新，'
+    + '距離更新還有 <strong id="ffCountdown" aria-hidden="true">--:--</strong>。<br>'
+    + '到時間後畫面會自動載入，你也可以稍後自行重新整理。',
+    'pending');
+
+  showChartMessage('⏳', '今日盤後數據尚未更新，請於 16:30 後再回來查看');
+  $('rankList').innerHTML =
+    '<div class="rank-empty">今日盤後數據尚未更新，請稍候</div>';
+
+  tickPending();
+  _pendTick = setInterval(tickPending, 1000);
+}
+
+function tickPending(){
+  const s = secsToUpdate();
+  const el = $('ffCountdown');
+  if(el) el.textContent = s > 0 ? fmtHMS(s) : '資料更新中…';
+  if(s <= 0 && !_pollTimer) _pollTimer = setTimeout(load, POLL_MS);
 }
 
 /* ── 版面計算：真實座標散布圖（X＝買賣超金額、Y＝漲跌幅%，中央＝0/0）── */

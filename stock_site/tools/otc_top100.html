@@ -455,6 +455,44 @@ let indexMap = {};  // code -> {foreign, trust, proprietary} for cross-inst look
 let bsState = { foreign:'buy', trust:'buy', prop:'buy' };
 let activeSync = null;       // { type, dir } 共振模式 | null
 
+/* ── 今日盤後數據尚未更新：倒數 + 到點後輪詢 ──
+   上櫃三大法人（外資/投信/自營商）約每個交易日 16:00 一次到齊。
+   倒數只跑本地計時、不打網路；歸零後才每 90 秒輪詢一次，資料到齊即停。 */
+const UPDATE_HH = 16, UPDATE_MM = 0;
+let _pendTick = null, _pollTimer = null;
+const twNow = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+function secsToUpdate(){
+  const t = twNow(), tgt = new Date(t);
+  tgt.setHours(UPDATE_HH, UPDATE_MM, 0, 0);
+  return Math.floor((tgt - t) / 1000);
+}
+function fmtHMS(s){
+  s = Math.max(0, s);
+  const p = n => String(n).padStart(2, '0');
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return (h > 0 ? h + ':' : '') + p(m) + ':' + p(s % 60);
+}
+function clearPending(){
+  clearInterval(_pendTick); clearTimeout(_pollTimer);
+  _pendTick = _pollTimer = null;
+}
+function tickPending(){
+  const s = secsToUpdate();
+  const el = document.getElementById('rbCountdown');
+  if (el) el.textContent = s > 0 ? fmtHMS(s) : '資料更新中…';
+  if (s <= 0 && !_pollTimer) _pollTimer = setTimeout(() => loadData(), 90000);
+}
+
+/* ── meta 列日期一律「日期：YYYY-MM-DD」（跨頁一致）── */
+function todayYmd(){
+  const t = twNow();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function setMetaDate(txt){
+  const el = document.getElementById('dataDate');
+  if (el) el.textContent = '日期：' + txt;
+}
+
 /* ── 交易日判斷：問後端 /api/trading_status（含國定假日，非單純看星期）── */
 async function checkTradingStatus(){
   try {
@@ -473,6 +511,7 @@ async function checkTradingStatus(){
 
 /* ── 顯示休市狀態：鎖面板、清空表格、不打 /api/otc_top100 ── */
 function showClosedState(nextTradingDay){
+  clearPending();
   const dow = new Date().getDay();
   const dayNames = ['日','一','二','三','四','五','六'];
   let nextStr = '—';
@@ -481,7 +520,7 @@ function showClosedState(nextTradingDay){
     nextStr = `${next.getMonth()+1}/${next.getDate()} (週${dayNames[next.getDay()]})`;
   }
 
-  document.getElementById('dataDate').textContent = `資料日期：${getTodayStr()}`;
+  setMetaDate('今日休市');
 
   const banner = document.getElementById('readinessBanner');
   const panel  = document.querySelector('.ctrl-panel');
@@ -510,6 +549,7 @@ function showClosedState(nextTradingDay){
 
 /* ── Load Data ── */
 async function loadData(){
+  clearPending();
   setStatus('load','正在載入上櫃法人資料…');
 
   // 先問後端是否為交易日（含國定假日）→ 休市就不打 /api/otc_top100
@@ -536,13 +576,12 @@ async function loadData(){
 /* ── Data Readiness Check ── */
 function checkDataReadiness(data){
   const today = getTodayStr();
-  document.getElementById('dataDate').textContent = `資料日期：${today}`;
 
   // Check each institution: has data AND it has at least 1 row
   const insts = [
-    { key:'foreign',     label:'外資',   updateTime:'16:15' },
-    { key:'trust',       label:'投信',   updateTime:'15:30' },
-    { key:'proprietary', label:'自營商', updateTime:'16:15' },
+    { key:'foreign',     label:'外資',   updateTime:'16:00' },
+    { key:'trust',       label:'投信',   updateTime:'16:00' },
+    { key:'proprietary', label:'自營商', updateTime:'16:00' },
   ];
 
   // We check by whether buy+sell arrays are non-empty
@@ -564,7 +603,9 @@ function checkDataReadiness(data){
   const panel  = document.querySelector('.ctrl-panel');
 
   if (allReady){
-    // All data present — show brief success banner then hide
+    // 資料到齊 — 顯示短暫「已就緒」後隱藏，停止倒數/輪詢
+    clearPending();
+    setMetaDate(todayYmd());
     banner.className = 'readiness-banner ready';
     banner.innerHTML = `
       <div class="rb-icon">✅</div>
@@ -576,8 +617,9 @@ function checkDataReadiness(data){
     panel.classList.remove('data-locked');
     setTimeout(() => { banner.style.display = 'none'; }, 4000);
   } else {
-    // Not all ready — lock UI and show which are missing
+    // 今日盤後數據尚未更新 — 鎖住面板、顯示倒數，並列出各法人狀態
     panel.classList.add('data-locked');
+    setMetaDate('今日尚未更新');
     const rows = instStatus.map(s => `
       <div class="rb-row">
         <div class="rb-dot ${s.ready ? 'ok' : 'wait'}"></div>
@@ -588,13 +630,14 @@ function checkDataReadiness(data){
     banner.innerHTML = `
       <div class="rb-icon">⏳</div>
       <div class="rb-body">
-        <div class="rb-title">今日盤後數據尚未完全就緒</div>
-        <div class="rb-desc">待三大法人資料全部更新後自動解鎖，目前顯示的是最近一次的完整數據</div>
+        <div class="rb-title">今日盤後數據尚未更新</div>
+        <div class="rb-desc">上櫃三大法人買賣超於每個交易日盤後約 <strong>16:00</strong> 更新，距離更新還有 <strong id="rbCountdown" aria-hidden="true">--:--</strong>。<br>到時間後畫面會自動載入，你也可以稍後自行重新整理。</div>
         <div class="rb-rows">${rows}</div>
       </div>`;
     banner.style.display = 'flex';
-    // Poll every 90 seconds to re-check
-    setTimeout(() => loadData(), 90000);
+    clearInterval(_pendTick);
+    tickPending();
+    _pendTick = setInterval(tickPending, 1000);
   }
 }
 

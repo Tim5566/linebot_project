@@ -246,30 +246,49 @@ function formatCountdown(secs) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
-let _countdownTimer = null;
+// ── 資料日期一律顯示「日期：YYYY-MM-DD」（跨頁一致）──
+function fmtDate(s) {
+  let d = String(s || '').replace(/\D/g, '');
+  if (d.length === 7) d = (parseInt(d.slice(0,3), 10) + 1911) + d.slice(3);  // 民國 → 西元
+  return d.length === 8 ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : String(s || '—');
+}
+function todayYmd() {
+  const t = getTWTime();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function setMetaDate(txt) {
+  const el = document.getElementById('metaDate');
+  if (el) el.textContent = '日期：' + txt;
+}
+
+let _countdownTimer = null, _pollTimer = null;
+function clearPending() {
+  clearInterval(_countdownTimer); clearTimeout(_pollTimer);
+  _countdownTimer = _pollTimer = null;
+}
 
 function showPendingState() {
-  clearInterval(_countdownTimer);
+  clearPending();
   document.getElementById('disposalContent').innerHTML = `
     <div class="state-wrap">
       <div class="state-icon">⏳</div>
-      <div class="state-title">等待今日資料更新</div>
+      <div class="state-title">今日盤後數據尚未更新</div>
       <div class="state-sub">
-        每日盤後資料更新時間：<strong style="color:var(--accent)">上市約 17:45</strong> ／ <strong style="color:var(--orange)">上櫃約 18:00</strong><br>
-        距離更新時間還有
+        處置股資料於每個交易日盤後約 <strong style="color:var(--accent)">17:45</strong> 更新（上櫃約 18:00），距離更新還有
       </div>
-      <div class="state-timer" id="pendingCountdown">--:--</div>
-      <div class="state-sub" style="margin-top:4px;font-size:.62rem">
-        目前顯示的為前一個交易日資料，或尚無資料
+      <div class="state-timer" id="pendingCountdown" aria-hidden="true">--:--</div>
+      <div class="state-sub" style="margin-top:4px">
+        到時間後畫面會自動載入，你也可以稍後自行重新整理。
       </div>
     </div>`;
   document.getElementById('disposalCount').textContent = '--';
+  setMetaDate('今日尚未更新');
 
   function tick() {
     const secs = secsTo1730();
     const el = document.getElementById('pendingCountdown');
-    if (el) el.textContent = formatCountdown(secs);
-    if (secs <= 0) { clearInterval(_countdownTimer); setTimeout(loadDisposal, 2000); }
+    if (el) el.textContent = secs > 0 ? formatCountdown(secs) : '資料更新中…';
+    if (secs <= 0 && !_pollTimer) _pollTimer = setTimeout(loadDisposal, 90000);
   }
   tick();
   _countdownTimer = setInterval(tick, 1000);
@@ -296,9 +315,10 @@ function showClosedState(nextTradingDay) {
       </div>
     </div>`;
   document.getElementById('disposalCount').textContent = '0';
+  setMetaDate('今日休市');
 }
 
-function showEmptyState() {
+function showEmptyState(date) {
   document.getElementById('disposalContent').innerHTML = `
     <div class="state-wrap">
       <div class="state-icon">✅</div>
@@ -306,6 +326,7 @@ function showEmptyState() {
       <div class="state-sub">今日盤後尚無處置股公告，或資料尚未更新完成</div>
     </div>`;
   document.getElementById('disposalCount').textContent = '0';
+  setMetaDate(fmtDate(date || todayYmd()));
 }
 
 // ── 篩選狀態 ─────────────────────────────────────────────────────────────────
@@ -328,7 +349,7 @@ function setDisposalFilter(filter) {
 }
 
 function renderDisposal(items, date) {
-  if (!items || items.length === 0) { showEmptyState(); return; }
+  if (!items || items.length === 0) { showEmptyState(date); return; }
 
   _disposalFilter = 'all';
 
@@ -373,9 +394,8 @@ function renderDisposal(items, date) {
   document.getElementById('disposalContent').innerHTML = `<div class="disposal-list">${html}</div>`;
 
   // 更新日期與筆數
-  const dateEl  = document.getElementById('metaDate');
   const splitEl = document.getElementById('metaSplit');
-  if (dateEl) dateEl.textContent = `日期：${date || getTWTime().toLocaleDateString('zh-TW')}`;
+  setMetaDate(fmtDate(date || todayYmd()));
   if (splitEl) splitEl.textContent = `上市 ${twseN} ／ 上櫃 ${otcN}　`;
 
   // 更新 tab 數字
@@ -392,7 +412,7 @@ function renderDisposal(items, date) {
 }
 
 async function loadDisposal() {
-  clearInterval(_countdownTimer);
+  clearPending();
 
   // 休市判斷（含國定假日，問後端 get_trading_holidays）→ 休市就不打 /api/disposal
   const { isTrading, nextTradingDay } = await checkTradingStatus();

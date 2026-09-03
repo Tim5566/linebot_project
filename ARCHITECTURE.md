@@ -159,7 +159,7 @@ def serve_stock_assets(filename):
 |---|---|
 | `/api/top100` | 上市法人買賣超前 100（讀 `top100_cache`） |
 | `/api/otc_top100` | 上櫃法人買賣超前 100 |
-| `/api/fund_flow?market=twse\|otc` | 資金強度流向前20（`fund_flow.html` 用）。讀 `stock_data/{date}/{market}`（法人股數）＋ `stock_data/{date}/price_all/{market}`（收盤價，缺就現場補抓一次）→ `calc_fund_flow()` 算散布圖＋排行 → 快取 `fundflow_cache/{date}/{market}`。16:30 前顯示前一交易日；`?preview=1` 略過限制 |
+| `/api/fund_flow?market=twse\|otc` | 資金強度流向前20（`fund_flow.html` 用）。讀 `stock_data/{date}/{market}`（法人股數）＋ `stock_data/{date}/price_all/{market}`（收盤價，缺就現場補抓一次）→ `calc_fund_flow()` 算散布圖＋排行 → 快取 `fundflow_cache/{date}/{market}`。回傳 `is_today` / `is_trading_day` / `trade_date` 供前端判斷。交易日 16:30 前後端仍回傳前一交易日資料且 `is_today=false`，**但前端改為顯示「今日盤後數據尚未更新」＋倒數、鎖住市場切換、不再顯示前一交易日內容**（見 §6.2 統一等待狀態）；休市日才照常顯示最近交易日資料。`?preview=1` 略過 16:30 限制 |
 | `/api/stock` | 查詢單一個股資料 |
 | `/api/stock_name` | 股票代碼查名稱 |
 | `/api/news` | 重大訊息 |
@@ -306,15 +306,27 @@ Google 帳號登入、大盤即時數據、設定彈窗（僅保留管理員維�
 - **twse_top100.html / otc_top100.html**：法人買賣超排行榜，支援外資/投信/自營商切換，
   以及「共振篩選」（找出多個法人同步買超/賣超的股票），資料來源是 `/api/top100` 或
   `/api/otc_top100`
-- **ma_finder.html**：均線雷達，核心運算在後端 `/api/wave_data`
+- **ma_finder.html**：均線雷達，核心運算在後端 `/api/wave_data`（吃歷史股價，任何時段都可用，無等待狀態）
 - **fund_flow.html**：資金強度流向前20。前端 canvas 手繪散布圖（X＝法人買賣超金額、Y＝當日漲跌幅%，
   買賣兩側各自比例尺；氣泡大小＝金額、明顯度＝漲跌幅）＋資金強度流入/流出雙向排行。資料來源 `/api/fund_flow`。
   漲跌幅顯示到小數點第 2 位、漲紅跌綠平盤白。**收盤價來源用證交所 MI_INDEX（openapi 的 STOCK_DAY_ALL 常延遲更新，不用）。**
 
+#### 6.2.1 統一的「今日盤後數據尚未更新」等待狀態（跨 5 個工具）
+
+`twse_top100` / `otc_top100` / `fund_flow` / `news/notice` / `news/disposal` 這 5 個工具，在**交易日、當日盤後資料尚未到齊**時共用同一套處理（各頁 inline JS，非共用模組）：
+
+- **前置**：先問 `/api/trading_status`（fund_flow 由後端回 `is_trading_day`）。**週末/國定假日直接顯示休市狀態、不進等待流程、不輪詢。**
+- **文案統一**：標題一律「今日盤後數據尚未更新」，內文「{資料名稱}於每個交易日盤後約 **HH:MM** 更新，距離更新還有 `HH:MM:SS`。到時間後畫面會自動載入，你也可以稍後自行重新整理。」不再顯示前一交易日資料。
+- **倒數**：`secsToUpdate()` / `secsTo1745()` 每秒跑本地計時（`aria-hidden`，不觸發 aria-live 播報），不打網路。
+- **到點後輪詢**：倒數歸零才每 90 秒重打一次 API（`_pollTimer` 單一化、不疊加）；資料到齊即渲染並 `clearPending()` 停掉所有計時器。
+- **各工具目標時間**：上市 top100＝16:15、上櫃 top100＝16:00、fund_flow＝16:30、注意股/處置股＝17:45。
+- top100 兩支仍保留「外資/投信/自營商」逐項狀態小清單（上櫃三支時間已統一為 16:00）。
+- **日期標籤統一**：4 支工具（twse_top100 / otc_top100 / notice / disposal）meta 列一律由各頁的 `setMetaDate()` 顯示「**日期：YYYY-MM-DD**」——有資料＝資料交易日、等待中＝「今日尚未更新」、休市＝「今日休市」。notice / disposal 另有 `fmtDate()` 把 API 回傳的 `YYYYMMDD` / `YYYY/MM/DD` / 民國年正規化。（先前 twse/otc 顯示「資料日期：YYYY/MM/DD」且固定為今日、notice 的 `setStatus()` 會把 meta 覆寫成當下時鐘時間，都已修掉。）
+
 ### 6.3 公告類（`stock_site/news/`）
-- **news.html**：重大訊息（`/api/news`）
-- **notice.html**：注意股查詢（`/api/notice`）
-- **disposal.html**：處置股查詢（`/api/disposal`）
+- **news.html**：重大訊息（`/api/news`）。整天即時更新，每 20 分鐘自動刷新，無「等待盤後」狀態。
+- **notice.html**：注意股查詢（`/api/notice`）。盤後約 17:45 更新，未就緒時走 §6.2.1 統一等待狀態。
+- **disposal.html**：處置股查詢（`/api/disposal`）。上市約 17:45、上櫃約 18:00 更新，未就緒時走 §6.2.1 統一等待狀態（倒數以 17:45 為準）。
 
 ### 6.4 教學文章（`stock_site/features/` + `stock_site/chips/`）
 20 篇原創教學（技術分析 10 篇 + 籌碼分析 10 篇），特色：
