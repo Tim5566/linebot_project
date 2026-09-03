@@ -181,14 +181,6 @@ def register_api(app):
     def serve_images(filename):
         return send_from_directory('images', filename)
 
-    @app.route("/music/<path:filename>")
-    def serve_music(filename):
-        return send_from_directory('music', filename)
-
-    @app.route("/fonts/<path:filename>")
-    def serve_fonts(filename):
-        return send_from_directory('fonts', filename)
-
     @app.route("/stock_site/assets/<path:filename>")
     def serve_stock_assets(filename):
         return send_from_directory('stock_site/assets', filename)
@@ -558,16 +550,21 @@ def register_api(app):
                 key = (sid, start)
                 if key in seen_twse: continue
                 seen_twse.add(key)
+                # 備註欄含官方「處置原因」連結（近一個月注意交易資訊）
+                remark = s(row[9]) if len(row) > 9 else ""
+                m = _re.search(r"href=['\"](notice\.html\?[^'\"]+)['\"]", remark)
+                reason_url = "https://www.twse.com.tw/zh/announcement/" + m.group(1) if m else ""
                 results.append({
-                    "code":      sid,
-                    "name":      s(row[3]),
-                    "market":    "上市",
-                    "pub_date":  s(row[1]),
-                    "count":     s(row[4]),
-                    "condition": s(row[5]),
-                    "start":     start,
-                    "end":       end,
-                    "measure":   s(row[7]),
+                    "code":       sid,
+                    "name":       s(row[3]),
+                    "market":     "上市",
+                    "pub_date":   s(row[1]),
+                    "count":      s(row[4]),
+                    "condition":  s(row[5]),
+                    "start":      start,
+                    "end":        end,
+                    "measure":    s(row[7]),
+                    "reason_url": reason_url,
                 })
         except Exception as e:
             print(f"[api/disposal] TWSE 失敗: {e}")
@@ -586,6 +583,8 @@ def register_api(app):
                     sid = s(row[2])
                     if not sid: continue
                     name = _re.sub(r'\([^)]*\)', '', s(row[3])).strip()
+                    # 處置原因文字尾巴常帶櫃買頁面攤平的相對連結 (./attention.html)，清掉
+                    condition = _re.sub(r"\(\.?/?attention\.html[^)]*\)", "", s(row[6])).strip()
                     period_raw = s(row[5])
                     parts = period_raw.replace('～', '~').split('~')
                     start = parts[0].strip() if parts else ""
@@ -593,16 +592,21 @@ def register_api(app):
                     key = (sid, start)
                     if key in seen_otc: continue
                     seen_otc.add(key)
+                    # 連結欄含官方「公布注意情形」查詢連結，取其 query 接到正式處置原因頁
+                    link_raw = s(row[10]) if len(row) > 10 else ""
+                    m = _re.search(r"\(\./attention\.html(\?[^)]+)\)", link_raw)
+                    reason_url = "https://www.tpex.org.tw/zh-tw/announce/market/attention.html" + m.group(1) if m else ""
                     results.append({
-                        "code":      sid,
-                        "name":      name,
-                        "market":    "上櫃",
-                        "pub_date":  s(row[1]),
-                        "count":     s(row[4]),
-                        "condition": s(row[6]),
-                        "start":     start,
-                        "end":       end,
-                        "measure":   "",
+                        "code":       sid,
+                        "name":       name,
+                        "market":     "上櫃",
+                        "pub_date":   s(row[1]),
+                        "count":      s(row[4]),
+                        "condition":  condition,
+                        "start":      start,
+                        "end":        end,
+                        "measure":    "",
+                        "reason_url": reason_url,
                     })
         except Exception as e:
             print(f"[api/disposal] OTC 失敗: {e}")

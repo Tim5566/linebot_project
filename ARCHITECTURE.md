@@ -56,7 +56,8 @@
 ├── robots.txt                  # 爬蟲規則，指向 sitemap.xml
 ├── sitemap.xml                 # 30 個頁面的 SEO sitemap
 ├── tools.py                    # 小工具（民國年轉換等）
-├── music/                      # 靜態音樂檔（網站音效用）
+├── docs/                       # 專案文件（非上線內容，未接路由）
+│   └── jellystock-runtime-architecture.html  # 執行動態架構圖（archify 產出的獨立 HTML，可切深/淺色、匯出 PNG/SVG）
 └── stock_site/                 # 【前端頁面】依功能分資料夾
     ├── assets/
     │   └── site.css           # 【全站共用樣式】設計 token + 共用元件，改風格改這一處
@@ -145,7 +146,7 @@ def twse_top100_page():
 共涵蓋：首頁、20 篇教學文、4 個工具頁、3 個公告頁、3 個法律頁 = 31 頁，跟 `sitemap.xml` 完全對應。
 （`sitemap.xml` 由 `api_routes.py` 的 `_SITEMAP_PAGES` + `/sitemap.xml` 路由「動態產生」，根目錄的靜態 `sitemap.xml` 檔已無效、未被送出。）
 
-另有靜態資源路由（仿 `/images`、`/music`、`/fonts` 寫法，純檔案服務）：
+另有靜態資源路由（`/images/<filename>`，純檔案服務，目前只服務 logo `jelly.png`）：
 ```python
 @app.route("/stock_site/assets/<path:filename>")
 def serve_stock_assets(filename):
@@ -164,7 +165,7 @@ def serve_stock_assets(filename):
 | `/api/stock_name` | 股票代碼查名稱 |
 | `/api/news` | 重大訊息 |
 | `/api/notice` | 注意股清單 |
-| `/api/disposal` | 處置股清單 |
+| `/api/disposal` | 處置股清單。每筆含 `reason_url`：官方「處置原因」查詢連結，上市從 TWSE `punish` JSON 的備註欄抓 `notice.html?querytype=2&...&stockNo=`、上櫃從 TPEx `disposal` JSON 的連結欄抓 query 接到 `https://www.tpex.org.tw/zh-tw/announce/market/attention.html?code=...`；抓不到留空字串。上櫃 `condition` 會清掉櫃買頁面攤平出來的 `(./attention.html)` 尾巴 |
 | `/api/market` | 大盤總覽數據 |
 | `/api/wave_data` | 均線雷達運算邏輯（最大宗，`ma_finder.html` 用） |
 | `/api/trading_status` | 今天是否為交易日 |
@@ -326,7 +327,7 @@ Google 帳號登入、大盤即時數據、設定彈窗（僅保留管理員維�
 ### 6.3 公告類（`stock_site/news/`）
 - **news.html**：重大訊息（`/api/news`）。整天即時更新，每 20 分鐘自動刷新，無「等待盤後」狀態。
 - **notice.html**：注意股查詢（`/api/notice`）。盤後約 17:45 更新，未就緒時走 §6.2.1 統一等待狀態。
-- **disposal.html**：處置股查詢（`/api/disposal`）。上市約 17:45、上櫃約 18:00 更新，未就緒時走 §6.2.1 統一等待狀態（倒數以 17:45 為準）。
+- **disposal.html**：處置股查詢（`/api/disposal`）。上市約 17:45、上櫃約 18:00 更新，未就緒時走 §6.2.1 統一等待狀態（倒數以 17:45 為準）。每檔處置條件後方有 `［處置原因］` 外連（`item.reason_url`，新分頁開啟，連到 TWSE / TPEx 官方近一個月注意交易資訊查詢頁）；`reason_url` 為空則不顯示。
 
 ### 6.4 教學文章（`stock_site/features/` + `stock_site/chips/`）
 20 篇原創教學（技術分析 10 篇 + 籌碼分析 10 篇），特色：

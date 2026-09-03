@@ -119,6 +119,12 @@
     .disposal-meta-item { font-family: var(--font-mono); font-size: .66rem; color: var(--ink-faint); letter-spacing: .02em; }
     .disposal-meta-item.highlight { color: var(--orange); }
     .disposal-condition { font-size: .82rem; color: var(--ink-body); line-height: 1.65; }
+    .disposal-reason-link {
+      display: inline-block; white-space: nowrap;
+      font-family: var(--font-mono); font-size: .72rem; font-weight: 700;
+      color: var(--accent); text-decoration: none; letter-spacing: .02em;
+    }
+    .disposal-reason-link:hover { text-decoration: underline; }
 
     @media (max-width: 600px) {
       .disposal-card-left { width: 64px; padding: 12px 6px; }
@@ -363,6 +369,7 @@ function renderDisposal(items, date) {
     const pub_date  = (item.pub_date  || '').trim();
     const count     = (item.count     || '').trim();
     const condition = (item.condition || '').trim();
+    const reasonUrl = (item.reason_url || '').trim();
     const start     = (item.start     || '').trim();
     const end       = (item.end       || '').trim();
     const measure   = (item.measure   || '').trim();
@@ -386,7 +393,7 @@ function renderDisposal(items, date) {
             ${pub_date ? `<span class="disposal-meta-item">📅 公布：${pub_date}</span>` : ''}
             ${count    ? `<span class="disposal-meta-item highlight">🔢 累計 ${count} 次</span>` : ''}
           </div>
-          ${condition ? `<div class="disposal-condition">${condition}</div>` : ''}
+          ${condition ? `<div class="disposal-condition">${condition}${reasonUrl ? ` <a class="disposal-reason-link" href="${reasonUrl}" target="_blank" rel="noopener noreferrer">［處置原因］</a>` : ''}</div>` : ''}
         </div>
       </div>`;
   }).join('');
