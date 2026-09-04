@@ -51,10 +51,11 @@
 ├── post_Info.py                # 【核心】組裝查詢結果文字（給 LINE Bot 回覆 & 網頁用）
 ├── Procfile                    # Render 部署啟動指令（gunicorn）
 ├── push_service.py             # 【核心】排程廣播邏輯（幾點該做什麼、該推播什麼）
+├── sector_flow.py              # 【核心】類股資金流向：產業別對照同步 + 每日類股法人資金流向計算（熱力圖工具用）
 ├── README.md
 ├── requirements.txt
-├── robots.txt                  # 爬蟲規則，指向 sitemap.xml
-├── sitemap.xml                 # 30 個頁面的 SEO sitemap
+├── robots.txt                  # 爬蟲規則，指向 sitemap.xml（由 api_routes.py 的 /robots.txt 路由送出）
+├── sitemap.xml                 # SEO sitemap（實際由 api_routes.py 的 _SITEMAP_PAGES 動態產生，目前 32 頁；根目錄這支靜態檔已無效）
 ├── tools.py                    # 小工具（民國年轉換等）
 ├── docs/                       # 專案文件（非上線內容，未接路由）
 │   └── jellystock-runtime-architecture.html  # 執行動態架構圖（archify 產出的獨立 HTML，可切深/淺色、匯出 PNG/SVG）
@@ -65,7 +66,8 @@
     │   ├── twse_top100.html    # 上市法人買賣超前100
     │   ├── otc_top100.html     # 上櫃法人買賣超前100
     │   ├── ma_finder.html      # 均線雷達
-    │   └── fund_flow.html      # 資金強度流向前20（法人買賣超金額 × 當日漲跌幅 散布圖＋排行）
+    │   ├── fund_flow.html      # 個股資金流向強度前20（法人買賣超金額 × 當日漲跌幅 散布圖＋排行）
+    │   └── sector_heatmap.html # 類股資金流向熱力圖（上市＋上櫃整合，法人淨買超金額按產業別加總＋連續流入/流出天數）
     ├── news/                   # 公告/警示類頁面
     │   ├── news.html           # 重大訊息
     │   ├── notice.html         # 注意股查詢
@@ -143,7 +145,7 @@
 def twse_top100_page():
     return send_from_directory(...)
 ```
-共涵蓋：首頁、20 篇教學文、4 個工具頁、3 個公告頁、3 個法律頁 = 31 頁，跟 `sitemap.xml` 完全對應。
+共涵蓋：首頁、20 篇教學文、5 個工具頁、3 個公告頁、3 個法律頁 = 32 頁，跟 `sitemap.xml` 完全對應。
 （`sitemap.xml` 由 `api_routes.py` 的 `_SITEMAP_PAGES` + `/sitemap.xml` 路由「動態產生」，根目錄的靜態 `sitemap.xml` 檔已無效、未被送出。）
 
 另有靜態資源路由（`/images/<filename>`，純檔案服務，目前只服務 logo `jelly.png`）：
@@ -160,7 +162,8 @@ def serve_stock_assets(filename):
 |---|---|
 | `/api/top100` | 上市法人買賣超前 100（讀 `top100_cache`） |
 | `/api/otc_top100` | 上櫃法人買賣超前 100 |
-| `/api/fund_flow?market=twse\|otc` | 資金強度流向前20（`fund_flow.html` 用）。讀 `stock_data/{date}/{market}`（法人股數）＋ `stock_data/{date}/price_all/{market}`（收盤價，缺就現場補抓一次）→ `calc_fund_flow()` 算散布圖＋排行 → 快取 `fundflow_cache/{date}/{market}`。回傳 `is_today` / `is_trading_day` / `trade_date` 供前端判斷。交易日 16:30 前後端仍回傳前一交易日資料且 `is_today=false`，**但前端改為顯示「今日盤後數據尚未更新」＋倒數、鎖住市場切換、不再顯示前一交易日內容**（見 §6.2 統一等待狀態）；休市日才照常顯示最近交易日資料。`?preview=1` 略過 16:30 限制 |
+| `/api/fund_flow?market=twse\|otc` | 個股資金流向強度前20（`fund_flow.html` 用）。讀 `stock_data/{date}/{market}`（法人股數）＋ `stock_data/{date}/price_all/{market}`（收盤價，缺就現場補抓一次）→ `calc_fund_flow()` 算散布圖＋排行 → 快取 `fundflow_cache/{date}/{market}`。回傳 `is_today` / `is_trading_day` / `trade_date` 供前端判斷。交易日 16:30 前後端仍回傳前一交易日資料且 `is_today=false`，**但前端改為顯示「今日盤後數據尚未更新」＋倒數、鎖住市場切換、不再顯示前一交易日內容**（見 §6.2 統一等待狀態）；休市日才照常顯示最近交易日資料。`?preview=1` 略過 16:30 限制 |
+| `/api/sector_heatmap` | 類股資金流向熱力圖（`sector_heatmap.html` 用）。讀 `sector_flow_history` 最近 3 個交易日快照 → 算每個類股當日資金占比＋連續流入/流出天數。交易日 18:00 前回 `status:"waiting"`；今日快照未產生時 `sector_flow.build_heatmap_payload()` 會現場補算並寫入。`?preview=1` 略過 18:00 關卡 |
 | `/api/stock` | 查詢單一個股資料 |
 | `/api/stock_name` | 股票代碼查名稱 |
 | `/api/news` | 重大訊息 |
@@ -191,7 +194,7 @@ def serve_stock_assets(filename):
 | `sync_all(label=N)` | **總入口**，依 `label` 決定要跑上面哪一組任務（label 對應表見 5.4） |
 | `_check_data_missing()` / `schedule_retry_if_missing()` | 資料檢查與補跑機制，避免官方 API 當天資料還沒更新時抓到空值 |
 | `_fetch_price_all_twse(date)` / `_fetch_price_all_otc()` / `sync_price_all()` | 抓全市場當日收盤價＋漲跌價差，寫 `stock_data/{date}/price_all/{twse\|otc}`。上市來源＝證交所 `MI_INDEX?type=ALLBUT0999&date=`（帶日期參數），上櫃＝TPEx openapi。內含資料日期比對防呆。**目前只由 `/api/fund_flow` 現場呼叫，未進 `SCHEDULE`。** |
-| `calc_fund_flow()` | 資金強度流向計算：選買超金額前20＋賣超金額前20＝40 檔，用「金額百分位＋漲跌幅百分位」算強勢分數，回傳散布圖 bubbles＋資金強度流入/流出排行 |
+| `calc_fund_flow()` | 個股資金流向強度計算：選買超金額前20＋賣超金額前20＝40 檔，用「金額百分位＋漲跌幅百分位」算強勢分數，回傳散布圖 bubbles＋資金流入/流出強度排行 |
 | `_cleanup_old_fundflow_cache()` | 清 `fundflow_cache` 舊日期（比照 `_cleanup_old_top100_cache`；`price_all` 因是 `stock_data/{date}` 子節點，由 `cleanup_old_stock_data()` 連帶清除） |
 
 Firebase 資料庫路徑結構（Realtime DB，非 Firestore）：
@@ -200,12 +203,16 @@ stock_data/{YYYY-MM-DD}/twse           # 當天 TWSE 法人資料
 stock_data/{YYYY-MM-DD}/otc            # 當天 OTC 法人資料
 stock_data/{YYYY-MM-DD}/market         # 當天大盤總覽
 stock_data/{YYYY-MM-DD}/meta           # 當天同步狀態 metadata（成功/失敗/時間戳）
-stock_data/{YYYY-MM-DD}/price_all/twse # 當天上市全市場收盤價＋漲跌價差 {代碼:{c,d}}（資金強度流向用）
+stock_data/{YYYY-MM-DD}/price_all/twse # 當天上市全市場收盤價＋漲跌價差 {代碼:{c,d}}（個股資金流向強度用）
 stock_data/{YYYY-MM-DD}/price_all/otc  # 當天上櫃全市場收盤價＋漲跌價差
 top100_cache/{YYYY-MM-DD}/twse         # 當天 TWSE 買賣超前100快取
 top100_cache/{YYYY-MM-DD}/otc          # 當天 OTC 買賣超前100快取
-fundflow_cache/{YYYY-MM-DD}/twse       # 當天上市資金強度流向計算結果快取
-fundflow_cache/{YYYY-MM-DD}/otc        # 當天上櫃資金強度流向計算結果快取
+fundflow_cache/{YYYY-MM-DD}/twse       # 當天上市個股資金流向強度計算結果快取
+fundflow_cache/{YYYY-MM-DD}/otc        # 當天上櫃個股資金流向強度計算結果快取
+industry_map/twse/{股票代碼} = 產業代碼  # 上市公司產業別對照（MOPS 產業代碼，每 6 天內自動重抓一次）
+industry_map/otc/{股票代碼}  = 產業代碼  # 上櫃公司產業別對照（與上市同一組代碼）
+industry_map/meta                      # 產業別對照最後更新時間 + 筆數
+sector_flow_history/{YYYYMMDD}         # 該交易日類股法人資金流向快照 {trade_date, markets, total_abs, sectors:{代碼:{amt,share}}}；只保留最近 3 個交易日
 stock_list/twse/{股票代碼} = 股票名稱    # 全市場代碼對照表（上市）
 stock_list/otc/{股票代碼}  = 股票名稱    # 全市場代碼對照表（上櫃）
 stock_list/meta                        # 代碼清單最後更新時間
@@ -230,9 +237,11 @@ label=0 時發休市通知）→ 呼叫 `_call_sync_test(label)` 打自己的 `/
 （用 HTTP 自己呼叫自己，而非直接 import 呼叫 `sync_all`，這樣做的好處是可以在正式環境
 上直接用瀏覽器打這個網址手動補跑某個 label）→ 依 label 決定要不要對 LINE 使用者廣播。
 
-另外每週日 08:00 有獨立排程跑 `_sync_stock_list_weekly()`。
+另外有兩支**獨立背景排程**（不在 `SCHEDULE` 清單、不廣播）：
+- 每週日 08:00 `_sync_stock_list_weekly()`（更新代碼清單）
+- 每週一~週五 18:10 `_sync_sector_flow_daily()`（計算當日「類股法人資金流向」快照，寫入 `sector_flow_history`，供類股資金流向熱力圖工具算連續流入/流出天數。內部再用 `is_trading_day()` 濾掉國定假日，並先 `sector_flow._ensure_industry_map()` 確保產業別對照表未過期）
 
-> ⚠️ **資金強度流向（fund_flow）尚未進 `SCHEDULE`**：`sync_price_all()` 目前只由 `/api/fund_flow`
+> ⚠️ **個股資金流向強度（fund_flow）尚未進 `SCHEDULE`**：`sync_price_all()` 目前只由 `/api/fund_flow`
 > 在快取未命中時「現場補抓一次」。因此每個交易日第一個開該頁的訪客會觸發一次即時抓取（約 1～2 秒），
 > 之後走 `fundflow_cache`。之後若要讓它準時預先算好，可在 `sync_all()` 的 `label==3`（16:15）尾端
 > 加呼叫，不需動 `SCHEDULE` 時間表。
@@ -260,6 +269,20 @@ TWSE，冷卻時間 1 小時），避免每次查詢都重打外部 API。`is_tr
 單純工具函式，目前只有 `to_minguo()`（西元轉民國年），供其他檔案需要處理台灣官方
 API 常用的民國年格式時使用。
 
+### 5.8 `sector_flow.py`（類股資金流向熱力圖引擎）
+上市＋上櫃**整合**的類股法人資金流向計算，供 `/api/sector_heatmap` 與 18:10 每日排程共用。
+
+| 函式 | 功能 |
+|---|---|
+| `_sync_industry_map()` | 抓 TWSE `openapi t187ap03_L`（`產業別`）+ TPEx `openapi mopsfin_t187ap03_O`（`SecuritiesIndustryCode`）→ 寫 `industry_map/{twse\|otc}`。兩邊都是 MOPS 同一組產業代碼 |
+| `_ensure_industry_map(max_age_days=6)` | 對照表過期或不存在才重抓（每日排程開頭呼叫） |
+| `compute_sector_flow(date)` | 讀 `stock_data/{date}/{twse,otc}`（法人淨買超股數）＋ `price_all`（缺就用 `firebase_sync._fetch_price_all_*` 現場補抓）→ 每檔 `(外資+投信+自營商 淨買超股數) × 收盤價` 依產業別加總 → 回傳 `{sectors:{代碼:{amt,share}}, total_abs, markets}`。`share` 分母＝當日全部類股淨買賣超金額**絕對值總和** |
+| `sync_sector_flow(date)` | `compute_sector_flow` + 寫 `sector_flow_history/{YYYYMMDD}` + 清舊快照（只留最近 3 個交易日） |
+| `build_heatmap_payload()` | 讀 `sector_flow_history` 最近 3 個交易日 → 算每個類股當日占比、連續同方向天數（最多 3）、期間累計金額/占比 → 組出熱力圖 tiles ＋ 連續流入/流出榜（連續 ≥2 天）。今日快照未產生且當日法人資料已就緒時，現場呼叫 `sync_sector_flow(today)` 補算 |
+| `INDUSTRY_NAMES` | MOPS 產業代碼 → 中文顯示名稱（管理股票 80／TDR 91／空值 併入「其他未分類」） |
+
+**資金定義**與「個股資金流向強度前20」一致：外資＋投信＋自營商淨買超股數 × 收盤價（概算；官方「外資」為外陸資不含外資自營商）。只收 4 碼代號個股。
+
 ---
 
 ## 6. 前端頁面說明
@@ -267,7 +290,7 @@ API 常用的民國年格式時使用。
 ### 6.0 全站共用樣式 `stock_site/assets/site.css`（風格統一，改一處全站生效）
 - **唯一固定風格：機構淺色**（券商研究報告風）。不做深色、不做主題切換。
 - 第一層是 `:root` 設計 token（顏色 / 字體 / 圓角 / 間距 / 陰影）＋ `color-scheme: light`，
-  **改風格＝改這裡一處**，30 頁同步生效。字體用檔案最上方的 `@import` 載入（Noto Serif TC
+  **改風格＝改這裡一處**，全站頁面同步生效。字體用檔案最上方的 `@import` 載入（Noto Serif TC
   標題 / Noto Sans TC 內文 / JetBrains Mono 數字），各頁 `<head>` 不再各自放 Google Fonts `<link>`。
 - 第二層是共用元件：`header` / `footer` / `.btn-back` / `.doc-card` / `.data-table` /
   `.page-hero` / 各式提示框 / `.disclaimer` / 廣告容器 `.ad-*` / 維護遮罩 `.maint-overlay`。
@@ -281,7 +304,7 @@ API 常用的民國年格式時使用。
 - **歷史背景**：舊版每頁內嵌 500～8000 行 CSS、還帶一整段 `body.theme-day{}` 白天模式
   覆寫與 2～3 段主題同步 `<script>`（`jelly_global_theme` / `BroadcastChannel`）。
   已全數移除，改為單一 `site.css`。
-- **導入進度**：全 30 頁已轉換（法律 3、公告 3、工具 3、首頁、技術分析教學 10、籌碼分析教學 10）。
+- **導入進度**：全部頁面已轉換（法律 3、公告 3、工具 5、首頁、技術分析教學 10、籌碼分析教學 10）。
   教學文轉換方式：固定 `<body class="theme-day">` ＋ 全站色票統一（用色相分桶把日間主題所有
   顏色收斂成 4 個語意色：機構藍 / 綠(漲跌) / 紅(錯誤) / 琥珀(提醒)＋灰階），移除星空/藍天/雲/太陽
   背景動畫，接 site.css。AdSense `<ins>` 與 SVG 圖表「日間修色」script 保留。
@@ -308,9 +331,12 @@ Google 帳號登入、大盤即時數據、設定彈窗（僅保留管理員維�
   以及「共振篩選」（找出多個法人同步買超/賣超的股票），資料來源是 `/api/top100` 或
   `/api/otc_top100`
 - **ma_finder.html**：均線雷達，核心運算在後端 `/api/wave_data`（吃歷史股價，任何時段都可用，無等待狀態）
-- **fund_flow.html**：資金強度流向前20。前端 canvas 手繪散布圖（X＝法人買賣超金額、Y＝當日漲跌幅%，
-  買賣兩側各自比例尺；氣泡大小＝金額、明顯度＝漲跌幅）＋資金強度流入/流出雙向排行。資料來源 `/api/fund_flow`。
+- **fund_flow.html**：個股資金流向強度前20。前端 canvas 手繪散布圖（X＝法人買賣超金額、Y＝當日漲跌幅%，
+  買賣兩側各自比例尺；氣泡大小＝金額、明顯度＝漲跌幅）＋資金流入/流出強度雙向排行。資料來源 `/api/fund_flow`。
   漲跌幅顯示到小數點第 2 位、漲紅跌綠平盤白。**收盤價來源用證交所 MI_INDEX（openapi 的 STOCK_DAY_ALL 常延遲更新，不用）。**
+- **sector_heatmap.html**：類股資金流向熱力圖。上市＋上櫃整合，約 30 個類股色塊網格（依當日資金占比著色、紅=流入綠=流出），
+  每格顯示 類股名／今日淨買賣超億元／今日占比%／`連N天流入(流出)` 徽章；下方「資金連續流入」「資金連續流出」兩張榜
+  列出連續 ≥2 天同方向的類股＋期間累計金額與占比。資料來源 `/api/sector_heatmap`（每交易日 18:00 後開放）。純 HTML/CSS grid，無 canvas。
 
 #### 6.2.1 統一的「今日盤後數據尚未更新」等待狀態（跨 5 個工具）
 
@@ -321,6 +347,7 @@ Google 帳號登入、大盤即時數據、設定彈窗（僅保留管理員維�
 - **倒數**：`secsToUpdate()` / `secsTo1745()` 每秒跑本地計時（`aria-hidden`，不觸發 aria-live 播報），不打網路。
 - **到點後輪詢**：倒數歸零才每 90 秒重打一次 API（`_pollTimer` 單一化、不疊加）；資料到齊即渲染並 `clearPending()` 停掉所有計時器。
 - **各工具目標時間**：上市 top100＝16:15、上櫃 top100＝16:00、fund_flow＝16:30、注意股/處置股＝17:45。
+- **sector_heatmap** 另用一套類似但獨立的等待狀態（inline JS）：交易日 18:00 前後端回 `status:"waiting"`，前端顯示倒數到 18:00、歸零後每 90 秒輪詢，休市日直接顯示最近交易日快照。
 - top100 兩支仍保留「外資/投信/自營商」逐項狀態小清單（上櫃三支時間已統一為 16:00）。
 - **日期標籤統一**：4 支工具（twse_top100 / otc_top100 / notice / disposal）meta 列一律由各頁的 `setMetaDate()` 顯示「**日期：YYYY-MM-DD**」——有資料＝資料交易日、等待中＝「今日尚未更新」、休市＝「今日休市」。notice / disposal 另有 `fmtDate()` 把 API 回傳的 `YYYYMMDD` / `YYYY/MM/DD` / 民國年正規化。（先前 twse/otc 顯示「資料日期：YYYY/MM/DD」且固定為今日、notice 的 `setStatus()` 會把 meta 覆寫成當下時鐘時間，都已修掉。）
 

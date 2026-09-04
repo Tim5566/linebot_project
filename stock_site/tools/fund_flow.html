@@ -12,9 +12,9 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="theme-color" content="#e8ebf1" />
-  <title>資金強度流向前20｜JellyStock</title>
-  <meta name="description" content="台股三大法人買超金額前20名、賣超金額前20名個股，對照當日漲跌幅畫成散布圖，並以「金額＋漲跌幅」強勢分數排出資金強度流入／流出排行。資料來源 TWSE / TPEx 公開資訊，每個交易日 16:30 後更新。" />
-  <meta name="keywords" content="台股,資金強度,資金流向,三大法人買賣超,外資買超,投信買超,自營商,買超排行,賣超排行,盤後數據,JellyStock" />
+  <title>個股資金流向強度前20｜JellyStock</title>
+  <meta name="description" content="台股三大法人買超金額前20名、賣超金額前20名個股，對照當日漲跌幅畫成散布圖，並以「金額＋漲跌幅」強勢分數排出資金流入／流出強度排行。資料來源 TWSE / TPEx 公開資訊，每個交易日 16:30 後更新。" />
+  <meta name="keywords" content="台股,資金流向強度,資金流向,三大法人買賣超,外資買超,投信買超,自營商,買超排行,賣超排行,盤後數據,JellyStock" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://jellystockdata.com/stock_site/tools/fund_flow.html" />
   <link rel="icon" type="image/png" href="/images/jelly.png"/>
@@ -168,11 +168,11 @@
 
 <div class="app" id="main-content">
 
-  <h1 class="visually-hidden">資金強度流向前20 — 三大法人買超金額前20名與賣超金額前20名個股，對照當日漲跌幅</h1>
+  <h1 class="visually-hidden">個股資金流向強度前20 — 三大法人買超金額前20名與賣超金額前20名個股，對照當日漲跌幅</h1>
 
   <div class="ff-head">
     <div>
-      <div class="ff-title">資金強度流向前20</div>
+      <div class="ff-title">個股資金流向強度前20</div>
       <div class="ff-sub" id="ffSub">資料載入中…</div>
     </div>
     <div class="seg" id="mktSeg" role="group" aria-label="選擇市場">
@@ -189,7 +189,7 @@
     </div>
     <div class="guide-body collapsed" id="guideBody">
       <div class="guide-inner">
-        <b>「資金強度」</b>是把三大法人買賣超金額，和個股當天漲跌幅合起來看：法人大買、股價又同步大漲，代表資金<span class="g-in">進場力道強</span>；法人大賣、股價又大跌，代表資金<span class="g-out">出場力道強</span>。
+        <b>「資金流向強度」</b>是把三大法人買賣超金額，和個股當天漲跌幅合起來看：法人大買、股價又同步大漲，代表資金<span class="g-in">進場力道強</span>；法人大賣、股價又大跌，代表資金<span class="g-out">出場力道強</span>。
         <br><br>
         每個交易日 <b>16:30</b> 後，本工具挑出當天三大法人「<b>買超金額前 20 名</b>」與「<b>賣超金額前 20 名</b>」共 40 檔，畫成散布圖：
         <ul>
@@ -198,9 +198,9 @@
           <li>氣泡<b>大小</b>＝買賣超金額；氣泡<b>越鮮明</b>＝當天漲跌越劇烈（漲跌小的會比較淡，但仍看得見）。</li>
           <li><span class="g-in">右上角（紅底）</span>＝法人大買＋股價上漲；<span class="g-out">左下角（綠底）</span>＝法人大賣＋股價下跌。游標移到氣泡上可看該股金額與漲跌幅。</li>
         </ul>
-        下方排行的名次，是每檔在這 40 檔內的「買賣超金額排名＋漲跌幅排名」合計出的<b>資金強度分數</b>：
-        <span class="g-in">資金強度流入排行</span>取買超那 20 檔（分數高→低，買得多又漲得多的排前面），
-        <span class="g-out">資金強度流出排行</span>取賣超那 20 檔（分數低→高，賣得多又跌得多的排前面）。
+        下方排行的名次，是每檔在這 40 檔內的「買賣超金額排名＋漲跌幅排名」合計出的<b>資金流向強度分數</b>：
+        <span class="g-in">資金流入強度排行</span>取買超那 20 檔（分數高→低，買得多又漲得多的排前面），
+        <span class="g-out">資金流出強度排行</span>取賣超那 20 檔（分數低→高，賣得多又跌得多的排前面）。
         <br><br>
         買賣超金額＝（外資＋投信＋自營商 淨買賣股數）×當天收盤價，為概算值；資料僅涵蓋 4 碼代號的上市／上櫃個股（不含權證、ETF）。
       </div>
@@ -217,7 +217,7 @@
 
   <div class="chart-card fade-in" id="chartCard">
     <div class="chart-toolbar">
-      <span class="chart-label">▸ 資金強度散布圖</span>
+      <span class="chart-label">▸ 資金流向強度散布圖</span>
       <div class="chart-legend">
         <span class="lg-item"><span class="lg-dot buy"></span>法人買超</span>
         <span class="lg-item"><span class="lg-dot sell"></span>法人賣超</span>
@@ -235,8 +235,8 @@
 
   <div class="rank-card fade-in">
     <div class="rank-tabs" role="tablist">
-      <button class="rank-tab active" id="tabIn" role="tab" aria-selected="true" onclick="switchRankTab('in')">資金強度流入排行 前20名</button>
-      <button class="rank-tab" id="tabOut" role="tab" aria-selected="false" onclick="switchRankTab('out')">資金強度流出排行 前20名</button>
+      <button class="rank-tab active" id="tabIn" role="tab" aria-selected="true" onclick="switchRankTab('in')">資金流入強度排行 前20名</button>
+      <button class="rank-tab" id="tabOut" role="tab" aria-selected="false" onclick="switchRankTab('out')">資金流出強度排行 前20名</button>
     </div>
     <div class="rank-list" id="rankList" aria-live="polite">
       <div class="rank-empty">載入中…</div>
@@ -288,7 +288,7 @@ const state = {
 const $ = id => document.getElementById(id);
 
 /* ── 今日盤後資料未就緒：倒數 + 到點後輪詢 ──
-   資金強度流向於每個交易日 16:30 後（後端關卡）才納入當日資料。
+   個股資金流向強度於每個交易日 16:30 後（後端關卡）才納入當日資料。
    倒數只跑本地計時、不打網路；歸零後才每 90 秒輪詢一次，資料到齊即停。 */
 const UPDATE_HH = 16, UPDATE_MM = 30;
 const POLL_MS = 90000;
@@ -446,7 +446,7 @@ function showNotReady(){
   $('ffSub').textContent = '今日盤後數據尚未更新';
 
   showBanner('⏳', '今日盤後數據尚未更新',
-    '資金強度流向於每個交易日盤後約 <strong>16:30</strong> 更新，'
+    '個股資金流向強度於每個交易日盤後約 <strong>16:30</strong> 更新，'
     + '距離更新還有 <strong id="ffCountdown" aria-hidden="true">--:--</strong>。<br>'
     + '到時間後畫面會自動載入，你也可以稍後自行重新整理。',
     'pending');
@@ -689,7 +689,7 @@ function bindChartInteraction(){
     if(i < 0){ tip.style.display = 'none'; return; }
     const s = L.box[i];
     const dir = s.b.amt >= 0 ? 'buy' : 'sell';
-    const grpTxt = s.b.grp === 'in' ? '資金強度流入' : '資金強度流出';
+    const grpTxt = s.b.grp === 'in' ? '資金流入強度' : '資金流出強度';
     tip.innerHTML =
       `<div class="tt-name">${grpTxt} #${s.b.grank}　${s.b.name} <span style="opacity:.7">${s.b.id}</span></div>` +
       `<div class="tt-${dir}">法人${s.b.amt >= 0 ? '買超' : '賣超'} ${fmtAmt(s.b.amt)} 億</div>` +

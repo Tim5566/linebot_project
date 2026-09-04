@@ -66,6 +66,30 @@ def _sync_stock_list_weekly():
         print(f"[stock_list_weekly] 失敗: {e}")
 
 
+# ── 類股資金流向快照每日同步（不廣播，背景執行）─────────────────────────────
+def _sync_sector_flow_daily():
+    """
+    交易日 18:10：計算當日「類股法人資金流向」快照，寫入 sector_flow_history。
+    給「類股資金流向熱力圖」工具算連續流入/流出天數用（只保留最近 3 個交易日）。
+    直接 import 執行（與 Flask 同一個 process），不透過 HTTP。
+    """
+    try:
+        trading = is_trading_day()
+    except Exception as e:
+        print(f"[sector_flow_daily] 交易日判斷失敗，預設執行: {e}")
+        trading = True
+    if not trading:
+        print("[sector_flow_daily] 今日非交易日，略過")
+        return
+    try:
+        import sector_flow
+        sector_flow._ensure_industry_map()
+        sector_flow.sync_sector_flow()
+        print("[sector_flow_daily] 完成 ✅")
+    except Exception as e:
+        print(f"[sector_flow_daily] 執行失敗: {e}")
+
+
 # ── 今日盤後更新時間表（15:00 廣播）─────────────────────────────────────────
 SCHEDULE_MESSAGE = """📋 今日盤後更新時間表
 ─────────────────
@@ -168,6 +192,17 @@ def start_scheduler(line_bot_api):
         'cron',
         day_of_week='sun',
         hour=8, minute=0,
+        timezone=taiwan,
+    )
+
+    # ── 每交易日 18:10 類股資金流向快照（熱力圖工具用）──────────────────────
+    # 週一~週五觸發，內部再用 is_trading_day() 濾掉國定假日。
+    # 不進 SCHEDULE 清單，是獨立背景 job（比照上面的每週代碼清單同步）。
+    scheduler.add_job(
+        _sync_sector_flow_daily,
+        'cron',
+        day_of_week='mon-fri',
+        hour=18, minute=10,
         timezone=taiwan,
     )
 

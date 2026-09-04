@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GS848460QV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GS848460QV');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#e8ebf1" />
+  <title>類股資金流向熱力圖｜JellyStock</title>
+  <meta name="description" content="台股上市＋上櫃整合的類股法人資金流向熱力圖：以三大法人（外資＋投信＋自營商）淨買超金額按產業別加總，呈現當日各類股資金流入／流出強度，並列出連續三天資金流入或流出的類股。資料來源 TWSE / TPEx 公開資訊，每個交易日 18:00 後更新。" />
+  <meta name="keywords" content="台股,類股,產業類股,資金流向,資金流入,資金流出,三大法人買賣超,產業輪動,熱力圖,盤後數據,JellyStock" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://jellystockdata.com/stock_site/tools/sector_heatmap.html" />
+  <link rel="icon" type="image/png" href="/images/jelly.png"/>
+  <link rel="stylesheet" href="/stock_site/assets/site.css?v=2026-08-29" />
+  <style>
+    /* sector_heatmap.html 專屬元件（顏色一律走 site.css token） */
+    :root {
+      --in:  var(--up);     /* 資金流入 → 紅（台股慣例） */
+      --out: var(--down);   /* 資金流出 → 綠 */
+    }
+
+    .app { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
+
+    /* ── 頁首 ── */
+    .sh-head { margin-bottom: 14px; }
+    .sh-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--ink); line-height: 1.3; }
+    .sh-sub { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: 6px; letter-spacing: .02em; }
+    .sh-date { color: var(--accent); }
+
+    /* ── 使用說明（可收合）── */
+    .guide { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+    .guide-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; background: var(--surface-2); }
+    .guide-head:hover { background: var(--accent-soft); }
+    .guide-ico { font-size: 1rem; }
+    .guide-ttl { flex: 1; font-family: var(--font-display); font-weight: 700; color: var(--ink); font-size: .92rem; }
+    .guide-tgl { font-family: var(--font-mono); font-size: .66rem; color: var(--accent); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; background: var(--surface); }
+    .guide-body { max-height: 1200px; overflow: hidden; transition: max-height .3s ease; }
+    .guide-body.collapsed { max-height: 0; }
+    .guide-inner { padding: 14px 18px; font-size: .85rem; color: var(--ink-body); line-height: 1.8; }
+    .guide-inner b { color: var(--ink); }
+    .guide-inner .g-in  { color: var(--in);  font-weight: 700; }
+    .guide-inner .g-out { color: var(--out); font-weight: 700; }
+    .guide-inner ul { margin: 8px 0 0; padding-left: 18px; }
+    .guide-inner li { margin: 3px 0; }
+
+    /* ── 狀態橫幅 ── */
+    .sh-banner {
+      display: none; align-items: center; gap: 14px;
+      background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--radius-lg);
+      padding: 16px 20px; margin-bottom: 14px;
+    }
+    .sh-banner .rb-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .sh-banner .rb-title { font-family: var(--font-display); font-weight: 700; color: var(--ink); font-size: .98rem; margin-bottom: 3px; }
+    .sh-banner .rb-desc { font-size: .84rem; color: var(--ink-body); line-height: 1.7; }
+    .sh-banner.pending { align-items: flex-start; background: var(--orange-soft); border-color: #ecdcc8; }
+    .sh-banner.pending .rb-icon { font-size: 1.4rem; margin-top: 1px; }
+    .sh-banner.pending .rb-title { color: var(--orange); }
+
+    /* ── 卡片外框 ── */
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+    .card-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); flex-wrap: wrap; }
+    .card-label { font-family: var(--font-mono); font-size: .72rem; color: var(--accent); letter-spacing: .05em; }
+    .card-legend { display: flex; gap: 14px; }
+    .lg-item { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: .68rem; color: var(--ink-body); }
+    .lg-dot { width: 11px; height: 11px; border-radius: 3px; }
+    .lg-dot.in  { background: color-mix(in srgb, var(--in) 45%, transparent);  border: 1.5px solid var(--in); }
+    .lg-dot.out { background: color-mix(in srgb, var(--out) 45%, transparent); border: 1.5px solid var(--out); }
+
+    /* ── 熱力圖網格 ── */
+    .hm-grid {
+      display: grid; gap: 6px; padding: 14px 16px;
+      grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    }
+    .hm-tile {
+      border: 1px solid var(--line); border-radius: var(--radius-sm);
+      padding: 10px 11px 11px; background: var(--surface-2);
+      display: flex; flex-direction: column; gap: 3px; min-height: 92px;
+    }
+    .hm-name { font-family: var(--font-display); font-weight: 700; font-size: .92rem; color: var(--ink); line-height: 1.25; }
+    .hm-amt { font-family: var(--font-mono); font-weight: 700; font-size: .84rem; }
+    .hm-amt.in  { color: var(--in); }
+    .hm-amt.out { color: var(--out); }
+    .hm-amt.flat { color: var(--ink-faint); }
+    .hm-share { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-soft); }
+    .hm-badge {
+      margin-top: 2px; align-self: flex-start;
+      font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .02em;
+      border-radius: 999px; padding: 2px 8px;
+    }
+    .hm-badge.in  { background: color-mix(in srgb, var(--in) 14%, transparent);  color: var(--in);  border: 1px solid color-mix(in srgb, var(--in) 40%, transparent); }
+    .hm-badge.out { background: color-mix(in srgb, var(--out) 14%, transparent); color: var(--out); border: 1px solid color-mix(in srgb, var(--out) 40%, transparent); }
+
+    .hm-empty { padding: 40px 20px; text-align: center; color: var(--ink-faint); font-size: .88rem; line-height: 1.7; }
+
+    /* ── 連續榜（雙欄）── */
+    .streak-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .streak-card .card-toolbar { border-bottom: 1px solid var(--line); }
+    .streak-ttl-in  { color: var(--in); }
+    .streak-ttl-out { color: var(--out); }
+    .streak-list { padding: 4px 0; }
+    .streak-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 10px; row-gap: 3px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+    .streak-row:last-child { border-bottom: 0; }
+    .streak-row:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+    .streak-name { font-family: var(--font-display); font-weight: 700; font-size: .92rem; color: var(--ink); }
+    .streak-days { font-family: var(--font-mono); font-size: .74rem; font-weight: 700; }
+    .streak-days.in  { color: var(--in); }
+    .streak-days.out { color: var(--out); }
+    .streak-meta { grid-column: 1 / 3; font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft); }
+    .streak-empty { padding: 22px 16px; text-align: center; color: var(--ink-faint); font-size: .82rem; line-height: 1.7; }
+
+    .foot-note { font-size: .78rem; color: var(--ink-faint); line-height: 1.75; margin-top: 4px; }
+
+    @media (max-width: 640px) {
+      .sh-title { font-size: 1.2rem; }
+      .hm-grid { grid-template-columns: repeat(auto-fill, minmax(46%, 1fr)); gap: 6px; }
+      .streak-wrap { grid-template-columns: 1fr; }
+      .card-legend { width: 100%; }
+    }
+    .btn-back { white-space: nowrap; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">跳至主要內容</a>
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-icon"><img src="/images/jelly.png" alt="JellyStock" onerror="this.style.display='none'" width="40" height="40"/></div>
+      <div>
+        <div class="logo-text">JellyStock</div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a class="btn-back" href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回首頁
+    </a>
+  </div>
+</header>
+
+<div class="app" id="main-content">
+
+  <h1 class="visually-hidden">類股資金流向熱力圖 — 上市＋上櫃整合，三大法人淨買超金額按產業別加總，呈現當日各類股資金流入／流出強度與連續天數</h1>
+
+  <div class="sh-head">
+    <div class="sh-title">類股資金流向熱力圖</div>
+    <div class="sh-sub" id="shSub">資料載入中…</div>
+  </div>
+
+  <div class="guide" id="guide">
+    <div class="guide-head" onclick="toggleGuide()">
+      <span class="guide-ico">📖</span>
+      <span class="guide-ttl">使用說明</span>
+      <span class="guide-tgl" id="guideTgl">展開 ▼</span>
+    </div>
+    <div class="guide-body collapsed" id="guideBody">
+      <div class="guide-inner">
+        這張圖把<b>上市＋上櫃</b>所有個股，依<b>產業別</b>分成約 30 個類股，計算每個類股當天的
+        「三大法人（外資＋投信＋自營商）<b>淨買超金額</b>」＝該類股每檔（淨買超股數 × 當日收盤價）加總。
+        <br><br>
+        <b>今日佔比</b>＝該類股淨買賣超金額 ÷ <b>當天全部類股淨買賣超金額的絕對值總和</b>，
+        可以理解成「今天法人的資金，有多少比例集中在這個類股」。
+        <span class="g-in">正值（紅）＝資金流入</span>、<span class="g-out">負值（綠）＝資金流出</span>，
+        顏色越深代表當天佔比越高。
+        <ul>
+          <li><b>連N天流入 / 連N天流出</b>：比對最近 3 個交易日，方向都相同才算連續，最多顯示到「連 3 天」。</li>
+          <li>下方兩張榜列出<b>連續 2 天以上</b>同方向的類股，並附這段期間的累計金額與累計佔比。</li>
+          <li>成分股較少的類股（如造紙、玻璃陶瓷），單一個股的大額買賣就可能主導整個類股，判讀時請留意。</li>
+        </ul>
+        買賣超金額＝（外資＋投信＋自營商 淨買賣股數）×當日收盤價，為概算值；官方「外資」為外陸資（不含外資自營商）。
+        資料僅涵蓋 4 碼代號的上市／上櫃個股（不含權證、ETF）。每個交易日 <b>18:00</b> 後更新。
+      </div>
+    </div>
+  </div>
+
+  <div class="sh-banner" id="shBanner" aria-live="polite">
+    <div class="rb-icon" id="shBannerIcon">⏳</div>
+    <div>
+      <div class="rb-title" id="shBannerTitle">資料準備中</div>
+      <div class="rb-desc" id="shBannerDesc"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-toolbar">
+      <span class="card-label">▸ 今日類股資金流向（佔當日法人淨買賣超總量）</span>
+      <div class="card-legend">
+        <span class="lg-item"><span class="lg-dot in"></span>資金流入</span>
+        <span class="lg-item"><span class="lg-dot out"></span>資金流出</span>
+      </div>
+    </div>
+    <div class="hm-grid" id="hmGrid" aria-live="polite">
+      <div class="hm-empty">載入中…</div>
+    </div>
+  </div>
+
+  <div class="streak-wrap">
+    <div class="card streak-card">
+      <div class="card-toolbar">
+        <span class="card-label streak-ttl-in">▸ 資金連續流入</span>
+      </div>
+      <div class="streak-list" id="inflowList">
+        <div class="streak-empty">載入中…</div>
+      </div>
+    </div>
+    <div class="card streak-card">
+      <div class="card-toolbar">
+        <span class="card-label streak-ttl-out">▸ 資金連續流出</span>
+      </div>
+      <div class="streak-list" id="outflowList">
+        <div class="streak-empty">載入中…</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot-note" id="shFootNote"></p>
+
+</div>
+
+<footer>
+  <div class="footer-disclaimer">
+    <div class="footer-disclaimer-top">
+      <div class="footer-disclaimer-title">【 資料來源與免責聲明 】</div>
+      <div class="footer-brand">
+        <div class="footer-brand-name">盤後雷達</div>
+        <div class="footer-brand-sub">© 2026 JellyStock</div>
+      </div>
+    </div>
+    <p class="footer-disclaimer-text">⚠️ 本站為獨立開發之非官方網站，與臺灣證券交易所（TWSE）、櫃買中心（TPEx）及任何官方機構無任何關聯或授權。資料來源為上述機構之公開資訊，僅供參考，不構成任何投資建議。本站不保證資料之即時性與正確性，亦不對因使用本站資訊所致之任何損失負任何責任，使用者應自行審慎判斷並承擔投資風險。</p>
+    <div class="footer-legal-links">
+      <a href="/stock_site/legal/about.html">關於本站</a>
+      <span class="footer-sep">·</span>
+      <a href="/stock_site/legal/privacy.html">隱私政策</a>
+      <span class="footer-sep">·</span>
+      <a href="/stock_site/legal/disclaimer.html">免責聲明</a>
+      <span class="footer-sep">·</span>
+      <a href="https://mail.google.com/mail/?view=cm&to=llowoll5566@gmail.com" target="_blank" rel="noopener noreferrer">聯絡我們</a>
+      <span class="footer-sep">·</span>
+      <a href="https://www.facebook.com/share/1BXgFFBvrU/" target="_blank" rel="noopener noreferrer" class="footer-fb-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>官方粉絲團
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ── 今日盤後資料未就緒：倒數 + 到點後輪詢 ──
+   類股資金流向於每個交易日 18:00 後（後端關卡）才開放。
+   倒數只跑本地計時、不打網路；歸零後才每 90 秒輪詢一次，資料到齊即停。 */
+const UPDATE_HH = 18, UPDATE_MM = 0;
+const POLL_MS = 90000;
+let _pollTimer = null, _pendTick = null;
+const twNow = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+function secsToUpdate(){
+  const t = twNow(), tgt = new Date(t);
+  tgt.setHours(UPDATE_HH, UPDATE_MM, 0, 0);
+  return Math.floor((tgt - t) / 1000);
+}
+function fmtHMS(s){
+  s = Math.max(0, s);
+  const p = n => String(n).padStart(2, '0');
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return (h > 0 ? h + ':' : '') + p(m) + ':' + p(s % 60);
+}
+function clearPending(){
+  clearInterval(_pendTick); clearTimeout(_pollTimer);
+  _pendTick = _pollTimer = null;
+}
+
+function toggleGuide(){
+  const b = $('guideBody'), collapsed = b.classList.toggle('collapsed');
+  $('guideTgl').textContent = collapsed ? '展開 ▼' : '收合 ▲';
+}
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const fmtAmt = v => {
+  const a = Math.abs(v);
+  const s = a >= 100 ? a.toFixed(0) : a.toFixed(1);
+  return (v > 0 ? '+' : v < 0 ? '−' : '') + s;
+};
+
+/* 台股慣例：資金流入 → 紅、資金流出 → 綠 */
+const RGB = { in: [198, 40, 40], out: [23, 128, 90] };
+
+function showBanner(icon, title, desc, variant){
+  $('shBannerIcon').textContent = icon;
+  $('shBannerTitle').textContent = title;
+  $('shBannerDesc').innerHTML = desc;
+  $('shBanner').className = 'sh-banner' + (variant ? ' ' + variant : '');
+  $('shBanner').style.display = 'flex';
+}
+function hideBanner(){ $('shBanner').style.display = 'none'; $('shBanner').className = 'sh-banner'; }
+
+/* ── 載入資料 ── */
+async function load(){
+  hideBanner();
+  clearPending();
+
+  let j;
+  try{
+    const r = await fetch('/api/sector_heatmap', { cache: 'no-store' });
+    j = await r.json();
+  }catch(e){
+    $('hmGrid').innerHTML = '<div class="hm-empty">資料載入失敗，請稍後再試。</div>';
+    $('inflowList').innerHTML = $('outflowList').innerHTML = '<div class="streak-empty">資料載入失敗</div>';
+    return;
+  }
+
+  if(j.status === 'waiting'){
+    showNotReady();
+    return;
+  }
+
+  if(j.status !== 'ok' || !j.tiles || !j.tiles.length){
+    const msg = j.message || '目前查無資料';
+    $('shSub').textContent = msg;
+    $('hmGrid').innerHTML = `<div class="hm-empty">${msg}</div>`;
+    $('inflowList').innerHTML = $('outflowList').innerHTML = `<div class="streak-empty">${msg}</div>`;
+    $('shFootNote').textContent = '';
+    return;
+  }
+
+  const mkt = (j.markets || []);
+  const mktTxt = mkt.length === 2 ? '上市＋上櫃'
+              : mkt.includes('twse') ? '僅上市（上櫃資料尚未就緒）'
+              : mkt.includes('otc') ? '僅上櫃' : '';
+  $('shSub').innerHTML =
+    `<span class="sh-date">資料日期 ${j.trade_date || '—'}</span>　·　${mktTxt}　·　共 ${j.tiles.length} 個類股`;
+
+  if(j.is_trading_day === false){
+    showBanner('🗂️', '交易所今日休市',
+      `以下為最近一個交易日 <strong>${j.trade_date || ''}</strong> 的類股資金流向。`);
+  }
+
+  renderHeatmap(j.tiles);
+  renderStreak('inflowList', j.inflow, 'in');
+  renderStreak('outflowList', j.outflow, 'out');
+
+  const dayTxt = (j.days || []).join('、');
+  $('shFootNote').textContent =
+    `連續天數以最近交易日 ${dayTxt || j.trade_date} 為準比對；上線初期歷史累積未滿 3 天時，最多顯示到已累積的天數。`;
+}
+
+/* ── 今日盤後數據尚未更新 ── */
+function showNotReady(){
+  clearPending();
+  $('shSub').textContent = '今日盤後數據尚未更新';
+  showBanner('⏳', '今日盤後數據尚未更新',
+    '類股資金流向於每個交易日盤後約 <strong>18:00</strong> 更新，'
+    + '距離更新還有 <strong id="shCountdown" aria-hidden="true">--:--</strong>。<br>'
+    + '到時間後畫面會自動載入，你也可以稍後自行重新整理。',
+    'pending');
+  $('hmGrid').innerHTML = '<div class="hm-empty">今日盤後數據尚未更新，請於 18:00 後再回來查看</div>';
+  $('inflowList').innerHTML = $('outflowList').innerHTML =
+    '<div class="streak-empty">今日盤後數據尚未更新，請稍候</div>';
+  $('shFootNote').textContent = '';
+
+  tickPending();
+  _pendTick = setInterval(tickPending, 1000);
+}
+function tickPending(){
+  const s = secsToUpdate();
+  const el = $('shCountdown');
+  if(el) el.textContent = s > 0 ? fmtHMS(s) : '資料更新中…';
+  if(s <= 0 && !_pollTimer) _pollTimer = setTimeout(load, POLL_MS);
+}
+
+/* ── 熱力圖 ── */
+function renderHeatmap(tiles){
+  const maxAbs = Math.max(0.0001, ...tiles.map(t => Math.abs(t.share)));
+  $('hmGrid').innerHTML = tiles.map(t => {
+    const dir = t.amt > 0 ? 'in' : t.amt < 0 ? 'out' : 'flat';
+    const rgb = t.amt > 0 ? RGB.in : t.amt < 0 ? RGB.out : null;
+    const alpha = rgb ? (0.10 + 0.62 * clamp(Math.abs(t.share) / maxAbs, 0, 1)) : 0;
+    const bg = rgb ? `background:rgba(${rgb},${alpha.toFixed(3)});` : '';
+    const shareTxt = (t.share > 0 ? '+' : t.share < 0 ? '−' : '') + Math.abs(t.share).toFixed(2) + '%';
+    let badge = '';
+    if(t.streak >= 2 && t.direction !== 0){
+      const bd = t.direction === 1 ? 'in' : 'out';
+      const bt = t.direction === 1 ? '流入' : '流出';
+      badge = `<span class="hm-badge ${bd}">連${t.streak}天${bt}</span>`;
+    }
+    return `<div class="hm-tile" style="${bg}">
+      <span class="hm-name">${t.name}</span>
+      <span class="hm-amt ${dir}">${fmtAmt(t.amt)} 億</span>
+      <span class="hm-share">佔當日 ${shareTxt}</span>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+/* ── 連續流入 / 流出榜 ── */
+function renderStreak(elId, list, side){
+  const box = $(elId);
+  if(!list || !list.length){
+    box.innerHTML = `<div class="streak-empty">目前沒有連續 2 天以上資金${side === 'in' ? '流入' : '流出'}的類股。</div>`;
+    return;
+  }
+  box.innerHTML = list.map(t => {
+    const word = side === 'in' ? '流入' : '流出';
+    return `<div class="streak-row">
+      <span class="streak-name">${t.name}</span>
+      <span class="streak-days ${side}">連 ${t.streak} 天${word}</span>
+      <span class="streak-meta">累計 ${fmtAmt(t.cum_amt)} 億 · 佔同期 ${Math.abs(t.cum_share).toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+}
+
+load();
+</script>
+</body>
+</html>

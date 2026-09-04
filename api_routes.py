@@ -117,6 +117,10 @@ def register_api(app):
     def ads_txt():
         return send_from_directory('.', 'ads.txt', mimetype='text/plain')
 
+    @app.route("/robots.txt")
+    def robots_txt():
+        return send_from_directory('.', 'robots.txt', mimetype='text/plain')
+
     # ── Sitemap：動態產生，每日更新型頁面自動帶入今天日期 ────────────────────
     # 「daily」的頁面 lastmod 每次請求都算成今天（Asia/Taipei），
     # 其餘教學文章/法律頁面維持固定日期（因為內容本來就不常變動）。
@@ -127,6 +131,7 @@ def register_api(app):
         ("/stock_site/tools/twse_top100.html",              "daily",   "0.9", True,  None),
         ("/stock_site/tools/otc_top100.html",               "daily",   "0.9", True,  None),
         ("/stock_site/tools/fund_flow.html",                "daily",   "0.8", True,  None),
+        ("/stock_site/tools/sector_heatmap.html",           "daily",   "0.8", True,  None),
         ("/stock_site/news/disposal.html",                  "daily",   "0.7", True,  None),
         ("/stock_site/news/news.html",                      "daily",   "0.7", True,  None),
         ("/stock_site/news/notice.html",                    "daily",   "0.7", True,  None),
@@ -844,6 +849,45 @@ def register_api(app):
         except Exception as e:
             print(f"[api/fund_flow] 錯誤: {e}")
             return jsonify({"status": "error", "message": "資料讀取失敗，請稍後再試。"}), 500
+
+    # ── 類股資金流向熱力圖 頁面 ────────────────────────────────────────────────
+    @app.route("/stock_site/tools/sector_heatmap.html")
+    def page_sector_heatmap():
+        return send_from_directory('stock_site/tools', 'sector_heatmap.html')
+
+    # ── 類股資金流向熱力圖 資料 API ───────────────────────────────────────────
+    # 上市＋上櫃整合：三大法人（外資＋投信＋自營商）淨買超金額按產業別加總，
+    #   佔比分母 = 當日全部類股淨買賣超金額絕對值總和。
+    #   讀 sector_flow_history 最近 3 個交易日 → 算連續流入/流出天數。
+    #   交易日 18:00 前回 waiting；今日快照未產生時 build_heatmap_payload 會現場補算。
+    #   preview=1：略過 18:00 關卡（測試 / 上線複查用）。
+    @app.route("/api/sector_heatmap")
+    def api_sector_heatmap():
+        from sector_flow import build_heatmap_payload
+
+        preview = request.args.get("preview") == "1"
+        now_tp  = datetime.datetime.now(ZoneInfo("Asia/Taipei"))
+        try:
+            trading = is_trading_day()
+        except Exception:
+            trading = now_tp.weekday() < 5
+
+        if trading and now_tp.hour < 18 and not preview:
+            return jsonify({
+                "status": "waiting",
+                "is_trading_day": True,
+                "open_hh": 18, "open_mm": 0,
+                "message": "今日盤後數據尚未更新",
+            })
+
+        try:
+            payload = build_heatmap_payload()
+            payload["is_trading_day"] = trading
+            return jsonify(payload)
+        except Exception as e:
+            print(f"[api/sector_heatmap] 錯誤: {e}")
+            return jsonify({"status": "error",
+                            "message": "資料讀取失敗，請稍後再試。"}), 500
 
     # ── 個股查詢 API ───────────────────────────────────────────────────────────
     @app.route("/api/stock")
