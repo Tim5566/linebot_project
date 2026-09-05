@@ -21,6 +21,7 @@
   </script>
   <link rel="icon" type="image/png" href="/images/jelly.png" />
   <link rel="apple-touch-icon" href="/images/jelly.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#e8ebf1" />
   <meta name="description" content="JellyStock 盤後雷達｜台股即時法人追蹤，查詢外資、投信、自營商每日買賣超排行，大盤融資金額、借券賣出等盤後數據，資料來源 TWSE / TPEx 官方 API，每日自動更新。" />
@@ -6737,6 +6738,15 @@ setTimeout(() => {
   </div>
 </div>
 
+<script>
+  // 註冊 service worker：只用來讓網站符合「加到主畫面」/ App 殼安裝條件，
+  // 並在離線時顯示友善提示頁，不快取任何盤後資料。
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 
 </body>
 </html>

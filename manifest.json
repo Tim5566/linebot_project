@@ -1,0 +1,31 @@
+{
+  "name": "JellyStock｜台股即時法人追蹤",
+  "short_name": "JellyStock",
+  "description": "台股法人買賣超、注意股/處置股查詢，盤後數據每日自動更新",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#e8ebf1",
+  "theme_color": "#e8ebf1",
+  "lang": "zh-Hant-TW",
+  "icons": [
+    {
+      "src": "/stock_site/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/stock_site/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/stock_site/assets/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

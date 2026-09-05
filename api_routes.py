@@ -121,6 +121,21 @@ def register_api(app):
     def robots_txt():
         return send_from_directory('.', 'robots.txt', mimetype='text/plain')
 
+    # ── PWA / App 殼相關（manifest + service worker + 離線提示頁）───────────────
+    @app.route("/manifest.json")
+    def pwa_manifest():
+        return send_from_directory('.', 'manifest.json', mimetype='application/manifest+json')
+
+    @app.route("/sw.js")
+    def service_worker():
+        response = send_from_directory('.', 'sw.js', mimetype='application/javascript')
+        response.headers['Cache-Control'] = 'no-cache'
+        return response
+
+    @app.route("/offline.html")
+    def offline_page():
+        return send_from_directory('.', 'offline.html')
+
     # ── Sitemap：動態產生，每日更新型頁面自動帶入今天日期 ────────────────────
     # 「daily」的頁面 lastmod 每次請求都算成今天（Asia/Taipei），
     # 其餘教學文章/法律頁面維持固定日期（因為內容本來就不常變動）。

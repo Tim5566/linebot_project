@@ -48,6 +48,9 @@
 ├── get_trading_holidays.py     # 判斷今天是否為交易日（含休市日快取）
 ├── index.html                  # 網站首頁（根目錄，AdSense 程式碼已埋）
 ├── linebot_test.py             # 【入口檔】Flask app 啟動點 + LINE webhook 處理
+├── manifest.json                # PWA Web App Manifest（見第 10 節）
+├── sw.js                       # PWA Service Worker，只做離線提示、不快取盤後資料（見第 10 節）
+├── offline.html                # Service Worker 離線時顯示的友善提示頁
 ├── post_Info.py                # 【核心】組裝查詢結果文字（給 LINE Bot 回覆 & 網頁用）
 ├── Procfile                    # Render 部署啟動指令（gunicorn）
 ├── push_service.py             # 【核心】排程廣播邏輯（幾點該做什麼、該推播什麼）
@@ -61,7 +64,8 @@
 │   └── jellystock-runtime-architecture.html  # 執行動態架構圖（archify 產出的獨立 HTML，可切深/淺色、匯出 PNG/SVG）
 └── stock_site/                 # 【前端頁面】依功能分資料夾
     ├── assets/
-    │   └── site.css           # 【全站共用樣式】設計 token + 共用元件，改風格改這一處
+    │   ├── site.css            # 【全站共用樣式】設計 token + 共用元件，改風格改這一處
+    │   └── icons/               # PWA / App 圖示（icon-192.png、icon-512.png、icon-512-maskable.png，由 images/jelly.png 產生）
     ├── tools/                  # 資料查詢工具頁
     │   ├── twse_top100.html    # 上市法人買賣超前100
     │   ├── otc_top100.html     # 上櫃法人買賣超前100
@@ -154,7 +158,9 @@ def twse_top100_page():
 def serve_stock_assets(filename):
     return send_from_directory('stock_site/assets', filename)
 ```
-目前只服務 `site.css`（全站共用樣式表）。
+目前服務 `site.css`（全站共用樣式表）與 `icons/` 底下的 PWA 圖示。
+
+另有 PWA 相關的根目錄靜態檔路由（見第 10 節）：`/manifest.json`、`/sw.js`、`/offline.html`。
 
 **(b) API 路由**（前端 JS 用 fetch 呼叫，回傳 JSON），主要端點：
 
@@ -467,3 +473,42 @@ SYNC_SECRET=                  # /api/sync_test 等內部端點的驗證 token
 9. **教學章節大標題語意標籤已統一**：原本約 14 個章節用 `<div class="hero-title">`，
    已全部改為 `<h1 class="hero-title">`（每頁一個 `<h1>`，SEO / 無障礙）。其餘章節本來
    就是 `<h1>`。
+
+---
+
+## 10. PWA / Android App 殼（TWA）
+
+**目標**：讓網站可以被包裝成一個 Android App 上架 Google Play，但 App 內容 100% 即時
+載入正式網站——**以後網站改版/加功能，App 完全不用重新包版、不用重新送審**。只規劃
+Android（Google Play），目前不做 iOS App Store（純 WebView 包殼在 iOS 上架審查較嚴，
+容易被判定功能單薄退件）。
+
+**技術路線**：PWA（Progressive Web App）→ TWA（Trusted Web Activity）。TWA 本質是一個
+全螢幕 Chrome 分頁直接載入 `https://jellystockdata.com`，不是重寫一份 App 邏輯。
+
+**目前狀態（2026/09）**：已完成網站端 PWA 基礎，尚未包裝上架。
+
+- `manifest.json`（根目錄，路由 `/manifest.json`）：Web App Manifest，`start_url` /
+  `scope` 皆設為 `/`，`display: standalone`。
+- `sw.js`（根目錄，路由 `/sw.js`，回應帶 `Cache-Control: no-cache` 避免版本卡住）：
+  Service Worker，**只攔截整頁導覽請求（`navigate`）做離線 fallback，刻意不快取任何
+  法人買賣超/股價等資料頁面或 API 回應**——這些資料一律以 Firebase 即時同步為準，
+  快取舊資料會誤導使用者，違反第 5 節資料正確性原則。
+- `offline.html`（根目錄，路由 `/offline.html`）：離線時顯示的友善提示頁（`noindex`，
+  非 SEO 內容頁）。
+- `stock_site/assets/icons/`：`icon-192.png`、`icon-512.png`（一般用途）、
+  `icon-512-maskable.png`（Android 自適應圖示用，中央安全區 60%＋機構藍底
+  `#e8ebf1`），皆由 `images/jelly.png` 去背圖產生。
+- `index.html` `<head>` 加 `<link rel="manifest">`，`</body>` 前加極短 script 註冊
+  `sw.js`。**其餘頁面尚未加註冊**（安裝條件只需首頁具備即可，其他頁面之後有需要再加）。
+
+**尚未做、需要人工操作的後續步驟**（不在程式碼範圍內）：
+1. 用 PWABuilder（https://www.pwabuilder.com）貼上正式網址，產生 Android 簽署套件
+   （`.aab`）與簽署憑證 SHA-256 指紋。
+2. 依該指紋在網站新增 `/.well-known/assetlinks.json` 驗證檔（證明 App 與網域同一
+   擁有者，TWA 上架必要條件；指紋產生後才能寫，目前尚未新增此路由/檔案）。
+3. 申請 Google Play 開發者帳號（一次性 US$25）並上傳 `.aab`。
+
+**已知限制**：Android Play 商店對「純 WebView 包殼」有基本門檻（政策 4.4 Minimum
+Functionality），目前 `sw.js` 的離線提示頁已提供最基本的「感覺像 App」element，若上架
+審查卡關可能還需要補其他原生感功能（例如下拉刷新）。

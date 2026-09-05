@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#e8ebf1" />
+  <title>目前無法連線 - JellyStock</title>
+  <link rel="icon" type="image/png" href="/images/jelly.png" />
+  <link rel="stylesheet" href="/stock_site/assets/site.css?v=2026-08-29" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 24px;
+    }
+    .offline-box { max-width: 420px; }
+    .offline-box img { width: 72px; height: 72px; margin-bottom: 16px; }
+    .offline-box h1 { font-size: 1.25rem; margin-bottom: 8px; }
+    .offline-box p { color: var(--text-muted, #666); margin-bottom: 20px; }
+    .offline-box button {
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      background: var(--brand, #2d5be3);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-box" id="main-content">
+    <img src="/images/jelly.png" alt="JellyStock" />
+    <h1>目前無法連線</h1>
+    <p>請檢查網路連線後重新整理，或稍後再試一次。</p>
+    <button onclick="location.reload()">重新整理</button>
+  </div>
+</body>
+</html>
